@@ -154,7 +154,7 @@ TypeArguments =
   ;
 
 'terminal name' =
-  <(['] (!['] @TERMINAL_CHAR)+ ['])> @SPACING
+  <['] (!['] @TERMINAL_CHAR)+ [']> @SPACING
   ;
 
 'sub terminal name' =
