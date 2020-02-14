@@ -1,11 +1,11 @@
 peg2
 =======
 
-PEG+ (Parsing expression grammar) parser generator.
+PEG+ (Parsing expression grammar) parser generator.  
 
-Version 0.0.1-beta
+Version 0.0.1-beta  
 
-Warnings:
+Warnings:  
 This software is under development.  
 There is currently no instruction available.  
 This software does not contain public APIs because it is a tool (utility).  
