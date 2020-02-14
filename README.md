@@ -6,14 +6,14 @@ PEG+ (Parsing expression grammar) parser generator.
 Version 0.0.1-beta
 
 Warnings:
-This software is under development.
-There is currently no instruction available.
-This software does not contain public APIs because it is a tool (utility).
+This software is under development.  
+There is currently no instruction available.  
+This software does not contain public APIs because it is a tool (utility).  
 
-This is not a pure PEG (Parsing expression grammar).
-This is a slightly modified (extended) version of PEG with support for nonterminal, terminal and subterminal symbols.
+This is not a pure PEG (Parsing expression grammar).  
+This is a slightly modified (extended) version of PEG with support for nonterminal, terminal and subterminal symbols.  
 
-Example of grammar:
+Example of grammar:  
 
 ```
 # Globals
@@ -150,23 +150,23 @@ TypeArguments =
 # Terminals
 
 'non terminal name' =
-  i:@IDENTIFIER @SPACING
+  @IDENTIFIER @SPACING
   ;
 
 'terminal name' =
-  n:<(['] (!['] @TERMINAL_CHAR)+ ['])> @SPACING
+  <(['] (!['] @TERMINAL_CHAR)+ ['])> @SPACING
   ;
 
 'sub terminal name' =
-  i:<[@] @IDENTIFIER> @SPACING
+  <[@] @IDENTIFIER> @SPACING
   ;
 
 'semantic value' =
-  i:@IDENTIFIER ":"
+  @IDENTIFIER ":"
   ;
 
 'type name' =
-  i:@IDENTIFIER @SPACING
+  @IDENTIFIER @SPACING
   ;
 
 ';' =
@@ -281,7 +281,7 @@ int
   ;
 
 @IDENTIFIER =
-  i:<@IDENT_START @IDENT_CONT*>
+  <@IDENT_START @IDENT_CONT*>
   ;
 
 @IDENT_CONT =

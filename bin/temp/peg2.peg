@@ -94,7 +94,7 @@ OrderedChoiceExpression Expression =
   ;
 
 SequenceExpression Sequence =
-  e:Prefix+  a:'action'? { $$ = SequenceExpression(e, a); }
+  e:Prefix+ a:'action'? { $$ = SequenceExpression(e, a); }
   ;
 
 Expression Prefix =
