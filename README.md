@@ -1,0 +1,330 @@
+peg2
+=======
+
+PEG+ (Parsing expression grammar) parser generator.
+
+Version 0.0.1-beta
+
+Warnings:
+This software is under development.
+There is currently no instruction available.
+This software does not contain public APIs because it is a tool (utility).
+
+This is not a pure PEG (Parsing expression grammar).
+This is a slightly modified (extended) version of PEG with support for nonterminal, terminal and subterminal symbols.
+
+Example of grammar:
+
+```
+# Globals
+
+%{
+import 'package:peg2/grammar.dart';
+import 'package:peg2/expressions.dart';
+
+int _escape(int c) {
+  switch(c) {
+    case 110:
+     return 0xA;
+    case 114:
+      return 0xD;
+    case 116:
+      return 0x9;
+  }
+
+  return c;
+}
+
+Expression _prefix(String prefix, Expression expression, String variable) {
+  switch (prefix) {
+    case '&':
+     expression = AndPredicateExpression(expression);
+     break;
+    case '!':
+     expression = NotPredicateExpression(expression);
+     break;
+  }
+
+  expression.variable = variable;
+  return expression;
+}
+
+Expression _suffix(String suffix, Expression expression) {
+  switch (suffix) {
+    case '?':
+      return OptionalExpression(expression);
+    case '*':
+      return  ZeroOrMoreExpression(expression);
+    case '+':
+      return OneOrMoreExpression(expression);
+  }
+
+  return expression;
+}
+}%
+
+# Nonterminals
+
+Grammar Grammar =
+  'leading spaces'? g:'globals'? m:'members'? d:Definition+ 'end of file' { $$ = Grammar(d, g, m); }
+  ;
+
+Definition =
+  NonterminalDefinition
+  / TerminalDefinition
+  / SubterminalDefinition
+  ;
+
+ProductionRule NonterminalDefinition =
+  t:Type n:'non terminal name' '=' e:NonterminalExpression ';' { $$ = ProductionRule(n, ProductionRuleKind.Nonterminal, e, t); }
+  / n:'non terminal name' '=' e:NonterminalExpression ';' { $$ = ProductionRule(n, ProductionRuleKind.Nonterminal, e, null); }
+  ;
+
+OrderedChoiceExpression NonterminalExpression =
+  e:NonterminalSequence n:('/' e:NonterminalSequence)* { $$ = OrderedChoiceExpression([e, ...n]); }
+  ;
+
+SequenceExpression NonterminalSequence =
+  e:NonterminalPrefix+ a:'action'? { $$ = SequenceExpression(e, a); }
+  ;
+
+Expression NonterminalPrefix =
+  s:'semantic value'? p:('&' / '!')? e:NonterminalSuffix { $$ = _prefix(p, e, s); }
+  ;
+
+Expression NonterminalSuffix =
+  e:NonterminalPrimary s:('?' / '*' / '+')? { $$ = _suffix(s, e); }
+  ;
+
+Expression NonterminalPrimary =
+  n:'non terminal name' { $$ = NonterminalExpression(n); }
+  / n:'terminal name' { $$ = TerminalExpression(n); }
+  / '(' e:NonterminalExpression ')'
+  ;
+
+ProductionRule TerminalDefinition =
+  t:Type n:'terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.Terminal, e, t); }
+  / n:'terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.Terminal, e, null); }
+  ;
+
+OrderedChoiceExpression Expression =
+  e:Sequence n:('/' e:Sequence)* { $$ = OrderedChoiceExpression([e, ...n]); }
+  ;
+
+SequenceExpression Sequence =
+  e:Prefix+ a:'action'? { $$ = SequenceExpression(e, a); }
+  ;
+
+Expression Prefix =
+  s:'semantic value'? p:('&' / '!')? e:Suffix { $$ = _prefix(p, e, s); }
+  ;
+
+Expression Suffix =
+  e:Primary s:('?' / '*' / '+')? { $$ = _suffix(s, e); }
+  ;
+
+Expression Primary =
+  n:'sub terminal name' { $$ = SubterminalExpression(n); }
+  / '(' e:Expression ')'
+  / 'literal'
+  / 'character class'
+  / '.' { $$ = AnyCharacterExpression(); }
+  / '<' e:Expression '>' { $$ = CaptureExpression(e); }
+  ;
+
+ProductionRule SubterminalDefinition =
+  t:Type n:'sub terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.Subterminal, e, t); }
+  / n:'sub terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.Subterminal, e, null); }
+  ;
+
+String
+Type =
+  n:'type name' a:('<' a:TypeArguments '>')? { $$ = n + (a == null ? '' : '<' + a.join(', ') + '>'); }
+  ;
+
+List<String>
+TypeArguments =
+  t:Type n:(',' t:Type)* { $$ = [t, ...n]; }
+  ;
+
+# Terminals
+
+'non terminal name' =
+  i:@IDENTIFIER @SPACING
+  ;
+
+'terminal name' =
+  n:<(['] (!['] @TERMINAL_CHAR)+ ['])> @SPACING
+  ;
+
+'sub terminal name' =
+  i:<[@] @IDENTIFIER> @SPACING
+  ;
+
+'semantic value' =
+  i:@IDENTIFIER ":"
+  ;
+
+'type name' =
+  i:@IDENTIFIER @SPACING
+  ;
+
+';' =
+  ";" @SPACING
+  ;
+
+'action' =
+  "{" b:<@ACTION_BODY*> "}" @SPACING
+  ;
+
+'&' =
+  "&" @SPACING
+  ;
+
+Expression
+'character class' =
+  "[" r:(!"]" r:@RANGE)+ "]" @SPACING { $$ = CharacterClassExpression(r); }
+  ;
+
+')' =
+  ")" @SPACING
+  ;
+
+'.' =
+  "." @SPACING
+  ;
+
+'end of file' =
+  !.
+  ;
+
+'globals' =
+  "%{" b:<@GLOBALS_BODY*> "}%" @SPACING
+  ;
+
+'leading spaces' =
+  @SPACING
+  ;
+
+'=' =
+  "=" @SPACING
+  ;
+
+Expression
+'literal' =
+  ["] c:(!["] c:@LITERAL_CHAR)* ["] @SPACING { $$ = LiteralExpression(String.fromCharCodes(c)); }
+  ;
+
+'members' =
+  "{" b:<@ACTION_BODY*> "}" @SPACING
+  ;
+
+'!' =
+  "!" @SPACING
+  ;
+
+'(' =
+  "(" @SPACING
+  ;
+
+'+' =
+  "+" @SPACING
+  ;
+
+',' =
+  "," @SPACING
+  ;
+
+'?' =
+  "?" @SPACING
+  ;
+
+'/' =
+  "/" @SPACING
+  ;
+
+'*' =
+  "*" @SPACING
+  ;
+
+'<' =
+  "<" @SPACING
+  ;
+
+'>' =
+  ">" @SPACING
+  ;
+
+# Subterminals
+
+@ACTION_BODY =
+  "{" @ACTION_BODY* "}"
+  / !"}" .
+  ;
+
+@COMMENT =
+  "#" (!@EOL .)* @EOL?
+  ;
+
+@EOL =
+  "\r\n"
+  / [\n\r]
+  ;
+
+@GLOBALS_BODY =
+  !"}%" .
+  ;
+
+int
+@HEX_NUMBER =
+  [\\] "u" d:<[0-9A-Fa-f]+> { $$ = int.parse(d, radix: 16); }
+  ;
+
+@IDENTIFIER =
+  i:<@IDENT_START @IDENT_CONT*>
+  ;
+
+@IDENT_CONT =
+  @IDENT_START
+  / [0-9_]
+  ;
+
+@IDENT_START =
+  [A-Za-z]
+  ;
+
+int
+@LITERAL_CHAR =
+  "\\" c:["\\nrt] { $$ = _escape(c); }
+  / @HEX_NUMBER
+  / !"\\" !@EOL c:.
+  ;
+
+List<int>
+@RANGE =
+  s:@RANGE_CHAR "-" e:@RANGE_CHAR { $$ = [s, e]; }
+  / c:@RANGE_CHAR { $$ = [c, c]; }
+  ;
+
+int
+@RANGE_CHAR =
+  "\\" c:[\-\\\]nrt] { $$ = _escape(c); }
+  / @HEX_NUMBER
+  / !"\\" !@EOL c:.
+  ;
+
+@SPACE =
+  [\t ]
+  / @EOL
+  ;
+
+@SPACING =
+  (@SPACE / @COMMENT)*
+  ;
+
+@TERMINAL_CHAR =
+  "//" c:[']
+  / [ -&(-~]
+  ;
+
+```

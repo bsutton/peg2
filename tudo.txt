@@ -1,0 +1,7 @@
+optimize caller id assignment
+remove disabled hint "unused_local_variable"
+check duplicare semantic variables
+Re-implement grammar.findStartRule
+memoization
+add binary search for ranges
+implement optimization of variable usage (via replacement)

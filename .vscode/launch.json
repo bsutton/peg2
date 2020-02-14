@@ -1,0 +1,14 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "peg2",
+            "program": "bin/peg2.dart",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "bin/peg2.peg"
+            ]
+        }
+    ]
+}

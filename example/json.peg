@@ -1,0 +1,148 @@
+# Non terminals
+
+Json =
+  'leading spaces'? v:Value 'end of file'
+  ;
+
+Value =
+  Array
+  / 'false'
+  / 'null'
+  / 'true'
+  / Object
+  / 'number'
+  / 'string'
+  ;
+
+List
+Array =
+  '[' v:Values? ']' { $$ = v ?? []; }
+  ;
+
+List
+Values =
+  v:Value n:(',' v:Value)* { $$ = [v, ...n]; }
+  ;
+
+Map<String, dynamic>
+Object =
+  '{' m:Members? '}' { $$ = <String, dynamic>{}..addEntries(m ?? []); }
+  ;
+
+List<MapEntry<String, dynamic>>
+Members =
+  m:Member n:(',' m:Member)* { $$ = [m, ...n]; }
+  ;
+
+MapEntry<String, dynamic>
+Member =
+  k:'string' ':' v:Value { $$ = MapEntry(k, v); }
+  ;
+
+# Terminals
+
+'end of file' =
+  !.
+  ;
+
+'false' =
+  "false" @spacing  { $$ = false; }
+  ;
+
+'leading spaces' =
+  @spacing
+  ;
+
+'null' =
+  "null" @spacing  { $$ = null; }
+  ;
+
+'true' =
+  "true" @spacing { $$ = true; }
+  ;
+
+String
+'string' =
+  "\"" c:@char* "\"" @spacing { $$ = String.fromCharCodes(c); }
+  ;
+
+num
+'number' =
+  n:<[-]? ([0] / [1-9] [0-9]*) ([.] [0-9]+)? ([eE] [+-]? [0-9]+)?> @spacing { $$ = num.parse(n); }
+  ;
+
+'{' =
+ "{" @spacing
+  ;
+
+'}' =
+ "}" @spacing
+  ;
+
+'[' =
+ "[" @spacing
+  ;
+
+']' =
+ "]" @spacing
+  ;
+
+',' =
+ "," @spacing
+  ;
+
+':' =
+ ":" @spacing
+  ;
+
+# Sub terminals
+
+int
+@digit =
+  [0-9] { $$ = $$ - 48; }
+  ;
+
+int
+@digit1_9 =
+  [1-9] { $$ = $$ - 48; }
+  ;
+
+@char =
+  [\\] r:@escaped
+  / @unescaped
+  ;
+
+int
+@escaped =
+  [\u22]
+  / [\u5c]
+  / [\u2f]
+  / [\u62] { $$ = 0x8; }
+  / [\u66] { $$ = 0xC; }
+  / [\u6e] { $$ = 0xA; }
+  / [\u72] { $$ = 0xD; }
+  / [\u74] { $$ = 0x9; }
+  / [\u75] r:@hexdig4
+  ;
+
+int
+@hexdig4 =
+  a:@hexdig b:@hexdig c:@hexdig d:@hexdig { $$ = a * 0xfff + b * 0xff + c * 0xf + d; }
+  ;
+
+int
+@hexdig =
+  [a-f] { $$ = $$ - 97; }
+  / [A-F] { $$ = $$ - 65; }
+  / [0-9]  { $$ = $$ - 48; }
+  ;
+
+@unescaped =
+  [\u20-\u21]
+  / [\u23-\u5b]
+  / [\u5d-\u10ffff]
+  ;
+
+@spacing =
+  [ \n\r\t]*
+  ;
