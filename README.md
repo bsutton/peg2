@@ -52,7 +52,7 @@ Each rule is an ordered choice and consists of a single ordered choice expressio
 Each parsing variant is a sequence (`Sequence`) of parsing expressions, each of which, in turn, may consist of other parsing variant expressions (`OrderedChoice`).  
 
 Production rules return values. Return types can be specified explicitly or they can be inferred from return types of expressions `OrderedChoice`.  
-Return types of `OrderedChoice` expressions, is some cases, can be inferred from return types of `Sequence` expressions.  
+Return types of `OrderedChoice` expressions, in some cases, can be inferred from return types of `Sequence` expressions.  
 Return types of `Sequence` expressions can be inferred from the types of returned results of the expressions involved in the formation of the result.  
 
 In the case when a semantic action is used to generate the result, the type of the return value cannot be inferred automatically. In this case, it is recommended to specify the type of the returned result explicitly.  
