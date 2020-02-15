@@ -21,7 +21,7 @@ Since this software is a command line utility, it requires activation.
 To activate, you must run the command:  
 
 ```
-pub global activate peg2
+> pub global activate peg2
 ```
 
 After activation, the utility is ready for use.  
@@ -29,7 +29,7 @@ After activation, the utility is ready for use.
 Example of use:  
 
 ```
-pub global run peg2 json.peg
+> pub global run peg2 json.peg
 ```
 
 Remember to periodically update this software to get the latest version.  
