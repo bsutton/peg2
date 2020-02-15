@@ -6,3 +6,4 @@ add binary search for (long) ranges
 implement optimization of variable usage (via replacement)
 support of NNBD (when it will be available)
 add some kinds of grammar analyzers
+remove (eliminate) unnecessary test "if (_success)" after optional expressions

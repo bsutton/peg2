@@ -61,7 +61,7 @@ Example of explicitly specifying the type of the return result:
 
 ```
 bool 'false' =
-  "false" @spacing { $$ = true; }
+  "false" @spacing { $$ = false; }
 ```
 
 ### Sequence expression
