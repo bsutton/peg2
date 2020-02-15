@@ -7,8 +7,6 @@ class ExpressionInitializer extends ExpressionVisitor<Object> {
 
   int _level;
 
-  int _semanticValuesDepth;
-
   ProductionRule _rule;
 
   Map<String, ProductionRule> _rules;
@@ -27,7 +25,6 @@ class ExpressionInitializer extends ExpressionVisitor<Object> {
     _expressionId = 0;
     for (var rule in rules) {
       _level = 0;
-      _semanticValuesDepth = 0;
       _rule = rule;
       rule.expression.accept(this);
     }

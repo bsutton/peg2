@@ -1,32 +1,32 @@
 class JsonParser {
   static const _eof = 0x110000;
-  
+
   FormatException error;
-  
+
   int _c;
-  
+
   int _cp;
-  
+
   int _failed;
-  
+
   int _failurePos;
-  
+
   bool _hasMalformed;
-  
+
   String _input;
-  
+
   int _pos;
-  
+
   bool _predicate;
-  
+
   dynamic _result;
-  
+
   bool _success;
-  
+
   List<String> _terminals;
-  
+
   int _terminalCount;
-  
+
   dynamic parse(String text) {
     if (text == null) {
       throw ArgumentError.notNull('text');
@@ -39,13 +39,13 @@ class JsonParser {
     _input = null;
     return result;
   }
-  
+
   void _buildError() {
     if (_success) {
       error = null;
       return;
     }
-  
+
     String escape(int c) {
       switch (c) {
         case 10:
@@ -59,14 +59,14 @@ class JsonParser {
       }
       return String.fromCharCode(c);
     }
-  
+
     String getc(int position) {
       if (position < _input.length) {
         return "'${escape(_input.codeUnitAt(position))}'";
       }
       return 'end of file';
     }
-  
+
     final temp = _terminals.take(_terminalCount).toList();
     temp.sort((e1, e2) => e1.compareTo(e2));
     final terminals = temp.toSet();
@@ -97,8 +97,8 @@ class JsonParser {
       error = FormatException(message, _input, _failurePos);
     }
   }
-  
-  void _fail(int failed) {  
+
+  void _fail(int failed) {
     if (!_predicate) {
       if (_failurePos < failed) {
         _failurePos = failed;
@@ -111,13 +111,13 @@ class JsonParser {
     }
     _success = false;
   }
-  
+
   void _failure(String name) {
     var flagged = true;
     final malformed = _failed > _pos;
     if (malformed && !_hasMalformed) {
       _hasMalformed = true;
-      _terminalCount = 0;    
+      _terminalCount = 0;
     } else if (_hasMalformed) {
       flagged = false;
     }
@@ -128,7 +128,7 @@ class JsonParser {
       _terminals[_terminalCount++] = name;
     }
   }
-  
+
   void _getch() {
     _cp = _pos;
     var pos = _pos;
@@ -149,7 +149,7 @@ class JsonParser {
       _c = _eof;
     }
   }
-  
+
   int _matchAny() {
     if (_cp != _pos) {
       _getch();
@@ -163,10 +163,10 @@ class JsonParser {
     } else {
       _fail(_pos);
     }
-  
+
     return result;
   }
-  
+
   int _matchChar(int c) {
     if (_cp != _pos) {
       _getch();
@@ -177,13 +177,13 @@ class JsonParser {
       _pos += _c < 0xffff ? 1 : 2;
       _c = null;
       _success = true;
-    } else {    
-      _fail(_pos);    
+    } else {
+      _fail(_pos);
     }
-  
+
     return result;
   }
-  
+
   int _matchRanges(List<int> ranges) {
     if (_cp != _pos) {
       _getch();
@@ -205,14 +205,14 @@ class JsonParser {
         }
       }
     }
-  
+
     if (!_success) {
       _fail(_pos);
     }
-  
+
     return result;
   }
-  
+
   String _matchString(String text) {
     String result;
     final length = text.length;
@@ -225,29 +225,29 @@ class JsonParser {
         break;
       }
     }
-  
+
     if (i == length) {
       _pos += length;
       _success = true;
       result = text;
-    } else {    
+    } else {
       _fail(_pos + i);
     }
-  
+
     return result;
   }
-  
+
   bool _memoized(int id, int cid) {
     return false;
   }
-  
+
   void _memoize(result) {
     //
   }
-  
+
   void _reset() {
     _c = _eof;
-    _cp = -1;  
+    _cp = -1;
     _failurePos = -1;
     _hasMalformed = false;
     _pos = 0;
@@ -256,7 +256,7 @@ class JsonParser {
     _terminals = [];
     _terminals.length = 20;
   }
-  
+
   dynamic _parseJson(int $0, bool $1) {
     dynamic $2;
     dynamic $3;
@@ -288,7 +288,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   dynamic _parseValue(int $0, bool $1) {
     dynamic $2;
     dynamic $3;
@@ -346,7 +346,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   List _parseArray(int $0, bool $1) {
     List $2;
     List $3;
@@ -381,7 +381,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   List _parseValues(int $0, bool $1) {
     List $2;
     List $3;
@@ -437,7 +437,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   Map<String, dynamic> _parseObject(int $0, bool $1) {
     Map<String, dynamic> $2;
     Map<String, dynamic> $3;
@@ -472,7 +472,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   List<MapEntry<String, dynamic>> _parseMembers(int $0, bool $1) {
     List<MapEntry<String, dynamic>> $2;
     List<MapEntry<String, dynamic>> $3;
@@ -528,7 +528,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   MapEntry<String, dynamic> _parseMember(int $0, bool $1) {
     MapEntry<String, dynamic> $2;
     MapEntry<String, dynamic> $3;
@@ -559,7 +559,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   dynamic _parse_end_of_file(int $0, bool $1) {
     _failed = -1;
     dynamic $2;
@@ -588,7 +588,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   dynamic _parse_false(int $0, bool $1) {
     _failed = -1;
     dynamic $2;
@@ -617,7 +617,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   List<int> _parse_leading_spaces(int $0, bool $1) {
     _failed = -1;
     List<int> $2;
@@ -632,7 +632,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   dynamic _parse_null(int $0, bool $1) {
     _failed = -1;
     dynamic $2;
@@ -661,7 +661,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   dynamic _parse_true(int $0, bool $1) {
     _failed = -1;
     dynamic $2;
@@ -690,7 +690,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   String _parse_string(int $0, bool $1) {
     _failed = -1;
     String $2;
@@ -740,7 +740,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   num _parse_number(int $0, bool $1) {
     _failed = -1;
     num $2;
@@ -930,7 +930,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   String _parse_$LeftBrace(int $0, bool $1) {
     _failed = -1;
     String $2;
@@ -957,7 +957,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   String _parse_$RightBrace(int $0, bool $1) {
     _failed = -1;
     String $2;
@@ -984,7 +984,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   String _parse_$LeftSquareBracket(int $0, bool $1) {
     _failed = -1;
     String $2;
@@ -1011,7 +1011,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   String _parse_$RightSquareBracket(int $0, bool $1) {
     _failed = -1;
     String $2;
@@ -1038,7 +1038,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   String _parse_$Comma(int $0, bool $1) {
     _failed = -1;
     String $2;
@@ -1065,7 +1065,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   String _parse_$Colon(int $0, bool $1) {
     _failed = -1;
     String $2;
@@ -1092,7 +1092,7 @@ class JsonParser {
     }
     return $2;
   }
-  
+
   int _parse$$digit(int $0, bool $1) {
     int $2;
     int $3;
@@ -1108,7 +1108,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   int _parse$$digit1_9(int $0, bool $1) {
     int $2;
     int $3;
@@ -1124,7 +1124,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   int _parse$$char(int $0, bool $1) {
     int $2;
     int $3;
@@ -1159,7 +1159,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   int _parse$$escaped(int $0, bool $1) {
     int $2;
     int $3;
@@ -1263,7 +1263,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   int _parse$$hexdig4(int $0, bool $1) {
     int $2;
     int $3;
@@ -1299,7 +1299,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   int _parse$$hexdig(int $0, bool $1) {
     int $2;
     int $3;
@@ -1344,7 +1344,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   int _parse$$unescaped(int $0, bool $1) {
     int $2;
     int $3;
@@ -1377,7 +1377,7 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
+
   List<int> _parse$$spacing(int $0, bool $1) {
     List<int> $2;
     List<int> $3;
@@ -1402,7 +1402,9 @@ class JsonParser {
     $2 = $3;
     return $2;
   }
-  
 }
 
 // ignore_for_file: prefer_final_locals
+// ignore_for_file: unused_element
+// ignore_for_file: unused_field
+// ignore_for_file: unused_local_variable

@@ -823,10 +823,6 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     return variable;
   }
 
-  int _rangesKind(List<List> ranges) {
-    //
-  }
-
   void _restoreVars(BlockOperation block, Map<Variable, Variable> variables) {
     for (final key in variables.keys) {
       _addAssign(block, _varOp(variables[key]), _varOp(key));

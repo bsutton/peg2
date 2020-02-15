@@ -3,7 +3,7 @@ peg2
 
 PEG+ (Parsing expression grammar) parser generator.  
 
-Version 0.1.0
+Version 0.1.2
 
 Warning: This software is under development.  
 There is currently no instruction available.  
@@ -140,13 +140,11 @@ ProductionRule SubterminalDefinition =
   / n:'sub terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.Subterminal, e, null); }
   ;
 
-String
-Type =
+String Type =
   n:'type name' a:('<' a:TypeArguments '>')? { $$ = n + (a == null ? '' : '<' + a.join(', ') + '>'); }
   ;
 
-List<String>
-TypeArguments =
+List<String> TypeArguments =
   t:Type n:(',' t:Type)* { $$ = [t, ...n]; }
   ;
 
@@ -184,8 +182,7 @@ TypeArguments =
   "&" @SPACING
   ;
 
-Expression
-'character class' =
+Expression 'character class' =
   "[" r:(!"]" r:@RANGE)+ "]" @SPACING { $$ = CharacterClassExpression(r); }
   ;
 
@@ -213,8 +210,7 @@ Expression
   "=" @SPACING
   ;
 
-Expression
-'literal' =
+Expression 'literal' =
   ["] c:(!["] c:@LITERAL_CHAR)* ["] @SPACING { $$ = LiteralExpression(String.fromCharCodes(c)); }
   ;
 
@@ -278,8 +274,7 @@ Expression
   !"}%" .
   ;
 
-int
-@HEX_NUMBER =
+int @HEX_NUMBER =
   [\\] "u" d:<[0-9A-Fa-f]+> { $$ = int.parse(d, radix: 16); }
   ;
 
@@ -296,21 +291,18 @@ int
   [A-Za-z]
   ;
 
-int
-@LITERAL_CHAR =
+int @LITERAL_CHAR =
   "\\" c:["\\nrt] { $$ = _escape(c); }
   / @HEX_NUMBER
   / !"\\" !@EOL c:.
   ;
 
-List<int>
-@RANGE =
+List<int> @RANGE =
   s:@RANGE_CHAR "-" e:@RANGE_CHAR { $$ = [s, e]; }
   / c:@RANGE_CHAR { $$ = [c, c]; }
   ;
 
-int
-@RANGE_CHAR =
+int @RANGE_CHAR =
   "\\" c:[\-\\\]nrt] { $$ = _escape(c); }
   / @HEX_NUMBER
   / !"\\" !@EOL c:.

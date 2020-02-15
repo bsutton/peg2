@@ -47,7 +47,19 @@ class ParserGenerator {
     final parserClassBuilder = ParserClassBuilder();
     final name = options.name + 'Parser';
     parserClassBuilder.build(grammar, name, libraryBuilder, methodBuilders);
-    libraryBuilder.add('// ignore_for_file: prefer_final_locals, unused_local_variable');    
-    return libraryBuilder.build(0).join('\n');
+    libraryBuilder.add('// ignore_for_file: prefer_final_locals');
+    libraryBuilder.add('// ignore_for_file: unused_element');
+    libraryBuilder.add('// ignore_for_file: unused_field');
+    libraryBuilder.add('// ignore_for_file: unused_local_variable');
+    final formatter = DartFormatter();
+    var source = libraryBuilder.build(0).join('\n');
+    try {
+      source = formatter.format(source);
+      // ignore: unused_catch_clause
+    } on FormatterException catch (e) {
+      //
+    }
+
+    return source;
   }
 }

@@ -9,6 +9,15 @@
             "args": [
                 "bin/peg2.peg"
             ]
+        },
+        {
+            "name": "create example",
+            "program": "bin/peg2.dart",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "example/json.peg", "example/example.dart"
+            ]
         }
     ]
 }
