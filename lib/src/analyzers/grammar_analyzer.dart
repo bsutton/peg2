@@ -9,11 +9,12 @@ class GrammarAnalyzer {
     }
 
     _errors = <String>[];
-    final rules = grammar.rules;
+    //final rules = grammar.rules;
     // Analyze
     return _errors;
   }
 
+  /*
   void _addError(Expression expression, String message) {
     final rule = expression.rule;
     final sb = StringBuffer();
@@ -22,4 +23,5 @@ class GrammarAnalyzer {
     sb.write(': ');
     sb.write(message);
   }
+  */
 }

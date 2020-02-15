@@ -47,8 +47,7 @@ class ParserGenerator {
     final parserClassBuilder = ParserClassBuilder();
     final name = options.name + 'Parser';
     parserClassBuilder.build(grammar, name, libraryBuilder, methodBuilders);
-    //libraryBuilder.add('// ignore_for_file: prefer_final_locals, unused_local_variable');
-    libraryBuilder.add('// ignore_for_file: prefer_final_locals');
+    libraryBuilder.add('// ignore_for_file: prefer_final_locals, unused_local_variable');    
     return libraryBuilder.build(0).join('\n');
   }
 }
