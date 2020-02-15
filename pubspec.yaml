@@ -1,6 +1,6 @@
 name: peg2
 description: PEG+ (Parsing expression grammar) parser generator.
-version: 0.0.1-beta
+version: 0.1.0
 environment:
   sdk: '>=2.7.0 <3.0.0'
 dependencies:

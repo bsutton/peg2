@@ -3,15 +3,18 @@ peg2
 
 PEG+ (Parsing expression grammar) parser generator.  
 
-Version 0.0.1-beta  
+Version 0.1.0
 
-Warnings:  
-This software is under development.  
+Warning: This software is under development.  
 There is currently no instruction available.  
 This software does not contain public APIs because it is a tool (utility).  
 
+This tool works, it is able to generate itself (yet another peg2), but it may contain errors and it will be changed in order to improve results of work.  
+
+All planned improvements and discovered flaws can be found in the "todo.txt" file.  
+
 This is not a pure PEG (Parsing expression grammar).  
-This is a slightly modified (extended) version of PEG with support for nonterminal, terminal and subterminal symbols.  
+This is a slightly modified (extended) version of PEG with support for nonterminal, terminal and subterminal symbols and with the support of the expression "Capture". 
 
 Example of grammar:  
 

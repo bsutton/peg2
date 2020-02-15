@@ -1,7 +1,8 @@
 optimize caller id assignment
-remove disabled hint "unused_local_variable"
 check duplicare semantic variables
-Re-implement grammar.findStartRule
-memoization
-add binary search for ranges
+re-implement grammar.findStartRule
+implement memoization
+add binary search for (long) ranges
 implement optimization of variable usage (via replacement)
+support of NNBD (when it will be available)
+add some kinds of grammar analyzers
