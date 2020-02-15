@@ -9,7 +9,7 @@ This is a slightly modified (extended) version of PEG with support for nontermin
 
 ### Warning
 
-This software does not contain public APIs because it is a tool (utility).  
+This software does not contain public API because it is a tool (utility).  
 
 ### Planned features
 
