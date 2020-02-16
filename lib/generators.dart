@@ -16,6 +16,7 @@ part 'src/generators/operation_initializer.dart';
 part 'src/generators/operation_optimizer.dart';
 part 'src/generators/operation_replacer.dart';
 part 'src/generators/operations_to_code_converter.dart';
+part 'src/generators/optional_expression_resolver.dart';
 part 'src/generators/parser_class_builder.dart';
 part 'src/generators/parser_generator.dart';
 part 'src/generators/rules_to_operations_builder.dart';

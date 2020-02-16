@@ -7,6 +7,8 @@ abstract class Expression {
 
   bool isLast = false;
 
+  bool isOptional = false;
+
   int level;
 
   Expression parent;

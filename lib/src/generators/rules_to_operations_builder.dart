@@ -66,7 +66,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     final b = _block;
     final child = node.expression;
     _addNodeComment(b, node);
-    final saved = _saveVars(b, [
+    final state = _saveVars(b, [
       _c,
       _cp,
       _pos,
@@ -78,7 +78,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     _addAssign(b, _varOp(_productive), _constOp(false));
     child.accept(this);
     final result = _newVar(b, 'var');
-    _restoreVars(b, saved);
+    _restoreVars(b, state);
     _result = result;
     return null;
   }
@@ -187,7 +187,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     final b = _block;
     final child = node.expression;
     _addNodeComment(b, node);
-    final saved = _saveVars(b, [
+    final state = _saveVars(b, [
       _c,
       _cp,
       _pos,
@@ -201,7 +201,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     _result = _newVar(b, 'var', null);
     _addAssign(
         b, _varOp(_success), _unary(OperationKind.not, _varOp(_success)));
-    _restoreVars(b, saved);
+    _restoreVars(b, state);
     return null;
   }
 
@@ -250,10 +250,14 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     _addNodeComment(b, node);
     _result = _newVar(b, returnType, null);
     child.accept(this);
-    _ifNotSuccess(b, (b) {
-      _addAssign(b, _varOp(_success), _constOp(true));
-      _addAssign(b, _varOp(_result), _constOp(null));
-    });
+    _addAssign(b, _varOp(_success), _constOp(true));
+    return null;
+  }
+
+  T _getValueAs<T>(value) {
+    if (value is T) {
+      return value;
+    }
 
     return null;
   }
@@ -264,6 +268,16 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     final expressions = node.expressions;
     final returnType = node.returnType;
     _addNodeComment(b, node);
+    void temp(BlockOperation b) {
+      var flag = false;
+      if (b.operations.isNotEmpty) {
+        final last = b.operations.last;
+        if (last.kind == OperationKind.conditional) {
+          final op1 = last as ConstantOperation;
+        }
+      }
+    }
+
     final result = _newVar(b, returnType, null);
     if (expressions.length > 1) {
       _addLoop(b, (b) {
@@ -306,95 +320,111 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     final varCount = expressions.where((e) => e.variable != null).length;
     _addNodeComment(b, node);
     final result = _newVar(b, returnType, null);
-    BlockOperation failBlock;
-    BlockOperation lastBlock;
-    if (expressions.length > 1) {
-      final results = <Expression, Variable>{};
-      final state = _saveVars(b, [_c, _cp, _pos]);
-      for (var i = 0; i < expressions.length; i++) {
-        final child = expressions[i];
-        if (i == 0 && varCount == 0) {
-          _notProductive = false;
-        } else {
-          if (child.variable == null) {
-            _notProductive = true;
-          } else {
-            _notProductive = false;
-          }
-        }
+    BlockOperation firstAfterNotOptional;
+    void Function(BlockOperation) onSuccess;
+    void Function(BlockOperation) onFailure;
+    final optionalCount = expressions.where((e) => e.isOptional).length;
+    final allOptional = expressions.length == optionalCount;
+    var hasSavedState = !allOptional;
+    if (expressions.length == 1) {
+      hasSavedState = false;
+    }
 
-        void f(BlockOperation b) {
-          _block = b;
-          child.accept(this);
-          results[child] = _result;
-          if (child.variable != null) {
-            variables[child] = _result;
-          }
+    Map<Variable, Variable> savedState;
+    if (hasSavedState) {
+      savedState = _saveVars(b, [_c, _cp, _pos]);
+    }
 
-          lastBlock = b;
-        }
-
-        if (i == 0) {
-          f(b);
-        } else {
-          _ifSuccess(lastBlock, f);
-          failBlock ??= lastBlock;
-        }
-      }
-
-      void fail(BlockOperation b) {
-        _restoreVars(b, state);
-        //_addAssign(b, result, _constOp(null));
-      }
-
-      var fFalse = fail;
-      if (expressions.length > 2) {
-        fFalse = null;
-      }
-
-      if (hasAction) {
-        _ifSuccess(lastBlock, (b) {
-          _buildAction(b, node, result, variables);
-        }, fFalse);
+    final results = <Expression, Variable>{};
+    var needTestSuccess = false;
+    for (var i = 0; i < expressions.length; i++) {
+      final child = expressions[i];
+      if (i == 0 && varCount == 0) {
+        _notProductive = false;
       } else {
-        if (variables.isEmpty) {
+        if (child.variable == null) {
+          _notProductive = true;
+        } else {
+          _notProductive = false;
+        }
+      }
+
+      void onExpression(BlockOperation b) {
+        _block = b;
+        child.accept(this);
+        results[child] = _result;
+        if (child.variable != null) {
+          variables[child] = _result;
+        }
+
+        needTestSuccess = !child.isOptional;
+      }
+
+      if (!needTestSuccess) {
+        // Optimization: remove previous "_success = true;"
+        if (_block.operations.isNotEmpty) {
+          final last = _getValueAs<BinaryOperation>(_block.operations.last);
+          if (last?.kind == OperationKind.assign) {
+            final left = _getValueAs<VariableOperation>(last.left);
+            if (left?.variable == _success) {
+              final right = _getValueAs<ConstantOperation>(last.right);
+              if (right?.value == true) {
+                _block.operations.removeLast();
+              }
+            }
+          }
+        }
+
+        onExpression(_block);
+      } else {
+        _ifSuccess(_block, onExpression);
+        firstAfterNotOptional ??= _block;
+      }
+    }
+
+    if (hasSavedState) {
+      onFailure = (b) {
+        _restoreVars(b, savedState);
+      };
+    }
+
+    if (hasAction) {
+      onSuccess = (b) {
+        _buildAction(b, node, result, variables);
+      };
+    } else {
+      if (variables.isEmpty) {
+        onSuccess = (b) {
           final variable = results.values.first;
-          _ifSuccess(lastBlock, (b) {
-            _addAssign(b, _varOp(result), _varOp(variable));
-          }, fFalse);
-        } else if (variables.length == 1) {
+          _addAssign(b, _varOp(result), _varOp(variable));
+        };
+      } else if (variables.length == 1) {
+        onSuccess = (b) {
           final expression = variables.keys.first;
           final variable = results[expression];
-          _ifSuccess(lastBlock, (b) {
-            _addAssign(b, _varOp(result), _varOp(variable));
-          }, fFalse);
-        } else {
+          _addAssign(b, _varOp(result), _varOp(variable));
+        };
+      } else {
+        onSuccess = (b) {
           final list =
               ListOperation(null, variables.values.map(_varOp).toList());
-          _ifSuccess(lastBlock, (b) {
-            _addAssign(b, _varOp(result), list);
-          }, fFalse);
-        }
+          _addAssign(b, _varOp(result), list);
+        };
       }
+    }
 
-      if (expressions.length > 2) {
-        _ifNotSuccess(failBlock, fail);
+    if (!needTestSuccess) {
+      if (hasAction) {
+        _addBlock(_block, onSuccess);
+      } else {
+        onSuccess(_block);
       }
     } else {
-      _notProductive = false;
-      final child = expressions[0];
-      child.accept(this);
-      if (child.variable != null) {
-        variables[child] = _result;
-      }
+      _ifSuccess(_block, onSuccess);
+    }
 
-      if (hasAction) {
-        _ifSuccess(b, (b) {
-          _buildAction(b, node, result, variables);
-        });
-      } else {
-        _addAssign(b, _varOp(result), _varOp(_result));
-      }
+    if (onFailure != null) {
+      _ifNotSuccess(b, onFailure);
     }
 
     _block = b;
@@ -463,6 +493,14 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
   void _addAssign(BlockOperation b, Operation left, Operation right) {
     final operation = BinaryOperation(left, OperationKind.assign, right);
     b.operations.add(operation);
+  }
+
+  BlockOperation _addBlock(
+      BlockOperation block, void Function(BlockOperation) f) {
+    final op = BlockOperation();
+    block.operations.add(op);
+    f(op);
+    return op;
   }
 
   void _addBreak(BlockOperation b) {
@@ -847,4 +885,10 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
   VariableOperation _varOp(Variable variable) {
     return VariableOperation(variable);
   }
+}
+
+class _SequenceElement {
+  bool testKind;
+
+  void Function(BlockOperation) gen;
 }

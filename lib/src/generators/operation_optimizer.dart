@@ -5,6 +5,6 @@ class OperationOptimizer {
     final lastAssignedResultResolver = LastAssignedResultResolver();
     operation.accept(lastAssignedResultResolver);
     final unusedVariablesRemover = UnusedVariablesRemover();
-    operation.accept(unusedVariablesRemover);
+    unusedVariablesRemover.remove(operation);
   }
 }

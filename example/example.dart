@@ -265,24 +265,18 @@ class JsonParser {
     var $6 = _cp;
     var $7 = _pos;
     // NOP;
-    var $9 = _parse_leading_spaces(3, false);
-    if (!_success) {
-      _success = true;
-      $9 = null;
-    }
+    _parse_leading_spaces(3, false);
+    var $10 = _parseValue(4, $1);
     if (_success) {
-      var $10 = _parseValue(4, $1);
+      _parse_end_of_file(5, false);
       if (_success) {
-        _parse_end_of_file(5, false);
-        if (_success) {
-          $4 = $10;
-        }
+        $4 = $10;
       }
-      if (!_success) {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -295,49 +289,63 @@ class JsonParser {
     for (;;) {
       List $4;
       var $5 = _parseArray(8, $1);
-      $4 = $5;
+      if (_success) {
+        $4 = $5;
+      }
       if (_success) {
         $3 = $4;
         break;
       }
       dynamic $6;
       var $7 = _parse_false(10, $1);
-      $6 = $7;
+      if (_success) {
+        $6 = $7;
+      }
       if (_success) {
         $3 = $6;
         break;
       }
       dynamic $8;
       var $9 = _parse_null(12, $1);
-      $8 = $9;
+      if (_success) {
+        $8 = $9;
+      }
       if (_success) {
         $3 = $8;
         break;
       }
       dynamic $10;
       var $11 = _parse_true(14, $1);
-      $10 = $11;
+      if (_success) {
+        $10 = $11;
+      }
       if (_success) {
         $3 = $10;
         break;
       }
       Map<String, dynamic> $12;
       var $13 = _parseObject(16, $1);
-      $12 = $13;
+      if (_success) {
+        $12 = $13;
+      }
       if (_success) {
         $3 = $12;
         break;
       }
       num $14;
       var $15 = _parse_number(18, $1);
-      $14 = $15;
+      if (_success) {
+        $14 = $15;
+      }
       if (_success) {
         $3 = $14;
         break;
       }
       String $16;
       var $17 = _parse_string(20, $1);
-      $16 = $17;
+      if (_success) {
+        $16 = $17;
+      }
       if (_success) {
         $3 = $16;
       }
@@ -358,24 +366,18 @@ class JsonParser {
     if (_success) {
       // NOP;
       var $10 = _parseValues(25, $1);
-      if (!_success) {
-        _success = true;
-        $10 = null;
-      }
+      _parse_$RightSquareBracket(26, false);
       if (_success) {
-        _parse_$RightSquareBracket(26, false);
-        if (_success) {
-          var v = $10;
-          List $$;
-          $$ = v ?? [];
-          $4 = $$;
-        }
+        var v = $10;
+        List $$;
+        $$ = v ?? [];
+        $4 = $$;
       }
-      if (!_success) {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -406,11 +408,12 @@ class JsonParser {
           var $16 = _parseValue(34, $1);
           if (_success) {
             $11 = $16;
-          } else {
-            _c = $12;
-            _cp = $13;
-            _pos = $14;
           }
+        }
+        if (!_success) {
+          _c = $12;
+          _cp = $13;
+          _pos = $14;
         }
         $10 = $11;
         if (!_success) {
@@ -421,17 +424,18 @@ class JsonParser {
           $9.add($10);
         }
       }
-      if (_success) {
+      {
         var v = $8;
         var n = $9;
         List $$;
         $$ = [v, ...n];
         $4 = $$;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
       }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -449,24 +453,18 @@ class JsonParser {
     if (_success) {
       // NOP;
       var $10 = _parseMembers(39, $1);
-      if (!_success) {
-        _success = true;
-        $10 = null;
-      }
+      _parse_$RightBrace(40, false);
       if (_success) {
-        _parse_$RightBrace(40, false);
-        if (_success) {
-          var m = $10;
-          Map<String, dynamic> $$;
-          $$ = <String, dynamic>{}..addEntries(m ?? []);
-          $4 = $$;
-        }
+        var m = $10;
+        Map<String, dynamic> $$;
+        $$ = <String, dynamic>{}..addEntries(m ?? []);
+        $4 = $$;
       }
-      if (!_success) {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -497,11 +495,12 @@ class JsonParser {
           var $16 = _parseMember(48, $1);
           if (_success) {
             $11 = $16;
-          } else {
-            _c = $12;
-            _cp = $13;
-            _pos = $14;
           }
+        }
+        if (!_success) {
+          _c = $12;
+          _cp = $13;
+          _pos = $14;
         }
         $10 = $11;
         if (!_success) {
@@ -512,17 +511,18 @@ class JsonParser {
           $9.add($10);
         }
       }
-      if (_success) {
+      {
         var m = $8;
         var n = $9;
         List<MapEntry<String, dynamic>> $$;
         $$ = [m, ...n];
         $4 = $$;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
       }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -549,11 +549,11 @@ class JsonParser {
           $4 = $$;
         }
       }
-      if (!_success) {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -580,7 +580,9 @@ class JsonParser {
     _pos = $7;
     _predicate = $8;
     $1 = $9;
-    $4 = $11;
+    if (_success) {
+      $4 = $11;
+    }
     $3 = $4;
     $2 = $3;
     if (!_success) {
@@ -600,15 +602,16 @@ class JsonParser {
     _matchString('false');
     if (_success) {
       _parse$$spacing(61, false);
-      if (_success) {
+      {
         dynamic $$;
         $$ = false;
         $4 = $$;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
       }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -644,15 +647,16 @@ class JsonParser {
     _matchString('null');
     if (_success) {
       _parse$$spacing(68, false);
-      if (_success) {
+      {
         dynamic $$;
         $$ = null;
         $4 = $$;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
       }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -673,15 +677,16 @@ class JsonParser {
     _matchString('true');
     if (_success) {
       _parse$$spacing(72, false);
-      if (_success) {
+      {
         dynamic $$;
         $$ = true;
         $4 = $$;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
       }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -715,23 +720,21 @@ class JsonParser {
           $9.add($10);
         }
       }
+      _matchString('\"');
       if (_success) {
-        _matchString('\"');
-        if (_success) {
-          _parse$$spacing(79, false);
-          if (_success) {
-            var c = $9;
-            String $$;
-            $$ = String.fromCharCodes(c);
-            $4 = $$;
-          }
+        _parse$$spacing(79, false);
+        {
+          var c = $9;
+          String $$;
+          $$ = String.fromCharCodes(c);
+          $4 = $$;
         }
       }
-      if (!_success) {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -760,16 +763,15 @@ class JsonParser {
     var $15 = _pos;
     // NOP;
     var $17 = _matchChar(45);
-    if (!_success) {
-      _success = true;
-      $17 = null;
-    }
+    _success = true;
     if (_success) {
       int $18;
       for (;;) {
         int $19;
         var $20 = _matchChar(48);
-        $19 = $20;
+        if (_success) {
+          $19 = $20;
+        }
         if (_success) {
           $18 = $19;
           break;
@@ -798,13 +800,13 @@ class JsonParser {
           }
           if (_success) {
             $21 = $26;
-          } else {
-            _c = $22;
-            _cp = $23;
-            _pos = $24;
           }
         }
-        if (_success) {
+        if (!_success) {
+          _c = $22;
+          _cp = $23;
+          _pos = $24;
+        } else {
           $18 = $21;
         }
         break;
@@ -840,17 +842,15 @@ class JsonParser {
           }
           if (_success) {
             $32 = $36;
-          } else {
-            _c = $33;
-            _cp = $34;
-            _pos = $35;
           }
         }
-        $31 = $32;
         if (!_success) {
-          _success = true;
-          $31 = null;
+          _c = $33;
+          _cp = $34;
+          _pos = $35;
         }
+        $31 = $32;
+        _success = true;
         if (_success) {
           // NOP;
           int $42;
@@ -883,27 +883,25 @@ class JsonParser {
             }
             if (_success) {
               $43 = $48;
-            } else {
-              _c = $44;
-              _cp = $45;
-              _pos = $46;
             }
           }
-          $42 = $43;
           if (!_success) {
-            _success = true;
-            $42 = null;
+            _c = $44;
+            _cp = $45;
+            _pos = $46;
           }
+          $42 = $43;
+          _success = true;
           if (_success) {
             $12 = $17;
           }
         }
       }
-      if (!_success) {
-        _c = $13;
-        _cp = $14;
-        _pos = $15;
-      }
+    }
+    if (!_success) {
+      _c = $13;
+      _cp = $14;
+      _pos = $15;
     }
     $11 = $12;
     if (_success) {
@@ -912,16 +910,17 @@ class JsonParser {
     $1 = $10;
     if (_success) {
       _parse$$spacing(106, false);
-      if (_success) {
+      {
         var n = $8;
         num $$;
         $$ = num.parse(n);
         $4 = $$;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
       }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -942,13 +941,12 @@ class JsonParser {
     var $8 = _matchString('{');
     if (_success) {
       _parse$$spacing(110, false);
-      if (_success) {
-        $4 = $8;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+      $4 = $8;
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -969,13 +967,12 @@ class JsonParser {
     var $8 = _matchString('}');
     if (_success) {
       _parse$$spacing(114, false);
-      if (_success) {
-        $4 = $8;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+      $4 = $8;
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -996,13 +993,12 @@ class JsonParser {
     var $8 = _matchString('[');
     if (_success) {
       _parse$$spacing(118, false);
-      if (_success) {
-        $4 = $8;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+      $4 = $8;
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -1023,13 +1019,12 @@ class JsonParser {
     var $8 = _matchString(']');
     if (_success) {
       _parse$$spacing(122, false);
-      if (_success) {
-        $4 = $8;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+      $4 = $8;
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -1050,13 +1045,12 @@ class JsonParser {
     var $8 = _matchString(',');
     if (_success) {
       _parse$$spacing(126, false);
-      if (_success) {
-        $4 = $8;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+      $4 = $8;
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -1077,13 +1071,12 @@ class JsonParser {
     var $8 = _matchString(':');
     if (_success) {
       _parse$$spacing(130, false);
-      if (_success) {
-        $4 = $8;
-      } else {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+      $4 = $8;
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -1138,19 +1131,21 @@ class JsonParser {
         var $9 = _parse$$escaped(140, $1);
         if (_success) {
           $4 = $9;
-        } else {
-          _c = $5;
-          _cp = $6;
-          _pos = $7;
         }
       }
-      if (_success) {
+      if (!_success) {
+        _c = $5;
+        _cp = $6;
+        _pos = $7;
+      } else {
         $3 = $4;
         break;
       }
       int $10;
       var $11 = _parse$$unescaped(142, $1);
-      $10 = $11;
+      if (_success) {
+        $10 = $11;
+      }
       if (_success) {
         $3 = $10;
       }
@@ -1166,21 +1161,27 @@ class JsonParser {
     for (;;) {
       int $4;
       var $5 = _matchChar(34);
-      $4 = $5;
+      if (_success) {
+        $4 = $5;
+      }
       if (_success) {
         $3 = $4;
         break;
       }
       int $6;
       var $7 = _matchChar(92);
-      $6 = $7;
+      if (_success) {
+        $6 = $7;
+      }
       if (_success) {
         $3 = $6;
         break;
       }
       int $8;
       var $9 = _matchChar(47);
-      $8 = $9;
+      if (_success) {
+        $8 = $9;
+      }
       if (_success) {
         $3 = $8;
         break;
@@ -1249,13 +1250,13 @@ class JsonParser {
         var $25 = _parse$$hexdig4(162, $1);
         if (_success) {
           $20 = $25;
-        } else {
-          _c = $21;
-          _cp = $22;
-          _pos = $23;
         }
       }
-      if (_success) {
+      if (!_success) {
+        _c = $21;
+        _cp = $22;
+        _pos = $23;
+      } else {
         $3 = $20;
       }
       break;
@@ -1289,11 +1290,11 @@ class JsonParser {
           }
         }
       }
-      if (!_success) {
-        _c = $5;
-        _cp = $6;
-        _pos = $7;
-      }
+    }
+    if (!_success) {
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
     $3 = $4;
     $2 = $3;
@@ -1352,7 +1353,9 @@ class JsonParser {
       int $4;
       const $5 = [32, 33];
       var $6 = _matchRanges($5);
-      $4 = $6;
+      if (_success) {
+        $4 = $6;
+      }
       if (_success) {
         $3 = $4;
         break;
@@ -1360,7 +1363,9 @@ class JsonParser {
       int $7;
       const $8 = [35, 91];
       var $9 = _matchRanges($8);
-      $7 = $9;
+      if (_success) {
+        $7 = $9;
+      }
       if (_success) {
         $3 = $7;
         break;
@@ -1368,7 +1373,9 @@ class JsonParser {
       int $10;
       const $11 = [93, 1114111];
       var $12 = _matchRanges($11);
-      $10 = $12;
+      if (_success) {
+        $10 = $12;
+      }
       if (_success) {
         $3 = $10;
       }

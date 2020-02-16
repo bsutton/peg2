@@ -303,7 +303,6 @@ enum OperationKind {
   action,
   assign,
   block,
-  binary,
   break_,
   call,
   conditional,

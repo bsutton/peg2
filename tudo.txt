@@ -4,8 +4,7 @@ re-implement grammar.findStartRule
 implement memoization
 add binary search for (long) ranges
 implement optimization of variable usage (via replacement)
-support of NNBD (when it will be available)
 add some kinds of grammar analyzers
 remove (eliminate) unnecessary test "if (_success)" after optional expressions
 inline subterminals if this is possible (also implement analyzer for that)
-add support of library prefix to type declaration (eg. foo.Baz<bar.Bar>)
+implement conditional expression flow optimizer (append else to if, merge blocks to previous conditional, etc)

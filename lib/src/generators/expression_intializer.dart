@@ -1,6 +1,6 @@
 part of '../../generators.dart';
 
-class ExpressionInitializer extends ExpressionVisitor<Object> {
+class ExpressionInitializer extends ExpressionVisitor {
   int _actionIndex;
 
   int _expressionId;
@@ -28,40 +28,38 @@ class ExpressionInitializer extends ExpressionVisitor<Object> {
       _rule = rule;
       rule.expression.accept(this);
     }
+
+    final optionalExpressionResolver = OptionalExpressionResolver();
+    optionalExpressionResolver.resolve(rules);
   }
 
   @override
-  Object visitAndPredicate(AndPredicateExpression node) {
+  void visitAndPredicate(AndPredicateExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   @override
-  Object visitAnyCharacter(AnyCharacterExpression node) {
+  void visitAnyCharacter(AnyCharacterExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   @override
-  Object visitCapture(CaptureExpression node) {
+  void visitCapture(CaptureExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   @override
-  Object visitCharacterClass(CharacterClassExpression node) {
+  void visitCharacterClass(CharacterClassExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   @override
-  Object visitLiteral(LiteralExpression node) {
+  void visitLiteral(LiteralExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   @override
-  Object visitNonterminal(NonterminalExpression node) {
+  void visitNonterminal(NonterminalExpression node) {
     _initializeNode(node);
     final rule = _rules[node.name];
     if (rule == null) {
@@ -69,35 +67,30 @@ class ExpressionInitializer extends ExpressionVisitor<Object> {
     }
 
     node.expression = rule.expression;
-    return null;
   }
 
   @override
-  Object visitNotPredicate(NotPredicateExpression node) {
+  void visitNotPredicate(NotPredicateExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   @override
-  Object visitOneOrMore(OneOrMoreExpression node) {
+  void visitOneOrMore(OneOrMoreExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   @override
-  Object visitOptional(OptionalExpression node) {
+  void visitOptional(OptionalExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   @override
-  Object visitOrderedChoice(OrderedChoiceExpression node) {
+  void visitOrderedChoice(OrderedChoiceExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   @override
-  Object visitSequence(SequenceExpression node) {
+  void visitSequence(SequenceExpression node) {
     _initializeNode(node);
     final expressions = node.expressions;
     final length = expressions.length;
@@ -109,12 +102,10 @@ class ExpressionInitializer extends ExpressionVisitor<Object> {
     if (node.actionSource != null) {
       node.actionIndex = _actionIndex++;
     }
-
-    return null;
   }
 
   @override
-  Object visitSubterminal(SubterminalExpression node) {
+  void visitSubterminal(SubterminalExpression node) {
     _initializeNode(node);
     final rule = _rules[node.name];
     if (rule == null) {
@@ -122,11 +113,10 @@ class ExpressionInitializer extends ExpressionVisitor<Object> {
     }
 
     node.expression = rule.expression;
-    return null;
   }
 
   @override
-  Object visitTerminal(TerminalExpression node) {
+  void visitTerminal(TerminalExpression node) {
     _initializeNode(node);
     final rule = _rules[node.name];
     if (rule == null) {
@@ -134,13 +124,11 @@ class ExpressionInitializer extends ExpressionVisitor<Object> {
     }
 
     node.expression = rule.expression;
-    return null;
   }
 
   @override
-  Object visitZeroOrMore(ZeroOrMoreExpression node) {
+  void visitZeroOrMore(ZeroOrMoreExpression node) {
     _initializeNode(node);
-    return null;
   }
 
   void _initializeNode(Expression node) {
