@@ -1216,7 +1216,7 @@ class Peg2Parser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    var $8 = _parse_type_name(154, $1);
+    var $8 = _parseTypeName(154, $1);
     if (_success) {
       // NOP;
       List<String> $10;
@@ -1261,6 +1261,49 @@ class Peg2Parser {
     return $2;
   }
 
+  String _parseTypeName(int $0, bool $1) {
+    String $2;
+    String $3;
+    for (;;) {
+      String $4;
+      var $5 = _c;
+      var $6 = _cp;
+      var $7 = _pos;
+      var $8 = _parse_library_prefix(163, $1);
+      if (_success) {
+        _parse_$Period(164, false);
+        if (_success) {
+          var $10 = _parse_type_name(165, $1);
+          if (_success) {
+            var p = $8;
+            var n = $10;
+            String $$;
+            $$ = '$p.$n';
+            $4 = $$;
+          }
+        }
+        if (!_success) {
+          _c = $5;
+          _cp = $6;
+          _pos = $7;
+        }
+      }
+      if (_success) {
+        $3 = $4;
+        break;
+      }
+      String $11;
+      var $12 = _parse_type_name(167, $1);
+      $11 = $12;
+      if (_success) {
+        $3 = $11;
+      }
+      break;
+    }
+    $2 = $3;
+    return $2;
+  }
+
   List<String> _parseTypeArguments(int $0, bool $1) {
     List<String> $2;
     List<String> $3;
@@ -1268,7 +1311,7 @@ class Peg2Parser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    var $8 = _parseType(163, $1);
+    var $8 = _parseType(170, $1);
     if (_success) {
       List<String> $9;
       if ($1) {
@@ -1280,9 +1323,9 @@ class Peg2Parser {
         var $12 = _c;
         var $13 = _cp;
         var $14 = _pos;
-        _parse_$Comma(167, false);
+        _parse_$Comma(174, false);
         if (_success) {
-          var $16 = _parseType(168, $1);
+          var $16 = _parseType(175, $1);
           if (_success) {
             $11 = $16;
           } else {
@@ -1325,9 +1368,9 @@ class Peg2Parser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    var $8 = _parse$$IDENTIFIER(171, $1);
+    var $8 = _parse$$IDENTIFIER(178, $1);
     if (_success) {
-      _parse$$SPACING(172, false);
+      _parse$$SPACING(179, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -1390,7 +1433,7 @@ class Peg2Parser {
         _predicate = $27;
         $1 = $28;
         if (_success) {
-          _parse$$TERMINAL_CHAR(184, false);
+          _parse$$TERMINAL_CHAR(191, false);
           if (_success) {
             $20 = $30;
           } else {
@@ -1430,7 +1473,7 @@ class Peg2Parser {
     }
     $1 = $10;
     if (_success) {
-      _parse$$SPACING(186, false);
+      _parse$$SPACING(193, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -1466,7 +1509,7 @@ class Peg2Parser {
     var $15 = _pos;
     var $16 = _matchChar(64);
     if (_success) {
-      _parse$$IDENTIFIER(193, false);
+      _parse$$IDENTIFIER(200, false);
       if (_success) {
         $12 = $16;
       } else {
@@ -1481,7 +1524,7 @@ class Peg2Parser {
     }
     $1 = $10;
     if (_success) {
-      _parse$$SPACING(194, false);
+      _parse$$SPACING(201, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -1506,7 +1549,7 @@ class Peg2Parser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    var $8 = _parse$$IDENTIFIER(197, $1);
+    var $8 = _parse$$IDENTIFIER(204, $1);
     if (_success) {
       _matchString(':');
       if (_success) {
@@ -1533,9 +1576,38 @@ class Peg2Parser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    var $8 = _parse$$IDENTIFIER(201, $1);
+    String $8;
+    var $9 = _pos;
+    var $10 = $1;
+    $1 = false;
+    String $11;
+    String $12;
+    var $13 = _c;
+    var $14 = _cp;
+    var $15 = _pos;
+    var $16 = _parse$$IDENTIFIER(211, $1);
     if (_success) {
-      _parse$$SPACING(202, false);
+      // NOP;
+      var $18 = _matchChar(63);
+      if (!_success) {
+        _success = true;
+        $18 = null;
+      }
+      if (_success) {
+        $12 = $16;
+      } else {
+        _c = $13;
+        _cp = $14;
+        _pos = $15;
+      }
+    }
+    $11 = $12;
+    if (_success) {
+      $8 = _input.substring($9, _pos);
+    }
+    $1 = $10;
+    if (_success) {
+      _parse$$SPACING(214, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -1552,6 +1624,50 @@ class Peg2Parser {
     return $2;
   }
 
+  String _parse_library_prefix(int $0, bool $1) {
+    _failed = -1;
+    String $2;
+    String $3;
+    String $4;
+    String $5;
+    var $6 = _pos;
+    var $7 = $1;
+    $1 = false;
+    int $8;
+    int $9;
+    var $10 = _c;
+    var $11 = _cp;
+    var $12 = _pos;
+    // NOP;
+    var $14 = _matchChar(95);
+    if (!_success) {
+      _success = true;
+      $14 = null;
+    }
+    if (_success) {
+      _parse$$IDENTIFIER(222, false);
+      if (_success) {
+        $9 = $14;
+      } else {
+        _c = $10;
+        _cp = $11;
+        _pos = $12;
+      }
+    }
+    $8 = $9;
+    if (_success) {
+      $5 = _input.substring($6, _pos);
+    }
+    $1 = $7;
+    $4 = $5;
+    $3 = $4;
+    $2 = $3;
+    if (!_success) {
+      _failure('\'library prefix\'');
+    }
+    return $2;
+  }
+
   String _parse_$Semicolon(int $0, bool $1) {
     _failed = -1;
     String $2;
@@ -1562,7 +1678,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString(';');
     if (_success) {
-      _parse$$SPACING(206, false);
+      _parse$$SPACING(226, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -1600,7 +1716,7 @@ class Peg2Parser {
         $14 = [];
       }
       for (;;) {
-        var $15 = _parse$$ACTION_BODY(214, $1);
+        var $15 = _parse$$ACTION_BODY(234, $1);
         if (!_success) {
           _success = true;
           break;
@@ -1618,7 +1734,7 @@ class Peg2Parser {
       if (_success) {
         _matchString('}');
         if (_success) {
-          _parse$$SPACING(216, false);
+          _parse$$SPACING(236, false);
           if (_success) {
             $4 = $9;
           }
@@ -1648,7 +1764,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('&');
     if (_success) {
-      _parse$$SPACING(220, false);
+      _parse$$SPACING(240, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -1702,7 +1818,7 @@ class Peg2Parser {
         _predicate = $19;
         $1 = $20;
         if (_success) {
-          var $23 = _parse$$RANGE(229, $1);
+          var $23 = _parse$$RANGE(249, $1);
           if (_success) {
             $12 = $23;
           } else {
@@ -1727,7 +1843,7 @@ class Peg2Parser {
       if (_success) {
         _matchString(']');
         if (_success) {
-          _parse$$SPACING(231, false);
+          _parse$$SPACING(251, false);
           if (_success) {
             var r = $9;
             Expression $$;
@@ -1760,7 +1876,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString(')');
     if (_success) {
-      _parse$$SPACING(235, false);
+      _parse$$SPACING(255, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -1787,7 +1903,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('.');
     if (_success) {
-      _parse$$SPACING(239, false);
+      _parse$$SPACING(259, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -1854,7 +1970,7 @@ class Peg2Parser {
         $14 = [];
       }
       for (;;) {
-        var $15 = _parse$$GLOBALS_BODY(251, $1);
+        var $15 = _parse$$GLOBALS_BODY(271, $1);
         if (!_success) {
           _success = true;
           break;
@@ -1872,7 +1988,7 @@ class Peg2Parser {
       if (_success) {
         _matchString('}%');
         if (_success) {
-          _parse$$SPACING(253, false);
+          _parse$$SPACING(273, false);
           if (_success) {
             $4 = $9;
           }
@@ -1897,7 +2013,7 @@ class Peg2Parser {
     List $2;
     List $3;
     List $4;
-    var $5 = _parse$$SPACING(256, $1);
+    var $5 = _parse$$SPACING(276, $1);
     $4 = $5;
     $3 = $4;
     $2 = $3;
@@ -1917,7 +2033,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('=');
     if (_success) {
-      _parse$$SPACING(260, false);
+      _parse$$SPACING(280, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -1970,7 +2086,7 @@ class Peg2Parser {
         _predicate = $18;
         $1 = $19;
         if (_success) {
-          var $22 = _parse$$LITERAL_CHAR(269, $1);
+          var $22 = _parse$$LITERAL_CHAR(289, $1);
           if (_success) {
             $11 = $22;
           } else {
@@ -1991,7 +2107,7 @@ class Peg2Parser {
       if (_success) {
         _matchChar(34);
         if (_success) {
-          _parse$$SPACING(271, false);
+          _parse$$SPACING(291, false);
           if (_success) {
             var c = $9;
             Expression $$;
@@ -2035,7 +2151,7 @@ class Peg2Parser {
         $14 = [];
       }
       for (;;) {
-        var $15 = _parse$$ACTION_BODY(279, $1);
+        var $15 = _parse$$ACTION_BODY(299, $1);
         if (!_success) {
           _success = true;
           break;
@@ -2053,7 +2169,7 @@ class Peg2Parser {
       if (_success) {
         _matchString('}');
         if (_success) {
-          _parse$$SPACING(281, false);
+          _parse$$SPACING(301, false);
           if (_success) {
             $4 = $9;
           }
@@ -2083,7 +2199,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('!');
     if (_success) {
-      _parse$$SPACING(285, false);
+      _parse$$SPACING(305, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -2110,7 +2226,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('(');
     if (_success) {
-      _parse$$SPACING(289, false);
+      _parse$$SPACING(309, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -2137,7 +2253,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('+');
     if (_success) {
-      _parse$$SPACING(293, false);
+      _parse$$SPACING(313, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -2164,7 +2280,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString(',');
     if (_success) {
-      _parse$$SPACING(297, false);
+      _parse$$SPACING(317, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -2191,7 +2307,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('?');
     if (_success) {
-      _parse$$SPACING(301, false);
+      _parse$$SPACING(321, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -2218,7 +2334,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('/');
     if (_success) {
-      _parse$$SPACING(305, false);
+      _parse$$SPACING(325, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -2245,7 +2361,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('*');
     if (_success) {
-      _parse$$SPACING(309, false);
+      _parse$$SPACING(329, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -2272,7 +2388,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('<');
     if (_success) {
-      _parse$$SPACING(313, false);
+      _parse$$SPACING(333, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -2299,7 +2415,7 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _matchString('>');
     if (_success) {
-      _parse$$SPACING(317, false);
+      _parse$$SPACING(337, false);
       if (_success) {
         $4 = $8;
       } else {
@@ -2331,7 +2447,7 @@ class Peg2Parser {
           $9 = [];
         }
         for (;;) {
-          var $10 = _parse$$ACTION_BODY(322, false);
+          var $10 = _parse$$ACTION_BODY(342, false);
           if (!_success) {
             _success = true;
             break;
@@ -2420,7 +2536,7 @@ class Peg2Parser {
         var $19 = $1;
         _predicate = true;
         $1 = false;
-        _parse$$EOL(335, $1);
+        _parse$$EOL(355, $1);
         var $21;
         _success = !_success;
         _c = $15;
@@ -2449,7 +2565,7 @@ class Peg2Parser {
       }
       if (_success) {
         // NOP;
-        var $24 = _parse$$EOL(338, false);
+        var $24 = _parse$$EOL(358, false);
         if (!_success) {
           _success = true;
           $24 = null;
@@ -2604,14 +2720,14 @@ class Peg2Parser {
     var $10 = _c;
     var $11 = _cp;
     var $12 = _pos;
-    var $13 = _parse$$IDENT_START(363, $1);
+    var $13 = _parse$$IDENT_START(383, $1);
     if (_success) {
       List<int> $14;
       if ($1) {
         $14 = [];
       }
       for (;;) {
-        var $15 = _parse$$IDENT_CONT(365, false);
+        var $15 = _parse$$IDENT_CONT(385, false);
         if (!_success) {
           _success = true;
           break;
@@ -2644,7 +2760,7 @@ class Peg2Parser {
     int $3;
     for (;;) {
       int $4;
-      var $5 = _parse$$IDENT_START(368, $1);
+      var $5 = _parse$$IDENT_START(388, $1);
       $4 = $5;
       if (_success) {
         $3 = $4;
@@ -2703,7 +2819,7 @@ class Peg2Parser {
         break;
       }
       int $11;
-      var $12 = _parse$$HEX_NUMBER(379, $1);
+      var $12 = _parse$$HEX_NUMBER(399, $1);
       $11 = $12;
       if (_success) {
         $3 = $11;
@@ -2736,7 +2852,7 @@ class Peg2Parser {
         var $28 = $1;
         _predicate = true;
         $1 = false;
-        _parse$$EOL(384, false);
+        _parse$$EOL(404, false);
         // NOP;
         _success = !_success;
         _c = $24;
@@ -2773,11 +2889,11 @@ class Peg2Parser {
       var $5 = _c;
       var $6 = _cp;
       var $7 = _pos;
-      var $8 = _parse$$RANGE_CHAR(388, $1);
+      var $8 = _parse$$RANGE_CHAR(408, $1);
       if (_success) {
         _matchString('-');
         if (_success) {
-          var $10 = _parse$$RANGE_CHAR(390, $1);
+          var $10 = _parse$$RANGE_CHAR(410, $1);
           if (_success) {
             var s = $8;
             var e = $10;
@@ -2797,7 +2913,7 @@ class Peg2Parser {
         break;
       }
       List<int> $11;
-      var $12 = _parse$$RANGE_CHAR(392, $1);
+      var $12 = _parse$$RANGE_CHAR(412, $1);
       if (_success) {
         var c = $12;
         List<int> $$;
@@ -2841,7 +2957,7 @@ class Peg2Parser {
         break;
       }
       int $11;
-      var $12 = _parse$$HEX_NUMBER(398, $1);
+      var $12 = _parse$$HEX_NUMBER(418, $1);
       $11 = $12;
       if (_success) {
         $3 = $11;
@@ -2874,7 +2990,7 @@ class Peg2Parser {
         var $28 = $1;
         _predicate = true;
         $1 = false;
-        _parse$$EOL(403, false);
+        _parse$$EOL(423, false);
         // NOP;
         _success = !_success;
         _c = $24;
@@ -2916,7 +3032,7 @@ class Peg2Parser {
         break;
       }
       dynamic $7;
-      var $8 = _parse$$EOL(409, $1);
+      var $8 = _parse$$EOL(429, $1);
       $7 = $8;
       if (_success) {
         $3 = $7;
@@ -2939,14 +3055,14 @@ class Peg2Parser {
       dynamic $6;
       for (;;) {
         dynamic $7;
-        var $8 = _parse$$SPACE(415, $1);
+        var $8 = _parse$$SPACE(435, $1);
         $7 = $8;
         if (_success) {
           $6 = $7;
           break;
         }
         String $9;
-        var $10 = _parse$$COMMENT(417, $1);
+        var $10 = _parse$$COMMENT(437, $1);
         $9 = $10;
         if (_success) {
           $6 = $9;

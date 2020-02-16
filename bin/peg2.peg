@@ -43,6 +43,7 @@ Expression _suffix(String suffix, Expression expression) {
 
   return expression;
 }
+
 }%
 
 # Nonterminals
@@ -120,7 +121,12 @@ ProductionRule SubterminalDefinition =
   ;
 
 String Type =
-  n:'type name' a:('<' a:TypeArguments '>')? { $$ = n + (a == null ? '' : '<' + a.join(', ') + '>'); }
+  n:TypeName a:('<' a:TypeArguments '>')? { $$ = n + (a == null ? '' : '<' + a.join(', ') + '>'); }
+  ;
+
+String TypeName =
+  p:'library prefix' '.' n:'type name' { $$ = '$p.$n'; }
+  / 'type name'
   ;
 
 List<String> TypeArguments =
@@ -146,7 +152,11 @@ List<String> TypeArguments =
   ;
 
 'type name' =
-  @IDENTIFIER @SPACING
+  <@IDENTIFIER [?]?> @SPACING
+  ;
+
+'library prefix' =
+  <[_]? @IDENTIFIER>
   ;
 
 ';' =
