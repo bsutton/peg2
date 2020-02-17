@@ -1,11 +1,5 @@
 part of '../../generators.dart';
 
-class ParserGeneratorOptions {
-  bool memoize = false;
-
-  String name;
-}
-
 class ParserGenerator {
   String generate(Grammar grammar, ParserGeneratorOptions options) {
     final grammarAnalyzer = GrammarAnalyzer();
@@ -20,7 +14,6 @@ class ParserGenerator {
 
     final rulesToOperationsBuilder = RulesToOperationsBuilder();
     final methods = rulesToOperationsBuilder.build(grammar, options);
-
     for (final method in methods) {
       final operationsInitializer = OperationInitializer();
       operationsInitializer.initialize(method);

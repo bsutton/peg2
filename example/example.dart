@@ -264,13 +264,12 @@ class JsonParser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    // NOP;
     _parse_leading_spaces(3, false);
-    var $10 = _parseValue(4, $1);
+    var $9 = _parseValue(4, $1);
     if (_success) {
       _parse_end_of_file(5, false);
       if (_success) {
-        $4 = $10;
+        $4 = $9;
       }
     }
     if (!_success) {
@@ -364,11 +363,10 @@ class JsonParser {
     var $7 = _pos;
     _parse_$LeftSquareBracket(23, false);
     if (_success) {
-      // NOP;
-      var $10 = _parseValues(25, $1);
+      var $9 = _parseValues(25, $1);
       _parse_$RightSquareBracket(26, false);
       if (_success) {
-        var v = $10;
+        var v = $9;
         List $$;
         $$ = v ?? [];
         $4 = $$;
@@ -451,11 +449,10 @@ class JsonParser {
     var $7 = _pos;
     _parse_$LeftBrace(37, false);
     if (_success) {
-      // NOP;
-      var $10 = _parseMembers(39, $1);
+      var $9 = _parseMembers(39, $1);
       _parse_$RightBrace(40, false);
       if (_success) {
-        var m = $10;
+        var m = $9;
         Map<String, dynamic> $$;
         $$ = <String, dynamic>{}..addEntries(m ?? []);
         $4 = $$;
@@ -711,7 +708,203 @@ class JsonParser {
         $9 = [];
       }
       for (;;) {
-        var $10 = _parse$$char(77, $1);
+        int $10;
+        for (;;) {
+          int $11;
+          var $12 = _c;
+          var $13 = _cp;
+          var $14 = _pos;
+          _matchChar(92);
+          if (_success) {
+            int $16;
+            for (;;) {
+              int $17;
+              var $18 = _matchChar(34);
+              if (_success) {
+                $17 = $18;
+              }
+              if (_success) {
+                $16 = $17;
+                break;
+              }
+              int $19;
+              var $20 = _matchChar(92);
+              if (_success) {
+                $19 = $20;
+              }
+              if (_success) {
+                $16 = $19;
+                break;
+              }
+              int $21;
+              var $22 = _matchChar(47);
+              if (_success) {
+                $21 = $22;
+              }
+              if (_success) {
+                $16 = $21;
+                break;
+              }
+              int $23;
+              _matchChar(98);
+              if (_success) {
+                int $$;
+                $$ = 0x8;
+                $23 = $$;
+              }
+              if (_success) {
+                $16 = $23;
+                break;
+              }
+              int $25;
+              _matchChar(102);
+              if (_success) {
+                int $$;
+                $$ = 0xC;
+                $25 = $$;
+              }
+              if (_success) {
+                $16 = $25;
+                break;
+              }
+              int $27;
+              _matchChar(110);
+              if (_success) {
+                int $$;
+                $$ = 0xA;
+                $27 = $$;
+              }
+              if (_success) {
+                $16 = $27;
+                break;
+              }
+              int $29;
+              _matchChar(114);
+              if (_success) {
+                int $$;
+                $$ = 0xD;
+                $29 = $$;
+              }
+              if (_success) {
+                $16 = $29;
+                break;
+              }
+              int $31;
+              _matchChar(116);
+              if (_success) {
+                int $$;
+                $$ = 0x9;
+                $31 = $$;
+              }
+              if (_success) {
+                $16 = $31;
+                break;
+              }
+              int $33;
+              var $34 = _c;
+              var $35 = _cp;
+              var $36 = _pos;
+              _matchChar(117);
+              if (_success) {
+                int $38;
+                int $39;
+                var $40 = _c;
+                var $41 = _cp;
+                var $42 = _pos;
+                var $43 = _parse$$hexdig(165, $1);
+                if (_success) {
+                  var $44 = _parse$$hexdig(166, $1);
+                  if (_success) {
+                    var $45 = _parse$$hexdig(167, $1);
+                    if (_success) {
+                      var $46 = _parse$$hexdig(168, $1);
+                      if (_success) {
+                        var a = $43;
+                        var b = $44;
+                        var c = $45;
+                        var d = $46;
+                        int $$;
+                        $$ = a * 0xfff + b * 0xff + c * 0xf + d;
+                        $39 = $$;
+                      }
+                    }
+                  }
+                }
+                if (!_success) {
+                  _c = $40;
+                  _cp = $41;
+                  _pos = $42;
+                }
+                $38 = $39;
+                if (_success) {
+                  $33 = $38;
+                }
+              }
+              if (!_success) {
+                _c = $34;
+                _cp = $35;
+                _pos = $36;
+              }
+              if (_success) {
+                $16 = $33;
+              }
+              break;
+            }
+            if (_success) {
+              $11 = $16;
+            }
+          }
+          if (!_success) {
+            _c = $12;
+            _cp = $13;
+            _pos = $14;
+          }
+          if (_success) {
+            $10 = $11;
+            break;
+          }
+          int $47;
+          int $48;
+          for (;;) {
+            int $49;
+            const $50 = [32, 33];
+            var $51 = _matchRanges($50);
+            if (_success) {
+              $49 = $51;
+            }
+            if (_success) {
+              $48 = $49;
+              break;
+            }
+            int $52;
+            const $53 = [35, 91];
+            var $54 = _matchRanges($53);
+            if (_success) {
+              $52 = $54;
+            }
+            if (_success) {
+              $48 = $52;
+              break;
+            }
+            int $55;
+            const $56 = [93, 1114111];
+            var $57 = _matchRanges($56);
+            if (_success) {
+              $55 = $57;
+            }
+            if (_success) {
+              $48 = $55;
+            }
+            break;
+          }
+          if (_success) {
+            $47 = $48;
+          }
+          if (_success) {
+            $10 = $47;
+          }
+          break;
+        }
         if (!_success) {
           _success = true;
           break;
@@ -761,139 +954,137 @@ class JsonParser {
     var $13 = _c;
     var $14 = _cp;
     var $15 = _pos;
-    // NOP;
-    var $17 = _matchChar(45);
+    var $16 = _matchChar(45);
     _success = true;
     if (_success) {
-      int $18;
+      int $17;
       for (;;) {
-        int $19;
-        var $20 = _matchChar(48);
-        if (_success) {
-          $19 = $20;
-        }
+        int $18;
+        var $19 = _matchChar(48);
         if (_success) {
           $18 = $19;
+        }
+        if (_success) {
+          $17 = $18;
           break;
         }
-        int $21;
-        var $22 = _c;
-        var $23 = _cp;
-        var $24 = _pos;
-        const $25 = [49, 57];
-        var $26 = _matchRanges($25);
+        int $20;
+        var $21 = _c;
+        var $22 = _cp;
+        var $23 = _pos;
+        const $24 = [49, 57];
+        var $25 = _matchRanges($24);
         if (_success) {
-          List<int> $27;
+          List<int> $26;
           if ($1) {
-            $27 = [];
+            $26 = [];
           }
           for (;;) {
-            const $28 = [48, 57];
-            var $29 = _matchRanges($28);
+            const $27 = [48, 57];
+            var $28 = _matchRanges($27);
             if (!_success) {
               _success = true;
               break;
             }
             if ($1) {
-              $27.add($29);
+              $26.add($28);
             }
           }
           if (_success) {
-            $21 = $26;
+            $20 = $25;
           }
         }
         if (!_success) {
-          _c = $22;
-          _cp = $23;
-          _pos = $24;
-        } else {
-          $18 = $21;
+          _c = $21;
+          _cp = $22;
+          _pos = $23;
+        }
+        if (_success) {
+          $17 = $20;
         }
         break;
       }
       if (_success) {
-        // NOP;
-        int $31;
-        int $32;
-        var $33 = _c;
-        var $34 = _cp;
-        var $35 = _pos;
-        var $36 = _matchChar(46);
+        int $29;
+        int $30;
+        var $31 = _c;
+        var $32 = _cp;
+        var $33 = _pos;
+        var $34 = _matchChar(46);
         if (_success) {
-          List<int> $37;
+          List<int> $35;
           if ($1) {
-            $37 = [];
+            $35 = [];
           }
-          var $38 = false;
+          var $36 = false;
           for (;;) {
-            const $39 = [48, 57];
-            var $40 = _matchRanges($39);
+            const $37 = [48, 57];
+            var $38 = _matchRanges($37);
             if (!_success) {
-              _success = $38;
+              _success = $36;
               if (!_success) {
-                $37 = null;
+                $35 = null;
               }
               break;
             }
             if ($1) {
-              $37.add($40);
+              $35.add($38);
             }
-            $38 = true;
+            $36 = true;
           }
           if (_success) {
-            $32 = $36;
+            $30 = $34;
           }
         }
         if (!_success) {
-          _c = $33;
-          _cp = $34;
-          _pos = $35;
+          _c = $31;
+          _cp = $32;
+          _pos = $33;
         }
-        $31 = $32;
+        $29 = $30;
         _success = true;
         if (_success) {
-          // NOP;
-          int $42;
-          int $43;
-          var $44 = _c;
-          var $45 = _cp;
-          var $46 = _pos;
-          const $47 = [69, 69, 101, 101];
-          var $48 = _matchRanges($47);
+          int $39;
+          int $40;
+          var $41 = _c;
+          var $42 = _cp;
+          var $43 = _pos;
+          const $44 = [69, 69, 101, 101];
+          var $45 = _matchRanges($44);
           if (_success) {
-            List<int> $49;
+            List<int> $46;
             if ($1) {
-              $49 = [];
+              $46 = [];
             }
-            var $50 = false;
+            var $47 = false;
             for (;;) {
-              const $51 = [32, 32, 43, 93];
-              var $52 = _matchRanges($51);
+              const $48 = [32, 32, 43, 93];
+              var $49 = _matchRanges($48);
               if (!_success) {
-                _success = $50;
+                _success = $47;
                 if (!_success) {
-                  $49 = null;
+                  $46 = null;
                 }
                 break;
               }
               if ($1) {
-                $49.add($52);
+                $46.add($49);
               }
-              $50 = true;
+              $47 = true;
             }
             if (_success) {
-              $43 = $48;
+              $40 = $45;
             }
           }
           if (!_success) {
-            _c = $44;
-            _cp = $45;
-            _pos = $46;
+            _c = $41;
+            _cp = $42;
+            _pos = $43;
           }
-          $42 = $43;
+          $39 = $40;
           _success = true;
           if (_success) {
-            $12 = $17;
+            $12 = $16;
           }
         }
       }
@@ -1128,7 +1319,140 @@ class JsonParser {
       var $7 = _pos;
       _matchChar(92);
       if (_success) {
-        var $9 = _parse$$escaped(140, $1);
+        int $9;
+        for (;;) {
+          int $10;
+          var $11 = _matchChar(34);
+          if (_success) {
+            $10 = $11;
+          }
+          if (_success) {
+            $9 = $10;
+            break;
+          }
+          int $12;
+          var $13 = _matchChar(92);
+          if (_success) {
+            $12 = $13;
+          }
+          if (_success) {
+            $9 = $12;
+            break;
+          }
+          int $14;
+          var $15 = _matchChar(47);
+          if (_success) {
+            $14 = $15;
+          }
+          if (_success) {
+            $9 = $14;
+            break;
+          }
+          int $16;
+          _matchChar(98);
+          if (_success) {
+            int $$;
+            $$ = 0x8;
+            $16 = $$;
+          }
+          if (_success) {
+            $9 = $16;
+            break;
+          }
+          int $18;
+          _matchChar(102);
+          if (_success) {
+            int $$;
+            $$ = 0xC;
+            $18 = $$;
+          }
+          if (_success) {
+            $9 = $18;
+            break;
+          }
+          int $20;
+          _matchChar(110);
+          if (_success) {
+            int $$;
+            $$ = 0xA;
+            $20 = $$;
+          }
+          if (_success) {
+            $9 = $20;
+            break;
+          }
+          int $22;
+          _matchChar(114);
+          if (_success) {
+            int $$;
+            $$ = 0xD;
+            $22 = $$;
+          }
+          if (_success) {
+            $9 = $22;
+            break;
+          }
+          int $24;
+          _matchChar(116);
+          if (_success) {
+            int $$;
+            $$ = 0x9;
+            $24 = $$;
+          }
+          if (_success) {
+            $9 = $24;
+            break;
+          }
+          int $26;
+          var $27 = _c;
+          var $28 = _cp;
+          var $29 = _pos;
+          _matchChar(117);
+          if (_success) {
+            int $31;
+            int $32;
+            var $33 = _c;
+            var $34 = _cp;
+            var $35 = _pos;
+            var $36 = _parse$$hexdig(165, $1);
+            if (_success) {
+              var $37 = _parse$$hexdig(166, $1);
+              if (_success) {
+                var $38 = _parse$$hexdig(167, $1);
+                if (_success) {
+                  var $39 = _parse$$hexdig(168, $1);
+                  if (_success) {
+                    var a = $36;
+                    var b = $37;
+                    var c = $38;
+                    var d = $39;
+                    int $$;
+                    $$ = a * 0xfff + b * 0xff + c * 0xf + d;
+                    $32 = $$;
+                  }
+                }
+              }
+            }
+            if (!_success) {
+              _c = $33;
+              _cp = $34;
+              _pos = $35;
+            }
+            $31 = $32;
+            if (_success) {
+              $26 = $31;
+            }
+          }
+          if (!_success) {
+            _c = $27;
+            _cp = $28;
+            _pos = $29;
+          }
+          if (_success) {
+            $9 = $26;
+          }
+          break;
+        }
         if (_success) {
           $4 = $9;
         }
@@ -1137,17 +1461,50 @@ class JsonParser {
         _c = $5;
         _cp = $6;
         _pos = $7;
-      } else {
+      }
+      if (_success) {
         $3 = $4;
         break;
       }
-      int $10;
-      var $11 = _parse$$unescaped(142, $1);
-      if (_success) {
-        $10 = $11;
+      int $40;
+      int $41;
+      for (;;) {
+        int $42;
+        const $43 = [32, 33];
+        var $44 = _matchRanges($43);
+        if (_success) {
+          $42 = $44;
+        }
+        if (_success) {
+          $41 = $42;
+          break;
+        }
+        int $45;
+        const $46 = [35, 91];
+        var $47 = _matchRanges($46);
+        if (_success) {
+          $45 = $47;
+        }
+        if (_success) {
+          $41 = $45;
+          break;
+        }
+        int $48;
+        const $49 = [93, 1114111];
+        var $50 = _matchRanges($49);
+        if (_success) {
+          $48 = $50;
+        }
+        if (_success) {
+          $41 = $48;
+        }
+        break;
       }
       if (_success) {
-        $3 = $10;
+        $40 = $41;
+      }
+      if (_success) {
+        $3 = $40;
       }
       break;
     }
@@ -1247,7 +1604,36 @@ class JsonParser {
       var $23 = _pos;
       _matchChar(117);
       if (_success) {
-        var $25 = _parse$$hexdig4(162, $1);
+        int $25;
+        int $26;
+        var $27 = _c;
+        var $28 = _cp;
+        var $29 = _pos;
+        var $30 = _parse$$hexdig(165, $1);
+        if (_success) {
+          var $31 = _parse$$hexdig(166, $1);
+          if (_success) {
+            var $32 = _parse$$hexdig(167, $1);
+            if (_success) {
+              var $33 = _parse$$hexdig(168, $1);
+              if (_success) {
+                var a = $30;
+                var b = $31;
+                var c = $32;
+                var d = $33;
+                int $$;
+                $$ = a * 0xfff + b * 0xff + c * 0xf + d;
+                $26 = $$;
+              }
+            }
+          }
+        }
+        if (!_success) {
+          _c = $27;
+          _cp = $28;
+          _pos = $29;
+        }
+        $25 = $26;
         if (_success) {
           $20 = $25;
         }
@@ -1256,7 +1642,8 @@ class JsonParser {
         _c = $21;
         _cp = $22;
         _pos = $23;
-      } else {
+      }
+      if (_success) {
         $3 = $20;
       }
       break;

@@ -1,4 +1,4 @@
-part of '../../generators.dart';
+part of '../../expression_transformers.dart';
 
 class ExpressionInitializer extends ExpressionVisitor {
   int _actionIndex;
@@ -67,6 +67,7 @@ class ExpressionInitializer extends ExpressionVisitor {
     }
 
     node.expression = rule.expression;
+    rule.callers.add(node);
   }
 
   @override
@@ -113,6 +114,7 @@ class ExpressionInitializer extends ExpressionVisitor {
     }
 
     node.expression = rule.expression;
+    rule.callers.add(node);
   }
 
   @override
@@ -124,6 +126,7 @@ class ExpressionInitializer extends ExpressionVisitor {
     }
 
     node.expression = rule.expression;
+    rule.callers.add(node);
   }
 
   @override

@@ -1,4 +1,4 @@
-part of '../../generators.dart';
+part of '../../operation_optimizers.dart';
 
 class OperationReplacer extends SimpleOperationVisitor {
   Operation _from;

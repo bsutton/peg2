@@ -1,4 +1,4 @@
-part of '../../generators.dart';
+part of '../../operation_optimizers.dart';
 
 class OperationOptimizer {
   void optimize(BlockOperation operation) {

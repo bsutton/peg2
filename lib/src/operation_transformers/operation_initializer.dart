@@ -1,4 +1,4 @@
-part of '../../generators.dart';
+part of '../../operation_transformers.dart';
 
 class OperationInitializer extends SimpleOperationVisitor {
   Operation parent;

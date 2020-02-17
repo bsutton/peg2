@@ -1,4 +1,4 @@
-part of '../../generators.dart';
+part of '../../expression_transformers.dart';
 
 class ExpressionReturnTypeResolver extends ExpressionVisitor<Object> {
   bool _hasModifications;

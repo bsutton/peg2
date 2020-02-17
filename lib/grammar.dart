@@ -1,5 +1,5 @@
 import 'expressions.dart';
-import 'generators.dart';
+import 'expression_transformers.dart';
 
 part 'src/grammar/grammar.dart';
 part 'src/grammar/production_rule.dart';

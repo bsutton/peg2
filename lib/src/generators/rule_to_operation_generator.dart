@@ -19,6 +19,8 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
 
   bool _notProductive;
 
+  ParserGeneratorOptions _options;
+
   Variable _pos;
 
   Variable _predicate;
@@ -43,6 +45,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     _memoize = Variable('_memoize');
     _memoized = Variable('_memoized');
     _notProductive = false;
+    _options = options;
     _predicate = Variable('_predicate');
     _pos = Variable('_pos');
     _success = Variable('_success');
@@ -54,7 +57,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
 
     final result = <MethodOperation>[];
     for (final rule in rules) {
-      final method = _buildRule(rule, options.memoize);
+      final method = _buildRule(rule);
       result.add(method);
     }
 
@@ -246,9 +249,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
   Object visitOptional(OptionalExpression node) {
     final b = _block;
     final child = node.expression;
-    final returnType = child.returnType;
     _addNodeComment(b, node);
-    _result = _newVar(b, returnType, null);
     child.accept(this);
     _addAssign(b, _varOp(_success), _constOp(true));
     return null;
@@ -268,16 +269,6 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     final expressions = node.expressions;
     final returnType = node.returnType;
     _addNodeComment(b, node);
-    void temp(BlockOperation b) {
-      var flag = false;
-      if (b.operations.isNotEmpty) {
-        final last = b.operations.last;
-        if (last.kind == OperationKind.conditional) {
-          final op1 = last as ConstantOperation;
-        }
-      }
-    }
-
     final result = _newVar(b, returnType, null);
     if (expressions.length > 1) {
       _addLoop(b, (b) {
@@ -439,10 +430,16 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     final name = Variable(_getRuleName(rule));
     final cid = node.id;
     _addNodeComment(b, node);
-    final productive = _notProductive ? _constOp(false) : _varOp(_productive);
-    final methodCall = _call(_varOp(name), [_constOp(cid), productive]);
-    final result = _newVar(b, 'var', methodCall);
-    _result = result;
+    if (_options.inlineSubterminals && rule.callers.length == 1) {
+      final child = rule.expression;
+      child.accept(this);
+    } else {
+      final productive = _notProductive ? _constOp(false) : _varOp(_productive);
+      final methodCall = _call(_varOp(name), [_constOp(cid), productive]);
+      final result = _newVar(b, 'var', methodCall);
+      _result = result;
+    }
+
     return null;
   }
 
@@ -647,7 +644,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     _addAssign(block, _varOp(result), _varOp($$));
   }
 
-  MethodOperation _buildRule(ProductionRule rule, bool memoize) {
+  MethodOperation _buildRule(ProductionRule rule) {
     _lastVariableIndex = 0;
     final cid = _allocVar();
     _productive = _allocVar();
@@ -659,7 +656,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     returnType ??= rule.expression.returnType;
     final result = _addMethod(returnType, name, params, (b) {
       _block = b;
-      if (memoize) {
+      if (_options.memoize) {
         final memoizedCall =
             CallOperation(_varOp(_memoized), [_constOp(rule.id), _varOp(cid)]);
         _addIf(b, memoizedCall, (b) {
@@ -682,7 +679,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
         });
       }
 
-      if (memoize) {
+      if (_options.memoize) {
         final memoizeCall = _call(_varOp(_memoize), [_varOp(result)]);
         _addOp(b, memoizeCall);
       }
@@ -885,10 +882,4 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
   VariableOperation _varOp(Variable variable) {
     return VariableOperation(variable);
   }
-}
-
-class _SequenceElement {
-  bool testKind;
-
-  void Function(BlockOperation) gen;
 }

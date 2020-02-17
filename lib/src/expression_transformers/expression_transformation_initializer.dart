@@ -1,4 +1,4 @@
-part of '../../generators.dart';
+part of '../../expression_transformers.dart';
 
 class ExpressionTransformationInitializer extends ExpressionVisitor<Object> {
   bool _hasModifications;

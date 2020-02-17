@@ -1,6 +1,8 @@
 part of '../../grammar.dart';
 
 class ProductionRule {
+  final Set<SymbolExpression> callers = {};
+
   OrderedChoiceExpression expression;
 
   final ProductionRuleKind kind;

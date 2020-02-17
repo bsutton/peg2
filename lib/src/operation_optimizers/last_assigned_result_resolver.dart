@@ -1,4 +1,4 @@
-part of '../../generators.dart';
+part of '../../operation_optimizers.dart';
 
 class LastAssignedResultResolver extends SimpleOperationVisitor {
   Map<Variable, Operation> _result = {};

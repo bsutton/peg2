@@ -19,5 +19,6 @@ part 'src/expressions/simple_expression_visitor.dart';
 part 'src/expressions/single_expression.dart';
 part 'src/expressions/subterminal_expression.dart';
 part 'src/expressions/suffix_expression.dart';
+part 'src/expressions/symbol_expression.dart';
 part 'src/expressions/terminal_expression.dart';
 part 'src/expressions/zero_or_more_expression.dart';
