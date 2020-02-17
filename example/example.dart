@@ -370,11 +370,9 @@ class JsonParser {
       $5 = $6;
       if (_success) {
         $4 = $5;
-      }
-      if (_success) {
         $3 = $4;
         break;
-      }
+      }      
       dynamic $26;
       var $27 = _parse_false(10, $1);
       if (_success) {
@@ -1103,24 +1101,20 @@ class JsonParser {
 
   String _parse_$LeftBrace(int $0, bool $1) {
     _failed = -1;
-    String $2;
-    String $3;
-    String $4;
+    String $2;    
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
     var $8 = _matchString('{');
     if (_success) {
       _parse$$spacing(110, false);
-      $4 = $8;
+      $2 = $8;
     }
     if (!_success) {
       _c = $5;
       _cp = $6;
       _pos = $7;
-    }
-    $3 = $4;
-    $2 = $3;
+    }    
     if (!_success) {
       _failure('\'{\'');
     }
@@ -1129,24 +1123,20 @@ class JsonParser {
 
   String _parse_$RightBrace(int $0, bool $1) {
     _failed = -1;
-    String $2;
-    String $3;
-    String $4;
+    String $2;    
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
     var $8 = _matchString('}');
     if (_success) {
       _parse$$spacing(114, false);
-      $4 = $8;
+      $2 = $8;
     }
     if (!_success) {
       _c = $5;
       _cp = $6;
       _pos = $7;
-    }
-    $3 = $4;
-    $2 = $3;
+    }    
     if (!_success) {
       _failure('\'}\'');
     }
@@ -1155,24 +1145,20 @@ class JsonParser {
 
   String _parse_$LeftSquareBracket(int $0, bool $1) {
     _failed = -1;
-    String $2;
-    String $3;
-    String $4;
+    String $2;    
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
     var $8 = _matchString('[');
     if (_success) {
       _parse$$spacing(118, false);
-      $4 = $8;
+      $2 = $8;
     }
     if (!_success) {
       _c = $5;
       _cp = $6;
       _pos = $7;
-    }
-    $3 = $4;
-    $2 = $3;
+    }    
     if (!_success) {
       _failure('\'[\'');
     }
@@ -1181,24 +1167,20 @@ class JsonParser {
 
   String _parse_$RightSquareBracket(int $0, bool $1) {
     _failed = -1;
-    String $2;
-    String $3;
-    String $4;
+    String $2;    
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
     var $8 = _matchString(']');
     if (_success) {
       _parse$$spacing(122, false);
-      $4 = $8;
+      $2 = $8;
     }
     if (!_success) {
       _c = $5;
       _cp = $6;
       _pos = $7;
-    }
-    $3 = $4;
-    $2 = $3;
+    }    
     if (!_success) {
       _failure('\']\'');
     }
@@ -1207,24 +1189,20 @@ class JsonParser {
 
   String _parse_$Comma(int $0, bool $1) {
     _failed = -1;
-    String $2;
-    String $3;
-    String $4;
+    String $2;    
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
     var $8 = _matchString(',');
     if (_success) {
       _parse$$spacing(126, false);
-      $4 = $8;
+      $2 = $8;
     }
     if (!_success) {
       _c = $5;
       _cp = $6;
       _pos = $7;
-    }
-    $3 = $4;
-    $2 = $3;
+    }    
     if (!_success) {
       _failure('\',\'');
     }
@@ -1233,24 +1211,20 @@ class JsonParser {
 
   String _parse_$Colon(int $0, bool $1) {
     _failed = -1;
-    String $2;
-    String $3;
-    String $4;
+    String $2;    
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
     var $8 = _matchString(':');
     if (_success) {
       _parse$$spacing(130, false);
-      $4 = $8;
+      $2 = $8;
     }
     if (!_success) {
       _c = $5;
       _cp = $6;
       _pos = $7;
-    }
-    $3 = $4;
-    $2 = $3;
+    }    
     if (!_success) {
       _failure('\':\'');
     }
@@ -1258,34 +1232,26 @@ class JsonParser {
   }
 
   int _parse$$digit(int $0, bool $1) {
-    int $2;
-    int $3;
-    int $4;
+    int $2;    
     const $5 = [48, 57];
     _matchRanges($5);
     if (_success) {
       int $$;
       $$ = $$ - 48;
-      $4 = $$;
-    }
-    $3 = $4;
-    $2 = $3;
+      $2 = $$;
+    }    
     return $2;
   }
 
   int _parse$$digit1_9(int $0, bool $1) {
-    int $2;
-    int $3;
-    int $4;
+    int $2;    
     const $5 = [49, 57];
     _matchRanges($5);
     if (_success) {
       int $$;
       $$ = $$ - 48;
-      $4 = $$;
-    }
-    $3 = $4;
-    $2 = $3;
+      $2 = $$;
+    }    
     return $2;
   }
 

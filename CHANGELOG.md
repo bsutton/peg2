@@ -1,3 +1,7 @@
+## 0.1.6
+
+- Removed import of `dart:html`. How was it added?
+
 ## 0.1.5
 
 - Added feature: convert nonterminal calls into inline expressions, command line option `--inline-nonterminals`

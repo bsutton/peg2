@@ -307,37 +307,34 @@ class Peg2Parser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    // NOP;
     _parse_leading_spaces(3, false);
-    // NOP;
-    var $11 = _parse_globals(5, $1);
-    // NOP;
-    var $13 = _parse_members(7, $1);
-    List<ProductionRule> $14;
+    var $9 = _parse_globals(5, $1);
+    var $10 = _parse_members(7, $1);
+    List<ProductionRule> $11;
     if ($1) {
-      $14 = [];
+      $11 = [];
     }
-    var $15 = false;
+    var $12 = false;
     for (;;) {
-      var $16 = _parseDefinition(9, $1);
+      var $13 = _parseDefinition(9, $1);
       if (!_success) {
-        _success = $15;
+        _success = $12;
         if (!_success) {
-          $14 = null;
+          $11 = null;
         }
         break;
       }
       if ($1) {
-        $14.add($16);
+        $11.add($13);
       }
-      $15 = true;
+      $12 = true;
     }
     if (_success) {
       _parse_end_of_file(10, false);
       if (_success) {
-        var g = $11;
-        var m = $13;
-        var d = $14;
+        var g = $9;
+        var m = $10;
+        var d = $11;
         Grammar $$;
         $$ = Grammar(d, g, m);
         $4 = $$;
@@ -547,12 +544,11 @@ class Peg2Parser {
       $9 = true;
     }
     if (_success) {
-      // NOP;
-      var $12 = _parse_action(43, $1);
+      var $11 = _parse_action(43, $1);
       _success = true;
       {
         var e = $8;
-        var a = $12;
+        var a = $11;
         SequenceExpression $$;
         $$ = SequenceExpression(e, a);
         $4 = $$;
@@ -575,35 +571,33 @@ class Peg2Parser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    // NOP;
-    var $9 = _parse_semantic_value(47, $1);
-    // NOP;
-    String $11;
+    var $8 = _parse_semantic_value(47, $1);
+    String $9;
     for (;;) {
+      String $10;
+      var $11 = _parse_$Ampersand(51, $1);
+      if (_success) {
+        $10 = $11;
+      }
+      if (_success) {
+        $9 = $10;
+        break;
+      }
       String $12;
-      var $13 = _parse_$Ampersand(51, $1);
+      var $13 = _parse_$ExclamationMark(53, $1);
       if (_success) {
         $12 = $13;
       }
       if (_success) {
-        $11 = $12;
-        break;
-      }
-      String $14;
-      var $15 = _parse_$ExclamationMark(53, $1);
-      if (_success) {
-        $14 = $15;
-      }
-      if (_success) {
-        $11 = $14;
+        $9 = $12;
       }
       break;
     }
-    var $16 = _parseNonterminalSuffix(54, $1);
+    var $14 = _parseNonterminalSuffix(54, $1);
     if (_success) {
-      var s = $9;
-      var p = $11;
-      var e = $16;
+      var s = $8;
+      var p = $9;
+      var e = $14;
       Expression $$;
       $$ = _prefix(p, e, s);
       $4 = $$;
@@ -627,41 +621,40 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _parseNonterminalPrimary(57, $1);
     if (_success) {
-      // NOP;
-      String $10;
+      String $9;
       for (;;) {
-        String $11;
-        var $12 = _parse_$QuestionMark(61, $1);
-        if (_success) {
-          $11 = $12;
-        }
+        String $10;
+        var $11 = _parse_$QuestionMark(61, $1);
         if (_success) {
           $10 = $11;
+        }
+        if (_success) {
+          $9 = $10;
           break;
         }
-        String $13;
-        var $14 = _parse_$Asterisk(63, $1);
+        String $12;
+        var $13 = _parse_$Asterisk(63, $1);
         if (_success) {
-          $13 = $14;
+          $12 = $13;
         }
         if (_success) {
-          $10 = $13;
+          $9 = $12;
           break;
         }
-        String $15;
-        var $16 = _parse_$PlusSign(65, $1);
+        String $14;
+        var $15 = _parse_$PlusSign(65, $1);
         if (_success) {
-          $15 = $16;
+          $14 = $15;
         }
         if (_success) {
-          $10 = $15;
+          $9 = $14;
         }
         break;
       }
       _success = true;
       {
         var e = $8;
-        var s = $10;
+        var s = $9;
         Expression $$;
         $$ = _suffix(s, e);
         $4 = $$;
@@ -891,12 +884,11 @@ class Peg2Parser {
       $9 = true;
     }
     if (_success) {
-      // NOP;
-      var $12 = _parse_action(100, $1);
+      var $11 = _parse_action(100, $1);
       _success = true;
       {
         var e = $8;
-        var a = $12;
+        var a = $11;
         SequenceExpression $$;
         $$ = SequenceExpression(e, a);
         $4 = $$;
@@ -919,35 +911,33 @@ class Peg2Parser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    // NOP;
-    var $9 = _parse_semantic_value(104, $1);
-    // NOP;
-    String $11;
+    var $8 = _parse_semantic_value(104, $1);
+    String $9;
     for (;;) {
+      String $10;
+      var $11 = _parse_$Ampersand(108, $1);
+      if (_success) {
+        $10 = $11;
+      }
+      if (_success) {
+        $9 = $10;
+        break;
+      }
       String $12;
-      var $13 = _parse_$Ampersand(108, $1);
+      var $13 = _parse_$ExclamationMark(110, $1);
       if (_success) {
         $12 = $13;
       }
       if (_success) {
-        $11 = $12;
-        break;
-      }
-      String $14;
-      var $15 = _parse_$ExclamationMark(110, $1);
-      if (_success) {
-        $14 = $15;
-      }
-      if (_success) {
-        $11 = $14;
+        $9 = $12;
       }
       break;
     }
-    var $16 = _parseSuffix(111, $1);
+    var $14 = _parseSuffix(111, $1);
     if (_success) {
-      var s = $9;
-      var p = $11;
-      var e = $16;
+      var s = $8;
+      var p = $9;
+      var e = $14;
       Expression $$;
       $$ = _prefix(p, e, s);
       $4 = $$;
@@ -971,41 +961,40 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _parsePrimary(114, $1);
     if (_success) {
-      // NOP;
-      String $10;
+      String $9;
       for (;;) {
-        String $11;
-        var $12 = _parse_$QuestionMark(118, $1);
-        if (_success) {
-          $11 = $12;
-        }
+        String $10;
+        var $11 = _parse_$QuestionMark(118, $1);
         if (_success) {
           $10 = $11;
+        }
+        if (_success) {
+          $9 = $10;
           break;
         }
-        String $13;
-        var $14 = _parse_$Asterisk(120, $1);
+        String $12;
+        var $13 = _parse_$Asterisk(120, $1);
         if (_success) {
-          $13 = $14;
+          $12 = $13;
         }
         if (_success) {
-          $10 = $13;
+          $9 = $12;
           break;
         }
-        String $15;
-        var $16 = _parse_$PlusSign(122, $1);
+        String $14;
+        var $15 = _parse_$PlusSign(122, $1);
         if (_success) {
-          $15 = $16;
+          $14 = $15;
         }
         if (_success) {
-          $10 = $15;
+          $9 = $14;
         }
         break;
       }
       _success = true;
       {
         var e = $8;
-        var s = $10;
+        var s = $9;
         Expression $$;
         $$ = _suffix(s, e);
         $4 = $$;
@@ -1202,32 +1191,31 @@ class Peg2Parser {
     var $7 = _pos;
     var $8 = _parseTypeName(154, $1);
     if (_success) {
-      // NOP;
+      List<String> $9;
       List<String> $10;
-      List<String> $11;
-      var $12 = _c;
-      var $13 = _cp;
-      var $14 = _pos;
+      var $11 = _c;
+      var $12 = _cp;
+      var $13 = _pos;
       _parse_$LessThanSign(158, false);
       if (_success) {
-        var $16 = _parseTypeArguments(159, $1);
+        var $15 = _parseTypeArguments(159, $1);
         if (_success) {
           _parse_$GreaterThanSign(160, false);
           if (_success) {
-            $11 = $16;
+            $10 = $15;
           }
         }
       }
       if (!_success) {
-        _c = $12;
-        _cp = $13;
-        _pos = $14;
+        _c = $11;
+        _cp = $12;
+        _pos = $13;
       }
-      $10 = $11;
+      $9 = $10;
       _success = true;
       {
         var n = $8;
-        var a = $10;
+        var a = $9;
         String $$;
         $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
         $4 = $$;
@@ -1573,7 +1561,6 @@ class Peg2Parser {
     var $15 = _pos;
     var $16 = _parse$$IDENTIFIER(211, $1);
     if (_success) {
-      // NOP;
       _matchChar(63);
       _success = true;
       if (_success) {
@@ -1621,13 +1608,12 @@ class Peg2Parser {
     var $10 = _c;
     var $11 = _cp;
     var $12 = _pos;
-    // NOP;
-    var $14 = _matchChar(95);
+    var $13 = _matchChar(95);
     _success = true;
     if (_success) {
       _parse$$IDENTIFIER(222, false);
       if (_success) {
-        $9 = $14;
+        $9 = $13;
       }
     }
     if (!_success) {
@@ -2534,7 +2520,6 @@ class Peg2Parser {
           $9.add($10);
         }
       }
-      // NOP;
       _parse$$EOL(358, false);
       _success = true;
       $4 = $8;
