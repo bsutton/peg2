@@ -1,4 +1,18 @@
-class JsonParser {
+void main() {
+  final parser = ExampleParser();
+  final result = parser.parse(_text);
+  if (parser.error != null) {
+    throw parser.error;
+  }
+
+  print(result);
+}
+
+final _text = '''
+{"foo": false}
+''';
+
+class ExampleParser {
   static const _eof = 0x110000;
 
   FormatException error;
@@ -20,6 +34,8 @@ class JsonParser {
   bool _predicate;
 
   dynamic _result;
+
+  List<int> _states;
 
   bool _success;
 
@@ -252,6 +268,8 @@ class JsonParser {
     _hasMalformed = false;
     _pos = 0;
     _predicate = false;
+    _states = [];
+    _states.length = 20 * 3;
     _terminalCount = 0;
     _terminals = [];
     _terminals.length = 20;
@@ -265,6 +283,7 @@ class JsonParser {
     var $6 = _cp;
     var $7 = _pos;
     _parse_leading_spaces(3, false);
+    _success = true;
     var $9 = _parseValue(4, $1);
     if (_success) {
       _parse_end_of_file(5, false);
@@ -272,6 +291,7 @@ class JsonParser {
         $4 = $9;
       }
     }
+    // NOP;
     if (!_success) {
       _c = $5;
       _cp = $6;
@@ -290,64 +310,57 @@ class JsonParser {
       var $5 = _parseArray(8, $1);
       if (_success) {
         $4 = $5;
-      }
-      if (_success) {
         $3 = $4;
         break;
       }
+      // NOP;
       dynamic $6;
       var $7 = _parse_false(10, $1);
       if (_success) {
         $6 = $7;
-      }
-      if (_success) {
         $3 = $6;
         break;
       }
+      // NOP;
       dynamic $8;
       var $9 = _parse_null(12, $1);
       if (_success) {
         $8 = $9;
-      }
-      if (_success) {
         $3 = $8;
         break;
       }
+      // NOP;
       dynamic $10;
       var $11 = _parse_true(14, $1);
       if (_success) {
         $10 = $11;
-      }
-      if (_success) {
         $3 = $10;
         break;
       }
+      // NOP;
       Map<String, dynamic> $12;
       var $13 = _parseObject(16, $1);
       if (_success) {
         $12 = $13;
-      }
-      if (_success) {
         $3 = $12;
         break;
       }
+      // NOP;
       num $14;
       var $15 = _parse_number(18, $1);
       if (_success) {
         $14 = $15;
-      }
-      if (_success) {
         $3 = $14;
         break;
       }
+      // NOP;
       String $16;
       var $17 = _parse_string(20, $1);
       if (_success) {
         $16 = $17;
-      }
-      if (_success) {
         $3 = $16;
       }
+      // NOP;
       break;
     }
     $2 = $3;
@@ -364,6 +377,7 @@ class JsonParser {
     _parse_$LeftSquareBracket(23, false);
     if (_success) {
       var $9 = _parseValues(25, $1);
+      _success = true;
       _parse_$RightSquareBracket(26, false);
       if (_success) {
         var v = $9;
@@ -371,6 +385,7 @@ class JsonParser {
         $$ = v ?? [];
         $4 = $$;
       }
+      // NOP;
     }
     if (!_success) {
       _c = $5;
@@ -415,13 +430,13 @@ class JsonParser {
         }
         $10 = $11;
         if (!_success) {
-          _success = true;
           break;
         }
         if ($1) {
           $9.add($10);
         }
       }
+      _success = true;
       {
         var v = $8;
         var n = $9;
@@ -429,6 +444,7 @@ class JsonParser {
         $$ = [v, ...n];
         $4 = $$;
       }
+      // NOP;
     }
     if (!_success) {
       _c = $5;
@@ -450,6 +466,7 @@ class JsonParser {
     _parse_$LeftBrace(37, false);
     if (_success) {
       var $9 = _parseMembers(39, $1);
+      _success = true;
       _parse_$RightBrace(40, false);
       if (_success) {
         var m = $9;
@@ -457,6 +474,7 @@ class JsonParser {
         $$ = <String, dynamic>{}..addEntries(m ?? []);
         $4 = $$;
       }
+      // NOP;
     }
     if (!_success) {
       _c = $5;
@@ -501,13 +519,13 @@ class JsonParser {
         }
         $10 = $11;
         if (!_success) {
-          _success = true;
           break;
         }
         if ($1) {
           $9.add($10);
         }
       }
+      _success = true;
       {
         var m = $8;
         var n = $9;
@@ -515,6 +533,7 @@ class JsonParser {
         $$ = [m, ...n];
         $4 = $$;
       }
+      // NOP;
     }
     if (!_success) {
       _c = $5;
@@ -599,7 +618,7 @@ class JsonParser {
     _matchString('false');
     if (_success) {
       _parse$$spacing(61, false);
-      {
+      if (_success) {
         dynamic $$;
         $$ = false;
         $4 = $$;
@@ -624,7 +643,9 @@ class JsonParser {
     List<int> $3;
     List<int> $4;
     var $5 = _parse$$spacing(64, $1);
-    $4 = $5;
+    if (_success) {
+      $4 = $5;
+    }
     $3 = $4;
     $2 = $3;
     if (!_success) {
@@ -644,7 +665,7 @@ class JsonParser {
     _matchString('null');
     if (_success) {
       _parse$$spacing(68, false);
-      {
+      if (_success) {
         dynamic $$;
         $$ = null;
         $4 = $$;
@@ -674,7 +695,7 @@ class JsonParser {
     _matchString('true');
     if (_success) {
       _parse$$spacing(72, false);
-      {
+      if (_success) {
         dynamic $$;
         $$ = true;
         $4 = $$;
@@ -710,23 +731,24 @@ class JsonParser {
       for (;;) {
         var $10 = _parse$$char(77, $1);
         if (!_success) {
-          _success = true;
           break;
         }
         if ($1) {
           $9.add($10);
         }
       }
+      _success = true;
       _matchString('\"');
       if (_success) {
         _parse$$spacing(79, false);
-        {
+        if (_success) {
           var c = $9;
           String $$;
           $$ = String.fromCharCodes(c);
           $4 = $$;
         }
       }
+      // NOP;
     }
     if (!_success) {
       _c = $5;
@@ -760,139 +782,134 @@ class JsonParser {
     var $15 = _pos;
     var $16 = _matchChar(45);
     _success = true;
-    if (_success) {
-      int $17;
-      for (;;) {
-        int $18;
-        var $19 = _matchChar(48);
-        if (_success) {
-          $18 = $19;
-        }
-        if (_success) {
-          $17 = $18;
-          break;
-        }
-        int $20;
-        var $21 = _c;
-        var $22 = _cp;
-        var $23 = _pos;
-        const $24 = [49, 57];
-        var $25 = _matchRanges($24);
-        if (_success) {
-          List<int> $26;
-          if ($1) {
-            $26 = [];
-          }
-          for (;;) {
-            const $27 = [48, 57];
-            var $28 = _matchRanges($27);
-            if (!_success) {
-              _success = true;
-              break;
-            }
-            if ($1) {
-              $26.add($28);
-            }
-          }
-          if (_success) {
-            $20 = $25;
-          }
-        }
-        if (!_success) {
-          _c = $21;
-          _cp = $22;
-          _pos = $23;
-        }
-        if (_success) {
-          $17 = $20;
-        }
+    int $17;
+    for (;;) {
+      int $18;
+      var $19 = _matchChar(48);
+      if (_success) {
+        $18 = $19;
+        $17 = $18;
         break;
       }
+      // NOP;
+      int $20;
+      var $21 = _c;
+      var $22 = _cp;
+      var $23 = _pos;
+      const $24 = [49, 57];
+      var $25 = _matchRanges($24);
       if (_success) {
-        int $29;
-        int $30;
-        var $31 = _c;
-        var $32 = _cp;
-        var $33 = _pos;
-        var $34 = _matchChar(46);
-        if (_success) {
-          List<int> $35;
-          if ($1) {
-            $35 = [];
-          }
-          var $36 = false;
-          for (;;) {
-            const $37 = [48, 57];
-            var $38 = _matchRanges($37);
-            if (!_success) {
-              _success = $36;
-              if (!_success) {
-                $35 = null;
-              }
-              break;
-            }
-            if ($1) {
-              $35.add($38);
-            }
-            $36 = true;
-          }
-          if (_success) {
-            $30 = $34;
-          }
+        List<int> $26;
+        if ($1) {
+          $26 = [];
         }
-        if (!_success) {
-          _c = $31;
-          _cp = $32;
-          _pos = $33;
-        }
-        $29 = $30;
-        _success = true;
-        if (_success) {
-          int $39;
-          int $40;
-          var $41 = _c;
-          var $42 = _cp;
-          var $43 = _pos;
-          const $44 = [69, 69, 101, 101];
-          var $45 = _matchRanges($44);
-          if (_success) {
-            List<int> $46;
-            if ($1) {
-              $46 = [];
-            }
-            var $47 = false;
-            for (;;) {
-              const $48 = [32, 32, 43, 93];
-              var $49 = _matchRanges($48);
-              if (!_success) {
-                _success = $47;
-                if (!_success) {
-                  $46 = null;
-                }
-                break;
-              }
-              if ($1) {
-                $46.add($49);
-              }
-              $47 = true;
-            }
-            if (_success) {
-              $40 = $45;
-            }
-          }
+        for (;;) {
+          const $27 = [48, 57];
+          var $28 = _matchRanges($27);
           if (!_success) {
-            _c = $41;
-            _cp = $42;
-            _pos = $43;
+            break;
           }
-          $39 = $40;
-          _success = true;
-          if (_success) {
-            $12 = $16;
+          if ($1) {
+            $26.add($28);
           }
+        }
+        _success = true;
+        $20 = $25;
+        // NOP;
+      }
+      if (!_success) {
+        _c = $21;
+        _cp = $22;
+        _pos = $23;
+      } else {
+        $17 = $20;
+      }
+      // NOP;
+      break;
+    }
+    if (_success) {
+      int $29;
+      int $30;
+      var $31 = _c;
+      var $32 = _cp;
+      var $33 = _pos;
+      var $34 = _matchChar(46);
+      if (_success) {
+        List<int> $35;
+        if ($1) {
+          $35 = [];
+        }
+        var $36 = false;
+        for (;;) {
+          const $37 = [48, 57];
+          var $38 = _matchRanges($37);
+          if (!_success) {
+            _success = $36;
+            if (!_success) {
+              $35 = null;
+            }
+            break;
+          }
+          if ($1) {
+            $35.add($38);
+          }
+          $36 = true;
+        }
+        if (_success) {
+          $30 = $34;
         }
       }
+      if (!_success) {
+        _c = $31;
+        _cp = $32;
+        _pos = $33;
+      }
+      $29 = $30;
+      _success = true;
+      int $39;
+      int $40;
+      var $41 = _c;
+      var $42 = _cp;
+      var $43 = _pos;
+      const $44 = [69, 69, 101, 101];
+      var $45 = _matchRanges($44);
+      if (_success) {
+        List<int> $46;
+        if ($1) {
+          $46 = [];
+        }
+        var $47 = false;
+        for (;;) {
+          const $48 = [32, 32, 43, 93];
+          var $49 = _matchRanges($48);
+          if (!_success) {
+            _success = $47;
+            if (!_success) {
+              $46 = null;
+            }
+            break;
+          }
+          if ($1) {
+            $46.add($49);
+          }
+          $47 = true;
+        }
+        if (_success) {
+          $40 = $45;
+        }
+      }
+      if (!_success) {
+        _c = $41;
+        _cp = $42;
+        _pos = $43;
+      }
+      $39 = $40;
+      _success = true;
+      $12 = $16;
+      // NOP;
+      // NOP;
     }
+    // NOP;
     if (!_success) {
       _c = $13;
       _cp = $14;
@@ -905,7 +922,7 @@ class JsonParser {
     $1 = $10;
     if (_success) {
       _parse$$spacing(106, false);
-      {
+      if (_success) {
         var n = $8;
         num $$;
         $$ = num.parse(n);
@@ -936,7 +953,9 @@ class JsonParser {
     var $8 = _matchString('{');
     if (_success) {
       _parse$$spacing(110, false);
-      $4 = $8;
+      if (_success) {
+        $4 = $8;
+      }
     }
     if (!_success) {
       _c = $5;
@@ -962,7 +981,9 @@ class JsonParser {
     var $8 = _matchString('}');
     if (_success) {
       _parse$$spacing(114, false);
-      $4 = $8;
+      if (_success) {
+        $4 = $8;
+      }
     }
     if (!_success) {
       _c = $5;
@@ -988,7 +1009,9 @@ class JsonParser {
     var $8 = _matchString('[');
     if (_success) {
       _parse$$spacing(118, false);
-      $4 = $8;
+      if (_success) {
+        $4 = $8;
+      }
     }
     if (!_success) {
       _c = $5;
@@ -1014,7 +1037,9 @@ class JsonParser {
     var $8 = _matchString(']');
     if (_success) {
       _parse$$spacing(122, false);
-      $4 = $8;
+      if (_success) {
+        $4 = $8;
+      }
     }
     if (!_success) {
       _c = $5;
@@ -1040,7 +1065,9 @@ class JsonParser {
     var $8 = _matchString(',');
     if (_success) {
       _parse$$spacing(126, false);
-      $4 = $8;
+      if (_success) {
+        $4 = $8;
+      }
     }
     if (!_success) {
       _c = $5;
@@ -1066,7 +1093,9 @@ class JsonParser {
     var $8 = _matchString(':');
     if (_success) {
       _parse$$spacing(130, false);
-      $4 = $8;
+      if (_success) {
+        $4 = $8;
+      }
     }
     if (!_success) {
       _c = $5;
@@ -1132,19 +1161,18 @@ class JsonParser {
         _c = $5;
         _cp = $6;
         _pos = $7;
-      }
-      if (_success) {
+      } else {
         $3 = $4;
         break;
       }
+      // NOP;
       int $10;
       var $11 = _parse$$unescaped(142, $1);
       if (_success) {
         $10 = $11;
-      }
-      if (_success) {
         $3 = $10;
       }
+      // NOP;
       break;
     }
     $2 = $3;
@@ -1159,29 +1187,26 @@ class JsonParser {
       var $5 = _matchChar(34);
       if (_success) {
         $4 = $5;
-      }
-      if (_success) {
         $3 = $4;
         break;
       }
+      // NOP;
       int $6;
       var $7 = _matchChar(92);
       if (_success) {
         $6 = $7;
-      }
-      if (_success) {
         $3 = $6;
         break;
       }
+      // NOP;
       int $8;
       var $9 = _matchChar(47);
       if (_success) {
         $8 = $9;
-      }
-      if (_success) {
         $3 = $8;
         break;
       }
+      // NOP;
       int $10;
       _matchChar(98);
       if (_success) {
@@ -1252,10 +1277,10 @@ class JsonParser {
         _c = $21;
         _cp = $22;
         _pos = $23;
-      }
-      if (_success) {
+      } else {
         $3 = $20;
       }
+      // NOP;
       break;
     }
     $2 = $3;
@@ -1352,30 +1377,27 @@ class JsonParser {
       var $6 = _matchRanges($5);
       if (_success) {
         $4 = $6;
-      }
-      if (_success) {
         $3 = $4;
         break;
       }
+      // NOP;
       int $7;
       const $8 = [35, 91];
       var $9 = _matchRanges($8);
       if (_success) {
         $7 = $9;
-      }
-      if (_success) {
         $3 = $7;
         break;
       }
+      // NOP;
       int $10;
       const $11 = [93, 1114111];
       var $12 = _matchRanges($11);
       if (_success) {
         $10 = $12;
-      }
-      if (_success) {
         $3 = $10;
       }
+      // NOP;
       break;
     }
     $2 = $3;
@@ -1394,14 +1416,15 @@ class JsonParser {
       const $6 = [9, 10, 13, 13, 32, 32];
       var $7 = _matchRanges($6);
       if (!_success) {
-        _success = true;
         break;
       }
       if ($1) {
         $5.add($7);
       }
     }
+    _success = true;
     $4 = $5;
+    // NOP;
     $3 = $4;
     $2 = $3;
     return $2;

@@ -23,6 +23,7 @@ class ParserClassBuilder {
       'int _pos',
       'bool _predicate',
       'dynamic _result',
+      'List<int> _states',
       'bool _success',
       'List<String> _terminals',
       'int _terminalCount',
@@ -261,6 +262,8 @@ void _reset() {
   _hasMalformed = false;
   _pos = 0;
   _predicate = false;
+  _states = [];
+  _states.length = 20 * 3;
   _terminalCount = 0;
   _terminals = [];
   _terminals.length = 20;

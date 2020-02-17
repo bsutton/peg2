@@ -1,3 +1,21 @@
+# Globals
+%{
+void main() {
+  final parser = ExampleParser();
+  final result = parser.parse(_text);
+  if (parser.error != null) {
+    throw parser.error;
+  }
+
+  print(result);
+}
+
+final _text = '''
+{"foo": false}
+''';
+
+}%
+
 # Non terminals
 
 Json =

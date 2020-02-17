@@ -1,31 +1,31 @@
 part of '../../expressions.dart';
 
-abstract class ExpressionVisitor<T> {
-  T visitAndPredicate(AndPredicateExpression node);
+abstract class ExpressionVisitor {
+  void visitAndPredicate(AndPredicateExpression node);
 
-  T visitAnyCharacter(AnyCharacterExpression node);
+  void visitAnyCharacter(AnyCharacterExpression node);
 
-  T visitCapture(CaptureExpression node);
+  void visitCapture(CaptureExpression node);
 
-  T visitCharacterClass(CharacterClassExpression node);
+  void visitCharacterClass(CharacterClassExpression node);
 
-  T visitLiteral(LiteralExpression node);
+  void visitLiteral(LiteralExpression node);
 
-  T visitNonterminal(NonterminalExpression node);
+  void visitNonterminal(NonterminalExpression node);
 
-  T visitNotPredicate(NotPredicateExpression node);
+  void visitNotPredicate(NotPredicateExpression node);
 
-  T visitOneOrMore(OneOrMoreExpression node);
+  void visitOneOrMore(OneOrMoreExpression node);
 
-  T visitOptional(OptionalExpression node);
+  void visitOptional(OptionalExpression node);
 
-  T visitOrderedChoice(OrderedChoiceExpression node);
+  void visitOrderedChoice(OrderedChoiceExpression node);
 
-  T visitSequence(SequenceExpression node);
+  void visitSequence(SequenceExpression node);
 
-  T visitSubterminal(SubterminalExpression node);
+  void visitSubterminal(SubterminalExpression node);
 
-  T visitTerminal(TerminalExpression node);
+  void visitTerminal(TerminalExpression node);
 
-  T visitZeroOrMore(ZeroOrMoreExpression node);
+  void visitZeroOrMore(ZeroOrMoreExpression node);
 }

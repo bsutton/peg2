@@ -1,6 +1,7 @@
 import 'operation_transformers.dart';
 import 'operations.dart';
 
+part 'src/operation_optimizers/conditional_operation_optimizer.dart';
 part 'src/operation_optimizers/last_assigned_result_resolver.dart';
 part 'src/operation_optimizers/operation_optimizer.dart';
 part 'src/operation_optimizers/operation_replacer.dart';

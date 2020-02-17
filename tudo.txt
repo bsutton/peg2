@@ -5,5 +5,4 @@ implement memoization
 add binary search for (long) ranges
 implement optimization of variable usage (via replacement)
 add some kinds of grammar analyzers
-remove (eliminate) unnecessary test "if (_success)" after optional expressions
-implement conditional expression flow optimizer (append else to if, merge blocks to previous conditional, etc)
+implement optimizer to remove "_succes = true" before calls to [_parseXXX, _matchXXX]

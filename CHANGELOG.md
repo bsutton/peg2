@@ -1,3 +1,7 @@
+## 0.1.7
+
+- Implemeted conditional operation optimizer to transform conditional operations
+
 ## 0.1.6
 
 - Removed import of `dart:html`. How was it added?

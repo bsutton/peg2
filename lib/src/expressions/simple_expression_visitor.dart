@@ -1,91 +1,91 @@
 part of '../../expressions.dart';
 
-class SimpleExpressionVisitor<T> extends ExpressionVisitor {
-  T visit(Expression node) {
+class SimpleExpressionVisitor extends ExpressionVisitor {
+  void visit(Expression node) {
     node.visitChildren(this);
     return null;
   }
 
   @override
-  T visitAndPredicate(AndPredicateExpression node) {
+  void visitAndPredicate(AndPredicateExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitAnyCharacter(AnyCharacterExpression node) {
+  void visitAnyCharacter(AnyCharacterExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitCapture(CaptureExpression node) {
+  void visitCapture(CaptureExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitCharacterClass(CharacterClassExpression node) {
+  void visitCharacterClass(CharacterClassExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitLiteral(LiteralExpression node) {
+  void visitLiteral(LiteralExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitNonterminal(NonterminalExpression node) {
+  void visitNonterminal(NonterminalExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitNotPredicate(NotPredicateExpression node) {
+  void visitNotPredicate(NotPredicateExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitOneOrMore(OneOrMoreExpression node) {
+  void visitOneOrMore(OneOrMoreExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitOptional(OptionalExpression node) {
+  void visitOptional(OptionalExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitOrderedChoice(OrderedChoiceExpression node) {
+  void visitOrderedChoice(OrderedChoiceExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitSequence(SequenceExpression node) {
+  void visitSequence(SequenceExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitSubterminal(SubterminalExpression node) {
+  void visitSubterminal(SubterminalExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitTerminal(TerminalExpression node) {
+  void visitTerminal(TerminalExpression node) {
     visit(node);
     return null;
   }
 
   @override
-  T visitZeroOrMore(ZeroOrMoreExpression node) {
+  void visitZeroOrMore(ZeroOrMoreExpression node) {
     visit(node);
     return null;
   }

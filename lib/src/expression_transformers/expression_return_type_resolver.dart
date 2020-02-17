@@ -1,6 +1,6 @@
 part of '../../expression_transformers.dart';
 
-class ExpressionReturnTypeResolver extends ExpressionVisitor<Object> {
+class ExpressionReturnTypeResolver extends ExpressionVisitor {
   bool _hasModifications;
 
   void resolve(List<ProductionRule> rules) {
@@ -20,42 +20,37 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor<Object> {
   }
 
   @override
-  Object visitAndPredicate(AndPredicateExpression node) {
+  void visitAndPredicate(AndPredicateExpression node) {
     node.visitChildren(this);
     _setReturnType(node, 'dynamic');
-    return null;
   }
 
   @override
-  Object visitAnyCharacter(AnyCharacterExpression node) {
+  void visitAnyCharacter(AnyCharacterExpression node) {
     node.visitChildren(this);
     _setReturnType(node, 'int');
-    return null;
   }
 
   @override
-  Object visitCapture(CaptureExpression node) {
+  void visitCapture(CaptureExpression node) {
     node.visitChildren(this);
     _setReturnType(node, 'String');
-    return null;
   }
 
   @override
-  Object visitCharacterClass(CharacterClassExpression node) {
+  void visitCharacterClass(CharacterClassExpression node) {
     node.visitChildren(this);
     _setReturnType(node, 'int');
-    return null;
   }
 
   @override
-  Object visitLiteral(LiteralExpression node) {
+  void visitLiteral(LiteralExpression node) {
     node.visitChildren(this);
     _setReturnType(node, 'String');
-    return null;
   }
 
   @override
-  Object visitNonterminal(NonterminalExpression node) {
+  void visitNonterminal(NonterminalExpression node) {
     node.visitChildren(this);
     final rule = node.expression.rule;
     final returnType = rule.returnType;
@@ -65,35 +60,30 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor<Object> {
     } else {
       _setReturnType(node, returnType);
     }
-
-    return null;
   }
 
   @override
-  Object visitNotPredicate(NotPredicateExpression node) {
+  void visitNotPredicate(NotPredicateExpression node) {
     node.visitChildren(this);
     _setReturnType(node, 'dynamic');
-    return null;
   }
 
   @override
-  Object visitOneOrMore(OneOrMoreExpression node) {
+  void visitOneOrMore(OneOrMoreExpression node) {
     node.visitChildren(this);
     final child = node.expression;
     _setReturnType(node, _getListReturnType(child.returnType));
-    return null;
   }
 
   @override
-  Object visitOptional(OptionalExpression node) {
+  void visitOptional(OptionalExpression node) {
     node.visitChildren(this);
     final child = node.expression;
     _setReturnType(node, child.returnType);
-    return null;
   }
 
   @override
-  Object visitOrderedChoice(OrderedChoiceExpression node) {
+  void visitOrderedChoice(OrderedChoiceExpression node) {
     final expressions = node.expressions;
     final count = expressions.length;
     final returnType = node.returnType;
@@ -118,12 +108,10 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor<Object> {
         _setReturnType(node, returnType);
       }
     }
-
-    return null;
   }
 
   @override
-  Object visitSequence(SequenceExpression node) {
+  void visitSequence(SequenceExpression node) {
     final expressions = node.expressions;
     final count = expressions.length;
     final returnType = node.returnType;
@@ -153,12 +141,10 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor<Object> {
         }
       }
     }
-
-    return null;
   }
 
   @override
-  Object visitSubterminal(SubterminalExpression node) {
+  void visitSubterminal(SubterminalExpression node) {
     node.visitChildren(this);
     final rule = node.expression.rule;
     final returnType = rule.returnType;
@@ -168,12 +154,10 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor<Object> {
     } else {
       _setReturnType(node, returnType);
     }
-
-    return null;
   }
 
   @override
-  Object visitTerminal(TerminalExpression node) {
+  void visitTerminal(TerminalExpression node) {
     node.visitChildren(this);
     final rule = node.expression.rule;
     final returnType = rule.returnType;
@@ -183,16 +167,13 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor<Object> {
     } else {
       _setReturnType(node, returnType);
     }
-
-    return null;
   }
 
   @override
-  Object visitZeroOrMore(ZeroOrMoreExpression node) {
+  void visitZeroOrMore(ZeroOrMoreExpression node) {
     node.visitChildren(this);
     final child = node.expression;
     _setReturnType(node, _getListReturnType(child.returnType));
-    return null;
   }
 
   String _getListReturnType(String returnType) {
