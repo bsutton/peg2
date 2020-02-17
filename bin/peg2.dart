@@ -13,12 +13,16 @@ void main(List<String> args) {
   final argParser = ArgParser();
   argParser.addFlag('print',
       abbr: 'p', defaultsTo: false, help: 'Print grammar');
-  argParser.addFlag('inline_subterm',
-      defaultsTo: true,
-      help: 'Convert subterminal calls into inline expression');
+  argParser.addFlag('inline-nonterminals',
+      defaultsTo: false,
+      help: 'Convert nonterminal calls into inline expressions');
+  argParser.addFlag('inline-subterminals',
+      defaultsTo: false,
+      help: 'Convert subterminal calls into inline expressions');
   final argResults = argParser.parse(args);
   final printGrammar = argResults['print'] as bool;
-  options.inlineSubterminals = argResults['inline_subterm'] as bool;
+  options.inlineNonterminals = argResults['inline-nonterminals'] as bool;
+  options.inlineSubterminals = argResults['inline-subterminals'] as bool;
   String inputFilename;
   String outputFilename;
   if (argResults.rest.length == 1) {

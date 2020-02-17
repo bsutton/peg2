@@ -57,8 +57,29 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
 
     final result = <MethodOperation>[];
     for (final rule in rules) {
-      final method = _buildRule(rule);
-      result.add(method);
+      var skip = false;
+      if (rule.callers.length == 1) {
+        switch (rule.kind) {
+          case ProductionRuleKind.Nonterminal:
+            if (_options.inlineNonterminals) {
+              skip = true;
+            }
+
+            break;
+          case ProductionRuleKind.Subterminal:
+            if (_options.inlineSubterminals) {
+              skip = true;
+            }
+
+            break;
+          default:
+        }
+      }
+
+      if (!skip) {
+        final method = _buildRule(rule);
+        result.add(method);
+      }
     }
 
     return result;
@@ -178,10 +199,16 @@ class RulesToOperationsBuilder extends ExpressionVisitor<Object> {
     final name = Variable(_getRuleName(rule));
     final cid = node.id;
     _addNodeComment(b, node);
-    final productive = _notProductive ? _constOp(false) : _varOp(_productive);
-    final methodCall = _call(_varOp(name), [_constOp(cid), productive]);
-    final result = _newVar(b, 'var', methodCall);
-    _result = result;
+    if (_options.inlineNonterminals && rule.callers.length == 1) {
+      final child = rule.expression;
+      child.accept(this);
+    } else {
+      final productive = _notProductive ? _constOp(false) : _varOp(_productive);
+      final methodCall = _call(_varOp(name), [_constOp(cid), productive]);
+      final result = _newVar(b, 'var', methodCall);
+      _result = result;
+    }
+
     return null;
   }
 

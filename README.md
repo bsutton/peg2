@@ -15,6 +15,11 @@ This software does not contain public API because it is a tool (utility).
 
 All planned improvements and discovered flaws can be found in the "todo.txt" file.  
 
+### Features
+
+- Convert nonterminal calls into inline expressions, command line option `--inline-nonterminals`
+- Convert subterminal calls into inline expressions, command line option `--inline-subterminals`
+
 ### Activation and usage
 
 Since this software is a command line utility, it requires activation.  

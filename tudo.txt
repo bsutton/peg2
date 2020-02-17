@@ -6,5 +6,4 @@ add binary search for (long) ranges
 implement optimization of variable usage (via replacement)
 add some kinds of grammar analyzers
 remove (eliminate) unnecessary test "if (_success)" after optional expressions
-inline subterminals if this is possible (also implement analyzer for that)
 implement conditional expression flow optimizer (append else to if, merge blocks to previous conditional, etc)

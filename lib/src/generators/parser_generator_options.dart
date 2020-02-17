@@ -1,6 +1,8 @@
 part of '../../generators.dart';
 
 class ParserGeneratorOptions {
+  bool inlineNonterminals = false;
+
   bool inlineSubterminals = false;
 
   bool memoize = false;

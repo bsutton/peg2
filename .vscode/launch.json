@@ -16,7 +16,10 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "--inline_subterm", "example/json.peg", "example/example.dart"
+                "--inline-nonterminals",
+                "--inline-subterminals",
+                "example/json.peg",
+                "example/example.dart"
             ]
         }
     ]

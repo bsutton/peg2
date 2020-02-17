@@ -1,3 +1,8 @@
+## 0.1.5
+
+- Added feature: convert nonterminal calls into inline expressions, command line option `--inline-nonterminals`
+- Added feature: convert subterminal calls into inline expressions, command line option `--inline-subterminals`
+
 ## 0.1.4
 
 - Added (experimental) support of NNBD type naming convetion to grammar `peg2.peg`
