@@ -15,6 +15,8 @@ abstract class OperationVisitor {
 
   void visitConstantOperation(ConstantOperation node);
 
+  void visitListAccessOperation(ListAccessOperation node);
+
   void visitListOperation(ListOperation node);
 
   void visitLoopOperation(LoopOperation node);

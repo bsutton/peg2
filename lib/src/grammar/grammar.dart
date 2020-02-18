@@ -1,6 +1,8 @@
 part of '../../grammar.dart';
 
 class Grammar {
+  int expressionCount;
+
   final String globals;
 
   Map<String, ProductionRule> mapOfRules;
@@ -46,7 +48,7 @@ class Grammar {
 
   void _initialize() {
     final expressionInitializer = ExpressionInitializer();
-    expressionInitializer.initialize(rules);
+    expressionInitializer.initialize(this);
     final expressionTransformationInitializer =
         ExpressionTransformationInitializer();
     expressionTransformationInitializer.initialize(rules);

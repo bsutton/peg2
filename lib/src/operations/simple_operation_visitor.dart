@@ -27,6 +27,9 @@ abstract class SimpleOperationVisitor extends OperationVisitor {
   void visitConstantOperation(ConstantOperation node) => visit(node);
 
   @override
+  void visitListAccessOperation(ListAccessOperation node) => visit(node);
+
+  @override
   void visitListOperation(ListOperation node) => visit(node);
 
   @override

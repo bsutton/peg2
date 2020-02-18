@@ -1,7 +1,6 @@
 optimize caller id assignment
 check duplicare semantic variables
 re-implement grammar.findStartRule
-implement memoization
 add binary search for (long) ranges
 implement optimization of variable usage (via replacement)
 add some kinds of grammar analyzers

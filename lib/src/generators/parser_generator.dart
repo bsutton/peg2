@@ -1,6 +1,74 @@
 part of '../../generators.dart';
 
 class ParserGenerator {
+  static const _classes = '''
+  class _Buffer<K, V> {
+  List<K> keys;
+
+  int length;
+
+  int pos;
+
+  final int size;
+
+  List<V> values;
+
+  _Buffer(this.size) {
+    keys = List(size);
+    values = List(size);
+    length = 0;
+    pos = 0;
+  }
+
+  void add(K key, V value) {
+    keys[pos] = key;
+    values[pos] = value;
+    if (++pos >= size) {
+      pos = 0;
+    }
+
+    if (length < size) {
+      length++;
+    }
+  }
+
+  K find(V value) {
+    var index = pos - 1;
+    var count = length;
+    while (count-- > 0) {
+      final v = values[index];
+      if (v == value) {
+        return keys[index];
+      }
+
+      if (++index > size) {
+        index = 0;
+      }
+    }
+
+    return null;
+  }
+}
+
+class _Memo {
+  final int id;
+
+  final int pos;
+
+  final result;
+
+  final bool success;
+
+  _Memo({
+    this.id,
+    this.pos,
+    this.result,
+    this.success,
+  });
+}
+
+''';
+
   String generate(Grammar grammar, ParserGeneratorOptions options) {
     final grammarAnalyzer = GrammarAnalyzer();
     final grammarErrors = grammarAnalyzer.analyze(grammar);
@@ -41,6 +109,8 @@ class ParserGenerator {
     final parserClassBuilder = ParserClassBuilder();
     final name = options.name + 'Parser';
     parserClassBuilder.build(grammar, name, libraryBuilder, methodBuilders);
+    final classes = lineSplitter.convert(_classes);
+    libraryBuilder.addAll(classes);
     libraryBuilder.add('// ignore_for_file: prefer_final_locals');
     libraryBuilder.add('// ignore_for_file: unused_element');
     libraryBuilder.add('// ignore_for_file: unused_field');

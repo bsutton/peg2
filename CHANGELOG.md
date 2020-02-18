@@ -1,6 +1,10 @@
+## 0.1.8
+
+- Implemented experimental memoization feature, command line option `--memoize`
+
 ## 0.1.7
 
-- Implemeted conditional operation optimizer to transform conditional operations
+- Implemented conditional operation optimizer to transform conditional operations
 
 ## 0.1.6
 

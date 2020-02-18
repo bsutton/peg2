@@ -1,8 +1,11 @@
 part of '../../generators.dart';
 
 class ParserClassBuilder {
+  Grammar _grammar;
+
   void build(Grammar grammar, String name, ContentBuilder builder,
       ContentBuilder methodBuilders) {
+    _grammar = grammar;
     final classBuilder = ClassBuilder(name: name);
     builder.add(classBuilder);
     _buildParserFields(classBuilder);
@@ -20,6 +23,9 @@ class ParserClassBuilder {
       'int _failurePos',
       'bool _hasMalformed',
       'String _input',
+      'List<bool> _memoizable',
+      'List<List<_Memo>> _memos',
+      'var _mresult',
       'int _pos',
       'bool _predicate',
       'dynamic _result',
@@ -27,6 +33,7 @@ class ParserClassBuilder {
       'bool _success',
       'List<String> _terminals',
       'int _terminalCount',
+      'List<_Buffer<int, int>> _tracks',
     ];
 
     for (final variable in variables) {
@@ -248,11 +255,59 @@ String _matchString(String text) {
 }
 
 bool _memoized(int id, int cid) {
+  final memos = _memos[_pos];
+  if (memos != null) {
+    for (var i = 0; i < memos.length; i++) {
+      final memo = memos[i];
+      if (memo.id == id) {
+        _cp = -1;
+        _pos = memo.pos;
+        _mresult = memo.result;
+        _success = memo.success;
+        return true;
+      }
+    }
+  }  
+
+  if (_memoizable[cid] == true) {
+    return false;
+  }
+
+  var track = _tracks[id];
+  if (track == null) {
+    track = _Buffer(10);
+    _tracks[id] = track;
+    track.add(cid, _pos);
+    return false;
+  }
+
+  final key = track.find(_pos);
+  if (key == null) {
+    return false;
+  }
+
+  if (key != cid) {
+    _memoizable[key] = true;
+  }
+  
   return false;
 }
 
-void _memoize(result) {
-  //
+void _memoize(int id, int pos, result) {
+  var memos = _memos[pos];
+  if (memos == null) {
+    memos = [];
+    _memos[pos] = memos;
+  }
+
+  final memo = _Memo(    
+    id: id,
+    pos: _pos,
+    result: result,
+    success: _success,
+  );
+
+  memos.add(memo);
 }
 
 void _reset() {
@@ -260,6 +315,10 @@ void _reset() {
   _cp = -1;  
   _failurePos = -1;
   _hasMalformed = false;
+  _memoizable = [];
+  _memoizable.length = {{EXPR_COUNT}};
+  _memos = [];
+  _memos.length = _input.length + 1;
   _pos = 0;
   _predicate = false;
   _states = [];
@@ -267,6 +326,8 @@ void _reset() {
   _terminalCount = 0;
   _terminals = [];
   _terminals.length = 20;
+  _tracks = [];
+  _tracks.length = {{EXPR_COUNT}};
 }
 
 ''';
@@ -275,6 +336,8 @@ void _reset() {
     final name = '_parse${start.name}';
     var methods = _methods;
     methods = methods.replaceFirst('{{START}}', '$name($cid, true)');
+    methods =
+        methods.replaceAll('{{EXPR_COUNT}}', '${_grammar.expressionCount}');
     final lineSplitter = LineSplitter();
     final lines = lineSplitter.convert(methods);
     builder.addAll(lines);

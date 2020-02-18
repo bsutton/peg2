@@ -18,7 +18,6 @@ class OperationsToCodeConverter extends OperationVisitor {
     final builder = ContentBuilder();
     builder.addAll(node.code);
     _result = builder;
-    return null;
   }
 
   @override
@@ -31,15 +30,17 @@ class OperationsToCodeConverter extends OperationVisitor {
       case OperationKind.assign:
         sb.write('=');
         break;
+      case OperationKind.equal:
+        sb.write('==');
+        break;
       default:
-        StateError('Unknown binary operation: ${node.kind}');
+        throw StateError('Unknown binary operation: ${node.kind}');
     }
 
     sb.write(' ');
     node.right.accept(this);
     sb.write(_resultAsString());
     _result = sb.toString();
-    return null;
   }
 
   @override
@@ -59,13 +60,11 @@ class OperationsToCodeConverter extends OperationVisitor {
     }
 
     _result = builder;
-    return null;
   }
 
   @override
   void visitBreakOperation(BreakOperation node) {
     _result = 'break';
-    return null;
   }
 
   @override
@@ -83,7 +82,6 @@ class OperationsToCodeConverter extends OperationVisitor {
     sb.write(arguments.join(', '));
     sb.write(')');
     _result = sb.toString();
-    return null;
   }
 
   @override
@@ -100,7 +98,6 @@ class OperationsToCodeConverter extends OperationVisitor {
     }
 
     _result = builder;
-    return null;
   }
 
   @override
@@ -115,8 +112,18 @@ class OperationsToCodeConverter extends OperationVisitor {
     } else {
       throw StateError('Unsupported constant: ${value.runtimeType}');
     }
+  }
 
-    return null;
+  @override
+  void visitListAccessOperation(ListAccessOperation node) {
+    final sb = StringBuffer();
+    node.list.accept(this);
+    sb.write(_resultAsString());
+    sb.write('[');
+    node.index.accept(this);
+    sb.write(_resultAsString());
+    sb.write(']');
+    _result = sb.toString();
   }
 
   @override
@@ -137,7 +144,6 @@ class OperationsToCodeConverter extends OperationVisitor {
     sb.write(list.join(', '));
     sb.write(']');
     _result = sb.toString();
-    return null;
   }
 
   @override
@@ -146,7 +152,6 @@ class OperationsToCodeConverter extends OperationVisitor {
     node.body.accept(this);
     builder.addAll(_resultAsContent());
     _result = builder;
-    return null;
   }
 
   @override
@@ -158,7 +163,6 @@ class OperationsToCodeConverter extends OperationVisitor {
     node.operation.accept(this);
     sb.write(_resultAsString());
     _result = sb.toString();
-    return null;
   }
 
   @override
@@ -176,13 +180,11 @@ class OperationsToCodeConverter extends OperationVisitor {
     node.body.accept(this);
     builder.addAll(_resultAsContent());
     _result = builder;
-    return null;
   }
 
   @override
   void visitNopOperation(NopOperation node) {
     _result = '// NOP';
-    return null;
   }
 
   @override
@@ -198,7 +200,6 @@ class OperationsToCodeConverter extends OperationVisitor {
     }
 
     _result = sb.toString();
-    return null;
   }
 
   @override
@@ -212,7 +213,6 @@ class OperationsToCodeConverter extends OperationVisitor {
     }
 
     _result = sb.toString();
-    return null;
   }
 
   @override
@@ -221,21 +221,25 @@ class OperationsToCodeConverter extends OperationVisitor {
     switch (node.kind) {
       case OperationKind.not:
         sb.write('!');
+        node.operand.accept(this);
+        sb.write(_resultAsString());
+        break;
+      case OperationKind.convert:
+        node.operand.accept(this);
+        sb.write(_resultAsString());
+        sb.write(' as ');
+        sb.write(node.type);
         break;
       default:
         throw StateError('Unknown unary operation: ${node.kind}');
     }
 
-    node.operand.accept(this);
-    sb.write(_resultAsString());
     _result = sb.toString();
-    return null;
   }
 
   @override
   void visitVariableOperation(VariableOperation node) {
     _result = node.variable.name.toString();
-    return null;
   }
 
   List _resultAsContent() {

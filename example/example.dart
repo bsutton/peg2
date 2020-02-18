@@ -29,6 +29,12 @@ class ExampleParser {
 
   String _input;
 
+  List<bool> _memoizable;
+
+  List<List<_Memo>> _memos;
+
+  var _mresult;
+
   int _pos;
 
   bool _predicate;
@@ -42,6 +48,8 @@ class ExampleParser {
   List<String> _terminals;
 
   int _terminalCount;
+
+  List<_Buffer<int, int>> _tracks;
 
   dynamic parse(String text) {
     if (text == null) {
@@ -254,11 +262,59 @@ class ExampleParser {
   }
 
   bool _memoized(int id, int cid) {
+    final memos = _memos[_pos];
+    if (memos != null) {
+      for (var i = 0; i < memos.length; i++) {
+        final memo = memos[i];
+        if (memo.id == id) {
+          _cp = -1;
+          _pos = memo.pos;
+          _mresult = memo.result;
+          _success = memo.success;
+          return true;
+        }
+      }
+    }
+
+    if (_memoizable[cid] == true) {
+      return false;
+    }
+
+    var track = _tracks[id];
+    if (track == null) {
+      track = _Buffer(10);
+      _tracks[id] = track;
+      track.add(cid, _pos);
+      return false;
+    }
+
+    final key = track.find(_pos);
+    if (key == null) {
+      return false;
+    }
+
+    if (key != cid) {
+      _memoizable[key] = true;
+    }
+
     return false;
   }
 
-  void _memoize(result) {
-    //
+  void _memoize(int id, int pos, result) {
+    var memos = _memos[pos];
+    if (memos == null) {
+      memos = [];
+      _memos[pos] = memos;
+    }
+
+    final memo = _Memo(
+      id: id,
+      pos: _pos,
+      result: result,
+      success: _success,
+    );
+
+    memos.add(memo);
   }
 
   void _reset() {
@@ -266,6 +322,10 @@ class ExampleParser {
     _cp = -1;
     _failurePos = -1;
     _hasMalformed = false;
+    _memoizable = [];
+    _memoizable.length = 187;
+    _memos = [];
+    _memos.length = _input.length + 1;
     _pos = 0;
     _predicate = false;
     _states = [];
@@ -273,6 +333,8 @@ class ExampleParser {
     _terminalCount = 0;
     _terminals = [];
     _terminals.length = 20;
+    _tracks = [];
+    _tracks.length = 187;
   }
 
   dynamic _parseJson(int $0, bool $1) {
@@ -1429,6 +1491,71 @@ class ExampleParser {
     $2 = $3;
     return $2;
   }
+}
+
+class _Buffer<K, V> {
+  List<K> keys;
+
+  int length;
+
+  int pos;
+
+  final int size;
+
+  List<V> values;
+
+  _Buffer(this.size) {
+    keys = List(size);
+    values = List(size);
+    length = 0;
+    pos = 0;
+  }
+
+  void add(K key, V value) {
+    keys[pos] = key;
+    values[pos] = value;
+    if (++pos >= size) {
+      pos = 0;
+    }
+
+    if (length < size) {
+      length++;
+    }
+  }
+
+  K find(V value) {
+    var index = pos - 1;
+    var count = length;
+    while (count-- > 0) {
+      final v = values[index];
+      if (v == value) {
+        return keys[index];
+      }
+
+      if (++index > size) {
+        index = 0;
+      }
+    }
+
+    return null;
+  }
+}
+
+class _Memo {
+  final int id;
+
+  final int pos;
+
+  final result;
+
+  final bool success;
+
+  _Memo({
+    this.id,
+    this.pos,
+    this.result,
+    this.success,
+  });
 }
 
 // ignore_for_file: prefer_final_locals

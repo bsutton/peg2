@@ -24,21 +24,24 @@ class ActionOperation extends Operation {
 }
 
 class BinaryOperation extends Operation {
-  @override
-  final OperationKind kind;
+  final OperationKind _kind;
 
   Operation left;
 
   Operation right;
 
-  BinaryOperation(this.left, this.kind, this.right) {
+  BinaryOperation(this.left, this._kind, this.right) {
     switch (kind) {
       case OperationKind.assign:
+      case OperationKind.equal:
         break;
       default:
         _errorInvalidOpertionKin();
     }
   }
+
+  @override
+  OperationKind get kind => _kind;
 
   @override
   void accept(OperationVisitor visitor) {
@@ -147,6 +150,28 @@ class ConstantOperation<T> extends Operation {
   @override
   void accept(OperationVisitor visitor) {
     visitor.visitConstantOperation(this);
+  }
+}
+
+class ListAccessOperation extends Operation {
+  Operation list;
+
+  Operation index;
+
+  ListAccessOperation(this.list, this.index);
+
+  @override
+  OperationKind get kind => OperationKind.listAccess;
+
+  @override
+  void accept(OperationVisitor visitor) {
+    visitor.visitListAccessOperation(this);
+  }
+
+  @override
+  void visitChildren(OperationVisitor visitor) {
+    list.accept(visitor);
+    index.accept(visitor);
   }
 }
 
@@ -307,7 +332,10 @@ enum OperationKind {
   call,
   conditional,
   constant,
+  convert,
+  equal,
   list,
+  listAccess,
   loop,
   method,
   nop,
@@ -365,9 +393,17 @@ class UnaryOperation extends Operation {
 
   Operation operand;
 
-  UnaryOperation(this.kind, this.operand) {
+  String type;
+
+  UnaryOperation(this.kind, this.operand, [this.type]) {
     switch (kind) {
       case OperationKind.not:
+        break;
+      case OperationKind.convert:
+        if (type == null) {
+          throw ArgumentError.notNull('type');
+        }
+
         break;
       default:
         _errorInvalidOpertionKin();

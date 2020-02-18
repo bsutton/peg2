@@ -45,6 +45,17 @@ class OperationReplacer extends SimpleOperationVisitor {
   }
 
   @override
+  void visitListAccessOperation(ListAccessOperation node) {
+    if (node.list == _from) {
+      node.list = _to;
+    } else if (node.index == _from) {
+      node.index = _to;
+    } else {
+      _errorUnableToReplace();
+    }
+  }
+
+  @override
   void visitListOperation(ListOperation node) {
     _replaceInList(node.elements);
   }

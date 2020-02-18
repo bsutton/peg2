@@ -11,11 +11,12 @@ class ExpressionInitializer extends ExpressionVisitor {
 
   Map<String, ProductionRule> _rules;
 
-  void initialize(List<ProductionRule> rules) {
-    if (rules == null) {
-      throw ArgumentError.notNull('rules');
+  void initialize(Grammar grammar) {
+    if (grammar == null) {
+      throw ArgumentError.notNull('grammar');
     }
 
+    final rules = grammar.rules;
     _rules = <String, ProductionRule>{};
     for (var rule in rules) {
       _rules[rule.name] = rule;
@@ -28,6 +29,8 @@ class ExpressionInitializer extends ExpressionVisitor {
       _rule = rule;
       rule.expression.accept(this);
     }
+
+    grammar.expressionCount = _expressionId;
 
     final optionalExpressionResolver = OptionalExpressionResolver();
     optionalExpressionResolver.resolve(rules);

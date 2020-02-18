@@ -13,9 +13,13 @@ class RulesToOperationsBuilder extends ExpressionVisitor {
 
   int _lastVariableIndex;
 
+  Variable _memoizable;
+
   Variable _memoize;
 
   Variable _memoized;
+
+  Variable _mresult;
 
   bool _notProductive;
 
@@ -42,8 +46,10 @@ class RulesToOperationsBuilder extends ExpressionVisitor {
     _cp = Variable('_cp');
     _failed = Variable('_failed');
     _failure = Variable('_failure');
+    _memoizable = Variable('_memoizable');
     _memoize = Variable('_memoize');
     _memoized = Variable('_memoized');
+    _mresult = Variable('_mresult');
     _notProductive = false;
     _options = options;
     _predicate = Variable('_predicate');
@@ -611,6 +617,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor {
   MethodOperation _buildRule(ProductionRule rule) {
     _lastVariableIndex = 0;
     final cid = _allocVar();
+    final expressionId = rule.expression.id;
     _productive = _allocVar();
     final name = _getRuleName(rule);
     final params = <ParameterOperation>[];
@@ -618,14 +625,20 @@ class RulesToOperationsBuilder extends ExpressionVisitor {
     params.add(ParameterOperation('bool', _productive));
     var returnType = rule.returnType;
     returnType ??= rule.expression.returnType;
+    Variable start;
     final result = _addMethod(returnType, name, params, (b) {
       _block = b;
+      //if (_options.memoize && rule.kind != ProductionRuleKind.Subterminal) {
       if (_options.memoize) {
-        final memoizedCall =
-            CallOperation(_varOp(_memoized), [_constOp(rule.id), _varOp(cid)]);
+        final memoizedCall = CallOperation(
+            _varOp(_memoized), [_constOp(expressionId), _varOp(cid)]);
         _addIf(b, memoizedCall, (b) {
-          _addReturn(b, _constOp(null));
+          final convert = UnaryOperation(
+              OperationKind.convert, _varOp(_mresult), returnType);
+          _addReturn(b, convert);
         });
+
+        start = _newVar(b, 'var', _varOp(_pos));
       }
 
       if (rule.kind == ProductionRuleKind.Terminal) {
@@ -643,9 +656,17 @@ class RulesToOperationsBuilder extends ExpressionVisitor {
         });
       }
 
+      //if (_options.memoize && rule.kind != ProductionRuleKind.Subterminal) {
       if (_options.memoize) {
-        final memoizeCall = _call(_varOp(_memoize), [_varOp(result)]);
-        _addOp(b, memoizeCall);
+        final listAccess =
+            ListAccessOperation(_varOp(_memoizable), _varOp(cid));
+        final test =
+            BinaryOperation(listAccess, OperationKind.equal, _constOp(true));
+        _addIf(b, test, (b) {
+          final memoizeCall = _call(_varOp(_memoize),
+              [_constOp(expressionId), _varOp(start), _varOp(result)]);
+          _addOp(b, memoizeCall);
+        });
       }
 
       _addReturn(b, _varOp(result));

@@ -19,10 +19,13 @@ void main(List<String> args) {
   argParser.addFlag('inline-subterminals',
       defaultsTo: false,
       help: 'Convert subterminal calls into inline expressions');
+  argParser.addFlag('memoize',
+      defaultsTo: false, help: 'Memoize results of calls');
   final argResults = argParser.parse(args);
   final printGrammar = argResults['print'] as bool;
   options.inlineNonterminals = argResults['inline-nonterminals'] as bool;
   options.inlineSubterminals = argResults['inline-subterminals'] as bool;
+  options.memoize = argResults['memoize'] as bool;
   String inputFilename;
   String outputFilename;
   if (argResults.rest.length == 1) {
