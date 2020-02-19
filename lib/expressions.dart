@@ -1,3 +1,5 @@
+import 'package:lists/lists.dart';
+
 import 'grammar.dart';
 
 part 'src/expressions/and_predicate_expression.dart';

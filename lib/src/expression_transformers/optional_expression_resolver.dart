@@ -56,7 +56,6 @@ class OptionalExpressionResolver extends ExpressionVisitor {
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
     _setIsOptional(node, false);
-    return null;
   }
 
   @override

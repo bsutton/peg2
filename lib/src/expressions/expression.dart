@@ -17,6 +17,8 @@ abstract class Expression {
 
   ProductionRule rule;
 
+  SparseBoolList startCharacters = SparseBoolList();
+
   String variable;
 
   bool used;

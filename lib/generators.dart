@@ -4,6 +4,7 @@ import 'package:dart_style/dart_style.dart';
 
 import 'analyzers.dart';
 import 'code_builder.dart';
+import 'experimental.dart';
 import 'expressions.dart';
 import 'grammar.dart';
 import 'operation_optimizers.dart';

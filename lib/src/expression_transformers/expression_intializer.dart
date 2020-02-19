@@ -34,6 +34,9 @@ class ExpressionInitializer extends ExpressionVisitor {
 
     final optionalExpressionResolver = OptionalExpressionResolver();
     optionalExpressionResolver.resolve(rules);
+    final expressionStartCharactersResolver =
+        ExpressionStartCharactersResolver();
+    expressionStartCharactersResolver.resolve(rules);
   }
 
   @override
