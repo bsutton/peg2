@@ -33,7 +33,8 @@ class ParserClassBuilder {
       'bool _success',
       'List<String> _terminals',
       'int _terminalCount',
-      'List<int> _tracks',
+      'List<int> _trackCid',
+      'List<int> _trackPos',
     ];
 
     for (final variable in variables) {
@@ -273,15 +274,19 @@ bool _memoized(int id, int cid) {
     return false;
   }
 
-  var last = _tracks[id];
-  _tracks[id] = cid;
-  if (last == null) {    
+  var lastCid = _trackCid[id];
+  var lastPos = _trackPos[id];
+  _trackCid[id] = cid;
+  _trackPos[id] = _pos;
+  if (lastCid == null) {    
     return false;
   }
 
-  if (last != cid) {
-    _memoizable[last] = true;
-    _memoizable[cid] = false;
+  if (lastPos == _pos) {
+    if (lastCid != cid) {
+      _memoizable[lastCid] = true;
+      _memoizable[cid] = false;
+    }
   }
   
   return false;
@@ -320,8 +325,10 @@ void _reset() {
   _terminalCount = 0;
   _terminals = [];
   _terminals.length = 20;
-  _tracks = [];
-  _tracks.length = {{EXPR_COUNT}};
+  _trackCid = [];
+  _trackCid.length = {{EXPR_COUNT}};
+  _trackPos = [];
+  _trackPos.length = {{EXPR_COUNT}};
 }
 
 ''';

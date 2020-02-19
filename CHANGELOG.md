@@ -1,3 +1,7 @@
+## 0.1.10
+
+- Memoization algorithm made more optimal
+
 ## 0.1.9
 
 - Improved performance of experimental memoization feature

@@ -16,7 +16,7 @@
             "program": "bin/peg2.dart",
             "request": "launch",
             "type": "dart",
-            "args": [
+            "args": [               
                 "example/example.peg",
                 "example/example.dart"
             ]

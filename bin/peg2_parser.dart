@@ -78,7 +78,9 @@ class Peg2Parser {
 
   int _terminalCount;
 
-  List<int> _tracks;
+  List<int> _trackCid;
+
+  List<int> _trackPos;
 
   dynamic parse(String text) {
     if (text == null) {
@@ -309,15 +311,19 @@ class Peg2Parser {
       return false;
     }
 
-    var last = _tracks[id];
-    _tracks[id] = cid;
-    if (last == null) {
+    var lastCid = _trackCid[id];
+    var lastPos = _trackPos[id];
+    _trackCid[id] = cid;
+    _trackPos[id] = _pos;
+    if (lastCid == null) {
       return false;
     }
 
-    if (last != cid) {
-      _memoizable[last] = true;
-      _memoizable[cid] = false;
+    if (lastPos == _pos) {
+      if (lastCid != cid) {
+        _memoizable[lastCid] = true;
+        _memoizable[cid] = false;
+      }
     }
 
     return false;
@@ -356,8 +362,10 @@ class Peg2Parser {
     _terminalCount = 0;
     _terminals = [];
     _terminals.length = 20;
-    _tracks = [];
-    _tracks.length = 444;
+    _trackCid = [];
+    _trackCid.length = 444;
+    _trackPos = [];
+    _trackPos.length = 444;
   }
 
   Grammar _parseGrammar(int $0, bool $1) {

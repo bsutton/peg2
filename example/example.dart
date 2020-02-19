@@ -49,7 +49,9 @@ class ExampleParser {
 
   int _terminalCount;
 
-  List<int> _tracks;
+  List<int> _trackCid;
+
+  List<int> _trackPos;
 
   dynamic parse(String text) {
     if (text == null) {
@@ -280,15 +282,19 @@ class ExampleParser {
       return false;
     }
 
-    var last = _tracks[id];
-    _tracks[id] = cid;
-    if (last == null) {
+    var lastCid = _trackCid[id];
+    var lastPos = _trackPos[id];
+    _trackCid[id] = cid;
+    _trackPos[id] = _pos;
+    if (lastCid == null) {
       return false;
     }
 
-    if (last != cid) {
-      _memoizable[last] = true;
-      _memoizable[cid] = false;
+    if (lastPos == _pos) {
+      if (lastCid != cid) {
+        _memoizable[lastCid] = true;
+        _memoizable[cid] = false;
+      }
     }
 
     return false;
@@ -327,8 +333,10 @@ class ExampleParser {
     _terminalCount = 0;
     _terminals = [];
     _terminals.length = 20;
-    _tracks = [];
-    _tracks.length = 187;
+    _trackCid = [];
+    _trackCid.length = 187;
+    _trackPos = [];
+    _trackPos.length = 187;
   }
 
   dynamic _parseJson(int $0, bool $1) {
