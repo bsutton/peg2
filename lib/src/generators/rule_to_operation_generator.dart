@@ -628,8 +628,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor {
     Variable start;
     final result = _addMethod(returnType, name, params, (b) {
       _block = b;
-      //if (_options.memoize && rule.kind != ProductionRuleKind.Subterminal) {
-      if (_options.memoize) {
+      if (_options.memoize && rule.callers.length > 1) {
         final memoizedCall = CallOperation(
             _varOp(_memoized), [_constOp(expressionId), _varOp(cid)]);
         _addIf(b, memoizedCall, (b) {
@@ -656,8 +655,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor {
         });
       }
 
-      //if (_options.memoize && rule.kind != ProductionRuleKind.Subterminal) {
-      if (_options.memoize) {
+      if (_options.memoize && rule.callers.length > 1) {
         final listAccess =
             ListAccessOperation(_varOp(_memoizable), _varOp(cid));
         final test =

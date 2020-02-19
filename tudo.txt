@@ -7,3 +7,4 @@ add some kinds of grammar analyzers
 implement optimizer to remove "_succes = true" before calls to [_parseXXX, _matchXXX]
 implement lookup tables (using starting characters of expressions) for the ordered choice expressions to improve the performance by skip unnecessary (heavy) operations
 implement expression starting characters resolver 
+improve memoization

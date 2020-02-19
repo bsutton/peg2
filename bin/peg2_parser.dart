@@ -367,186 +367,165 @@ class Peg2Parser {
   }
 
   Grammar _parseGrammar(int $0, bool $1) {
-    if (_memoized(0, $0)) {
-      return _mresult as Grammar;
-    }
-    var $2 = _pos;
+    Grammar $2;
     Grammar $3;
     Grammar $4;
-    Grammar $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
     _parse_leading_spaces(3, false);
     _success = true;
-    var $10 = _parse_globals(5, $1);
+    var $9 = _parse_globals(5, $1);
     _success = true;
-    var $11 = _parse_members(7, $1);
+    var $10 = _parse_members(7, $1);
     _success = true;
-    List<ProductionRule> $12;
+    List<ProductionRule> $11;
     if ($1) {
-      $12 = [];
+      $11 = [];
     }
-    var $13 = false;
+    var $12 = false;
     for (;;) {
-      var $14 = _parseDefinition(9, $1);
+      var $13 = _parseDefinition(9, $1);
       if (!_success) {
-        _success = $13;
+        _success = $12;
         if (!_success) {
-          $12 = null;
+          $11 = null;
         }
         break;
       }
       if ($1) {
-        $12.add($14);
+        $11.add($13);
       }
-      $13 = true;
+      $12 = true;
     }
     if (_success) {
       _parse_end_of_file(10, false);
       if (_success) {
-        var g = $10;
-        var m = $11;
-        var d = $12;
+        var g = $9;
+        var m = $10;
+        var d = $11;
         Grammar $$;
         $$ = Grammar(d, g, m);
-        $5 = $$;
+        $4 = $$;
       }
     }
     // NOP;
     // NOP;
     // NOP;
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(0, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   ProductionRule _parseDefinition(int $0, bool $1) {
-    if (_memoized(11, $0)) {
-      return _mresult as ProductionRule;
-    }
-    var $2 = _pos;
+    ProductionRule $2;
     ProductionRule $3;
-    ProductionRule $4;
     for (;;) {
-      ProductionRule $5;
-      var $6 = _parseNonterminalDefinition(13, $1);
+      ProductionRule $4;
+      var $5 = _parseNonterminalDefinition(13, $1);
       if (_success) {
-        $5 = $6;
         $4 = $5;
+        $3 = $4;
         break;
       }
       // NOP;
-      ProductionRule $7;
-      var $8 = _parseTerminalDefinition(15, $1);
+      ProductionRule $6;
+      var $7 = _parseTerminalDefinition(15, $1);
       if (_success) {
-        $7 = $8;
-        $4 = $7;
+        $6 = $7;
+        $3 = $6;
         break;
       }
       // NOP;
-      ProductionRule $9;
-      var $10 = _parseSubterminalDefinition(17, $1);
+      ProductionRule $8;
+      var $9 = _parseSubterminalDefinition(17, $1);
       if (_success) {
-        $9 = $10;
-        $4 = $9;
+        $8 = $9;
+        $3 = $8;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(11, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   ProductionRule _parseNonterminalDefinition(int $0, bool $1) {
-    if (_memoized(18, $0)) {
-      return _mresult as ProductionRule;
-    }
-    var $2 = _pos;
+    ProductionRule $2;
     ProductionRule $3;
-    ProductionRule $4;
     for (;;) {
-      ProductionRule $5;
-      var $6 = _c;
-      var $7 = _cp;
-      var $8 = _pos;
-      var $9 = _parseType(20, $1);
+      ProductionRule $4;
+      var $5 = _c;
+      var $6 = _cp;
+      var $7 = _pos;
+      var $8 = _parseType(20, $1);
       if (_success) {
-        var $10 = _parse_non_terminal_name(21, $1);
+        var $9 = _parse_non_terminal_name(21, $1);
         if (_success) {
           _parse_$EqualSign(22, false);
           if (_success) {
-            var $12 = _parseNonterminalExpression(23, $1);
+            var $11 = _parseNonterminalExpression(23, $1);
             if (_success) {
               _parse_$Semicolon(24, false);
               if (_success) {
-                var t = $9;
-                var n = $10;
-                var e = $12;
+                var t = $8;
+                var n = $9;
+                var e = $11;
                 ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.Nonterminal, e, t);
-                $5 = $$;
+                $4 = $$;
               }
             }
           }
         }
       }
       if (!_success) {
-        _c = $6;
-        _cp = $7;
-        _pos = $8;
+        _c = $5;
+        _cp = $6;
+        _pos = $7;
       } else {
-        $4 = $5;
+        $3 = $4;
         break;
       }
       // NOP;
-      ProductionRule $14;
-      var $15 = _c;
-      var $16 = _cp;
-      var $17 = _pos;
-      var $18 = _parse_non_terminal_name(26, $1);
+      ProductionRule $13;
+      var $14 = _c;
+      var $15 = _cp;
+      var $16 = _pos;
+      var $17 = _parse_non_terminal_name(26, $1);
       if (_success) {
         _parse_$EqualSign(27, false);
         if (_success) {
-          var $20 = _parseNonterminalExpression(28, $1);
+          var $19 = _parseNonterminalExpression(28, $1);
           if (_success) {
             _parse_$Semicolon(29, false);
             if (_success) {
-              var n = $18;
-              var e = $20;
+              var n = $17;
+              var e = $19;
               ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.Nonterminal, e, null);
-              $14 = $$;
+              $13 = $$;
             }
           }
         }
       }
       if (!_success) {
-        _c = $15;
-        _cp = $16;
-        _pos = $17;
+        _c = $14;
+        _cp = $15;
+        _pos = $16;
       } else {
-        $4 = $14;
+        $3 = $13;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(18, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   OrderedChoiceExpression _parseNonterminalExpression(int $0, bool $1) {
@@ -671,266 +650,238 @@ class Peg2Parser {
   }
 
   Expression _parseNonterminalPrefix(int $0, bool $1) {
-    if (_memoized(44, $0)) {
-      return _mresult as Expression;
-    }
-    var $2 = _pos;
+    Expression $2;
     Expression $3;
     Expression $4;
-    Expression $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
-    var $9 = _parse_semantic_value(47, $1);
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
+    var $8 = _parse_semantic_value(47, $1);
     _success = true;
-    String $10;
+    String $9;
     for (;;) {
-      String $11;
-      var $12 = _parse_$Ampersand(51, $1);
+      String $10;
+      var $11 = _parse_$Ampersand(51, $1);
       if (_success) {
-        $11 = $12;
         $10 = $11;
+        $9 = $10;
         break;
       }
       // NOP;
-      String $13;
-      var $14 = _parse_$ExclamationMark(53, $1);
+      String $12;
+      var $13 = _parse_$ExclamationMark(53, $1);
       if (_success) {
-        $13 = $14;
-        $10 = $13;
+        $12 = $13;
+        $9 = $12;
       }
       // NOP;
       break;
     }
     _success = true;
-    var $15 = _parseNonterminalSuffix(54, $1);
+    var $14 = _parseNonterminalSuffix(54, $1);
     if (_success) {
-      var s = $9;
-      var p = $10;
-      var e = $15;
+      var s = $8;
+      var p = $9;
+      var e = $14;
       Expression $$;
       $$ = _prefix(p, e, s);
-      $5 = $$;
+      $4 = $$;
     }
     // NOP;
     // NOP;
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(44, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   Expression _parseNonterminalSuffix(int $0, bool $1) {
-    if (_memoized(55, $0)) {
-      return _mresult as Expression;
-    }
-    var $2 = _pos;
+    Expression $2;
     Expression $3;
     Expression $4;
-    Expression $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
-    var $9 = _parseNonterminalPrimary(57, $1);
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
+    var $8 = _parseNonterminalPrimary(57, $1);
     if (_success) {
-      String $10;
+      String $9;
       for (;;) {
-        String $11;
-        var $12 = _parse_$QuestionMark(61, $1);
+        String $10;
+        var $11 = _parse_$QuestionMark(61, $1);
         if (_success) {
-          $11 = $12;
           $10 = $11;
+          $9 = $10;
           break;
         }
         // NOP;
-        String $13;
-        var $14 = _parse_$Asterisk(63, $1);
+        String $12;
+        var $13 = _parse_$Asterisk(63, $1);
         if (_success) {
-          $13 = $14;
-          $10 = $13;
+          $12 = $13;
+          $9 = $12;
           break;
         }
         // NOP;
-        String $15;
-        var $16 = _parse_$PlusSign(65, $1);
+        String $14;
+        var $15 = _parse_$PlusSign(65, $1);
         if (_success) {
-          $15 = $16;
-          $10 = $15;
+          $14 = $15;
+          $9 = $14;
         }
         // NOP;
         break;
       }
       _success = true;
       {
-        var e = $9;
-        var s = $10;
+        var e = $8;
+        var s = $9;
         Expression $$;
         $$ = _suffix(s, e);
-        $5 = $$;
+        $4 = $$;
       }
       // NOP;
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(55, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   Expression _parseNonterminalPrimary(int $0, bool $1) {
-    if (_memoized(66, $0)) {
-      return _mresult as Expression;
-    }
-    var $2 = _pos;
+    Expression $2;
     Expression $3;
-    Expression $4;
     for (;;) {
-      Expression $5;
-      var $6 = _parse_non_terminal_name(68, $1);
+      Expression $4;
+      var $5 = _parse_non_terminal_name(68, $1);
       if (_success) {
-        var n = $6;
+        var n = $5;
         Expression $$;
         $$ = NonterminalExpression(n);
-        $5 = $$;
+        $4 = $$;
       }
       if (_success) {
-        $4 = $5;
+        $3 = $4;
         break;
       }
-      Expression $7;
-      var $8 = _parse_terminal_name(70, $1);
+      Expression $6;
+      var $7 = _parse_terminal_name(70, $1);
       if (_success) {
-        var n = $8;
+        var n = $7;
         Expression $$;
         $$ = TerminalExpression(n);
-        $7 = $$;
+        $6 = $$;
       }
       if (_success) {
-        $4 = $7;
+        $3 = $6;
         break;
       }
-      Expression $9;
-      var $10 = _c;
-      var $11 = _cp;
-      var $12 = _pos;
+      Expression $8;
+      var $9 = _c;
+      var $10 = _cp;
+      var $11 = _pos;
       _parse_$LeftParenthesis(72, false);
       if (_success) {
-        var $14 = _parseNonterminalExpression(73, $1);
+        var $13 = _parseNonterminalExpression(73, $1);
         if (_success) {
           _parse_$RightParenthesis(74, false);
           if (_success) {
-            $9 = $14;
+            $8 = $13;
           }
         }
       }
       if (!_success) {
-        _c = $10;
-        _cp = $11;
-        _pos = $12;
+        _c = $9;
+        _cp = $10;
+        _pos = $11;
       } else {
-        $4 = $9;
+        $3 = $8;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(66, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   ProductionRule _parseTerminalDefinition(int $0, bool $1) {
-    if (_memoized(75, $0)) {
-      return _mresult as ProductionRule;
-    }
-    var $2 = _pos;
+    ProductionRule $2;
     ProductionRule $3;
-    ProductionRule $4;
     for (;;) {
-      ProductionRule $5;
-      var $6 = _c;
-      var $7 = _cp;
-      var $8 = _pos;
-      var $9 = _parseType(77, $1);
+      ProductionRule $4;
+      var $5 = _c;
+      var $6 = _cp;
+      var $7 = _pos;
+      var $8 = _parseType(77, $1);
       if (_success) {
-        var $10 = _parse_terminal_name(78, $1);
+        var $9 = _parse_terminal_name(78, $1);
         if (_success) {
           _parse_$EqualSign(79, false);
           if (_success) {
-            var $12 = _parseExpression(80, $1);
+            var $11 = _parseExpression(80, $1);
             if (_success) {
               _parse_$Semicolon(81, false);
               if (_success) {
-                var t = $9;
-                var n = $10;
-                var e = $12;
+                var t = $8;
+                var n = $9;
+                var e = $11;
                 ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.Terminal, e, t);
-                $5 = $$;
+                $4 = $$;
               }
             }
           }
         }
       }
       if (!_success) {
-        _c = $6;
-        _cp = $7;
-        _pos = $8;
+        _c = $5;
+        _cp = $6;
+        _pos = $7;
       } else {
-        $4 = $5;
+        $3 = $4;
         break;
       }
       // NOP;
-      ProductionRule $14;
-      var $15 = _c;
-      var $16 = _cp;
-      var $17 = _pos;
-      var $18 = _parse_terminal_name(83, $1);
+      ProductionRule $13;
+      var $14 = _c;
+      var $15 = _cp;
+      var $16 = _pos;
+      var $17 = _parse_terminal_name(83, $1);
       if (_success) {
         _parse_$EqualSign(84, false);
         if (_success) {
-          var $20 = _parseExpression(85, $1);
+          var $19 = _parseExpression(85, $1);
           if (_success) {
             _parse_$Semicolon(86, false);
             if (_success) {
-              var n = $18;
-              var e = $20;
+              var n = $17;
+              var e = $19;
               ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.Terminal, e, null);
-              $14 = $$;
+              $13 = $$;
             }
           }
         }
       }
       if (!_success) {
-        _c = $15;
-        _cp = $16;
-        _pos = $17;
+        _c = $14;
+        _cp = $15;
+        _pos = $16;
       } else {
-        $4 = $14;
+        $3 = $13;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(75, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   OrderedChoiceExpression _parseExpression(int $0, bool $1) {
@@ -1055,307 +1006,279 @@ class Peg2Parser {
   }
 
   Expression _parsePrefix(int $0, bool $1) {
-    if (_memoized(101, $0)) {
-      return _mresult as Expression;
-    }
-    var $2 = _pos;
+    Expression $2;
     Expression $3;
     Expression $4;
-    Expression $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
-    var $9 = _parse_semantic_value(104, $1);
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
+    var $8 = _parse_semantic_value(104, $1);
     _success = true;
-    String $10;
+    String $9;
     for (;;) {
-      String $11;
-      var $12 = _parse_$Ampersand(108, $1);
+      String $10;
+      var $11 = _parse_$Ampersand(108, $1);
       if (_success) {
-        $11 = $12;
         $10 = $11;
+        $9 = $10;
         break;
       }
       // NOP;
-      String $13;
-      var $14 = _parse_$ExclamationMark(110, $1);
+      String $12;
+      var $13 = _parse_$ExclamationMark(110, $1);
       if (_success) {
-        $13 = $14;
-        $10 = $13;
+        $12 = $13;
+        $9 = $12;
       }
       // NOP;
       break;
     }
     _success = true;
-    var $15 = _parseSuffix(111, $1);
+    var $14 = _parseSuffix(111, $1);
     if (_success) {
-      var s = $9;
-      var p = $10;
-      var e = $15;
+      var s = $8;
+      var p = $9;
+      var e = $14;
       Expression $$;
       $$ = _prefix(p, e, s);
-      $5 = $$;
+      $4 = $$;
     }
     // NOP;
     // NOP;
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(101, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   Expression _parseSuffix(int $0, bool $1) {
-    if (_memoized(112, $0)) {
-      return _mresult as Expression;
-    }
-    var $2 = _pos;
+    Expression $2;
     Expression $3;
     Expression $4;
-    Expression $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
-    var $9 = _parsePrimary(114, $1);
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
+    var $8 = _parsePrimary(114, $1);
     if (_success) {
-      String $10;
+      String $9;
       for (;;) {
-        String $11;
-        var $12 = _parse_$QuestionMark(118, $1);
+        String $10;
+        var $11 = _parse_$QuestionMark(118, $1);
         if (_success) {
-          $11 = $12;
           $10 = $11;
+          $9 = $10;
           break;
         }
         // NOP;
-        String $13;
-        var $14 = _parse_$Asterisk(120, $1);
+        String $12;
+        var $13 = _parse_$Asterisk(120, $1);
         if (_success) {
-          $13 = $14;
-          $10 = $13;
+          $12 = $13;
+          $9 = $12;
           break;
         }
         // NOP;
-        String $15;
-        var $16 = _parse_$PlusSign(122, $1);
+        String $14;
+        var $15 = _parse_$PlusSign(122, $1);
         if (_success) {
-          $15 = $16;
-          $10 = $15;
+          $14 = $15;
+          $9 = $14;
         }
         // NOP;
         break;
       }
       _success = true;
       {
-        var e = $9;
-        var s = $10;
+        var e = $8;
+        var s = $9;
         Expression $$;
         $$ = _suffix(s, e);
-        $5 = $$;
+        $4 = $$;
       }
       // NOP;
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(112, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   Expression _parsePrimary(int $0, bool $1) {
-    if (_memoized(123, $0)) {
-      return _mresult as Expression;
-    }
-    var $2 = _pos;
+    Expression $2;
     Expression $3;
-    Expression $4;
     for (;;) {
-      Expression $5;
-      var $6 = _parse_sub_terminal_name(125, $1);
+      Expression $4;
+      var $5 = _parse_sub_terminal_name(125, $1);
       if (_success) {
-        var n = $6;
+        var n = $5;
         Expression $$;
         $$ = SubterminalExpression(n);
-        $5 = $$;
+        $4 = $$;
       }
       if (_success) {
-        $4 = $5;
+        $3 = $4;
         break;
       }
-      Expression $7;
-      var $8 = _c;
-      var $9 = _cp;
-      var $10 = _pos;
+      Expression $6;
+      var $7 = _c;
+      var $8 = _cp;
+      var $9 = _pos;
       _parse_$LeftParenthesis(127, false);
       if (_success) {
-        var $12 = _parseExpression(128, $1);
+        var $11 = _parseExpression(128, $1);
         if (_success) {
           _parse_$RightParenthesis(129, false);
           if (_success) {
-            $7 = $12;
+            $6 = $11;
           }
         }
       }
       if (!_success) {
-        _c = $8;
-        _cp = $9;
-        _pos = $10;
+        _c = $7;
+        _cp = $8;
+        _pos = $9;
       } else {
-        $4 = $7;
+        $3 = $6;
         break;
       }
       // NOP;
-      Expression $14;
-      var $15 = _parse_literal(131, $1);
+      Expression $13;
+      var $14 = _parse_literal(131, $1);
       if (_success) {
-        $14 = $15;
-        $4 = $14;
+        $13 = $14;
+        $3 = $13;
         break;
       }
       // NOP;
-      Expression $16;
-      var $17 = _parse_character_class(133, $1);
+      Expression $15;
+      var $16 = _parse_character_class(133, $1);
       if (_success) {
-        $16 = $17;
-        $4 = $16;
+        $15 = $16;
+        $3 = $15;
         break;
       }
       // NOP;
-      Expression $18;
+      Expression $17;
       _parse_$Period(135, $1);
       if (_success) {
         Expression $$;
         $$ = AnyCharacterExpression();
-        $18 = $$;
+        $17 = $$;
       }
       if (_success) {
-        $4 = $18;
+        $3 = $17;
         break;
       }
-      Expression $20;
-      var $21 = _c;
-      var $22 = _cp;
-      var $23 = _pos;
+      Expression $19;
+      var $20 = _c;
+      var $21 = _cp;
+      var $22 = _pos;
       _parse_$LessThanSign(137, false);
       if (_success) {
-        var $25 = _parseExpression(138, $1);
+        var $24 = _parseExpression(138, $1);
         if (_success) {
           _parse_$GreaterThanSign(139, false);
           if (_success) {
-            var e = $25;
+            var e = $24;
             Expression $$;
             $$ = CaptureExpression(e);
-            $20 = $$;
+            $19 = $$;
           }
         }
       }
       if (!_success) {
-        _c = $21;
-        _cp = $22;
-        _pos = $23;
+        _c = $20;
+        _cp = $21;
+        _pos = $22;
       } else {
-        $4 = $20;
+        $3 = $19;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(123, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   ProductionRule _parseSubterminalDefinition(int $0, bool $1) {
-    if (_memoized(140, $0)) {
-      return _mresult as ProductionRule;
-    }
-    var $2 = _pos;
+    ProductionRule $2;
     ProductionRule $3;
-    ProductionRule $4;
     for (;;) {
-      ProductionRule $5;
-      var $6 = _c;
-      var $7 = _cp;
-      var $8 = _pos;
-      var $9 = _parseType(142, $1);
+      ProductionRule $4;
+      var $5 = _c;
+      var $6 = _cp;
+      var $7 = _pos;
+      var $8 = _parseType(142, $1);
       if (_success) {
-        var $10 = _parse_sub_terminal_name(143, $1);
+        var $9 = _parse_sub_terminal_name(143, $1);
         if (_success) {
           _parse_$EqualSign(144, false);
           if (_success) {
-            var $12 = _parseExpression(145, $1);
+            var $11 = _parseExpression(145, $1);
             if (_success) {
               _parse_$Semicolon(146, false);
               if (_success) {
-                var t = $9;
-                var n = $10;
-                var e = $12;
+                var t = $8;
+                var n = $9;
+                var e = $11;
                 ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.Subterminal, e, t);
-                $5 = $$;
+                $4 = $$;
               }
             }
           }
         }
       }
       if (!_success) {
-        _c = $6;
-        _cp = $7;
-        _pos = $8;
+        _c = $5;
+        _cp = $6;
+        _pos = $7;
       } else {
-        $4 = $5;
+        $3 = $4;
         break;
       }
       // NOP;
-      ProductionRule $14;
-      var $15 = _c;
-      var $16 = _cp;
-      var $17 = _pos;
-      var $18 = _parse_sub_terminal_name(148, $1);
+      ProductionRule $13;
+      var $14 = _c;
+      var $15 = _cp;
+      var $16 = _pos;
+      var $17 = _parse_sub_terminal_name(148, $1);
       if (_success) {
         _parse_$EqualSign(149, false);
         if (_success) {
-          var $20 = _parseExpression(150, $1);
+          var $19 = _parseExpression(150, $1);
           if (_success) {
             _parse_$Semicolon(151, false);
             if (_success) {
-              var n = $18;
-              var e = $20;
+              var n = $17;
+              var e = $19;
               ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.Subterminal, e, null);
-              $14 = $$;
+              $13 = $$;
             }
           }
         }
       }
       if (!_success) {
-        _c = $15;
-        _cp = $16;
-        _pos = $17;
+        _c = $14;
+        _cp = $15;
+        _pos = $16;
       } else {
-        $4 = $14;
+        $3 = $13;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(140, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   String _parseType(int $0, bool $1) {
@@ -1416,120 +1339,106 @@ class Peg2Parser {
   }
 
   String _parseTypeName(int $0, bool $1) {
-    if (_memoized(161, $0)) {
-      return _mresult as String;
-    }
-    var $2 = _pos;
+    String $2;
     String $3;
-    String $4;
     for (;;) {
-      String $5;
-      var $6 = _c;
-      var $7 = _cp;
-      var $8 = _pos;
-      var $9 = _parse_library_prefix(163, $1);
+      String $4;
+      var $5 = _c;
+      var $6 = _cp;
+      var $7 = _pos;
+      var $8 = _parse_library_prefix(163, $1);
       if (_success) {
         _parse_$Period(164, false);
         if (_success) {
-          var $11 = _parse_type_name(165, $1);
+          var $10 = _parse_type_name(165, $1);
           if (_success) {
-            var p = $9;
-            var n = $11;
+            var p = $8;
+            var n = $10;
             String $$;
             $$ = '$p.$n';
-            $5 = $$;
+            $4 = $$;
           }
         }
       }
       if (!_success) {
-        _c = $6;
-        _cp = $7;
-        _pos = $8;
+        _c = $5;
+        _cp = $6;
+        _pos = $7;
       } else {
-        $4 = $5;
+        $3 = $4;
         break;
       }
       // NOP;
-      String $12;
-      var $13 = _parse_type_name(167, $1);
+      String $11;
+      var $12 = _parse_type_name(167, $1);
       if (_success) {
-        $12 = $13;
-        $4 = $12;
+        $11 = $12;
+        $3 = $11;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(161, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   List<String> _parseTypeArguments(int $0, bool $1) {
-    if (_memoized(168, $0)) {
-      return _mresult as List<String>;
-    }
-    var $2 = _pos;
+    List<String> $2;
     List<String> $3;
     List<String> $4;
-    List<String> $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
-    var $9 = _parseType(170, $1);
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
+    var $8 = _parseType(170, $1);
     if (_success) {
-      List<String> $10;
+      List<String> $9;
       if ($1) {
-        $10 = [];
+        $9 = [];
       }
       for (;;) {
+        String $10;
         String $11;
-        String $12;
-        var $13 = _c;
-        var $14 = _cp;
-        var $15 = _pos;
+        var $12 = _c;
+        var $13 = _cp;
+        var $14 = _pos;
         _parse_$Comma(174, false);
         if (_success) {
-          var $17 = _parseType(175, $1);
+          var $16 = _parseType(175, $1);
           if (_success) {
-            $12 = $17;
+            $11 = $16;
           }
         }
         if (!_success) {
-          _c = $13;
-          _cp = $14;
-          _pos = $15;
+          _c = $12;
+          _cp = $13;
+          _pos = $14;
         }
-        $11 = $12;
+        $10 = $11;
         if (!_success) {
           break;
         }
         if ($1) {
-          $10.add($11);
+          $9.add($10);
         }
       }
       _success = true;
       {
-        var t = $9;
-        var n = $10;
+        var t = $8;
+        var n = $9;
         List<String> $$;
         $$ = [t, ...n];
-        $5 = $$;
+        $4 = $$;
       }
       // NOP;
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(168, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   String _parse_non_terminal_name(int $0, bool $1) {
@@ -1835,52 +1744,45 @@ class Peg2Parser {
   }
 
   String _parse_library_prefix(int $0, bool $1) {
-    if (_memoized(215, $0)) {
-      return _mresult as String;
-    }
-    var $2 = _pos;
     _failed = -1;
+    String $2;
     String $3;
     String $4;
     String $5;
-    String $6;
-    var $7 = _pos;
-    var $8 = $1;
+    var $6 = _pos;
+    var $7 = $1;
     $1 = false;
+    int $8;
     int $9;
-    int $10;
-    var $11 = _c;
-    var $12 = _cp;
-    var $13 = _pos;
-    var $14 = _matchChar(95);
+    var $10 = _c;
+    var $11 = _cp;
+    var $12 = _pos;
+    var $13 = _matchChar(95);
     _success = true;
     _parse$$IDENTIFIER(222, false);
     if (_success) {
-      $10 = $14;
+      $9 = $13;
     }
     // NOP;
     if (!_success) {
-      _c = $11;
-      _cp = $12;
-      _pos = $13;
+      _c = $10;
+      _cp = $11;
+      _pos = $12;
     }
-    $9 = $10;
+    $8 = $9;
     if (_success) {
-      $6 = _input.substring($7, _pos);
+      $5 = _input.substring($6, _pos);
     }
-    $1 = $8;
+    $1 = $7;
     if (_success) {
-      $5 = $6;
+      $4 = $5;
     }
-    $4 = $5;
     $3 = $4;
+    $2 = $3;
     if (!_success) {
       _failure('\'library prefix\'');
     }
-    if (_memoizable[$0] == true) {
-      _memoize(215, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$Semicolon(int $0, bool $1) {
@@ -2021,96 +1923,89 @@ class Peg2Parser {
   }
 
   Expression _parse_character_class(int $0, bool $1) {
-    if (_memoized(241, $0)) {
-      return _mresult as Expression;
-    }
-    var $2 = _pos;
     _failed = -1;
+    Expression $2;
     Expression $3;
     Expression $4;
-    Expression $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
     _matchString('[');
     if (_success) {
-      List<List<int>> $10;
+      List<List<int>> $9;
       if ($1) {
-        $10 = [];
+        $9 = [];
       }
-      var $11 = false;
+      var $10 = false;
       for (;;) {
+        List<int> $11;
         List<int> $12;
-        List<int> $13;
-        var $14 = _c;
-        var $15 = _cp;
-        var $16 = _pos;
-        var $17 = _c;
-        var $18 = _cp;
-        var $19 = _pos;
-        var $20 = _predicate;
-        var $21 = $1;
+        var $13 = _c;
+        var $14 = _cp;
+        var $15 = _pos;
+        var $16 = _c;
+        var $17 = _cp;
+        var $18 = _pos;
+        var $19 = _predicate;
+        var $20 = $1;
         _predicate = true;
         $1 = false;
         _matchString(']');
         // NOP;
         _success = !_success;
-        _c = $17;
-        _cp = $18;
-        _pos = $19;
-        _predicate = $20;
-        $1 = $21;
+        _c = $16;
+        _cp = $17;
+        _pos = $18;
+        _predicate = $19;
+        $1 = $20;
         if (_success) {
-          var $24 = _parse$$RANGE(249, $1);
+          var $23 = _parse$$RANGE(249, $1);
           if (_success) {
-            $13 = $24;
+            $12 = $23;
           }
         }
         if (!_success) {
-          _c = $14;
-          _cp = $15;
-          _pos = $16;
+          _c = $13;
+          _cp = $14;
+          _pos = $15;
         }
-        $12 = $13;
+        $11 = $12;
         if (!_success) {
-          _success = $11;
+          _success = $10;
           if (!_success) {
-            $10 = null;
+            $9 = null;
           }
           break;
         }
         if ($1) {
-          $10.add($12);
+          $9.add($11);
         }
-        $11 = true;
+        $10 = true;
       }
       if (_success) {
         _matchString(']');
         if (_success) {
           _parse$$SPACING(251, false);
           if (_success) {
-            var r = $10;
+            var r = $9;
             Expression $$;
             $$ = CharacterClassExpression(r);
-            $5 = $$;
+            $4 = $$;
           }
         }
       }
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
+    $2 = $3;
     if (!_success) {
       _failure('\'character class\'');
     }
-    if (_memoizable[$0] == true) {
-      _memoize(241, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$RightParenthesis(int $0, bool $1) {
@@ -2184,132 +2079,111 @@ class Peg2Parser {
   }
 
   dynamic _parse_end_of_file(int $0, bool $1) {
-    if (_memoized(260, $0)) {
-      return _mresult as dynamic;
-    }
-    var $2 = _pos;
     _failed = -1;
+    dynamic $2;
     dynamic $3;
     dynamic $4;
-    dynamic $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
-    var $9 = _predicate;
-    var $10 = $1;
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
+    var $8 = _predicate;
+    var $9 = $1;
     _predicate = true;
     $1 = false;
     _matchAny();
-    var $12;
+    var $11;
     _success = !_success;
-    _c = $6;
-    _cp = $7;
-    _pos = $8;
-    _predicate = $9;
-    $1 = $10;
+    _c = $5;
+    _cp = $6;
+    _pos = $7;
+    _predicate = $8;
+    $1 = $9;
     if (_success) {
-      $5 = $12;
+      $4 = $11;
     }
-    $4 = $5;
     $3 = $4;
+    $2 = $3;
     if (!_success) {
       _failure('\'end of file\'');
     }
-    if (_memoizable[$0] == true) {
-      _memoize(260, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_globals(int $0, bool $1) {
-    if (_memoized(264, $0)) {
-      return _mresult as String;
-    }
-    var $2 = _pos;
     _failed = -1;
+    String $2;
     String $3;
     String $4;
-    String $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
     _matchString('%{');
     if (_success) {
-      String $10;
-      var $11 = _pos;
-      var $12 = $1;
+      String $9;
+      var $10 = _pos;
+      var $11 = $1;
       $1 = false;
+      List $12;
       List $13;
       List $14;
-      List $15;
       if ($1) {
-        $15 = [];
+        $14 = [];
       }
       for (;;) {
-        var $16 = _parse$$GLOBALS_BODY(271, $1);
+        var $15 = _parse$$GLOBALS_BODY(271, $1);
         if (!_success) {
           break;
         }
         if ($1) {
-          $15.add($16);
+          $14.add($15);
         }
       }
       _success = true;
-      $14 = $15;
-      // NOP;
       $13 = $14;
+      // NOP;
+      $12 = $13;
       if (_success) {
-        $10 = _input.substring($11, _pos);
+        $9 = _input.substring($10, _pos);
       }
-      $1 = $12;
+      $1 = $11;
       if (_success) {
         _matchString('}%');
         if (_success) {
           _parse$$SPACING(273, false);
           if (_success) {
-            $5 = $10;
+            $4 = $9;
           }
         }
       }
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
+    $2 = $3;
     if (!_success) {
       _failure('\'globals\'');
     }
-    if (_memoizable[$0] == true) {
-      _memoize(264, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   List _parse_leading_spaces(int $0, bool $1) {
-    if (_memoized(274, $0)) {
-      return _mresult as List;
-    }
-    var $2 = _pos;
     _failed = -1;
+    List $2;
     List $3;
     List $4;
-    List $5;
-    var $6 = _parse$$SPACING(276, $1);
+    var $5 = _parse$$SPACING(276, $1);
     if (_success) {
-      $5 = $6;
+      $4 = $5;
     }
-    $4 = $5;
     $3 = $4;
+    $2 = $3;
     if (!_success) {
       _failure('\'leading spaces\'');
     }
-    if (_memoizable[$0] == true) {
-      _memoize(274, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$EqualSign(int $0, bool $1) {
@@ -2348,61 +2222,57 @@ class Peg2Parser {
   }
 
   Expression _parse_literal(int $0, bool $1) {
-    if (_memoized(281, $0)) {
-      return _mresult as Expression;
-    }
-    var $2 = _pos;
     _failed = -1;
+    Expression $2;
     Expression $3;
     Expression $4;
-    Expression $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
     _matchChar(34);
     if (_success) {
-      List<int> $10;
+      List<int> $9;
       if ($1) {
-        $10 = [];
+        $9 = [];
       }
       for (;;) {
+        int $10;
         int $11;
-        int $12;
-        var $13 = _c;
-        var $14 = _cp;
-        var $15 = _pos;
-        var $16 = _c;
-        var $17 = _cp;
-        var $18 = _pos;
-        var $19 = _predicate;
-        var $20 = $1;
+        var $12 = _c;
+        var $13 = _cp;
+        var $14 = _pos;
+        var $15 = _c;
+        var $16 = _cp;
+        var $17 = _pos;
+        var $18 = _predicate;
+        var $19 = $1;
         _predicate = true;
         $1 = false;
         _matchChar(34);
         // NOP;
         _success = !_success;
-        _c = $16;
-        _cp = $17;
-        _pos = $18;
-        _predicate = $19;
-        $1 = $20;
+        _c = $15;
+        _cp = $16;
+        _pos = $17;
+        _predicate = $18;
+        $1 = $19;
         if (_success) {
-          var $23 = _parse$$LITERAL_CHAR(289, $1);
+          var $22 = _parse$$LITERAL_CHAR(289, $1);
           if (_success) {
-            $12 = $23;
+            $11 = $22;
           }
         }
         if (!_success) {
-          _c = $13;
-          _cp = $14;
-          _pos = $15;
+          _c = $12;
+          _cp = $13;
+          _pos = $14;
         }
-        $11 = $12;
+        $10 = $11;
         if (!_success) {
           break;
         }
         if ($1) {
-          $10.add($11);
+          $9.add($10);
         }
       }
       _success = true;
@@ -2410,95 +2280,85 @@ class Peg2Parser {
       if (_success) {
         _parse$$SPACING(291, false);
         if (_success) {
-          var c = $10;
+          var c = $9;
           Expression $$;
           $$ = LiteralExpression(String.fromCharCodes(c));
-          $5 = $$;
+          $4 = $$;
         }
       }
       // NOP;
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
+    $2 = $3;
     if (!_success) {
       _failure('\'literal\'');
     }
-    if (_memoizable[$0] == true) {
-      _memoize(281, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_members(int $0, bool $1) {
-    if (_memoized(292, $0)) {
-      return _mresult as String;
-    }
-    var $2 = _pos;
     _failed = -1;
+    String $2;
     String $3;
     String $4;
-    String $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
     _matchString('{');
     if (_success) {
-      String $10;
-      var $11 = _pos;
-      var $12 = $1;
+      String $9;
+      var $10 = _pos;
+      var $11 = $1;
       $1 = false;
+      List $12;
       List $13;
       List $14;
-      List $15;
       if ($1) {
-        $15 = [];
+        $14 = [];
       }
       for (;;) {
-        var $16 = _parse$$ACTION_BODY(299, $1);
+        var $15 = _parse$$ACTION_BODY(299, $1);
         if (!_success) {
           break;
         }
         if ($1) {
-          $15.add($16);
+          $14.add($15);
         }
       }
       _success = true;
-      $14 = $15;
-      // NOP;
       $13 = $14;
+      // NOP;
+      $12 = $13;
       if (_success) {
-        $10 = _input.substring($11, _pos);
+        $9 = _input.substring($10, _pos);
       }
-      $1 = $12;
+      $1 = $11;
       if (_success) {
         _matchString('}');
         if (_success) {
           _parse$$SPACING(301, false);
           if (_success) {
-            $5 = $10;
+            $4 = $9;
           }
         }
       }
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
+    $2 = $3;
     if (!_success) {
       _failure('\'members\'');
     }
-    if (_memoizable[$0] == true) {
-      _memoize(292, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$ExclamationMark(int $0, bool $1) {
@@ -2607,38 +2467,31 @@ class Peg2Parser {
   }
 
   String _parse_$Comma(int $0, bool $1) {
-    if (_memoized(314, $0)) {
-      return _mresult as String;
-    }
-    var $2 = _pos;
     _failed = -1;
+    String $2;
     String $3;
     String $4;
-    String $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
-    var $9 = _matchString(',');
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
+    var $8 = _matchString(',');
     if (_success) {
       _parse$$SPACING(317, false);
       if (_success) {
-        $5 = $9;
+        $4 = $8;
       }
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
+    $2 = $3;
     if (!_success) {
       _failure('\',\'');
     }
-    if (_memoizable[$0] == true) {
-      _memoize(314, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$QuestionMark(int $0, bool $1) {
@@ -2902,80 +2755,73 @@ class Peg2Parser {
   }
 
   String _parse$$COMMENT(int $0, bool $1) {
-    if (_memoized(348, $0)) {
-      return _mresult as String;
-    }
-    var $2 = _pos;
+    String $2;
     String $3;
     String $4;
-    String $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
-    var $9 = _matchString('#');
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
+    var $8 = _matchString('#');
     if (_success) {
-      List $10;
+      List $9;
       if ($1) {
-        $10 = [];
+        $9 = [];
       }
       for (;;) {
+        dynamic $10;
         dynamic $11;
-        dynamic $12;
-        var $13 = _c;
-        var $14 = _cp;
-        var $15 = _pos;
-        var $16 = _c;
-        var $17 = _cp;
-        var $18 = _pos;
-        var $19 = _predicate;
-        var $20 = $1;
+        var $12 = _c;
+        var $13 = _cp;
+        var $14 = _pos;
+        var $15 = _c;
+        var $16 = _cp;
+        var $17 = _pos;
+        var $18 = _predicate;
+        var $19 = $1;
         _predicate = true;
         $1 = false;
         _parse$$EOL(355, $1);
-        var $22;
+        var $21;
         _success = !_success;
-        _c = $16;
-        _cp = $17;
-        _pos = $18;
-        _predicate = $19;
-        $1 = $20;
+        _c = $15;
+        _cp = $16;
+        _pos = $17;
+        _predicate = $18;
+        $1 = $19;
         if (_success) {
           _matchAny();
           if (_success) {
-            $12 = $22;
+            $11 = $21;
           }
         }
         if (!_success) {
-          _c = $13;
-          _cp = $14;
-          _pos = $15;
+          _c = $12;
+          _cp = $13;
+          _pos = $14;
         }
-        $11 = $12;
+        $10 = $11;
         if (!_success) {
           break;
         }
         if ($1) {
-          $10.add($11);
+          $9.add($10);
         }
       }
       _success = true;
       _parse$$EOL(358, false);
       _success = true;
-      $5 = $9;
+      $4 = $8;
       // NOP;
       // NOP;
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(348, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   dynamic _parse$$EOL(int $0, bool $1) {
@@ -3012,48 +2858,41 @@ class Peg2Parser {
   }
 
   dynamic _parse$$GLOBALS_BODY(int $0, bool $1) {
-    if (_memoized(364, $0)) {
-      return _mresult as dynamic;
-    }
-    var $2 = _pos;
+    dynamic $2;
     dynamic $3;
     dynamic $4;
-    dynamic $5;
-    var $6 = _c;
-    var $7 = _cp;
-    var $8 = _pos;
-    var $9 = _c;
-    var $10 = _cp;
-    var $11 = _pos;
-    var $12 = _predicate;
-    var $13 = $1;
+    var $5 = _c;
+    var $6 = _cp;
+    var $7 = _pos;
+    var $8 = _c;
+    var $9 = _cp;
+    var $10 = _pos;
+    var $11 = _predicate;
+    var $12 = $1;
     _predicate = true;
     $1 = false;
     _matchString('}%');
-    var $15;
+    var $14;
     _success = !_success;
-    _c = $9;
-    _cp = $10;
-    _pos = $11;
-    _predicate = $12;
-    $1 = $13;
+    _c = $8;
+    _cp = $9;
+    _pos = $10;
+    _predicate = $11;
+    $1 = $12;
     if (_success) {
       _matchAny();
       if (_success) {
-        $5 = $15;
+        $4 = $14;
       }
     }
     if (!_success) {
-      _c = $6;
-      _cp = $7;
-      _pos = $8;
+      _c = $5;
+      _cp = $6;
+      _pos = $7;
     }
-    $4 = $5;
     $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(364, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   int _parse$$HEX_NUMBER(int $0, bool $1) {
@@ -3184,36 +3023,29 @@ class Peg2Parser {
   }
 
   int _parse$$IDENT_CONT(int $0, bool $1) {
-    if (_memoized(386, $0)) {
-      return _mresult as int;
-    }
-    var $2 = _pos;
+    int $2;
     int $3;
-    int $4;
     for (;;) {
-      int $5;
-      var $6 = _parse$$IDENT_START(388, $1);
+      int $4;
+      var $5 = _parse$$IDENT_START(388, $1);
       if (_success) {
-        $5 = $6;
         $4 = $5;
+        $3 = $4;
         break;
       }
       // NOP;
-      int $7;
-      const $8 = [48, 57, 95, 95];
-      var $9 = _matchRanges($8);
+      int $6;
+      const $7 = [48, 57, 95, 95];
+      var $8 = _matchRanges($7);
       if (_success) {
-        $7 = $9;
-        $4 = $7;
+        $6 = $8;
+        $3 = $6;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(386, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   int _parse$$IDENT_START(int $0, bool $1) {
@@ -3238,157 +3070,143 @@ class Peg2Parser {
   }
 
   int _parse$$LITERAL_CHAR(int $0, bool $1) {
-    if (_memoized(394, $0)) {
-      return _mresult as int;
-    }
-    var $2 = _pos;
+    int $2;
     int $3;
-    int $4;
     for (;;) {
-      int $5;
-      var $6 = _c;
-      var $7 = _cp;
-      var $8 = _pos;
+      int $4;
+      var $5 = _c;
+      var $6 = _cp;
+      var $7 = _pos;
       _matchString('\\');
       if (_success) {
-        const $10 = [34, 34, 92, 92, 110, 110, 114, 114, 116, 116];
-        var $11 = _matchRanges($10);
+        const $9 = [34, 34, 92, 92, 110, 110, 114, 114, 116, 116];
+        var $10 = _matchRanges($9);
         if (_success) {
-          var c = $11;
+          var c = $10;
           int $$;
           $$ = _escape(c);
-          $5 = $$;
+          $4 = $$;
         }
       }
       if (!_success) {
-        _c = $6;
-        _cp = $7;
-        _pos = $8;
+        _c = $5;
+        _cp = $6;
+        _pos = $7;
       } else {
-        $4 = $5;
+        $3 = $4;
         break;
       }
       // NOP;
-      int $12;
-      var $13 = _parse$$HEX_NUMBER(399, $1);
+      int $11;
+      var $12 = _parse$$HEX_NUMBER(399, $1);
       if (_success) {
-        $12 = $13;
-        $4 = $12;
+        $11 = $12;
+        $3 = $11;
         break;
       }
       // NOP;
-      int $14;
-      var $15 = _c;
-      var $16 = _cp;
-      var $17 = _pos;
-      var $18 = _c;
-      var $19 = _cp;
-      var $20 = _pos;
-      var $21 = _predicate;
-      var $22 = $1;
+      int $13;
+      var $14 = _c;
+      var $15 = _cp;
+      var $16 = _pos;
+      var $17 = _c;
+      var $18 = _cp;
+      var $19 = _pos;
+      var $20 = _predicate;
+      var $21 = $1;
       _predicate = true;
       $1 = false;
       _matchString('\\');
       // NOP;
       _success = !_success;
-      _c = $18;
-      _cp = $19;
-      _pos = $20;
-      _predicate = $21;
-      $1 = $22;
+      _c = $17;
+      _cp = $18;
+      _pos = $19;
+      _predicate = $20;
+      $1 = $21;
       if (_success) {
-        var $25 = _c;
-        var $26 = _cp;
-        var $27 = _pos;
-        var $28 = _predicate;
-        var $29 = $1;
+        var $24 = _c;
+        var $25 = _cp;
+        var $26 = _pos;
+        var $27 = _predicate;
+        var $28 = $1;
         _predicate = true;
         $1 = false;
         _parse$$EOL(404, false);
         // NOP;
         _success = !_success;
-        _c = $25;
-        _cp = $26;
-        _pos = $27;
-        _predicate = $28;
-        $1 = $29;
+        _c = $24;
+        _cp = $25;
+        _pos = $26;
+        _predicate = $27;
+        $1 = $28;
         if (_success) {
-          var $32 = _matchAny();
+          var $31 = _matchAny();
           if (_success) {
-            $14 = $32;
+            $13 = $31;
           }
         }
       }
       if (!_success) {
-        _c = $15;
-        _cp = $16;
-        _pos = $17;
+        _c = $14;
+        _cp = $15;
+        _pos = $16;
       } else {
-        $4 = $14;
+        $3 = $13;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(394, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   List<int> _parse$$RANGE(int $0, bool $1) {
-    if (_memoized(406, $0)) {
-      return _mresult as List<int>;
-    }
-    var $2 = _pos;
+    List<int> $2;
     List<int> $3;
-    List<int> $4;
     for (;;) {
-      List<int> $5;
-      var $6 = _c;
-      var $7 = _cp;
-      var $8 = _pos;
-      var $9 = _parse$$RANGE_CHAR(408, $1);
+      List<int> $4;
+      var $5 = _c;
+      var $6 = _cp;
+      var $7 = _pos;
+      var $8 = _parse$$RANGE_CHAR(408, $1);
       if (_success) {
         _matchString('-');
         if (_success) {
-          var $11 = _parse$$RANGE_CHAR(410, $1);
+          var $10 = _parse$$RANGE_CHAR(410, $1);
           if (_success) {
-            var s = $9;
-            var e = $11;
+            var s = $8;
+            var e = $10;
             List<int> $$;
             $$ = [s, e];
-            $5 = $$;
+            $4 = $$;
           }
         }
       }
       if (!_success) {
-        _c = $6;
-        _cp = $7;
-        _pos = $8;
+        _c = $5;
+        _cp = $6;
+        _pos = $7;
       } else {
-        $4 = $5;
+        $3 = $4;
         break;
       }
       // NOP;
-      List<int> $12;
-      var $13 = _parse$$RANGE_CHAR(412, $1);
+      List<int> $11;
+      var $12 = _parse$$RANGE_CHAR(412, $1);
       if (_success) {
-        var c = $13;
+        var c = $12;
         List<int> $$;
         $$ = [c, c];
-        $12 = $$;
+        $11 = $$;
       }
       if (_success) {
-        $4 = $12;
+        $3 = $11;
       }
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(406, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   int _parse$$RANGE_CHAR(int $0, bool $1) {
@@ -3491,36 +3309,29 @@ class Peg2Parser {
   }
 
   dynamic _parse$$SPACE(int $0, bool $1) {
-    if (_memoized(425, $0)) {
-      return _mresult as dynamic;
-    }
-    var $2 = _pos;
+    dynamic $2;
     dynamic $3;
-    dynamic $4;
     for (;;) {
-      int $5;
-      const $6 = [9, 9, 32, 32];
-      var $7 = _matchRanges($6);
+      int $4;
+      const $5 = [9, 9, 32, 32];
+      var $6 = _matchRanges($5);
       if (_success) {
-        $5 = $7;
-        $4 = $5;
+        $4 = $6;
+        $3 = $4;
         break;
       }
       // NOP;
-      dynamic $8;
-      var $9 = _parse$$EOL(429, $1);
+      dynamic $7;
+      var $8 = _parse$$EOL(429, $1);
       if (_success) {
-        $8 = $9;
-        $4 = $8;
+        $7 = $8;
+        $3 = $7;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(425, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 
   List _parse$$SPACING(int $0, bool $1) {
@@ -3574,48 +3385,41 @@ class Peg2Parser {
   }
 
   int _parse$$TERMINAL_CHAR(int $0, bool $1) {
-    if (_memoized(438, $0)) {
-      return _mresult as int;
-    }
-    var $2 = _pos;
+    int $2;
     int $3;
-    int $4;
     for (;;) {
-      int $5;
-      var $6 = _c;
-      var $7 = _cp;
-      var $8 = _pos;
+      int $4;
+      var $5 = _c;
+      var $6 = _cp;
+      var $7 = _pos;
       _matchString('//');
       if (_success) {
-        var $10 = _matchChar(39);
+        var $9 = _matchChar(39);
         if (_success) {
-          $5 = $10;
+          $4 = $9;
         }
       }
       if (!_success) {
-        _c = $6;
-        _cp = $7;
-        _pos = $8;
+        _c = $5;
+        _cp = $6;
+        _pos = $7;
       } else {
-        $4 = $5;
+        $3 = $4;
         break;
       }
       // NOP;
-      int $11;
-      const $12 = [32, 38, 40, 126];
-      var $13 = _matchRanges($12);
+      int $10;
+      const $11 = [32, 38, 40, 126];
+      var $12 = _matchRanges($11);
       if (_success) {
-        $11 = $13;
-        $4 = $11;
+        $10 = $12;
+        $3 = $10;
       }
       // NOP;
       break;
     }
-    $3 = $4;
-    if (_memoizable[$0] == true) {
-      _memoize(438, $2, $3);
-    }
-    return $3;
+    $2 = $3;
+    return $2;
   }
 }
 
