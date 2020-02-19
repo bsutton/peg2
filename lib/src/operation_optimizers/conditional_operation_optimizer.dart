@@ -90,21 +90,6 @@ class ConditionalOperationOptimizer {
     resolver.resolve(operation);
   }
 
-  bool _isBasicBlock(BlockOperation block) {
-    final operations = block.operations;
-    for (var i = 0; i < operations.length; i++) {
-      final operation = operations[i];
-      switch (operation.kind) {
-        case OperationKind.assign:
-          break;
-        default:
-          return false;
-      }
-    }
-
-    return true;
-  }
-
   bool _isBlockEndsWithBreak(BlockOperation block) {
     final operations = block.operations;
     for (var i = operations.length - 1; i >= 0; i--) {
@@ -187,6 +172,46 @@ class ConditionalOperationOptimizer {
     return true;
   }
 
+  bool _isSimpleBinary(BinaryOperation binary) {
+    final kind = binary.kind;
+    if (kind != OperationKind.assign) {
+      return false;
+    }
+
+    if (binary.left.kind != OperationKind.variable) {
+      return false;
+    }
+
+    switch (binary.right.kind) {
+      case OperationKind.constant:
+      case OperationKind.variable:
+        return true;
+      default:
+    }
+
+    return false;
+  }
+
+  bool _isSimpleBlock(BlockOperation block) {
+    final operations = block.operations;
+    for (var i = 0; i < operations.length; i++) {
+      final operation = operations[i];
+      switch (operation.kind) {
+        case OperationKind.assign:
+          final binary = _getOp<BinaryOperation>(operation);
+          if (!_isSimpleBinary(binary)) {
+            return false;
+          }
+
+          break;
+        default:
+          return false;
+      }
+    }
+
+    return true;
+  }
+
   void _optimizeBlock(BlockOperation block) {
     _removeConditionals(block);
     _combineConditionals(block);
@@ -204,7 +229,7 @@ class ConditionalOperationOptimizer {
     final nextBlock = next.ifTrue;
     final variables = <Variable>[];
     if (_isEqualNot(prevTest, nextTest, variables)) {
-      if (_isBasicBlock(prevBlock)) {
+      if (_isSimpleBlock(prevBlock)) {
         if (!_isBlockEndsWithBreak(prevBlock)) {
           if (!_hasWritings(prevBlock, variables)) {
             _appendToBlock(nextBlock, prevBlock);
@@ -229,7 +254,7 @@ class ConditionalOperationOptimizer {
     final prevBlock = prev.ifTrue;
     final nextBlock = next.ifTrue;
     if (_isEqualVariables(prevTest, nextTest)) {
-      if (_isBasicBlock(prevBlock)) {
+      if (_isSimpleBlock(prevBlock)) {
         if (!_isBlockEndsWithBreak(prevBlock)) {
           final variable = _getOp<VariableOperation>(prev.test);
           if (!_hasWritings(prevBlock, [variable.variable])) {
@@ -256,7 +281,7 @@ class ConditionalOperationOptimizer {
     final nextBlock = next.ifTrue;
     final variables = <Variable>[];
     if (_isPotentialIfElse(prevTest, nextTest, variables)) {
-      if (_isBasicBlock(prevBlock)) {
+      if (_isSimpleBlock(prevBlock)) {
         if (!_isBlockEndsWithBreak(prevBlock)) {
           if (!_hasWritings(prevBlock, variables)) {
             _addElse(prev, nextBlock);
