@@ -78,7 +78,7 @@ class Peg2Parser {
 
   int _terminalCount;
 
-  List<_Buffer<int, int>> _tracks;
+  List<int> _tracks;
 
   dynamic parse(String text) {
     if (text == null) {
@@ -305,25 +305,19 @@ class Peg2Parser {
       }
     }
 
-    if (_memoizable[cid] == true) {
+    if (_memoizable[cid] != null) {
       return false;
     }
 
-    var track = _tracks[id];
-    if (track == null) {
-      track = _Buffer(10);
-      _tracks[id] = track;
-      track.add(cid, _pos);
+    var last = _tracks[id];
+    _tracks[id] = cid;
+    if (last == null) {
       return false;
     }
 
-    final key = track.find(_pos);
-    if (key == null) {
-      return false;
-    }
-
-    if (key != cid) {
-      _memoizable[key] = true;
+    if (last != cid) {
+      _memoizable[last] = true;
+      _memoizable[cid] = false;
     }
 
     return false;
@@ -3420,54 +3414,6 @@ class Peg2Parser {
     }
     $2 = $3;
     return $2;
-  }
-}
-
-class _Buffer<K, V> {
-  List<K> keys;
-
-  int length;
-
-  int pos;
-
-  final int size;
-
-  List<V> values;
-
-  _Buffer(this.size) {
-    keys = List(size);
-    values = List(size);
-    length = 0;
-    pos = 0;
-  }
-
-  void add(K key, V value) {
-    keys[pos] = key;
-    values[pos] = value;
-    if (++pos >= size) {
-      pos = 0;
-    }
-
-    if (length < size) {
-      length++;
-    }
-  }
-
-  K find(V value) {
-    var index = pos - 1;
-    var count = length;
-    while (count-- > 0) {
-      final v = values[index];
-      if (v == value) {
-        return keys[index];
-      }
-
-      if (++index > size) {
-        index = 0;
-      }
-    }
-
-    return null;
   }
 }
 

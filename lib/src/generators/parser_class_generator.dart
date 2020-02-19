@@ -33,7 +33,7 @@ class ParserClassBuilder {
       'bool _success',
       'List<String> _terminals',
       'int _terminalCount',
-      'List<_Buffer<int, int>> _tracks',
+      'List<int> _tracks',
     ];
 
     for (final variable in variables) {
@@ -263,31 +263,25 @@ bool _memoized(int id, int cid) {
         _cp = -1;
         _pos = memo.pos;
         _mresult = memo.result;
-        _success = memo.success;
+        _success = memo.success;  
         return true;
       }
     }
   }  
 
-  if (_memoizable[cid] == true) {
+  if (_memoizable[cid] != null) {
     return false;
   }
 
-  var track = _tracks[id];
-  if (track == null) {
-    track = _Buffer(10);
-    _tracks[id] = track;
-    track.add(cid, _pos);
+  var last = _tracks[id];
+  _tracks[id] = cid;
+  if (last == null) {    
     return false;
   }
 
-  final key = track.find(_pos);
-  if (key == null) {
-    return false;
-  }
-
-  if (key != cid) {
-    _memoizable[key] = true;
+  if (last != cid) {
+    _memoizable[last] = true;
+    _memoizable[cid] = false;
   }
   
   return false;

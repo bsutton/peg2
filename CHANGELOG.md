@@ -1,3 +1,7 @@
+## 0.1.9
+
+- Improved performance of experimental memoization feature
+
 ## 0.1.8
 
 - Implemented experimental memoization feature, command line option `--memoize`
