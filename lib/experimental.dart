@@ -1,3 +1,5 @@
+import 'package:lists/lists.dart';
+
 import 'expressions.dart';
 import 'grammar.dart';
 import 'operation_utils.dart';

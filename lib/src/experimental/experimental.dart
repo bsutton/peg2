@@ -167,6 +167,29 @@ class ExperimentalGenerator extends ExpressionVisitor {
       child.accept(this);
     }
 
+    final list = SparseList<List<Expression>>();
+    for (var i = 0; i < expressions.length; i++) {
+      final child = expressions[i];
+      for (final srcGroup in child.startCharacters.getGroups()) {
+        final allSpace = list.getAllSpace(srcGroup);
+        for (final dstGroup in allSpace) {          
+          var key = dstGroup.key;
+          if (key == null) {
+            key = [child];
+          } else {
+            key.add(child);
+          }
+
+          print(srcGroup);
+          final newGroup = GroupedRangeList<List<Expression>>(
+              dstGroup.start, dstGroup.end, key);
+          list.addGroup(newGroup);
+        }
+      }
+    }
+
+    print('---------');
+
     _block = block;
   }
 
