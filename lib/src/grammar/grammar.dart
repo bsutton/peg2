@@ -11,6 +11,8 @@ class Grammar {
 
   List<ProductionRule> rules;
 
+  ProductionRule start;
+
   Grammar(List<ProductionRule> rules, this.globals, this.members) {
     if (rules == null) {
       throw ArgumentError.notNull('rules');
@@ -20,6 +22,8 @@ class Grammar {
       throw ArgumentError('List of rules should not be empty');
     }
 
+    // TDDO: Find start rule
+    start = rules.first;
     mapOfRules = <String, ProductionRule>{};
     this.rules = <ProductionRule>[];
     var id = 0;
@@ -39,11 +43,6 @@ class Grammar {
     }
 
     _initialize();
-  }
-
-  ProductionRule findStartRule() {
-    // TODO
-    return rules.first;
   }
 
   void _initialize() {

@@ -75,9 +75,8 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
 
   @override
   void visitNonterminal(NonterminalExpression node) {
-    final rule = node.rule;
+    final rule = node.expression.rule;
     final child = rule.expression;
-    //child.accept(this);
     _addCharacters(node, child.startCharacters);
   }
 
@@ -133,17 +132,15 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
 
   @override
   void visitSubterminal(SubterminalExpression node) {
-    final rule = node.rule;
+    final rule = node.expression.rule;
     final child = rule.expression;
-    //child.accept(this);
     _addCharacters(node, child.startCharacters);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    final rule = node.rule;
+    final rule = node.expression.rule;
     final child = rule.expression;
-    //child.accept(this);
     _addCharacters(node, child.startCharacters);
   }
 

@@ -45,8 +45,8 @@ class _Memo {
     }
 
     // TODO: Experimental
-    //final experimentalGenerator = ExperimentalGenerator();
-    //experimentalGenerator.generate(grammar);
+    final experimentalGenerator = ExperimentalGenerator();
+    experimentalGenerator.generate(grammar);
 
     final operationsToCodeConverter = OperationsToCodeConverter();
     final methodBuilders = operationsToCodeConverter.convert(methods);

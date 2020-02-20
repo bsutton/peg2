@@ -3,11 +3,11 @@ part of '../../experimental.dart';
 class ExperimentalGenerator extends ExpressionVisitor {
   BlockOperation _block;
 
-  Map<Expression, Expression> _chain;
-
   Map<OrderedChoiceExpression, MethodOperation> _choices;
 
   Expression _startExpression;
+
+  Map<Expression, Expression> _startExpressions;
 
   int _lastVariableIndex;
 
@@ -22,7 +22,7 @@ class ExperimentalGenerator extends ExpressionVisitor {
   Variable _success;
 
   void generate(Grammar grammar) {
-    _chain = {};
+    _startExpressions = {};
     _choices = {};
     _lastVariableIndex = 0;
     _methodIs = {};
@@ -34,18 +34,38 @@ class ExperimentalGenerator extends ExpressionVisitor {
       expression.accept(this);
     }
 
-    for (final rule in grammar.rules) {
-      final expression = rule.expression;
-      for (final expr in expression.expressions) {
-        var xxx = _chain[expr];
-        while (true) {
-          xxx = _chain[xxx];
-          if (xxx == null) {
-            break;
-          }
-        }
-      }
+    final expressionChainResolver = ExpressionChainResolver();
+    final node = expressionChainResolver.resolve(grammar.start);
+
+    var ident = 0;
+    String pad(String s, int count) {
+      return s.padLeft(count + s.length);
     }
+
+    void visit(_Node node) {
+      final save = ident;
+      final sb = StringBuffer();
+      sb.write(''.padLeft(ident));
+      sb.write(node.expression.runtimeType);
+      sb.write(' (');
+      sb.write(node.expression.rule);
+      sb.write('): ');
+      sb.write(node.expression);
+      if (node.children.isEmpty) {
+        sb.write(' END');
+      }
+
+      print(sb);
+      ident += 2;
+      for (final child in node.children) {
+        visit(child);
+      }
+
+      ident = save;
+    }
+
+    visit(node);
+    var x = 0;
   }
 
   @override
@@ -133,7 +153,6 @@ class ExperimentalGenerator extends ExpressionVisitor {
   void visitNotPredicate(NotPredicateExpression node) {
     final child = node.expression;
     child.accept(this);
-
     if (node.index == 0) {
       //
     }
@@ -172,7 +191,7 @@ class ExperimentalGenerator extends ExpressionVisitor {
       final child = expressions[i];
       for (final srcGroup in child.startCharacters.getGroups()) {
         final allSpace = list.getAllSpace(srcGroup);
-        for (final dstGroup in allSpace) {          
+        for (final dstGroup in allSpace) {
           var key = dstGroup.key;
           if (key == null) {
             key = [child];
@@ -180,15 +199,12 @@ class ExperimentalGenerator extends ExpressionVisitor {
             key.add(child);
           }
 
-          print(srcGroup);
           final newGroup = GroupedRangeList<List<Expression>>(
               dstGroup.start, dstGroup.end, key);
           list.addGroup(newGroup);
         }
       }
     }
-
-    print('---------');
 
     _block = block;
   }
@@ -210,7 +226,7 @@ class ExperimentalGenerator extends ExpressionVisitor {
       results.add(_result);
     }
 
-    _chain[node] = _startExpression;
+    _startExpressions[node] = _startExpression;
     final parameter = ParameterOperation(_startExpression.returnType, arg0);
     final method = _allocMethod('_parserSeq', returnType, [parameter], block);
     _sequences[node] = method;
