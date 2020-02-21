@@ -327,7 +327,7 @@ class RulesToOperationsBuilder extends ExpressionVisitor {
     final result = _newVar(b, returnType, null);
     void Function(BlockOperation) onSuccess;
     void Function(BlockOperation) onFailure;
-    final optionalCount = expressions.where((e) => e.isOptional).length;
+    final optionalCount = expressions.where((e) => e.isOptionalOrPredicate).length;
     final allOptional = expressions.length == optionalCount;
     var hasSavedState = !allOptional;
     if (expressions.length == 1) {

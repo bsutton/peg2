@@ -124,7 +124,7 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
         _addCharacters(node, child.startCharacters);
       }
 
-      if (!child.isOptional) {
+      if (!child.isOptionalOrPredicate) {
         skip = true;
       }
     }

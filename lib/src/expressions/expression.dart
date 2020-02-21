@@ -9,6 +9,10 @@ abstract class Expression {
 
   bool isOptional = false;
 
+  bool isOptionalOrPredicate = false;
+
+  bool isPredicate = false;
+
   int level;
 
   Expression parent;

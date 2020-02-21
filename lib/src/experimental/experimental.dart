@@ -38,10 +38,6 @@ class ExperimentalGenerator extends ExpressionVisitor {
     final node = expressionChainResolver.resolve(grammar.start);
 
     var ident = 0;
-    String pad(String s, int count) {
-      return s.padLeft(count + s.length);
-    }
-
     void visit(_Node node) {
       final save = ident;
       final sb = StringBuffer();
@@ -65,7 +61,6 @@ class ExperimentalGenerator extends ExpressionVisitor {
     }
 
     visit(node);
-    var x = 0;
   }
 
   @override
