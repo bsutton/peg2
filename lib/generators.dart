@@ -11,6 +11,7 @@ import 'operation_optimizers.dart';
 import 'operation_transformers.dart';
 import 'operations.dart';
 
+part 'src/generators/expression_code_generator.dart';
 part 'src/generators/operations_to_code_converter.dart';
 part 'src/generators/parser_class_generator.dart';
 part 'src/generators/parser_generator.dart';

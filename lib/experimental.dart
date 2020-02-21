@@ -7,3 +7,4 @@ import 'operations.dart';
 
 part 'src/experimental/experimental.dart';
 part 'src/experimental/expression_chain_resolver.dart';
+part 'src/experimental/expression_node.dart';

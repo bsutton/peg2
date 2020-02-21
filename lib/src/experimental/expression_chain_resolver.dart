@@ -1,14 +1,14 @@
 part of '../../experimental.dart';
 
 class ExpressionChainResolver extends ExpressionVisitor {
-  _Node _node;
+  ExpressionNode _node;
 
   Set<Expression> _visited;
 
-  _Node resolve(ProductionRule rule) {
-    _node = _Node(null);
+  ExpressionNode resolve(OrderedChoiceExpression expression) {
+    _node = ExpressionNode(null);
     _visited = {};
-    rule.expression.accept(this);
+    expression.accept(this);
     return _node.children.first;
   }
 
@@ -19,7 +19,7 @@ class ExpressionChainResolver extends ExpressionVisitor {
 
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
-    _node.addChild(_Node(node));
+    _node.addChild(ExpressionNode(node));
   }
 
   @override
@@ -29,12 +29,12 @@ class ExpressionChainResolver extends ExpressionVisitor {
 
   @override
   void visitCharacterClass(CharacterClassExpression node) {
-    _node.addChild(_Node(node));
+    _node.addChild(ExpressionNode(node));
   }
 
   @override
   void visitLiteral(LiteralExpression node) {
-    _node.addChild(_Node(node));
+    _node.addChild(ExpressionNode(node));
   }
 
   @override
@@ -64,7 +64,7 @@ class ExpressionChainResolver extends ExpressionVisitor {
     }
 
     final prevNode = _node;
-    _node = _Node(node);
+    _node = ExpressionNode(node);
     for (final child in node.expressions) {
       child.accept(this);
     }
@@ -76,7 +76,7 @@ class ExpressionChainResolver extends ExpressionVisitor {
   @override
   void visitSequence(SequenceExpression node) {
     final prevNode = _node;
-    _node = _Node(node);
+    _node = ExpressionNode(node);
     //node.expressions[0].accept(this);
     for (final child in node.expressions) {
       child.accept(this);
@@ -107,17 +107,5 @@ class ExpressionChainResolver extends ExpressionVisitor {
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
     node.expression.accept(this);
-  }
-}
-
-class _Node {
-  final Expression expression;
-
-  List<_Node> children = [];
-
-  _Node(this.expression);
-
-  void addChild(_Node child) {
-    children.add(child);
   }
 }

@@ -62,7 +62,7 @@ class OperationReplacer extends SimpleOperationVisitor {
 
   @override
   void visitMemberOperation(MemberOperation node) {
-    node.operation = _replace(node.operation);
+    node.member = _replace(node.member);
   }
 
   @override

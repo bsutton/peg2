@@ -222,12 +222,12 @@ class LoopOperation extends Operation {
 class MemberOperation extends Operation {
   Operation member;
 
-  Operation operation;
+  Operation owner;
 
-  MemberOperation(this.member, this.operation);
+  MemberOperation(this.owner, this.member);
 
   @override
-  OperationKind get kind => OperationKind.method;
+  OperationKind get kind => OperationKind.member;
 
   @override
   void accept(OperationVisitor visitor) {
@@ -236,8 +236,8 @@ class MemberOperation extends Operation {
 
   @override
   void visitChildren(OperationVisitor visitor) {
+    owner.accept(visitor);
     member.accept(visitor);
-    operation.accept(visitor);
   }
 }
 
@@ -337,6 +337,7 @@ enum OperationKind {
   list,
   listAccess,
   loop,
+  member,
   method,
   nop,
   not,

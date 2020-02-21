@@ -157,10 +157,10 @@ class OperationsToCodeConverter extends OperationVisitor {
   @override
   void visitMemberOperation(MemberOperation node) {
     final sb = StringBuffer();
-    node.member.accept(this);
+    node.owner.accept(this);
     sb.write(_resultAsString());
     sb.write('.');
-    node.operation.accept(this);
+    node.member.accept(this);
     sb.write(_resultAsString());
     _result = sb.toString();
   }

@@ -1,13 +1,41 @@
 part of '../../operation_utils.dart';
 
-void addAssign(BlockOperation b, Operation left, Operation right) {
-  final operation = BinaryOperation(left, OperationKind.assign, right);
-  b.operations.add(operation);
+BinaryOperation addAssign(
+    BlockOperation block, Operation left, Operation right) {
+  final op = BinaryOperation(left, OperationKind.assign, right);
+  addOp(block, op);
+  return op;
 }
 
-void addBreak(BlockOperation b) {
+BreakOperation addBreak(BlockOperation block) {
   final op = BreakOperation();
-  b.operations.add(op);
+  addOp(block, op);
+  return op;
+}
+
+CallOperation addCall(
+    BlockOperation block, Operation function, List<Operation> arguments) {
+  final op = callOp(function, arguments);
+  return op;
+}
+
+ConditionalOperation addIf(
+    BlockOperation block, Operation test, void Function(BlockOperation) fTrue,
+    [void Function(BlockOperation) fFalse]) {
+  final bTrue = BlockOperation();
+  BlockOperation bFalse;
+  if (fFalse != null) {
+    bFalse = BlockOperation();
+  }
+
+  final op = ConditionalOperation(test, bTrue, bFalse);
+  addOp(block, op);
+  fTrue(bTrue);
+  if (fFalse != null) {
+    fFalse(bFalse);
+  }
+
+  return op;
 }
 
 ConditionalOperation addIfElse(
@@ -29,25 +57,6 @@ ConditionalOperation addIfElse(
   return op;
 }
 
-ConditionalOperation addIf(
-    BlockOperation block, Operation test, void Function(BlockOperation) fTrue,
-    [void Function(BlockOperation) fFalse]) {
-  final bTrue = BlockOperation();
-  BlockOperation bFalse;
-  if (fFalse != null) {
-    bFalse = BlockOperation();
-  }
-
-  final op = ConditionalOperation(test, bTrue, bFalse);
-  block.operations.add(op);
-  fTrue(bTrue);
-  if (fFalse != null) {
-    fFalse(bFalse);
-  }
-
-  return op;
-}
-
 LoopOperation addLoop(BlockOperation block, void Function(BlockOperation) f) {
   final body = BlockOperation();
   final op = LoopOperation(body);
@@ -59,9 +68,18 @@ LoopOperation addLoop(BlockOperation block, void Function(BlockOperation) f) {
   return op;
 }
 
-void addMember(BlockOperation b, Operation member, Operation operation) {
-  final op = MemberOperation(member, operation);
-  b.operations.add(op);
+MemberOperation addMbrCall(BlockOperation block, Operation owner,
+    VariableOperation method, List<Operation> arguments) {
+  final op = mbrCall(owner, method, arguments);
+  addOp(block, op);
+  return op;
+}
+
+MemberOperation addMember(
+    BlockOperation block, Operation owner, Operation member) {
+  final op = MemberOperation(owner, member);
+  addOp(block, op);
+  return op;
 }
 
 MethodOperation addMethod(String type, String name,
@@ -76,13 +94,13 @@ void addOp(BlockOperation block, Operation operation) {
   block.operations.add(operation);
 }
 
-void addReturn(BlockOperation b, Operation operation) {
+void addReturn(BlockOperation block, Operation operation) {
   final op = ReturnOperation(operation);
-  b.operations.add(op);
+  addOp(block, op);
 }
 
-CallOperation call(Operation op, List<Operation> args) {
-  return CallOperation(op, args);
+CallOperation callOp(Operation function, List<Operation> arguments) {
+  return CallOperation(function, arguments);
 }
 
 ConstantOperation<T> constOp<T>(T value) {
@@ -102,8 +120,19 @@ ConditionalOperation ifVar(BlockOperation block, Variable variable,
   return addIf(block, varOp(variable), fTrue, fFalse);
 }
 
+MemberOperation mbrCall(
+    Operation owner, VariableOperation method, List<Operation> arguments) {
+  final member = callOp(method, arguments);
+  return mbrOp(owner, member);
+}
+
+MemberOperation mbrOp(Operation owner, Operation member) {
+  final op = MemberOperation(member, owner);
+  return op;
+}
+
 Variable newVar(BlockOperation b, String type, Variable Function() allocVar,
-    [Operation value]) {
+    Operation value) {
   final variable = allocVar();
   final parameter = ParameterOperation(type, variable, value);
   b.operations.add(parameter);
@@ -127,7 +156,7 @@ Map<Variable, Variable> saveVars(BlockOperation block,
   return result;
 }
 
-UnaryOperation unary(OperationKind kind, Operation op) {
+UnaryOperation unaryOp(OperationKind kind, Operation op) {
   return UnaryOperation(kind, op);
 }
 

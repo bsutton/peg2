@@ -3,42 +3,55 @@ part of '../../experimental.dart';
 class ExperimentalGenerator extends ExpressionVisitor {
   BlockOperation _block;
 
-  Map<OrderedChoiceExpression, MethodOperation> _choices;
+  Variable _c;
 
-  Expression _startExpression;
+  Variable _captures;
 
-  Map<Expression, Expression> _startExpressions;
+  Variable _cp;
+
+  Variable _input;
 
   int _lastVariableIndex;
 
-  Map<String, int> _methodIs;
+  Map<Expression, MethodOperation> _methodOperations;
 
-  Map<String, Variable> _methods;
+  Map<String, Variable> _methodVariables;
+
+  Variable _predicate;
+
+  Variable _pos;
+
+  Variable _productive;
 
   Variable _result;
-
-  Map<SequenceExpression, MethodOperation> _sequences;
 
   Variable _success;
 
   void generate(Grammar grammar) {
-    _startExpressions = {};
-    _choices = {};
+    _c = Variable('_c');
+    _captures = Variable('_captures');
+    _cp = Variable('_cp');
+    _input = Variable('_input');
     _lastVariableIndex = 0;
-    _methodIs = {};
-    _methods = {};
-    _sequences = {};
+    _methodOperations = {};
+    _methodVariables = {};
+    _predicate = Variable('_predicate');
+    _pos = Variable('_pos');
     _success = Variable('_success');
     for (final rule in grammar.rules) {
       final expression = rule.expression;
       expression.accept(this);
     }
 
+    final nodes = <ExpressionNode>[];
     final expressionChainResolver = ExpressionChainResolver();
-    final node = expressionChainResolver.resolve(grammar.start);
+    for (final rule in grammar.rules) {
+      final node = expressionChainResolver.resolve(rule.expression);
+      nodes.add(node);
+    }
 
     var ident = 0;
-    void visit(_Node node) {
+    void visit(ExpressionNode node) {
       final save = ident;
       final sb = StringBuffer();
       sb.write(''.padLeft(ident));
@@ -60,38 +73,89 @@ class ExperimentalGenerator extends ExpressionVisitor {
       ident = save;
     }
 
-    visit(node);
+    for (final node in nodes) {
+      print(node.expression.rule.name);
+      print('-----------------');
+      visit(node);
+    }
   }
 
   @override
   void visitAndPredicate(AndPredicateExpression node) {
-    final child = node.expression;
-    child.accept(this);
+    final b = _block;
+    if (node.index == 0) {
+      final popState = Variable('_popState');
+      addCall(b, varOp(popState), []);
+      _result = newVar(b, 'var', _allocVar, null);
+    } else {
+      final child = node.expression;
+      final state = saveVars(b, _allocVar, [
+        _c,
+        _cp,
+        _pos,
+        _predicate,
+        _productive,
+      ]);
+
+      addAssign(b, varOp(_predicate), constOp(true));
+      addAssign(b, varOp(_productive), constOp(false));
+      child.accept(this);
+      _result = newVar(b, 'var', _allocVar, null);
+      restoreVars(b, state);
+    }
   }
 
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
-    if (_startExpression == null) {
-      _setStartExpression(node);
+    if (node.index == 0) {
       return;
     }
 
     final matchAny = varOp(Variable('_matchAny'));
-    final methodCall = call(matchAny, []);
-    final result = newVar(_block, 'var', _allocVar, methodCall);
+    final callMatchAny = callOp(matchAny, []);
+    final result = newVar(_block, 'var', _allocVar, callMatchAny);
     _result = result;
   }
 
   @override
   void visitCapture(CaptureExpression node) {
+    final b = _block;
+    if (node.index == 0) {
+      final start = newVar(b, 'var', _allocVar, null);
+      final pop = Variable('pop');
+      final callPop = mbrCall(varOp(_captures), varOp(pop), []);
+      addAssign(b, varOp(start), callPop);
+      ifVar(b, _success, (b) {
+        final result = newVar(b, 'String', _allocVar, null);
+        final substring = Variable('substring');
+        final callSubstring = mbrCall(
+            varOp(_input), varOp(substring), [varOp(start), varOp(_pos)]);
+        addAssign(b, varOp(result), callSubstring);
+      });
+    } else {
+      final result = newVar(b, 'String', _allocVar, null);
+      final start = newVar(b, 'var', _allocVar, varOp(_pos));
+      final saved = saveVars(b, _allocVar, [_productive]);
+      addAssign(b, varOp(_productive), constOp(false));
+      node.expression.accept(this);
+      ifVar(b, _success, (b) {
+        final substring = Variable('substring');
+        final callSubstring = mbrCall(
+            varOp(_input), varOp(substring), [varOp(start), varOp(_pos)]);
+        addAssign(b, varOp(result), callSubstring);
+      });
+
+      restoreVars(b, saved);
+      _result = result;
+    }
+
     final child = node.expression;
     child.accept(this);
   }
 
   @override
   void visitCharacterClass(CharacterClassExpression node) {
-    if (_startExpression == null) {
-      _setStartExpression(node);
+    if (node.index == 0) {
       return;
     }
 
@@ -108,12 +172,11 @@ class ExperimentalGenerator extends ExpressionVisitor {
       }
     }
 
-    CallOperation methodCall;
     Variable result;
     if (simple && ranges.length == 2) {
       final matchChar = Variable('_matchChar');
-      methodCall = call(varOp(matchChar), [constOp(ranges[0])]);
-      result = newVar(b, 'var', _allocVar, methodCall);
+      final callMatchChar = callOp(varOp(matchChar), [constOp(ranges[0])]);
+      result = newVar(b, 'var', _allocVar, callMatchChar);
     } else {
       final elements = <ConstantOperation>[];
       for (var i = 0; i < ranges.length; i += 2) {
@@ -124,8 +187,8 @@ class ExperimentalGenerator extends ExpressionVisitor {
       final listOp = ListOperation(null, elements);
       final list = newVar(b, 'const', _allocVar, listOp);
       final matchRanges = Variable('_matchRanges');
-      methodCall = call(varOp(matchRanges), [varOp(list)]);
-      result = newVar(b, 'var', _allocVar, methodCall);
+      final callMatchRanges = callOp(varOp(matchRanges), [varOp(list)]);
+      result = newVar(b, 'var', _allocVar, callMatchRanges);
     }
 
     _result = result;
@@ -133,10 +196,11 @@ class ExperimentalGenerator extends ExpressionVisitor {
 
   @override
   void visitLiteral(LiteralExpression node) {
-    if (_startExpression == null) {
-      _setStartExpression(node);
+    if (node.index == 0) {
       return;
     }
+
+    throw null;
   }
 
   @override
@@ -146,40 +210,177 @@ class ExperimentalGenerator extends ExpressionVisitor {
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
-    final child = node.expression;
-    child.accept(this);
+    final b = _block;
     if (node.index == 0) {
-      //
+      final popState = Variable('_popState');
+      addCall(b, varOp(popState), []);
+      _result = newVar(b, 'var', _allocVar, null);
+      addAssign(
+          b, varOp(_success), unaryOp(OperationKind.not, varOp(_success)));
+    } else {
+      final child = node.expression;
+      final state = saveVars(b, _allocVar, [
+        _c,
+        _cp,
+        _pos,
+        _predicate,
+        _productive,
+      ]);
+
+      addAssign(b, varOp(_predicate), constOp(true));
+      addAssign(b, varOp(_productive), constOp(false));
+      child.accept(this);
+      _result = newVar(b, 'var', _allocVar, null);
+      addAssign(
+          b, varOp(_success), unaryOp(OperationKind.not, varOp(_success)));
+      restoreVars(b, state);
     }
   }
 
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
-    final child = node.expression;
-    child.accept(this);
+    final b = _block;
+    final returnType = node.returnType;
+    final result = newVar(b, returnType, _allocVar, null);
+    if (node.index == 0) {
+      ifVar(b, _success, (b) {
+        addIfElse(b, varOp(_productive), (b) {
+          addAssign(b, varOp(result), ListOperation(null, []));
+          final add = Variable('add');
+          addMbrCall(b, varOp(result), varOp(add), [varOp(_result)]);
+        });
+
+        addLoop(b, (b) {
+          _block = b;
+          node.expression.accept(this);
+          ifNotVar(b, _success, (b) {
+            addAssign(_block, varOp(_success), constOp(true));
+            addBreak(b);
+          });
+
+          addIfElse(b, varOp(_productive), (b) {
+            final add = Variable('add');
+            addMbrCall(b, varOp(result), varOp(add), [varOp(_result)]);
+          });
+        });
+      });
+    } else {
+      addIfElse(b, varOp(_productive), (b) {
+        addAssign(b, varOp(result), ListOperation(null, []));
+      });
+
+      final passed = newVar(b, 'var', _allocVar, constOp(false));
+      addLoop(b, (b) {
+        _block = b;
+        node.expression.accept(this);
+        ifNotVar(b, _success, (b) {
+          addAssign(b, varOp(_success), varOp(passed));
+          ifNotVar(b, _success, (b) {
+            addAssign(b, varOp(result), constOp(null));
+          });
+
+          addBreak(b);
+        });
+
+        addIfElse(b, varOp(_productive), (b) {
+          final add = Variable('add');
+          addMbrCall(b, varOp(result), varOp(add), [varOp(_result)]);
+        });
+
+        addAssign(b, varOp(passed), constOp(true));
+      });
+
+      _result = result;
+      _block = b;
+    }
   }
 
   @override
   void visitOptional(OptionalExpression node) {
     final child = node.expression;
     child.accept(this);
+    if (node.index == 0) {
+      //
+    } else {
+      //
+    }
+
     addAssign(_block, varOp(_success), constOp(true));
   }
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
-    if (_startExpression == null) {
-      _setStartExpression(node);
-    }
-
     final block = _block;
     final expressions = node.expressions;
-    final method = _getChoiceMethod(node);
+    final method = _getMethodOperation(node, []);
     _block = method.body;
     for (var i = 0; i < expressions.length; i++) {
       final child = expressions[i];
       child.accept(this);
     }
+
+    _block = block;
+  }
+
+  @override
+  void visitSequence(SequenceExpression node) {
+    final expressions = node.expressions;
+    final results = <Variable>[];
+    _lastVariableIndex = 0;
+    final arg0 = _allocVar();
+    final returnType = node.returnType;
+    final parameter = ParameterOperation(returnType, arg0);
+    final method = _getMethodOperation(node, [parameter]);
+    _block = method.body;
+    _result = arg0;
+    for (var i = 0; i < expressions.length; i++) {
+      final child = expressions[i];
+      child.accept(this);
+      results.add(_result);
+    }
+  }
+
+  @override
+  void visitSubterminal(SubterminalExpression node) {
+    _callRule(node);
+  }
+
+  @override
+  void visitTerminal(TerminalExpression node) {
+    _callRule(node);
+  }
+
+  @override
+  void visitZeroOrMore(ZeroOrMoreExpression node) {
+    if (node.index == 0) {
+      throw null;
+    }
+
+    final child = node.expression;
+    child.accept(this);
+  }
+
+  Variable _allocVar() {
+    final result = Variable('\$${_lastVariableIndex++}');
+    return result;
+  }
+
+  void _callRule(SymbolExpression node) {
+    if (node.index == 0) {
+      return;
+    } else {
+      final variable = _getCallVar(node.rule.expression.index);
+      final methodCall = callOp(variable, []);
+      final result = newVar(_block, 'var', _allocVar, methodCall);
+      _result = result;
+    }
+  }
+
+  void _generateChoice(OrderedChoiceExpression expression) {
+    final expressions = expression.expressions;
+
+    final expressionChainResolver = ExpressionChainResolver();
+    final node2 = expressionChainResolver.resolve(expression);
 
     final list = SparseList<List<Expression>>();
     for (var i = 0; i < expressions.length; i++) {
@@ -200,98 +401,31 @@ class ExperimentalGenerator extends ExpressionVisitor {
         }
       }
     }
-
-    _block = block;
   }
 
-  @override
-  void visitSequence(SequenceExpression node) {
-    final expressions = node.expressions;
-    final results = <Variable>[];
-    final returnType = node.returnType;
-    _lastVariableIndex = 0;
-    final arg0 = _allocVar();
-    final block = BlockOperation();
-    _block = block;
-    _result = arg0;
-    _startExpression = null;
-    for (var i = 0; i < expressions.length; i++) {
-      final child = expressions[i];
-      child.accept(this);
-      results.add(_result);
+  VariableOperation _getCallVar(int id) {
+    final name = '_p$id';
+    var variable = _methodVariables[name];
+    if (variable == null) {
+      variable = Variable(name);
+      _methodVariables[name] = variable;
     }
 
-    _startExpressions[node] = _startExpression;
-    final parameter = ParameterOperation(_startExpression.returnType, arg0);
-    final method = _allocMethod('_parserSeq', returnType, [parameter], block);
-    _sequences[node] = method;
+    final operation = VariableOperation(variable);
+    return operation;
   }
 
-  @override
-  void visitSubterminal(SubterminalExpression node) {
-    _callRule(node);
-  }
-
-  @override
-  void visitTerminal(TerminalExpression node) {
-    _callRule(node);
-  }
-
-  @override
-  void visitZeroOrMore(ZeroOrMoreExpression node) {
-    final child = node.expression;
-    child.accept(this);
-  }
-
-  MethodOperation _allocMethod(
-      String prefix, String returnType, List<ParameterOperation> parameters,
-      [BlockOperation block]) {
-    var id = _methodIs[prefix];
-    if (id == null) {
-      _methodIs[prefix] = 0;
-      id = 0;
-    }
-
-    _methodIs[prefix]++;
-    final name = '${prefix}$id';
-    _methods[name] = Variable(name);
-    return MethodOperation(returnType, name, parameters, block);
-  }
-
-  Variable _allocVar() {
-    final result = Variable('\$${_lastVariableIndex++}');
-    return result;
-  }
-
-  void _callRule(SymbolExpression node) {
-    if (_startExpression == null) {
-      _setStartExpression(node);
-      return;
-    }
-
-    final method = _getChoiceMethod(node.rule.expression);
-    final name = method.name;
-    final methodCall = call(varOp(_methods[name]), []);
-    final result = newVar(_block, 'var', _allocVar, methodCall);
-    _result = result;
-  }
-
-  MethodOperation _getChoiceMethod(OrderedChoiceExpression node) {
-    var method = _choices[node];
+  MethodOperation _getMethodOperation(
+      Expression expression, List<ParameterOperation> parameters) {
+    var method = _methodOperations[expression];
     if (method == null) {
-      final returnType = node.returnType;
-      method = _allocMethod('_parseChoice', returnType, []);
-      _choices[node] = method;
+      final id = expression.id;
+      final returnType = expression.returnType;
+      final variable = _getCallVar(id);
+      method = MethodOperation(returnType, variable.variable.name, parameters);
+      _methodOperations[expression] = method;
     }
 
     return method;
-  }
-
-  void _setStartExpression(Expression node) {
-    if (_startExpression != null) {
-      throw StateError('Unable to set start expression');
-    }
-
-    _startExpression = node;
   }
 }
