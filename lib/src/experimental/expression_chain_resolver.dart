@@ -12,9 +12,17 @@ class ExpressionChainResolver extends ExpressionVisitor {
     return _node.children.first;
   }
 
+  ExpressionNode _newNode(Expression expression) {
+    final prev = _node;
+    _node = ExpressionNode(expression);
+    return prev;
+  }
+
   @override
   void visitAndPredicate(AndPredicateExpression node) {
+    final prev = _newNode(node);
     node.expression.accept(this);
+    _node = prev;
   }
 
   @override
@@ -24,7 +32,9 @@ class ExpressionChainResolver extends ExpressionVisitor {
 
   @override
   void visitCapture(CaptureExpression node) {
+    final prev = _newNode(node);
     node.expression.accept(this);
+    _node = prev;
   }
 
   @override
@@ -44,17 +54,23 @@ class ExpressionChainResolver extends ExpressionVisitor {
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
+    final prev = _newNode(node);
     node.expression.accept(this);
+    _node = prev;
   }
 
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
+    final prev = _newNode(node);
     node.expression.accept(this);
+    _node = prev;
   }
 
   @override
   void visitOptional(OptionalExpression node) {
+    final prev = _newNode(node);
     node.expression.accept(this);
+    _node = prev;
   }
 
   @override
@@ -63,21 +79,20 @@ class ExpressionChainResolver extends ExpressionVisitor {
       //throw StateError('Recursive grammar');
     }
 
-    final prevNode = _node;
-    _node = ExpressionNode(node);
+    final prev = _newNode(node);
     for (final child in node.expressions) {
       child.accept(this);
     }
 
-    prevNode.addChild(_node);
-    _node = prevNode;
+    prev.addChild(_node);
+    _node = prev;
   }
 
   @override
   void visitSequence(SequenceExpression node) {
-    final prevNode = _node;
-    _node = ExpressionNode(node);
-    //node.expressions[0].accept(this);
+    final prev = _newNode(node);
+    node.expressions[0].accept(this);
+    /*
     for (final child in node.expressions) {
       child.accept(this);
       if (child is AndPredicateExpression ||
@@ -89,9 +104,10 @@ class ExpressionChainResolver extends ExpressionVisitor {
         break;
       }
     }
+    */
 
-    prevNode.addChild(_node);
-    _node = prevNode;
+    prev.addChild(_node);
+    _node = prev;
   }
 
   @override
@@ -106,6 +122,8 @@ class ExpressionChainResolver extends ExpressionVisitor {
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
+    final prev = _newNode(node);
     node.expression.accept(this);
+    _node = prev;
   }
 }
