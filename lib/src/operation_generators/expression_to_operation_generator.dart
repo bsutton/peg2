@@ -6,11 +6,21 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
   final ParserClassMembers m = ParserClassMembers();
 
-  bool isPostfix = false;
+  bool isPostfixGenerator = false;
+
+  Map<Expression, Map<String, ParameterOperation>> methodParameters = {};
 
   bool notProductive;
 
   final ParserGeneratorOptions options;
+
+  final String paramCallerId = 'callerID';
+
+  final String paramPostfix = 'postfix';
+
+  final String paramProductive = 'productive';
+
+  final String paramReturn = 'return';
 
   Variable productive;
 
@@ -20,7 +30,34 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
   ExpressionToOperationGenerator(this.options);
 
-  ParameterOperation findPostfixParamater(Expression expression);
+  ParameterOperation addMethodParameter(
+      Expression expression, String name, ParameterOperation parameter) {
+    var parameters = methodParameters[expression];
+    if (parameters == null) {
+      parameters = {};
+      methodParameters[expression] = parameters;
+    }
+
+    if (parameters.containsKey(name)) {
+      throw StateError('Method parameter already exists: $name');
+    }
+
+    parameters[name] = parameter;
+    return parameter;
+  }
+
+  ParameterOperation findMethodParameter(Expression expression, String name) {
+    final parameters = methodParameters[expression];
+    if (parameters == null) {
+      throw StateError('Unable to find method parameters: ${expression}');
+    }
+
+    if (!parameters.containsKey(name)) {
+      throw StateError('Unable to find method parameter: $name');
+    }
+
+    return parameters[name];
+  }
 
   VariableAllocator getLocalVarAlloc() {
     var lastVariableId = 0;
@@ -236,7 +273,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       hasSavedState = false;
     }
 
-    if (isPostfix) {
+    if (isPostfixGenerator) {
       hasSavedState = false;
     }
 
@@ -252,8 +289,8 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       void onExpression(BlockOperation b) {
         block = b;
         if (i == 0) {
-          if (isPostfix) {
-            final parameter = findPostfixParamater(node);
+          if (isPostfixGenerator) {
+            final parameter = findMethodParameter(node, paramPostfix);
             resultVar = parameter.variable;
           } else {
             child.accept(this);
@@ -299,9 +336,14 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
         };
       } else {
         onSuccess = (b) {
-          final list =
-              ListOperation(null, variables.values.map(varOp).toList());
-          addAssign(b, varOp(result), list);
+          if (node.isProductive) {
+            final list =
+                ListOperation(null, variables.values.map(varOp).toList());
+            addAssign(b, varOp(result), list);
+          } else {
+            // TODO:
+            addAssign(b, varOp(result), null);
+          }
         };
       }
     }

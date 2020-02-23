@@ -4,10 +4,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     with OperationUtils {
   Map<Expression, MethodOperation> _methods;
 
-  Map<Expression, ParameterOperation> _methodPostfixParameters;
-
-  Map<Expression, ParameterOperation> _methodReturnParameters;
-
   Map<String, Variable> _methodVariables;
 
   final Grammar grammar;
@@ -15,16 +11,9 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
   ExperimentalGenerator(this.grammar, ParserGeneratorOptions options)
       : super(options);
 
-  @override
-  ParameterOperation findPostfixParamater(Expression expression) {
-    return _findMethodPostfixParameter(expression);
-  }
-
   List<MethodOperation> generate() {
-    isPostfix = true;
+    isPostfixGenerator = true;
     _methods = {};
-    _methodPostfixParameters = {};
-    _methodReturnParameters = {};
     _methodVariables = {};
     for (final rule in grammar.rules) {
       final expression = rule.expression;
@@ -100,7 +89,8 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     }
 
     final methods2 = _methods.values.toList();
-    methods2.sort((a, b) => a.name.compareTo(b.name));
+    // TODO: Sort methods
+    //methods2.sort((a, b) => a.name.compareTo(b.name));
     return methods2;
   }
 
@@ -118,7 +108,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
       final varAlloc = getLocalVarAlloc();
       _generatePostfixMethod(node, varAlloc, (b) {
         addCall(b, varOp(m.popState), []);
-        resultVar = varAlloc.newVar(b, 'var', null);
       });
     }
   }
@@ -130,15 +119,14 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     } else {
       final varAlloc = getLocalVarAlloc();
       _generatePostfixMethod(node, varAlloc, (b) {
-        final start = varAlloc.newVar(b, 'var', null);
         final stopCapture = callOp(varOp(m.stopCapture), []);
-        addAssign(b, varOp(start), stopCapture);
+        final start = varAlloc.newVar(b, 'var', stopCapture);
         addIfVar(b, m.success, (b) {
-          final result = varAlloc.newVar(b, 'String', null);
           final substring = Variable('substring');
           final callSubstring = mbrCallOp(
               varOp(m.input), varOp(substring), [varOp(start), varOp(m.pos)]);
-          addAssign(b, varOp(result), callSubstring);
+          final ret = findMethodParameter(node, paramReturn);
+          addAssign(b, varOp(ret.variable), callSubstring);
         });
       });
     }
@@ -156,10 +144,9 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     } else {
       final varAlloc = getLocalVarAlloc();
       _generatePostfixMethod(node, varAlloc, (b) {
+        addCall(b, varOp(m.popState), []);
         addAssign(
             b, varOp(m.success), unaryOp(OperationKind.not, varOp(m.success)));
-        addCall(b, varOp(m.popState), []);
-        resultVar = varAlloc.newVar(b, 'var', null);
       });
     }
   }
@@ -256,7 +243,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
               if (expression is StartExpression) {
                 final child = expression.expression;
                 if (child is AndPredicateExpression ||
-                    child is AndPredicateExpression) {
+                    child is NotPredicateExpression) {
                   addCall(b, varOp(m.pushState), []);
                 } else if (choice is CaptureExpression) {
                   addCall(b, varOp(m.startCapture), []);
@@ -270,14 +257,17 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
               } else if (expression is SingleExpression) {
                 expression.accept(this);
                 final methodVar = _getMethodVariable(expression);
-                final callExpr = callOp(varOp(methodVar), [varOp(resultVar)]);
+                final parameters = [varOp(resultVar), constOp(true)];
+                final callExpr = callOp(varOp(methodVar), parameters);
                 resultVar = varAlloc.newVar(block, 'var', callExpr);
               } else if (expression is SequenceExpression) {
                 expression.accept(this);
                 final methodVar = _getMethodVariable(expression);
-                final callExpr = callOp(varOp(methodVar), [varOp(resultVar)]);
+                final parameters = [varOp(resultVar), constOp(true)];
+                final callExpr = callOp(varOp(methodVar), parameters);
                 resultVar = varAlloc.newVar(block, 'var', callExpr);
               } else if (expression is OrderedChoiceExpression) {
+                // Skip
               } else {
                 throw StateError(
                     'Invalid expresssion: ${expression.runtimeType}');
@@ -287,14 +277,15 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
             if (i < choices.length - 1) {
               addIfVar(b, m.success, addBreak);
             } else {
+              final returnParameter = findMethodParameter(node, paramReturn);
+              addAssign(
+                  block, varOp(returnParameter.variable), varOp(resultVar));
               addBreak(b);
             }
           }
         });
 
         block = b;
-        final returnParameter = _findMethodReturnParameter(node);
-        addAssign(block, varOp(returnParameter.variable), varOp(resultVar));
       });
     }
   }
@@ -303,7 +294,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
   void visitSequence(SequenceExpression node) {
     final varAlloc = getLocalVarAlloc();
     _generatePostfixMethod(node, varAlloc, (b) {
-      productive = varAlloc.newVar(b, 'var', constOp(true));
+      productive = findMethodParameter(node, paramProductive).variable;
       super.visitSequence(node);
     });
   }
@@ -349,34 +340,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     }
   }
 
-  MethodOperation _findMethod(Expression expression) {
-    final method = _methods[expression];
-    if (method == null) {
-      throw StateError('Expression method not found');
-    }
-
-    return method;
-  }
-
-  ParameterOperation _findMethodPostfixParameter(Expression expression) {
-    final result = _methodPostfixParameters[expression];
-    if (result == null) {
-      throw StateError(
-          'Unable to find method postfix parameter: ${expression}');
-    }
-
-    return result;
-  }
-
-  ParameterOperation _findMethodReturnParameter(Expression expression) {
-    final result = _methodReturnParameters[expression];
-    if (result == null) {
-      throw StateError('Unable to find method return parameter: ${expression}');
-    }
-
-    return result;
-  }
-
   List<List<Expression>> _flattenNode(ExpressionNode node) {
     final result = <List<Expression>>[];
     if (node.children.isEmpty) {
@@ -396,12 +359,21 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   void _generateChoiceMethod(OrderedChoiceExpression expression,
       VariableAllocator varAlloc, void Function(BlockOperation) f) {
-    final parameters = <ParameterOperation>[];
+    final callerId = ParameterOperation('int', varAlloc.alloc());
+    final productive = ParameterOperation('bool', varAlloc.alloc());
+    final parameters = {
+      paramCallerId: callerId,
+      paramProductive: productive,
+    };
+
     _generateMethod(expression, varAlloc, parameters, f);
   }
 
-  void _generateMethod(Expression expression, VariableAllocator varAlloc,
-      List<ParameterOperation> parameters, void Function(BlockOperation) f) {
+  void _generateMethod(
+      Expression expression,
+      VariableAllocator varAlloc,
+      Map<String, ParameterOperation> parameters,
+      void Function(BlockOperation) f) {
     final variable = _getMethodVariable(expression);
     var method = _methods[expression];
     if (method != null) {
@@ -409,17 +381,24 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     }
 
     final returnType = expression.returnType;
-    method = MethodOperation(returnType, variable.name, parameters);
+    final params = <ParameterOperation>[];
+    for (final name in parameters.keys) {
+      final parameter = parameters[name];
+      params.add(parameter);
+      addMethodParameter(expression, name, parameter);
+    }
+
+    method = MethodOperation(returnType, variable.name, params);
     _methods[expression] = method;
     final prevResultVar = resultVar;
     final prevBlock = block;
-    final prevVarAlloc = varAlloc;
+    final prevVarAlloc = this.varAlloc;
     this.varAlloc = varAlloc;
     block = method.body;
     final returnVariable = varAlloc.alloc();
-    final returnParameter = ParameterOperation(returnType, returnVariable);
-    _methodReturnParameters[expression] = returnParameter;
-    addOp(block, returnParameter);
+    final returnParam = ParameterOperation(returnType, returnVariable);
+    addMethodParameter(expression, paramReturn, returnParam);
+    addOp(block, returnParam);
     f(method.body);
     addReturn(block, varOp(returnVariable));
     this.varAlloc = prevVarAlloc;
@@ -429,21 +408,26 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   void _generatePostfixMethod(Expression expression, VariableAllocator varAlloc,
       void Function(BlockOperation) f) {
-    var parameterType = 'var';
+    var postfixType = 'var';
     if (expression is SingleExpression) {
       final child = expression.expression;
-      parameterType = child.returnType;
+      postfixType = child.returnType;
     } else if (expression is SequenceExpression) {
       final expressions = expression.expressions;
-      parameterType = expressions[0].returnType;
+      postfixType = expressions[0].returnType;
     } else {
       StateError(
           'Unable to generate postfix nethod for expression: ${expression.runtimeType}');
     }
 
-    final parameter = ParameterOperation(parameterType, varAlloc.alloc());
-    _methodPostfixParameters[expression] = parameter;
-    _generateMethod(expression, varAlloc, [parameter], f);
+    final postfix = ParameterOperation(postfixType, varAlloc.alloc());
+    final productive = ParameterOperation('bool', varAlloc.alloc());
+    final parameters = {
+      paramPostfix: postfix,
+      paramProductive: productive,
+    };
+
+    _generateMethod(expression, varAlloc, parameters, f);
   }
 
   String _getExpressionMethodName(Expression expression) {
@@ -474,16 +458,14 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
   }
 
   void _visitSymbolExpression(SymbolExpression node) {
-    if (node.index != 0) {
-      final rule = node.expression.rule;
-      final returnType = rule.returnType;
-      final expression = rule.expression;
-      final name = _getMethodVariable(expression);
-      final callRule = callOp(varOp(name), []);
-      final result = varAlloc.newVar(block, returnType, callRule);
-      resultVar = result;
-    } else {
-      return;
-    }
+    final rule = node.expression.rule;
+    var returnType = rule.returnType;
+    final expression = rule.expression;
+    returnType ??= rule.expression.returnType;
+    final name = _getMethodVariable(expression);
+    final parameters = [constOp(0), constOp(true)];
+    final callRule = callOp(varOp(name), parameters);
+    final result = varAlloc.newVar(block, returnType, callRule);
+    resultVar = result;
   }
 }

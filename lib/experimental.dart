@@ -1,5 +1,3 @@
-import 'package:lists/lists.dart';
-
 import 'expressions.dart';
 import 'generators.dart';
 import 'grammar.dart';

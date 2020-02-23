@@ -1,11 +1,14 @@
 part of '../../generators.dart';
 
-class ParserClassBuilder {
-  Grammar _grammar;
+class ParserClassGenerator {
+  final Grammar grammar;
 
-  void build(Grammar grammar, String name, ContentBuilder builder,
-      ContentBuilder methodBuilders) {
-    _grammar = grammar;
+  final ParserGeneratorOptions options;
+
+  ParserClassGenerator(this.grammar, this.options);
+
+  void build(ContentBuilder builder, ContentBuilder methodBuilders) {
+    final name = options.name + 'Parser';
     final classBuilder = ClassBuilder(name: name);
     builder.add(classBuilder);
     _buildParserFields(classBuilder);
@@ -29,7 +32,8 @@ class ParserClassBuilder {
       'int _pos',
       'bool _predicate',
       'dynamic _result',
-      'List<int> _states',
+      'List<_State> _states',
+      'int _statesPos',
       'bool _success',
       'List<String> _terminals',
       'int _terminalCount',
@@ -309,6 +313,27 @@ void _memoize(int id, int pos, result) {
   memos.add(memo);
 }
 
+void _popState() {
+  if (_statesPos <= 0) {
+    throw StateError('Stack error');
+  }
+
+  final state = _states[_statesPos--];
+  _c = state.c;
+  _cp = state.cp;
+  _pos = state.pos;
+  _predicate = state.predicate;
+}
+
+void _pushState() {
+  if (_statesPos >= _states.length) {
+    _states.length += 20;
+  }
+
+  final state = _State(c: _c, cp: _cp, pos: _pos, predicate: _predicate);
+  _states[_statesPos++] = state;
+}
+
 void _reset() {
   _c = _eof;
   _cp = -1;  
@@ -321,7 +346,8 @@ void _reset() {
   _pos = 0;
   _predicate = false;
   _states = [];
-  _states.length = 20 * 3;
+  _states.length = 20;
+  _statesPos = 0;
   _terminalCount = 0;
   _terminals = [];
   _terminals.length = 20;
@@ -334,11 +360,17 @@ void _reset() {
 ''';
 
     final cid = start.id;
-    final name = '_parse${start.name}';
+    String name;
+    if (options.isPostfix()) {
+      name = '_e${start.id}';
+    } else {
+      name = '_parse${start.name}';
+    }
+
     var methods = _methods;
     methods = methods.replaceFirst('{{START}}', '$name($cid, true)');
     methods =
-        methods.replaceAll('{{EXPR_COUNT}}', '${_grammar.expressionCount}');
+        methods.replaceAll('{{EXPR_COUNT}}', '${grammar.expressionCount}');
     final lineSplitter = LineSplitter();
     final lines = lineSplitter.convert(methods);
     builder.addAll(lines);

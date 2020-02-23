@@ -16,9 +16,20 @@ class _Memo {
     this.pos,
     this.result,
     this.success,
-  });
+  });  
 }
 
+class _State {
+  final int c;
+
+  final int cp;
+
+  final int pos;
+
+  final bool predicate;
+
+  _State({this.c, this.cp, this.pos, this.predicate});
+}
 ''';
 
   final Grammar grammar;
@@ -38,9 +49,16 @@ class _Memo {
       return null;
     }
 
-    final rulesToOperationsBuilder =
-        RulesToOperationsGenerator(grammar, options);
-    final methods = rulesToOperationsBuilder.build();
+    List<MethodOperation> methods;
+    if (options.isPostfix()) {
+      final experimentalGenerator = ExperimentalGenerator(grammar, options);
+      methods = experimentalGenerator.generate();
+    } else {
+      final rulesToOperationsBuilder =
+          RulesToOperationsGenerator(grammar, options);
+      methods = rulesToOperationsBuilder.build();
+    }
+
     for (final method in methods) {
       final operationsInitializer = OperationInitializer();
       operationsInitializer.initialize(method);
@@ -50,8 +68,6 @@ class _Memo {
       final operationsOptimizer = OperationOptimizer();
       operationsOptimizer.optimize(method.body);
     }
-
-    _experimental();
 
     final operationsToCodeConverter = OperationsToCodeConverter();
     final methodBuilders = operationsToCodeConverter.convert(methods);
@@ -67,9 +83,8 @@ class _Memo {
       libraryBuilder.addAll(lines);
     }
 
-    final parserClassBuilder = ParserClassBuilder();
-    final name = options.name + 'Parser';
-    parserClassBuilder.build(grammar, name, libraryBuilder, methodBuilders);
+    final parserClassBuilder = ParserClassGenerator(grammar, options);
+    parserClassBuilder.build(libraryBuilder, methodBuilders);
     final classes = lineSplitter.convert(_classes);
     libraryBuilder.addAll(classes);
     libraryBuilder.add('// ignore_for_file: prefer_final_locals');
@@ -99,33 +114,5 @@ class _Memo {
         builder.add('//   memoize: ${options.memoize}');
         builder.add('');
         */
-  }
-
-  void _experimental() {
-    // TODO: Experimental
-    final experimentalGenerator = ExperimentalGenerator(grammar, options);
-    final methods = experimentalGenerator.generate();
-    for (final method in methods) {
-      final operationsInitializer = OperationInitializer();
-      operationsInitializer.initialize(method);
-    }
-
-    for (final method in methods) {
-      final operationsOptimizer = OperationOptimizer();
-      operationsOptimizer.optimize(method.body);
-    }
-
-    final operationsToCodeConverter = OperationsToCodeConverter();
-    final methodBuilders = operationsToCodeConverter.convert(methods);
-    final formatter = DartFormatter();
-    var source = methodBuilders.build(0).join('\n');
-    try {
-      source = formatter.format(source);
-      // ignore: unused_catch_clause
-    } on FormatterException catch (e) {
-      //
-    }
-
-    print(source);
   }
 }

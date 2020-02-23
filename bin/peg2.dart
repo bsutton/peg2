@@ -11,8 +11,6 @@ import 'peg2_parser.dart';
 void main(List<String> args) {
   final options = ParserGeneratorOptions();
   final argParser = ArgParser();
-  argParser.addFlag('print',
-      abbr: 'p', defaultsTo: false, help: 'Print grammar');
   argParser.addFlag('inline-nonterminals',
       defaultsTo: false,
       help: 'Convert nonterminal calls into inline expressions');
@@ -21,11 +19,18 @@ void main(List<String> args) {
       help: 'Convert subterminal calls into inline expressions');
   argParser.addFlag('memoize',
       defaultsTo: false, help: 'Memoize results of calls');
+  argParser.addOption('parser',
+      allowed: ['general', 'postfix'],
+      defaultsTo: 'general',
+      help: 'Type of generated perser');
+  argParser.addFlag('print',
+      abbr: 'p', defaultsTo: false, help: 'Print grammar');
   final argResults = argParser.parse(args);
   final printGrammar = argResults['print'] as bool;
   options.inlineNonterminals = argResults['inline-nonterminals'] as bool;
   options.inlineSubterminals = argResults['inline-subterminals'] as bool;
   options.memoize = argResults['memoize'] as bool;
+  options.parserType = argResults['parser'] as String;
   String inputFilename;
   String outputFilename;
   if (argResults.rest.length == 1) {

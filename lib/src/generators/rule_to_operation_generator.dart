@@ -51,11 +51,6 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
   }
 
   @override
-  ParameterOperation findPostfixParamater(Expression expression) {
-    throw UnsupportedError('');
-  }
-
-  @override
   String getRuleMethodName(ProductionRule rule) {
     var name = rule.name;
     switch (rule.kind) {
