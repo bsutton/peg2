@@ -260,9 +260,9 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     final b = block;
     final expressions = node.expressions;
     final hasAction = node.actionIndex != null;
-    final returnType = node.returnType;
     final variables = <Expression, Variable>{};
-    final result = varAlloc.newVar(b, returnType, null);
+    final returnParam = findMethodParameter(node, paramReturn);
+    final result = returnParam.variable;
     void Function(BlockOperation) onSuccess;
     void Function(BlockOperation) onFailure;
     final optionalCount =

@@ -6,6 +6,8 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   Map<String, Variable> _methodVariables;
 
+  bool _isPostfixVisit = false;
+
   final Grammar grammar;
 
   ExperimentalGenerator(this.grammar, ParserGeneratorOptions options)
@@ -102,9 +104,10 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   @override
   void visitAndPredicate(AndPredicateExpression node) {
-    if (node.index != 0) {
+    if (!_isPostfixVisit) {
       super.visitAndPredicate(node);
     } else {
+      _isPostfixVisit = false;
       final varAlloc = getLocalVarAlloc();
       _generatePostfixMethod(node, varAlloc, (b) {
         addCall(b, varOp(m.popState), []);
@@ -114,9 +117,10 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   @override
   void visitCapture(CaptureExpression node) {
-    if (node.index != 0) {
+    if (!_isPostfixVisit) {
       super.visitCapture(node);
     } else {
+      _isPostfixVisit = false;
       final varAlloc = getLocalVarAlloc();
       _generatePostfixMethod(node, varAlloc, (b) {
         final stopCapture = callOp(varOp(m.stopCapture), []);
@@ -139,9 +143,10 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
-    if (node.index != 0) {
+    if (!_isPostfixVisit) {
       super.visitNotPredicate(node);
     } else {
+      _isPostfixVisit = false;
       final varAlloc = getLocalVarAlloc();
       _generatePostfixMethod(node, varAlloc, (b) {
         addCall(b, varOp(m.popState), []);
@@ -153,9 +158,10 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
-    if (node.index != 0) {
+    if (!_isPostfixVisit) {
       super.visitOneOrMore(node);
     } else {
+      _isPostfixVisit = false;
       final varAlloc = getLocalVarAlloc();
       _generatePostfixMethod(node, varAlloc, (b) {
         final returnType = node.returnType;
@@ -187,9 +193,10 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   @override
   void visitOptional(OptionalExpression node) {
-    if (node.index != 0) {
+    if (!_isPostfixVisit) {
       super.visitOptional(node);
     } else {
+      _isPostfixVisit = false;
       final varAlloc = getLocalVarAlloc();
       _generatePostfixMethod(node, varAlloc, (b) {
         addAssign(block, varOp(m.success), constOp(true));
@@ -204,10 +211,17 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
       child.accept(this);
     }
 
-    if (_hasChoiceMethod(node)) {
-      final varAlloc = getLocalVarAlloc();
-      _generateChoiceMethod(node, varAlloc, (b) {
-        /*
+    if (node.parent != null) {
+      final methodVar = _getMethodVariable(node);
+      // TODO: callerId
+      final parameters = [constOp(0), constOp(true)];
+      final callExpr = callOp(varOp(methodVar), parameters);
+      resultVar = this.varAlloc.newVar(block, 'var', callExpr);
+    }
+
+    final varAlloc = getLocalVarAlloc();
+    _generateChoiceMethod(node, varAlloc, (b) {
+      /*
         final list = SparseList<List<Expression>>();
         for (var i = 0; i < expressions.length; i++) {
           final child = expressions[i];
@@ -229,71 +243,101 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
         }
         */
 
-        final expressionChainResolver = ExpressionChainResolver();
-        final root = expressionChainResolver.resolve(node);
-        final choices = _flattenNode(root);
-        final b = block;
-        addLoop(b, (b) {
-          block = b;
-          for (var i = 0; i < choices.length; i++) {
-            final choice = choices[i];
-            //var prefixCount = 0;
-            for (var j = 0; j < choice.length; j++) {
-              final expression = choice[j];
-              if (expression is StartExpression) {
-                final child = expression.expression;
-                if (child is AndPredicateExpression ||
-                    child is NotPredicateExpression) {
-                  addCall(b, varOp(m.pushState), []);
-                } else if (choice is CaptureExpression) {
-                  addCall(b, varOp(m.startCapture), []);
-                }
+      final expressionChainResolver = ExpressionChainResolver();
+      final root = expressionChainResolver.resolve(node);
+      final choices = _flattenNode(root);
+      final b = block;
 
-                //prefixCount++;
-              } else if (expression is AnyCharacterExpression ||
-                  expression is CharacterClassExpression ||
-                  expression is LiteralExpression) {
-                expression.accept(this);
-              } else if (expression is SingleExpression) {
-                expression.accept(this);
-                final methodVar = _getMethodVariable(expression);
-                final parameters = [varOp(resultVar), constOp(true)];
-                final callExpr = callOp(varOp(methodVar), parameters);
-                resultVar = varAlloc.newVar(block, 'var', callExpr);
-              } else if (expression is SequenceExpression) {
-                expression.accept(this);
-                final methodVar = _getMethodVariable(expression);
-                final parameters = [varOp(resultVar), constOp(true)];
-                final callExpr = callOp(varOp(methodVar), parameters);
-                resultVar = varAlloc.newVar(block, 'var', callExpr);
-              } else if (expression is OrderedChoiceExpression) {
-                // Skip
-              } else {
-                throw StateError(
-                    'Invalid expresssion: ${expression.runtimeType}');
+      // TODO
+      addAssign(b, varOp(m.failed), constOp(-1));
+
+      addLoop(b, (b) {
+        block = b;
+        for (var i = 0; i < choices.length; i++) {
+          final choice =
+              choices[i].where((e) => e is! OrderedChoiceExpression).toList();
+          //var prefixCount = 0;
+          for (var j = 0; j < choice.length; j++) {
+            final expression = choice[j];
+            if (expression is StartExpression) {
+              final child = expression.expression;
+              if (child is AndPredicateExpression ||
+                  child is NotPredicateExpression) {
+                addCall(b, varOp(m.pushState), []);
+              } else if (child is CaptureExpression) {
+                addCall(b, varOp(m.startCapture), []);
               }
-            }
 
-            if (i < choices.length - 1) {
-              addIfVar(b, m.success, addBreak);
+              //prefixCount++;
+            } else if (expression is AnyCharacterExpression ||
+                expression is CharacterClassExpression ||
+                expression is LiteralExpression) {
+              expression.accept(this);
+            } else if (expression is SingleExpression) {
+              if (expression is OptionalExpression) {
+                addAssign(b, varOp(m.success), constOp(true));
+              } else if (expression is AndPredicateExpression) {
+                final popState = callOp(varOp(m.popState), []);
+                resultVar = varAlloc.newVar(b, 'var', popState);
+              } else if (expression is NotPredicateExpression) {
+                final popState = callOp(varOp(m.popState), []);
+                resultVar = varAlloc.newVar(b, 'var', popState);
+                addAssign(b, varOp(m.success),
+                    unaryOp(OperationKind.not, varOp(m.success)));
+              } else {
+                _isPostfixVisit = true;
+                expression.accept(this);
+                final methodVar = _getMethodVariable(expression);
+                final parameters = [varOp(resultVar), constOp(true)];
+                final callExpr = callOp(varOp(methodVar), parameters);
+                resultVar = varAlloc.newVar(block, 'var', callExpr);
+              }
+            } else if (expression is SequenceExpression) {
+              if (expression.expressions.length > 1 ||
+                  expression.actionIndex != null) {
+                expression.accept(this);
+                final methodVar = _getMethodVariable(expression);
+                final parameters = [varOp(resultVar), constOp(true)];
+                final callExpr = callOp(varOp(methodVar), parameters);
+                resultVar = varAlloc.newVar(block, 'var', callExpr);
+              } else {
+                // Skip
+              }
             } else {
-              final returnParameter = findMethodParameter(node, paramReturn);
-              addAssign(
-                  block, varOp(returnParameter.variable), varOp(resultVar));
-              addBreak(b);
+              throw StateError(
+                  'Invalid expresssion: ${expression.runtimeType}');
             }
           }
-        });
 
-        block = b;
+          if (i < choices.length - 1) {
+            addIfVar(b, m.success, (b) {
+              final returnParameter = findMethodParameter(node, paramReturn);
+              addAssign(b, varOp(returnParameter.variable), varOp(resultVar));
+              addBreak(b);
+            });
+          } else {
+            addIfVar(b, m.success, (b) {
+              final returnParameter = findMethodParameter(node, paramReturn);
+              addAssign(b, varOp(returnParameter.variable), varOp(resultVar));
+            });
+
+            addBreak(b);
+          }
+        }
       });
-    }
+
+      block = b;
+    });
   }
 
   @override
   void visitSequence(SequenceExpression node) {
     final varAlloc = getLocalVarAlloc();
     _generatePostfixMethod(node, varAlloc, (b) {
+      if (node.id == 42) {
+        var x = 0;
+      }
+
       productive = findMethodParameter(node, paramProductive).variable;
       super.visitSequence(node);
     });
@@ -311,9 +355,10 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
-    if (node.index != 0) {
+    if (!_isPostfixVisit) {
       super.visitZeroOrMore(node);
     } else {
+      _isPostfixVisit = false;
       final varAlloc = getLocalVarAlloc();
       _generatePostfixMethod(node, varAlloc, (b) {
         final returnType = node.returnType;

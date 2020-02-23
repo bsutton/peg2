@@ -8,3 +8,4 @@ implement optimizer to remove "_succes = true" before calls to [_parseXXX, _matc
 implement lookup tables (using starting characters of expressions) for the ordered choice expressions to improve the performance by skip unnecessary (heavy) operations
 improve expression starting characters resolver (reduce number of starting characters)
 find bug in unused variables optimizer
+inline popState and pushState

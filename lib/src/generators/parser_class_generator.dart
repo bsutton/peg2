@@ -21,6 +21,8 @@ class ParserClassGenerator {
       'static const _eof = 0x110000',
       'FormatException error',
       'int _c',
+      'List<int> _captures',
+      'int _capturePos',
       'int _cp',
       'int _failed',
       'int _failurePos',
@@ -313,16 +315,17 @@ void _memoize(int id, int pos, result) {
   memos.add(memo);
 }
 
-void _popState() {
+dynamic _popState() {
   if (_statesPos <= 0) {
     throw StateError('Stack error');
   }
 
-  final state = _states[_statesPos--];
+  final state = _states[--_statesPos];
   _c = state.c;
   _cp = state.cp;
   _pos = state.pos;
   _predicate = state.predicate;
+  return null;
 }
 
 void _pushState() {
@@ -336,6 +339,9 @@ void _pushState() {
 
 void _reset() {
   _c = _eof;
+  _captures = [];
+  _captures.length = 10;
+  _capturePos = 0;
   _cp = -1;  
   _failurePos = -1;
   _hasMalformed = false;
@@ -357,6 +363,21 @@ void _reset() {
   _trackPos.length = {{EXPR_COUNT}};
 }
 
+void _startCapture() {
+  if (_capturePos >= _captures.length) {
+    _captures.length += 10;
+  }
+
+  _captures[_capturePos++] = _pos;
+}
+
+int _stopCapture() {
+  if (_capturePos <= 0) {
+    throw StateError('Stack error');
+  }
+
+  return _captures[--_capturePos];
+}
 ''';
 
     final cid = start.id;
