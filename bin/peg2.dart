@@ -67,8 +67,8 @@ void main(List<String> args) {
   }
 
   options.name = camelize(name);
-  final parserGenerator = ParserGenerator();
-  final parserCode = parserGenerator.generate(grammar, options);
+  final parserGenerator = ParserGenerator(grammar, options);
+  final parserCode = parserGenerator.generate();
   if (parserCode == null) {
     print('Parser generation error');
     exit(-1);

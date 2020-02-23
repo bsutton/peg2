@@ -346,11 +346,11 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    _parse_leading_spaces(3, false);
+    var $8 = _parse_leading_spaces(3, false);
     _success = true;
     var $9 = _parseValue(4, $1);
     if (_success) {
-      _parse_end_of_file(5, false);
+      var $10 = _parse_end_of_file(5, false);
       if (_success) {
         $4 = $9;
       }
@@ -438,11 +438,11 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    _parse_$LeftSquareBracket(23, false);
+    var $8 = _parse_$LeftSquareBracket(23, false);
     if (_success) {
       var $9 = _parseValues(25, $1);
       _success = true;
-      _parse_$RightSquareBracket(26, false);
+      var $10 = _parse_$RightSquareBracket(26, false);
       if (_success) {
         var v = $9;
         List $$;
@@ -480,7 +480,7 @@ class ExampleParser {
         var $12 = _c;
         var $13 = _cp;
         var $14 = _pos;
-        _parse_$Comma(33, false);
+        var $15 = _parse_$Comma(33, false);
         if (_success) {
           var $16 = _parseValue(34, $1);
           if (_success) {
@@ -527,11 +527,11 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    _parse_$LeftBrace(37, false);
+    var $8 = _parse_$LeftBrace(37, false);
     if (_success) {
       var $9 = _parseMembers(39, $1);
       _success = true;
-      _parse_$RightBrace(40, false);
+      var $10 = _parse_$RightBrace(40, false);
       if (_success) {
         var m = $9;
         Map<String, dynamic> $$;
@@ -569,7 +569,7 @@ class ExampleParser {
         var $12 = _c;
         var $13 = _cp;
         var $14 = _pos;
-        _parse_$Comma(47, false);
+        var $15 = _parse_$Comma(47, false);
         if (_success) {
           var $16 = _parseMember(48, $1);
           if (_success) {
@@ -618,7 +618,7 @@ class ExampleParser {
     var $7 = _pos;
     var $8 = _parse_string(51, $1);
     if (_success) {
-      _parse_$Colon(52, false);
+      var $9 = _parse_$Colon(52, false);
       if (_success) {
         var $10 = _parseValue(53, $1);
         if (_success) {
@@ -652,7 +652,7 @@ class ExampleParser {
     var $9 = $1;
     _predicate = true;
     $1 = false;
-    _matchAny();
+    var $10 = _matchAny();
     var $11;
     _success = !_success;
     _c = $5;
@@ -679,9 +679,9 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    _matchString('false');
+    var $8 = _matchString('false');
     if (_success) {
-      _parse$$spacing(61, false);
+      var $9 = _parse$$spacing(61, false);
       if (_success) {
         dynamic $$;
         $$ = false;
@@ -706,7 +706,7 @@ class ExampleParser {
     List<int> $2;
     List<int> $3;
     List<int> $4;
-    var $5 = _parse$$spacing(64, $1);
+    var $5 = _parse$$spacing(64, false);
     if (_success) {
       $4 = $5;
     }
@@ -726,9 +726,9 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    _matchString('null');
+    var $8 = _matchString('null');
     if (_success) {
-      _parse$$spacing(68, false);
+      var $9 = _parse$$spacing(68, false);
       if (_success) {
         dynamic $$;
         $$ = null;
@@ -756,9 +756,9 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    _matchString('true');
+    var $8 = _matchString('true');
     if (_success) {
-      _parse$$spacing(72, false);
+      var $9 = _parse$$spacing(72, false);
       if (_success) {
         dynamic $$;
         $$ = true;
@@ -786,7 +786,7 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _cp;
     var $7 = _pos;
-    _matchString('\"');
+    var $8 = _matchString('\"');
     if (_success) {
       List<int> $9;
       if ($1) {
@@ -802,9 +802,9 @@ class ExampleParser {
         }
       }
       _success = true;
-      _matchString('\"');
+      var $11 = _matchString('\"');
       if (_success) {
-        _parse$$spacing(79, false);
+        var $12 = _parse$$spacing(79, false);
         if (_success) {
           var c = $9;
           String $$;
@@ -864,17 +864,11 @@ class ExampleParser {
       var $25 = _matchRanges($24);
       if (_success) {
         List<int> $26;
-        if ($1) {
-          $26 = [];
-        }
         for (;;) {
           const $27 = [48, 57];
           var $28 = _matchRanges($27);
           if (!_success) {
             break;
-          }
-          if ($1) {
-            $26.add($28);
           }
         }
         _success = true;
@@ -900,9 +894,6 @@ class ExampleParser {
       var $34 = _matchChar(46);
       if (_success) {
         List<int> $35;
-        if ($1) {
-          $35 = [];
-        }
         var $36 = false;
         for (;;) {
           const $37 = [48, 57];
@@ -913,9 +904,6 @@ class ExampleParser {
               $35 = null;
             }
             break;
-          }
-          if ($1) {
-            $35.add($38);
           }
           $36 = true;
         }
@@ -939,9 +927,6 @@ class ExampleParser {
       var $45 = _matchRanges($44);
       if (_success) {
         List<int> $46;
-        if ($1) {
-          $46 = [];
-        }
         var $47 = false;
         for (;;) {
           const $48 = [32, 32, 43, 93];
@@ -952,9 +937,6 @@ class ExampleParser {
               $46 = null;
             }
             break;
-          }
-          if ($1) {
-            $46.add($49);
           }
           $47 = true;
         }
@@ -985,7 +967,7 @@ class ExampleParser {
     }
     $1 = $10;
     if (_success) {
-      _parse$$spacing(106, false);
+      var $50 = _parse$$spacing(106, false);
       if (_success) {
         var n = $8;
         num $$;
@@ -1016,7 +998,7 @@ class ExampleParser {
     var $7 = _pos;
     var $8 = _matchString('{');
     if (_success) {
-      _parse$$spacing(110, false);
+      var $9 = _parse$$spacing(110, false);
       if (_success) {
         $4 = $8;
       }
@@ -1044,7 +1026,7 @@ class ExampleParser {
     var $7 = _pos;
     var $8 = _matchString('}');
     if (_success) {
-      _parse$$spacing(114, false);
+      var $9 = _parse$$spacing(114, false);
       if (_success) {
         $4 = $8;
       }
@@ -1072,7 +1054,7 @@ class ExampleParser {
     var $7 = _pos;
     var $8 = _matchString('[');
     if (_success) {
-      _parse$$spacing(118, false);
+      var $9 = _parse$$spacing(118, false);
       if (_success) {
         $4 = $8;
       }
@@ -1100,7 +1082,7 @@ class ExampleParser {
     var $7 = _pos;
     var $8 = _matchString(']');
     if (_success) {
-      _parse$$spacing(122, false);
+      var $9 = _parse$$spacing(122, false);
       if (_success) {
         $4 = $8;
       }
@@ -1128,7 +1110,7 @@ class ExampleParser {
     var $7 = _pos;
     var $8 = _matchString(',');
     if (_success) {
-      _parse$$spacing(126, false);
+      var $9 = _parse$$spacing(126, false);
       if (_success) {
         $4 = $8;
       }
@@ -1156,7 +1138,7 @@ class ExampleParser {
     var $7 = _pos;
     var $8 = _matchString(':');
     if (_success) {
-      _parse$$spacing(130, false);
+      var $9 = _parse$$spacing(130, false);
       if (_success) {
         $4 = $8;
       }
@@ -1179,7 +1161,7 @@ class ExampleParser {
     int $3;
     int $4;
     const $5 = [48, 57];
-    _matchRanges($5);
+    var $6 = _matchRanges($5);
     if (_success) {
       int $$;
       $$ = $$ - 48;
@@ -1195,7 +1177,7 @@ class ExampleParser {
     int $3;
     int $4;
     const $5 = [49, 57];
-    _matchRanges($5);
+    var $6 = _matchRanges($5);
     if (_success) {
       int $$;
       $$ = $$ - 48;
@@ -1214,7 +1196,7 @@ class ExampleParser {
       var $5 = _c;
       var $6 = _cp;
       var $7 = _pos;
-      _matchChar(92);
+      var $8 = _matchChar(92);
       if (_success) {
         var $9 = _parse$$escaped(140, $1);
         if (_success) {
@@ -1272,7 +1254,7 @@ class ExampleParser {
       }
       // NOP;
       int $10;
-      _matchChar(98);
+      var $11 = _matchChar(98);
       if (_success) {
         int $$;
         $$ = 0x8;
@@ -1283,7 +1265,7 @@ class ExampleParser {
         break;
       }
       int $12;
-      _matchChar(102);
+      var $13 = _matchChar(102);
       if (_success) {
         int $$;
         $$ = 0xC;
@@ -1294,7 +1276,7 @@ class ExampleParser {
         break;
       }
       int $14;
-      _matchChar(110);
+      var $15 = _matchChar(110);
       if (_success) {
         int $$;
         $$ = 0xA;
@@ -1305,7 +1287,7 @@ class ExampleParser {
         break;
       }
       int $16;
-      _matchChar(114);
+      var $17 = _matchChar(114);
       if (_success) {
         int $$;
         $$ = 0xD;
@@ -1316,7 +1298,7 @@ class ExampleParser {
         break;
       }
       int $18;
-      _matchChar(116);
+      var $19 = _matchChar(116);
       if (_success) {
         int $$;
         $$ = 0x9;
@@ -1330,7 +1312,7 @@ class ExampleParser {
       var $21 = _c;
       var $22 = _cp;
       var $23 = _pos;
-      _matchChar(117);
+      var $24 = _matchChar(117);
       if (_success) {
         var $25 = _parse$$hexdig4(162, $1);
         if (_success) {
@@ -1393,7 +1375,7 @@ class ExampleParser {
     for (;;) {
       int $4;
       const $5 = [97, 102];
-      _matchRanges($5);
+      var $6 = _matchRanges($5);
       if (_success) {
         int $$;
         $$ = $$ - 97;
@@ -1405,7 +1387,7 @@ class ExampleParser {
       }
       int $7;
       const $8 = [65, 70];
-      _matchRanges($8);
+      var $9 = _matchRanges($8);
       if (_success) {
         int $$;
         $$ = $$ - 65;
@@ -1417,7 +1399,7 @@ class ExampleParser {
       }
       int $10;
       const $11 = [48, 57];
-      _matchRanges($11);
+      var $12 = _matchRanges($11);
       if (_success) {
         int $$;
         $$ = $$ - 48;
@@ -1473,17 +1455,11 @@ class ExampleParser {
     List<int> $3;
     List<int> $4;
     List<int> $5;
-    if ($1) {
-      $5 = [];
-    }
     for (;;) {
       const $6 = [9, 10, 13, 13, 32, 32];
       var $7 = _matchRanges($6);
       if (!_success) {
         break;
-      }
-      if ($1) {
-        $5.add($7);
       }
     }
     _success = true;

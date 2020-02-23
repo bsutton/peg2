@@ -8,7 +8,7 @@ class OperationOptimizer {
     final conditionalOperationOptimizer = ConditionalOperationOptimizer();
     conditionalOperationOptimizer.optimize(operation);
 
-    final unusedVariablesRemover = UnusedVariablesRemover();
-    unusedVariablesRemover.remove(operation);
+    //final unusedVariablesRemover = UnusedVariablesRemover();
+    //unusedVariablesRemover.remove(operation);
   }
 }

@@ -1,37 +1,39 @@
 part of '../../operations.dart';
 
 abstract class OperationVisitor {
-  void visitActionOperation(ActionOperation node);
+  void visitAction(ActionOperation node);
 
-  void visitBinaryOperation(BinaryOperation node);
+  void visitBinary(BinaryOperation node);
 
-  void visitBlockOperation(BlockOperation node);
+  void visitBlock(BlockOperation node);
 
-  void visitBreakOperation(BreakOperation node);
+  void visitBreak(BreakOperation node);
 
-  void visitCallOperation(CallOperation node);
+  void visitCall(CallOperation node);
 
-  void visitConditionalOperation(ConditionalOperation node);
+  void visitComment(CommentOperation node);
 
-  void visitConstantOperation(ConstantOperation node);
+  void visitConditional(ConditionalOperation node);
 
-  void visitListAccessOperation(ListAccessOperation node);
+  void visitConstant(ConstantOperation node);
 
-  void visitListOperation(ListOperation node);
+  void visitList(ListOperation node);
 
-  void visitLoopOperation(LoopOperation node);
+  void visitListAccess(ListAccessOperation node);
 
-  void visitMemberOperation(MemberOperation node);
+  void visitLoop(LoopOperation node);
 
-  void visitMethodOperation(MethodOperation node);
+  void visitMember(MemberOperation node);
 
-  void visitNopOperation(NopOperation node);
+  void visitMethod(MethodOperation node);
 
-  void visitParameterOperation(ParameterOperation node);
+  void visitNop(NopOperation node);
 
-  void visitReturnOperation(ReturnOperation node);
+  void visitParameter(ParameterOperation node);
 
-  void visitUnaryOperation(UnaryOperation node);
+  void visitReturn(ReturnOperation node);
 
-  void visitVariableOperation(VariableOperation node);
+  void visitUnary(UnaryOperation node);
+
+  void visitVariable(VariableOperation node);
 }

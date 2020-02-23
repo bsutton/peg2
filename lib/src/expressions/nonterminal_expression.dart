@@ -4,7 +4,7 @@ class NonterminalExpression extends SymbolExpression {
   NonterminalExpression(String name) : super(name);
 
   @override
-  dynamic accept(ExpressionVisitor visitor) {
-    return visitor.visitNonterminal(this);
+  void accept(ExpressionVisitor visitor) {
+    visitor.visitNonterminal(this);
   }
 }

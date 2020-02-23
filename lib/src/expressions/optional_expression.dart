@@ -7,7 +7,7 @@ class OptionalExpression extends SuffixExpression {
   String get suffix => '?';
 
   @override
-  dynamic accept(ExpressionVisitor visitor) {
-    return visitor.visitOptional(this);
+  void accept(ExpressionVisitor visitor) {
+    visitor.visitOptional(this);
   }
 }

@@ -19,12 +19,12 @@ class OperationReplacer extends SimpleOperationVisitor {
   }
 
   @override
-  void visitActionOperation(ActionOperation node) {
+  void visitAction(ActionOperation node) {
     throw UnimplementedError();
   }
 
   @override
-  void visitBinaryOperation(BinaryOperation node) {
+  void visitBinary(BinaryOperation node) {
     if (node.left == _from) {
       node.left = _to;
     } else if (node.right == _from) {
@@ -35,17 +35,17 @@ class OperationReplacer extends SimpleOperationVisitor {
   }
 
   @override
-  void visitBlockOperation(BlockOperation node) {
+  void visitBlock(BlockOperation node) {
     _replaceInList(node.operations);
   }
 
   @override
-  void visitCallOperation(CallOperation node) {
+  void visitCall(CallOperation node) {
     _replaceInList(node.arguments);
   }
 
   @override
-  void visitListAccessOperation(ListAccessOperation node) {
+  void visitListAccess(ListAccessOperation node) {
     if (node.list == _from) {
       node.list = _to;
     } else if (node.index == _from) {
@@ -56,27 +56,27 @@ class OperationReplacer extends SimpleOperationVisitor {
   }
 
   @override
-  void visitListOperation(ListOperation node) {
+  void visitList(ListOperation node) {
     _replaceInList(node.elements);
   }
 
   @override
-  void visitMemberOperation(MemberOperation node) {
+  void visitMember(MemberOperation node) {
     node.member = _replace(node.member);
   }
 
   @override
-  void visitParameterOperation(ParameterOperation node) {
+  void visitParameter(ParameterOperation node) {
     node.operation = _replace(node.operation);
   }
 
   @override
-  void visitReturnOperation(ReturnOperation node) {
+  void visitReturn(ReturnOperation node) {
     node.operation = _replace(node.operation);
   }
 
   @override
-  void visitUnaryOperation(UnaryOperation node) {
+  void visitUnary(UnaryOperation node) {
     node.operand = _replace(node.operand);
   }
 

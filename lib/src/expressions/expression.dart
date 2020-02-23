@@ -13,6 +13,8 @@ abstract class Expression {
 
   bool isPredicate = false;
 
+  bool isProductive = false;
+
   int level;
 
   Expression parent;
@@ -27,9 +29,9 @@ abstract class Expression {
 
   bool used;
 
-  dynamic accept(ExpressionVisitor visitor);
+  void accept(ExpressionVisitor visitor);
 
-  dynamic visitChildren(ExpressionVisitor visitor) {
-    return null;
+  void visitChildren(ExpressionVisitor visitor) {
+    //
   }
 }

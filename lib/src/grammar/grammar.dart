@@ -51,6 +51,10 @@ class Grammar {
     final expressionTransformationInitializer =
         ExpressionTransformationInitializer();
     expressionTransformationInitializer.initialize(rules);
+
+    final expressionProductivenessResolver = ExpressionProductivenessResolver();
+    expressionProductivenessResolver.resolve(this);
+
     final expressionReturnTypeResolver = ExpressionReturnTypeResolver();
     expressionReturnTypeResolver.resolve(rules);
   }

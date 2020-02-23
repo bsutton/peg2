@@ -125,9 +125,10 @@ class OptionalExpressionResolver extends ExpressionVisitor {
       node.isPredicate = isPredicate;
     }
 
-    if (node.isOptionalOrPredicate != isPredicate) {
+    final isOptionalOrPredicate = isOptional || isPredicate;
+    if (node.isOptionalOrPredicate != isOptionalOrPredicate) {
       _hasModifications = true;
-      node.isOptionalOrPredicate = isPredicate;
+      node.isOptionalOrPredicate = isOptionalOrPredicate;
     }
   }
 }

@@ -14,8 +14,8 @@ class LastAssignedResultResolver extends SimpleOperationVisitor {
   }
 
   @override
-  void visitBinaryOperation(BinaryOperation node) {
-    super.visitBinaryOperation(node);
+  void visitBinary(BinaryOperation node) {
+    super.visitBinary(node);
     if (node.kind == OperationKind.assign) {
       if (node.left is VariableOperation) {
         final left = node.left as VariableOperation;
@@ -30,29 +30,29 @@ class LastAssignedResultResolver extends SimpleOperationVisitor {
   }
 
   @override
-  void visitConditionalOperation(ConditionalOperation node) {
+  void visitConditional(ConditionalOperation node) {
     _result = {};
-    super.visitConditionalOperation(node);
+    super.visitConditional(node);
     _removeResults(node);
   }
 
   @override
-  void visitLoopOperation(LoopOperation node) {
+  void visitLoop(LoopOperation node) {
     _result = {};
-    super.visitLoopOperation(node);
+    super.visitLoop(node);
     _removeResults(node);
   }
 
   @override
-  void visitParameterOperation(ParameterOperation node) {
-    super.visitParameterOperation(node);
+  void visitParameter(ParameterOperation node) {
+    super.visitParameter(node);
     _result[node.variable] = node.operation;
     node.variableResults = {..._result};
   }
 
   @override
-  void visitVariableOperation(VariableOperation node) {
-    super.visitVariableOperation(node);
+  void visitVariable(VariableOperation node) {
+    super.visitVariable(node);
     final variable = node.variable;
     node.parent.variableUsage(variable, 1, VariableUsage.read);
   }

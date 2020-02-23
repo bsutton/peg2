@@ -4,7 +4,7 @@ class TerminalExpression extends SymbolExpression {
   TerminalExpression(String name) : super(name);
 
   @override
-  dynamic accept(ExpressionVisitor visitor) {
-    return visitor.visitTerminal(this);
+  void accept(ExpressionVisitor visitor) {
+    visitor.visitTerminal(this);
   }
 }

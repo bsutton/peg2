@@ -16,10 +16,17 @@
             "program": "bin/peg2.dart",
             "request": "launch",
             "type": "dart",
-            "args": [               
+            "args": [
                 "example/example.peg",
                 "example/example.dart"
             ]
+        },
+        {
+            "name": "example",
+            "program": "example/example.dart",
+            "request": "launch",
+            "type": "dart",
+            "args": []
         }
     ]
 }

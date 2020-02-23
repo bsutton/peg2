@@ -7,7 +7,7 @@ class OneOrMoreExpression extends SuffixExpression {
   String get suffix => '+';
 
   @override
-  dynamic accept(ExpressionVisitor visitor) {
-    return visitor.visitOneOrMore(this);
+  void accept(ExpressionVisitor visitor) {
+    visitor.visitOneOrMore(this);
   }
 }

@@ -11,8 +11,8 @@ class SequenceExpression extends MultipleExpression<Expression> {
   String get separator => ' ';
 
   @override
-  dynamic accept(ExpressionVisitor visitor) {
-    return visitor.visitSequence(this);
+  void accept(ExpressionVisitor visitor) {
+    visitor.visitSequence(this);
   }
 
   @override

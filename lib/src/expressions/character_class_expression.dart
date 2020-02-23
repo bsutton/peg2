@@ -66,8 +66,8 @@ class CharacterClassExpression extends Expression {
   }
 
   @override
-  dynamic accept(ExpressionVisitor visitor) {
-    return visitor.visitCharacterClass(this);
+  void accept(ExpressionVisitor visitor) {
+    visitor.visitCharacterClass(this);
   }
 
   @override

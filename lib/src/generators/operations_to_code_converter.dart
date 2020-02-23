@@ -14,14 +14,14 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitActionOperation(ActionOperation node) {
+  void visitAction(ActionOperation node) {
     final builder = ContentBuilder();
     builder.addAll(node.code);
     _result = builder;
   }
 
   @override
-  void visitBinaryOperation(BinaryOperation node) {
+  void visitBinary(BinaryOperation node) {
     final sb = StringBuffer();
     node.left.accept(this);
     sb.write(_resultAsString());
@@ -44,7 +44,7 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitBlockOperation(BlockOperation node) {
+  void visitBlock(BlockOperation node) {
     final builder = BlockStatementBuilder();
     for (final operation in node.operations) {
       operation.accept(this);
@@ -63,12 +63,12 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitBreakOperation(BreakOperation node) {
+  void visitBreak(BreakOperation node) {
     _result = 'break';
   }
 
   @override
-  void visitCallOperation(CallOperation node) {
+  void visitCall(CallOperation node) {
     final sb = StringBuffer();
     node.function.accept(this);
     sb.write(_resultAsString());
@@ -85,7 +85,20 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitConditionalOperation(ConditionalOperation node) {
+  void visitComment(CommentOperation node) {
+    final sb = StringBuffer();
+    if (node.isDocComment) {
+      sb.write('/// ');
+    } else {
+      sb.write('// ');
+    }
+
+    sb.write(node.text);
+    _result = sb.toString();
+  }
+
+  @override
+  void visitConditional(ConditionalOperation node) {
     node.test.accept(this);
     final test = _resultAsString();
     final builder = IfStatementBuilder(test);
@@ -101,7 +114,7 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitConstantOperation(ConstantOperation node) {
+  void visitConstant(ConstantOperation node) {
     final value = node.value;
     if (value is String) {
       _result = '\'${Utils.escape(value)}\'';
@@ -115,19 +128,7 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitListAccessOperation(ListAccessOperation node) {
-    final sb = StringBuffer();
-    node.list.accept(this);
-    sb.write(_resultAsString());
-    sb.write('[');
-    node.index.accept(this);
-    sb.write(_resultAsString());
-    sb.write(']');
-    _result = sb.toString();
-  }
-
-  @override
-  void visitListOperation(ListOperation node) {
+  void visitList(ListOperation node) {
     final list = <String>[];
     for (final element in node.elements) {
       element.accept(this);
@@ -147,7 +148,19 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitLoopOperation(LoopOperation node) {
+  void visitListAccess(ListAccessOperation node) {
+    final sb = StringBuffer();
+    node.list.accept(this);
+    sb.write(_resultAsString());
+    sb.write('[');
+    node.index.accept(this);
+    sb.write(_resultAsString());
+    sb.write(']');
+    _result = sb.toString();
+  }
+
+  @override
+  void visitLoop(LoopOperation node) {
     final builder = ForStatementBuilder(';;');
     node.body.accept(this);
     builder.addAll(_resultAsContent());
@@ -155,7 +168,7 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitMemberOperation(MemberOperation node) {
+  void visitMember(MemberOperation node) {
     final sb = StringBuffer();
     node.owner.accept(this);
     sb.write(_resultAsString());
@@ -166,7 +179,7 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitMethodOperation(MethodOperation node) {
+  void visitMethod(MethodOperation node) {
     final type = node.returnType.toString();
     final name = node.name.toString();
     final parameters = <String>[];
@@ -183,12 +196,12 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitNopOperation(NopOperation node) {
+  void visitNop(NopOperation node) {
     _result = '// NOP';
   }
 
   @override
-  void visitParameterOperation(ParameterOperation node) {
+  void visitParameter(ParameterOperation node) {
     final sb = StringBuffer();
     sb.write(node.type);
     sb.write(' ');
@@ -203,7 +216,7 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitReturnOperation(ReturnOperation node) {
+  void visitReturn(ReturnOperation node) {
     final sb = StringBuffer();
     sb.write('return');
     if (node.operation != null) {
@@ -216,7 +229,7 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitUnaryOperation(UnaryOperation node) {
+  void visitUnary(UnaryOperation node) {
     final sb = StringBuffer();
     switch (node.kind) {
       case OperationKind.not:
@@ -238,7 +251,7 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitVariableOperation(VariableOperation node) {
+  void visitVariable(VariableOperation node) {
     _result = node.variable.name.toString();
   }
 

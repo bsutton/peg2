@@ -16,7 +16,7 @@ class OperationInitializer extends SimpleOperationVisitor {
   }
 
   @override
-  void visitMethodOperation(MethodOperation node) {
+  void visitMethod(MethodOperation node) {
     node.parent = null;
     parent = node;
     node.visitChildren(this);

@@ -10,8 +10,8 @@ class LiteralExpression extends Expression {
   }
 
   @override
-  dynamic accept(ExpressionVisitor visitor) {
-    return visitor.visitLiteral(this);
+  void accept(ExpressionVisitor visitor) {
+    visitor.visitLiteral(this);
   }
 
   @override

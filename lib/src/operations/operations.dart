@@ -12,7 +12,7 @@ class ActionOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitActionOperation(this);
+    visitor.visitAction(this);
   }
 
   @override
@@ -45,7 +45,7 @@ class BinaryOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitBinaryOperation(this);
+    visitor.visitBinary(this);
   }
 
   @override
@@ -69,7 +69,7 @@ class BlockOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitBlockOperation(this);
+    visitor.visitBlock(this);
   }
 
   @override
@@ -86,7 +86,7 @@ class BreakOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitBreakOperation(this);
+    visitor.visitBreak(this);
   }
 }
 
@@ -102,7 +102,7 @@ class CallOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitCallOperation(this);
+    visitor.visitCall(this);
   }
 
   @override
@@ -111,6 +111,22 @@ class CallOperation extends Operation {
     for (final argument in arguments) {
       argument.accept(visitor);
     }
+  }
+}
+
+class CommentOperation extends Operation {
+  bool isDocComment;
+
+  String text;
+
+  CommentOperation(this.text, [this.isDocComment = false]);
+
+  @override
+  OperationKind get kind => OperationKind.comment;
+
+  @override
+  void accept(OperationVisitor visitor) {
+    visitor.visitComment(this);
   }
 }
 
@@ -128,7 +144,7 @@ class ConditionalOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitConditionalOperation(this);
+    visitor.visitConditional(this);
   }
 
   @override
@@ -149,7 +165,7 @@ class ConstantOperation<T> extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitConstantOperation(this);
+    visitor.visitConstant(this);
   }
 }
 
@@ -165,7 +181,7 @@ class ListAccessOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitListAccessOperation(this);
+    visitor.visitListAccess(this);
   }
 
   @override
@@ -187,7 +203,7 @@ class ListOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitListOperation(this);
+    visitor.visitList(this);
   }
 
   @override
@@ -210,7 +226,7 @@ class LoopOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitLoopOperation(this);
+    visitor.visitLoop(this);
   }
 
   @override
@@ -231,7 +247,7 @@ class MemberOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitMemberOperation(this);
+    visitor.visitMember(this);
   }
 
   @override
@@ -259,7 +275,7 @@ class MethodOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitMethodOperation(this);
+    visitor.visitMethod(this);
   }
 
   @override
@@ -278,7 +294,7 @@ class NopOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitNopOperation(this);
+    visitor.visitNop(this);
   }
 }
 
@@ -330,6 +346,7 @@ enum OperationKind {
   block,
   break_,
   call,
+  comment,
   conditional,
   constant,
   convert,
@@ -360,7 +377,7 @@ class ParameterOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitParameterOperation(this);
+    visitor.visitParameter(this);
   }
 
   @override
@@ -379,7 +396,7 @@ class ReturnOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitReturnOperation(this);
+    visitor.visitReturn(this);
   }
 
   @override
@@ -413,7 +430,7 @@ class UnaryOperation extends Operation {
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitUnaryOperation(this);
+    visitor.visitUnary(this);
   }
 
   @override
@@ -431,14 +448,18 @@ class Variable {
 class VariableOperation extends Operation {
   Variable variable;
 
-  VariableOperation(this.variable);
+  VariableOperation(this.variable) {
+    if (variable == null) {
+      throw ArgumentError.notNull('variable');
+    }
+  }
 
   @override
   OperationKind get kind => OperationKind.variable;
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitVariableOperation(this);
+    visitor.visitVariable(this);
   }
 }
 

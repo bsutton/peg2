@@ -12,8 +12,7 @@ abstract class SingleExpression extends Expression {
   }
 
   @override
-  dynamic visitChildren(ExpressionVisitor visitor) {
+  void visitChildren(ExpressionVisitor visitor) {
     expression.accept(visitor);
-    return null;
   }
 }

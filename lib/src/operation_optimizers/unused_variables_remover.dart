@@ -6,8 +6,8 @@ class UnusedVariablesRemover extends SimpleOperationVisitor {
   }
 
   @override
-  void visitParameterOperation(ParameterOperation node) {
-    super.visitParameterOperation(node);
+  void visitParameter(ParameterOperation node) {
+    super.visitParameter(node);
     final parent = node.parent;
     final variable = node.variable;
     var reads = parent.readings[variable];

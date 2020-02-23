@@ -27,7 +27,8 @@ class ExpressionInitializer extends ExpressionVisitor {
     for (var rule in rules) {
       _level = 0;
       _rule = rule;
-      rule.expression.accept(this);
+      final expression = rule.expression;
+      expression.accept(this);
     }
 
     grammar.expressionCount = _expressionId;
@@ -98,7 +99,6 @@ class ExpressionInitializer extends ExpressionVisitor {
 
   @override
   void visitSequence(SequenceExpression node) {
-    _initializeNode(node);
     final expressions = node.expressions;
     final length = expressions.length;
     for (var i = 0; i < length; i++) {
@@ -106,6 +106,7 @@ class ExpressionInitializer extends ExpressionVisitor {
       child.index = i;
     }
 
+    _initializeNode(node);
     if (node.actionSource != null) {
       node.actionIndex = _actionIndex++;
     }

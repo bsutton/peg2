@@ -5,8 +5,8 @@ class OrderedChoiceExpression extends MultipleExpression<SequenceExpression> {
       : super(expressions);
 
   @override
-  dynamic accept(ExpressionVisitor visitor) {
-    return visitor.visitOrderedChoice(this);
+  void accept(ExpressionVisitor visitor) {
+    visitor.visitOrderedChoice(this);
   }
 
   @override

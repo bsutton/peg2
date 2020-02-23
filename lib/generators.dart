@@ -7,8 +7,10 @@ import 'code_builder.dart';
 import 'experimental.dart';
 import 'expressions.dart';
 import 'grammar.dart';
+import 'operation_generators.dart';
 import 'operation_optimizers.dart';
 import 'operation_transformers.dart';
+import 'operation_utils.dart';
 import 'operations.dart';
 
 part 'src/generators/operations_to_code_converter.dart';

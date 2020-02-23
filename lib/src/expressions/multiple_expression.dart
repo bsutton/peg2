@@ -28,11 +28,9 @@ abstract class MultipleExpression<E extends Expression> extends Expression {
   }
 
   @override
-  dynamic visitChildren(ExpressionVisitor visitor) {
+  void visitChildren(ExpressionVisitor visitor) {
     for (var expression in expressions) {
       expression.accept(visitor);
     }
-
-    return null;
   }
 }

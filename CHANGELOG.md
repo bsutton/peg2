@@ -1,3 +1,7 @@
+## 0.1.11
+
+- Added new resolver: `ExpressionProductivenessResolver`
+
 ## 0.1.10
 
 - Memoization algorithm made more optimal

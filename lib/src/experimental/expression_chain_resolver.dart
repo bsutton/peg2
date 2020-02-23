@@ -1,50 +1,43 @@
 part of '../../experimental.dart';
 
 class ExpressionChainResolver extends ExpressionVisitor {
-  ExpressionNode _node;
+  ExpressionNode _parent;
+
+  List<Expression> _startExpressions;
 
   Set<Expression> _visited;
 
   ExpressionNode resolve(OrderedChoiceExpression expression) {
-    _node = ExpressionNode(null);
+    _parent = ExpressionNode(null);
+    _startExpressions = [];
     _visited = {};
     expression.accept(this);
-    return _node.children.first;
-  }
-
-  ExpressionNode _newNode(Expression expression) {
-    final prev = _node;
-    _node = ExpressionNode(expression);
-    return prev;
+    return _parent.children.first;
   }
 
   @override
   void visitAndPredicate(AndPredicateExpression node) {
-    final prev = _newNode(node);
-    node.expression.accept(this);
-    _node = prev;
+    _processSingle(node);
   }
 
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
-    _node.addChild(ExpressionNode(node));
+    _processChar(node);
   }
 
   @override
   void visitCapture(CaptureExpression node) {
-    final prev = _newNode(node);
-    node.expression.accept(this);
-    _node = prev;
+    _processSingle(node);
   }
 
   @override
   void visitCharacterClass(CharacterClassExpression node) {
-    _node.addChild(ExpressionNode(node));
+    _processChar(node);
   }
 
   @override
   void visitLiteral(LiteralExpression node) {
-    _node.addChild(ExpressionNode(node));
+    _processChar(node);
   }
 
   @override
@@ -54,23 +47,17 @@ class ExpressionChainResolver extends ExpressionVisitor {
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
-    final prev = _newNode(node);
-    node.expression.accept(this);
-    _node = prev;
+    _processSingle(node);
   }
 
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
-    final prev = _newNode(node);
-    node.expression.accept(this);
-    _node = prev;
+    _processSingle(node);
   }
 
   @override
   void visitOptional(OptionalExpression node) {
-    final prev = _newNode(node);
-    node.expression.accept(this);
-    _node = prev;
+    _processSingle(node);
   }
 
   @override
@@ -79,35 +66,36 @@ class ExpressionChainResolver extends ExpressionVisitor {
       //throw StateError('Recursive grammar');
     }
 
-    final prev = _newNode(node);
+    final parent = _parent;
+    final current = ExpressionNode(node);
+    parent.addChild(current);
     for (final child in node.expressions) {
+      _parent = current;
       child.accept(this);
     }
 
-    prev.addChild(_node);
-    _node = prev;
+    _parent = parent;
   }
 
   @override
   void visitSequence(SequenceExpression node) {
-    final prev = _newNode(node);
-    node.expressions[0].accept(this);
+    final parent = _parent;
+    final current = ExpressionNode(node);
+    parent.addChild(current);
+    _parent = current;
+    final expressions = node.expressions;
+    expressions[0].accept(this);
     /*
-    for (final child in node.expressions) {
+    for (var i = 0; i < expressions.length; i++) {
+      final child = expressions[i];
       child.accept(this);
-      if (child is AndPredicateExpression ||
-          child is NotPredicateExpression ||
-          child is OptionalExpression ||
-          child is ZeroOrMoreExpression) {
-        //
-      } else {
+      if (!child.isOptionalOrPredicate) {
         break;
       }
     }
     */
 
-    prev.addChild(_node);
-    _node = prev;
+    _parent = parent;
   }
 
   @override
@@ -122,8 +110,30 @@ class ExpressionChainResolver extends ExpressionVisitor {
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
-    final prev = _newNode(node);
-    node.expression.accept(this);
-    _node = prev;
+    _processSingle(node);
+  }
+
+  void _processChar(Expression expression) {
+    final current = ExpressionNode(expression);
+    _parent.addChild(current);
+    var prev = current;
+    for (final expression in _startExpressions) {
+      final node = ExpressionNode(expression);
+      prev.addChild(node);
+      prev = node;
+    }
+
+    _startExpressions.clear();
+  }
+
+  void _processSingle(SingleExpression expression) {
+    final parent = _parent;
+    final current = ExpressionNode(expression);
+    parent.addChild(current);
+    _parent = current;
+    _startExpressions.add(StartExpression(expression));
+    final child = expression.expression;
+    child.accept(this);
+    _parent = parent;
   }
 }

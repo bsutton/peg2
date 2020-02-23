@@ -1,431 +1,489 @@
 part of '../../experimental.dart';
 
-class ExperimentalGenerator extends ExpressionVisitor {
-  BlockOperation _block;
+class ExperimentalGenerator extends ExpressionToOperationGenerator
+    with OperationUtils {
+  Map<Expression, MethodOperation> _methods;
 
-  Variable _c;
+  Map<Expression, ParameterOperation> _methodPostfixParameters;
 
-  Variable _captures;
-
-  Variable _cp;
-
-  Variable _input;
-
-  int _lastVariableIndex;
-
-  Map<Expression, MethodOperation> _methodOperations;
+  Map<Expression, ParameterOperation> _methodReturnParameters;
 
   Map<String, Variable> _methodVariables;
 
-  Variable _predicate;
+  final Grammar grammar;
 
-  Variable _pos;
+  ExperimentalGenerator(this.grammar, ParserGeneratorOptions options)
+      : super(options);
 
-  Variable _productive;
+  @override
+  ParameterOperation findPostfixParamater(Expression expression) {
+    return _findMethodPostfixParameter(expression);
+  }
 
-  Variable _result;
-
-  Variable _success;
-
-  void generate(Grammar grammar) {
-    _c = Variable('_c');
-    _captures = Variable('_captures');
-    _cp = Variable('_cp');
-    _input = Variable('_input');
-    _lastVariableIndex = 0;
-    _methodOperations = {};
+  List<MethodOperation> generate() {
+    isPostfix = true;
+    _methods = {};
+    _methodPostfixParameters = {};
+    _methodReturnParameters = {};
     _methodVariables = {};
-    _predicate = Variable('_predicate');
-    _pos = Variable('_pos');
-    _success = Variable('_success');
     for (final rule in grammar.rules) {
       final expression = rule.expression;
       expression.accept(this);
     }
 
-    final nodes = <ExpressionNode>[];
-    final expressionChainResolver = ExpressionChainResolver();
-    for (final rule in grammar.rules) {
-      final node = expressionChainResolver.resolve(rule.expression);
-      nodes.add(node);
-    }
-
-    var ident = 0;
-    void visit(ExpressionNode node) {
-      final save = ident;
-      final sb = StringBuffer();
-      sb.write(''.padLeft(ident));
-      sb.write(node.expression.runtimeType);
-      sb.write(' (');
-      sb.write(node.expression.rule);
-      sb.write('): ');
-      sb.write(node.expression);
-      if (node.children.isEmpty) {
-        sb.write(' END');
+    void diag() {
+      final nodes = <ExpressionNode>[];
+      final expressionChainResolver = ExpressionChainResolver();
+      for (final rule in grammar.rules) {
+        final node = expressionChainResolver.resolve(rule.expression);
+        nodes.add(node);
       }
 
-      print(sb);
-      ident += 2;
-      for (final child in node.children) {
-        visit(child);
+      var ident = 0;
+      void visit(ExpressionNode node) {
+        final save = ident;
+        final sb = StringBuffer();
+        sb.write(''.padLeft(ident));
+        sb.write(node.expression.runtimeType);
+        sb.write(' (');
+        sb.write(node.expression.rule);
+        sb.write('): ');
+        sb.write(node.expression);
+        if (node.children.isEmpty) {
+          sb.write(' END');
+        }
+
+        print(sb);
+        ident += 2;
+        for (final child in node.children) {
+          visit(child);
+        }
+
+        ident = save;
       }
 
-      ident = save;
+      for (final node in nodes) {
+        print(node.expression.rule.name);
+        print('-----------------');
+        visit(node);
+      }
+
+      List<List<Expression>> flatten(ExpressionNode node) {
+        final result = <List<Expression>>[];
+        if (node.children.isEmpty) {
+          result.add([node.expression]);
+        } else {
+          for (final child in node.children) {
+            final branch = flatten(child);
+            for (var element in branch) {
+              element.add(node.expression);
+              result.add(element);
+            }
+          }
+        }
+
+        return result;
+      }
+
+      for (final node in nodes) {
+        print('-----------------');
+        print(node.expression.rule.name);
+        print('-----------------');
+        final expressions = flatten(node);
+        for (final element in expressions) {
+          print('*******');
+          print(element
+              .map((e) => '${e.runtimeType} (${e.rule}): $e')
+              .join('\n'));
+        }
+      }
     }
 
-    for (final node in nodes) {
-      print(node.expression.rule.name);
-      print('-----------------');
-      visit(node);
-    }
+    final methods2 = _methods.values.toList();
+    methods2.sort((a, b) => a.name.compareTo(b.name));
+    return methods2;
+  }
+
+  @override
+  String getRuleMethodName(ProductionRule rule) {
+    final expression = rule.expression;
+    return _getExpressionMethodName(expression);
   }
 
   @override
   void visitAndPredicate(AndPredicateExpression node) {
-    final b = _block;
-    if (node.index == 0) {
-      final popState = Variable('_popState');
-      addCall(b, varOp(popState), []);
-      _result = newVar(b, 'var', _allocVar, null);
+    if (node.index != 0) {
+      super.visitAndPredicate(node);
     } else {
-      final child = node.expression;
-      final state = saveVars(b, _allocVar, [
-        _c,
-        _cp,
-        _pos,
-        _predicate,
-        _productive,
-      ]);
-
-      addAssign(b, varOp(_predicate), constOp(true));
-      addAssign(b, varOp(_productive), constOp(false));
-      child.accept(this);
-      _result = newVar(b, 'var', _allocVar, null);
-      restoreVars(b, state);
+      final varAlloc = getLocalVarAlloc();
+      _generatePostfixMethod(node, varAlloc, (b) {
+        addCall(b, varOp(m.popState), []);
+        resultVar = varAlloc.newVar(b, 'var', null);
+      });
     }
-  }
-
-  @override
-  void visitAnyCharacter(AnyCharacterExpression node) {
-    if (node.index == 0) {
-      return;
-    }
-
-    final matchAny = varOp(Variable('_matchAny'));
-    final callMatchAny = callOp(matchAny, []);
-    final result = newVar(_block, 'var', _allocVar, callMatchAny);
-    _result = result;
   }
 
   @override
   void visitCapture(CaptureExpression node) {
-    final b = _block;
-    if (node.index == 0) {
-      final start = newVar(b, 'var', _allocVar, null);
-      final pop = Variable('pop');
-      final callPop = mbrCall(varOp(_captures), varOp(pop), []);
-      addAssign(b, varOp(start), callPop);
-      ifVar(b, _success, (b) {
-        final result = newVar(b, 'String', _allocVar, null);
-        final substring = Variable('substring');
-        final callSubstring = mbrCall(
-            varOp(_input), varOp(substring), [varOp(start), varOp(_pos)]);
-        addAssign(b, varOp(result), callSubstring);
-      });
+    if (node.index != 0) {
+      super.visitCapture(node);
     } else {
-      final result = newVar(b, 'String', _allocVar, null);
-      final start = newVar(b, 'var', _allocVar, varOp(_pos));
-      final saved = saveVars(b, _allocVar, [_productive]);
-      addAssign(b, varOp(_productive), constOp(false));
-      node.expression.accept(this);
-      ifVar(b, _success, (b) {
-        final substring = Variable('substring');
-        final callSubstring = mbrCall(
-            varOp(_input), varOp(substring), [varOp(start), varOp(_pos)]);
-        addAssign(b, varOp(result), callSubstring);
+      final varAlloc = getLocalVarAlloc();
+      _generatePostfixMethod(node, varAlloc, (b) {
+        final start = varAlloc.newVar(b, 'var', null);
+        final stopCapture = callOp(varOp(m.stopCapture), []);
+        addAssign(b, varOp(start), stopCapture);
+        addIfVar(b, m.success, (b) {
+          final result = varAlloc.newVar(b, 'String', null);
+          final substring = Variable('substring');
+          final callSubstring = mbrCallOp(
+              varOp(m.input), varOp(substring), [varOp(start), varOp(m.pos)]);
+          addAssign(b, varOp(result), callSubstring);
+        });
       });
-
-      restoreVars(b, saved);
-      _result = result;
     }
-
-    final child = node.expression;
-    child.accept(this);
-  }
-
-  @override
-  void visitCharacterClass(CharacterClassExpression node) {
-    if (node.index == 0) {
-      return;
-    }
-
-    final b = _block;
-    final ranges = <int>[];
-    var simple = true;
-    for (final range in node.ranges) {
-      final start = range[0];
-      final end = range[1];
-      ranges.add(start);
-      ranges.add(end);
-      if (start != end) {
-        simple = false;
-      }
-    }
-
-    Variable result;
-    if (simple && ranges.length == 2) {
-      final matchChar = Variable('_matchChar');
-      final callMatchChar = callOp(varOp(matchChar), [constOp(ranges[0])]);
-      result = newVar(b, 'var', _allocVar, callMatchChar);
-    } else {
-      final elements = <ConstantOperation>[];
-      for (var i = 0; i < ranges.length; i += 2) {
-        elements.add(ConstantOperation(ranges[i]));
-        elements.add(ConstantOperation(ranges[i + 1]));
-      }
-
-      final listOp = ListOperation(null, elements);
-      final list = newVar(b, 'const', _allocVar, listOp);
-      final matchRanges = Variable('_matchRanges');
-      final callMatchRanges = callOp(varOp(matchRanges), [varOp(list)]);
-      result = newVar(b, 'var', _allocVar, callMatchRanges);
-    }
-
-    _result = result;
-  }
-
-  @override
-  void visitLiteral(LiteralExpression node) {
-    if (node.index == 0) {
-      return;
-    }
-
-    throw null;
   }
 
   @override
   void visitNonterminal(NonterminalExpression node) {
-    _callRule(node);
+    _visitSymbolExpression(node);
   }
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
-    final b = _block;
-    if (node.index == 0) {
-      final popState = Variable('_popState');
-      addCall(b, varOp(popState), []);
-      _result = newVar(b, 'var', _allocVar, null);
-      addAssign(
-          b, varOp(_success), unaryOp(OperationKind.not, varOp(_success)));
+    if (node.index != 0) {
+      super.visitNotPredicate(node);
     } else {
-      final child = node.expression;
-      final state = saveVars(b, _allocVar, [
-        _c,
-        _cp,
-        _pos,
-        _predicate,
-        _productive,
-      ]);
-
-      addAssign(b, varOp(_predicate), constOp(true));
-      addAssign(b, varOp(_productive), constOp(false));
-      child.accept(this);
-      _result = newVar(b, 'var', _allocVar, null);
-      addAssign(
-          b, varOp(_success), unaryOp(OperationKind.not, varOp(_success)));
-      restoreVars(b, state);
+      final varAlloc = getLocalVarAlloc();
+      _generatePostfixMethod(node, varAlloc, (b) {
+        addAssign(
+            b, varOp(m.success), unaryOp(OperationKind.not, varOp(m.success)));
+        addCall(b, varOp(m.popState), []);
+        resultVar = varAlloc.newVar(b, 'var', null);
+      });
     }
   }
 
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
-    final b = _block;
-    final returnType = node.returnType;
-    final result = newVar(b, returnType, _allocVar, null);
-    if (node.index == 0) {
-      ifVar(b, _success, (b) {
-        addIfElse(b, varOp(_productive), (b) {
-          addAssign(b, varOp(result), ListOperation(null, []));
-          final add = Variable('add');
-          addMbrCall(b, varOp(result), varOp(add), [varOp(_result)]);
-        });
-
-        addLoop(b, (b) {
-          _block = b;
-          node.expression.accept(this);
-          ifNotVar(b, _success, (b) {
-            addAssign(_block, varOp(_success), constOp(true));
-            addBreak(b);
-          });
-
-          addIfElse(b, varOp(_productive), (b) {
-            final add = Variable('add');
-            addMbrCall(b, varOp(result), varOp(add), [varOp(_result)]);
-          });
-        });
-      });
+    if (node.index != 0) {
+      super.visitOneOrMore(node);
     } else {
-      addIfElse(b, varOp(_productive), (b) {
-        addAssign(b, varOp(result), ListOperation(null, []));
-      });
-
-      final passed = newVar(b, 'var', _allocVar, constOp(false));
-      addLoop(b, (b) {
-        _block = b;
-        node.expression.accept(this);
-        ifNotVar(b, _success, (b) {
-          addAssign(b, varOp(_success), varOp(passed));
-          ifNotVar(b, _success, (b) {
-            addAssign(b, varOp(result), constOp(null));
+      final varAlloc = getLocalVarAlloc();
+      _generatePostfixMethod(node, varAlloc, (b) {
+        final returnType = node.returnType;
+        final result = varAlloc.newVar(b, returnType, null);
+        addIfVar(b, m.success, (b) {
+          addIfElse(b, varOp(productive), (b) {
+            addAssign(b, varOp(result), ListOperation(null, []));
+            final add = Variable('add');
+            addMbrCall(b, varOp(result), varOp(add), [varOp(resultVar)]);
           });
 
-          addBreak(b);
-        });
+          addLoop(b, (b) {
+            block = b;
+            node.expression.accept(this);
+            addIfNotVar(b, m.success, (b) {
+              addAssign(block, varOp(m.success), constOp(true));
+              addBreak(b);
+            });
 
-        addIfElse(b, varOp(_productive), (b) {
-          final add = Variable('add');
-          addMbrCall(b, varOp(result), varOp(add), [varOp(_result)]);
+            addIfElse(b, varOp(productive), (b) {
+              final add = Variable('add');
+              addMbrCall(b, varOp(result), varOp(add), [varOp(resultVar)]);
+            });
+          });
         });
-
-        addAssign(b, varOp(passed), constOp(true));
       });
-
-      _result = result;
-      _block = b;
     }
   }
 
   @override
   void visitOptional(OptionalExpression node) {
-    final child = node.expression;
-    child.accept(this);
-    if (node.index == 0) {
-      //
+    if (node.index != 0) {
+      super.visitOptional(node);
     } else {
-      //
+      final varAlloc = getLocalVarAlloc();
+      _generatePostfixMethod(node, varAlloc, (b) {
+        addAssign(block, varOp(m.success), constOp(true));
+      });
     }
-
-    addAssign(_block, varOp(_success), constOp(true));
   }
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
-    final block = _block;
     final expressions = node.expressions;
-    final method = _getMethodOperation(node, []);
-    _block = method.body;
-    for (var i = 0; i < expressions.length; i++) {
-      final child = expressions[i];
+    for (final child in expressions) {
       child.accept(this);
     }
 
-    _block = block;
+    if (_hasChoiceMethod(node)) {
+      final varAlloc = getLocalVarAlloc();
+      _generateChoiceMethod(node, varAlloc, (b) {
+        /*
+        final list = SparseList<List<Expression>>();
+        for (var i = 0; i < expressions.length; i++) {
+          final child = expressions[i];
+          for (final srcGroup in child.startCharacters.getGroups()) {
+            final allSpace = list.getAllSpace(srcGroup);
+            for (final dstGroup in allSpace) {
+              var key = dstGroup.key;
+              if (key == null) {
+                key = [child];
+              } else {
+                key.add(child);
+              }
+
+              final newGroup = GroupedRangeList<List<Expression>>(
+                  dstGroup.start, dstGroup.end, key);
+              list.addGroup(newGroup);
+            }
+          }
+        }
+        */
+
+        final expressionChainResolver = ExpressionChainResolver();
+        final root = expressionChainResolver.resolve(node);
+        final choices = _flattenNode(root);
+        final b = block;
+        addLoop(b, (b) {
+          block = b;
+          for (var i = 0; i < choices.length; i++) {
+            final choice = choices[i];
+            //var prefixCount = 0;
+            for (var j = 0; j < choice.length; j++) {
+              final expression = choice[j];
+              if (expression is StartExpression) {
+                final child = expression.expression;
+                if (child is AndPredicateExpression ||
+                    child is AndPredicateExpression) {
+                  addCall(b, varOp(m.pushState), []);
+                } else if (choice is CaptureExpression) {
+                  addCall(b, varOp(m.startCapture), []);
+                }
+
+                //prefixCount++;
+              } else if (expression is AnyCharacterExpression ||
+                  expression is CharacterClassExpression ||
+                  expression is LiteralExpression) {
+                expression.accept(this);
+              } else if (expression is SingleExpression) {
+                expression.accept(this);
+                final methodVar = _getMethodVariable(expression);
+                final callExpr = callOp(varOp(methodVar), [varOp(resultVar)]);
+                resultVar = varAlloc.newVar(block, 'var', callExpr);
+              } else if (expression is SequenceExpression) {
+                expression.accept(this);
+                final methodVar = _getMethodVariable(expression);
+                final callExpr = callOp(varOp(methodVar), [varOp(resultVar)]);
+                resultVar = varAlloc.newVar(block, 'var', callExpr);
+              } else if (expression is OrderedChoiceExpression) {
+              } else {
+                throw StateError(
+                    'Invalid expresssion: ${expression.runtimeType}');
+              }
+            }
+
+            if (i < choices.length - 1) {
+              addIfVar(b, m.success, addBreak);
+            } else {
+              addBreak(b);
+            }
+          }
+        });
+
+        block = b;
+        final returnParameter = _findMethodReturnParameter(node);
+        addAssign(block, varOp(returnParameter.variable), varOp(resultVar));
+      });
+    }
   }
 
   @override
   void visitSequence(SequenceExpression node) {
-    final expressions = node.expressions;
-    final results = <Variable>[];
-    _lastVariableIndex = 0;
-    final arg0 = _allocVar();
-    final returnType = node.returnType;
-    final parameter = ParameterOperation(returnType, arg0);
-    final method = _getMethodOperation(node, [parameter]);
-    _block = method.body;
-    _result = arg0;
-    for (var i = 0; i < expressions.length; i++) {
-      final child = expressions[i];
-      child.accept(this);
-      results.add(_result);
-    }
+    final varAlloc = getLocalVarAlloc();
+    _generatePostfixMethod(node, varAlloc, (b) {
+      productive = varAlloc.newVar(b, 'var', constOp(true));
+      super.visitSequence(node);
+    });
   }
 
   @override
   void visitSubterminal(SubterminalExpression node) {
-    _callRule(node);
+    _visitSymbolExpression(node);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    _callRule(node);
+    _visitSymbolExpression(node);
   }
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
-    if (node.index == 0) {
-      throw null;
-    }
+    if (node.index != 0) {
+      super.visitZeroOrMore(node);
+    } else {
+      final varAlloc = getLocalVarAlloc();
+      _generatePostfixMethod(node, varAlloc, (b) {
+        final returnType = node.returnType;
+        final result = varAlloc.newVar(b, returnType, null);
+        addIfVar(b, m.success, (b) {
+          addIfElse(b, varOp(productive), (b) {
+            addAssign(b, varOp(result), ListOperation(null, []));
+          });
 
-    final child = node.expression;
-    child.accept(this);
+          addLoop(b, (b) {
+            block = b;
+            node.expression.accept(this);
+            addIfNotVar(b, m.success, addBreak);
+            addIfElse(b, varOp(productive), (b) {
+              final add = Variable('add');
+              addMbrCall(b, varOp(result), varOp(add), [varOp(resultVar)]);
+            });
+          });
+        });
+
+        addAssign(b, varOp(m.success), constOp(true));
+        resultVar = result;
+      });
+    }
   }
 
-  Variable _allocVar() {
-    final result = Variable('\$${_lastVariableIndex++}');
+  MethodOperation _findMethod(Expression expression) {
+    final method = _methods[expression];
+    if (method == null) {
+      throw StateError('Expression method not found');
+    }
+
+    return method;
+  }
+
+  ParameterOperation _findMethodPostfixParameter(Expression expression) {
+    final result = _methodPostfixParameters[expression];
+    if (result == null) {
+      throw StateError(
+          'Unable to find method postfix parameter: ${expression}');
+    }
+
     return result;
   }
 
-  void _callRule(SymbolExpression node) {
-    if (node.index == 0) {
-      return;
-    } else {
-      final variable = _getCallVar(node.rule.expression.index);
-      final methodCall = callOp(variable, []);
-      final result = newVar(_block, 'var', _allocVar, methodCall);
-      _result = result;
+  ParameterOperation _findMethodReturnParameter(Expression expression) {
+    final result = _methodReturnParameters[expression];
+    if (result == null) {
+      throw StateError('Unable to find method return parameter: ${expression}');
     }
+
+    return result;
   }
 
-  void _generateChoice(OrderedChoiceExpression expression) {
-    final expressions = expression.expressions;
-
-    final expressionChainResolver = ExpressionChainResolver();
-    final node2 = expressionChainResolver.resolve(expression);
-
-    final list = SparseList<List<Expression>>();
-    for (var i = 0; i < expressions.length; i++) {
-      final child = expressions[i];
-      for (final srcGroup in child.startCharacters.getGroups()) {
-        final allSpace = list.getAllSpace(srcGroup);
-        for (final dstGroup in allSpace) {
-          var key = dstGroup.key;
-          if (key == null) {
-            key = [child];
-          } else {
-            key.add(child);
-          }
-
-          final newGroup = GroupedRangeList<List<Expression>>(
-              dstGroup.start, dstGroup.end, key);
-          list.addGroup(newGroup);
+  List<List<Expression>> _flattenNode(ExpressionNode node) {
+    final result = <List<Expression>>[];
+    if (node.children.isEmpty) {
+      result.add([node.expression]);
+    } else {
+      for (final child in node.children) {
+        final branch = _flattenNode(child);
+        for (var element in branch) {
+          element.add(node.expression);
+          result.add(element);
         }
       }
     }
+
+    return result;
   }
 
-  VariableOperation _getCallVar(int id) {
-    final name = '_p$id';
+  void _generateChoiceMethod(OrderedChoiceExpression expression,
+      VariableAllocator varAlloc, void Function(BlockOperation) f) {
+    final parameters = <ParameterOperation>[];
+    _generateMethod(expression, varAlloc, parameters, f);
+  }
+
+  void _generateMethod(Expression expression, VariableAllocator varAlloc,
+      List<ParameterOperation> parameters, void Function(BlockOperation) f) {
+    final variable = _getMethodVariable(expression);
+    var method = _methods[expression];
+    if (method != null) {
+      return;
+    }
+
+    final returnType = expression.returnType;
+    method = MethodOperation(returnType, variable.name, parameters);
+    _methods[expression] = method;
+    final prevResultVar = resultVar;
+    final prevBlock = block;
+    final prevVarAlloc = varAlloc;
+    this.varAlloc = varAlloc;
+    block = method.body;
+    final returnVariable = varAlloc.alloc();
+    final returnParameter = ParameterOperation(returnType, returnVariable);
+    _methodReturnParameters[expression] = returnParameter;
+    addOp(block, returnParameter);
+    f(method.body);
+    addReturn(block, varOp(returnVariable));
+    this.varAlloc = prevVarAlloc;
+    block = prevBlock;
+    resultVar = prevResultVar;
+  }
+
+  void _generatePostfixMethod(Expression expression, VariableAllocator varAlloc,
+      void Function(BlockOperation) f) {
+    var parameterType = 'var';
+    if (expression is SingleExpression) {
+      final child = expression.expression;
+      parameterType = child.returnType;
+    } else if (expression is SequenceExpression) {
+      final expressions = expression.expressions;
+      parameterType = expressions[0].returnType;
+    } else {
+      StateError(
+          'Unable to generate postfix nethod for expression: ${expression.runtimeType}');
+    }
+
+    final parameter = ParameterOperation(parameterType, varAlloc.alloc());
+    _methodPostfixParameters[expression] = parameter;
+    _generateMethod(expression, varAlloc, [parameter], f);
+  }
+
+  String _getExpressionMethodName(Expression expression) {
+    final id = expression.id;
+    final name = '_e$id';
+    return name;
+  }
+
+  Variable _getMethodVariable(Expression expression) {
+    final name = _getExpressionMethodName(expression);
     var variable = _methodVariables[name];
     if (variable == null) {
       variable = Variable(name);
       _methodVariables[name] = variable;
     }
 
-    final operation = VariableOperation(variable);
-    return operation;
+    return variable;
   }
 
-  MethodOperation _getMethodOperation(
-      Expression expression, List<ParameterOperation> parameters) {
-    var method = _methodOperations[expression];
-    if (method == null) {
-      final id = expression.id;
-      final returnType = expression.returnType;
-      final variable = _getCallVar(id);
-      method = MethodOperation(returnType, variable.variable.name, parameters);
-      _methodOperations[expression] = method;
+  bool _hasChoiceMethod(OrderedChoiceExpression expression) {
+    var result = false;
+    final parent = expression.parent;
+    if (parent == null || expression.expressions.length > 1) {
+      result = true;
     }
 
-    return method;
+    return result;
+  }
+
+  void _visitSymbolExpression(SymbolExpression node) {
+    if (node.index != 0) {
+      final rule = node.expression.rule;
+      final returnType = rule.returnType;
+      final expression = rule.expression;
+      final name = _getMethodVariable(expression);
+      final callRule = callOp(varOp(name), []);
+      final result = varAlloc.newVar(block, returnType, callRule);
+      resultVar = result;
+    } else {
+      return;
+    }
   }
 }

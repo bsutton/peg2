@@ -7,7 +7,7 @@ class NotPredicateExpression extends PrefixExpression {
   String get prefix => '!';
 
   @override
-  dynamic accept(ExpressionVisitor visitor) {
-    return visitor.visitNotPredicate(this);
+  void accept(ExpressionVisitor visitor) {
+    visitor.visitNotPredicate(this);
   }
 }

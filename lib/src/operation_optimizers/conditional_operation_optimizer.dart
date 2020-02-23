@@ -204,6 +204,8 @@ class ConditionalOperationOptimizer {
           }
 
           break;
+        case OperationKind.comment:
+          break;
         default:
           return false;
       }

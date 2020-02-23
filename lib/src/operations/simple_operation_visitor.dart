@@ -6,53 +6,56 @@ abstract class SimpleOperationVisitor extends OperationVisitor {
   }
 
   @override
-  void visitActionOperation(ActionOperation node) => visit(node);
+  void visitAction(ActionOperation node) => visit(node);
 
   @override
-  void visitBinaryOperation(BinaryOperation node) => visit(node);
+  void visitBinary(BinaryOperation node) => visit(node);
 
   @override
-  void visitBlockOperation(BlockOperation node) => visit(node);
+  void visitBlock(BlockOperation node) => visit(node);
 
   @override
-  void visitBreakOperation(BreakOperation node) => visit(node);
+  void visitBreak(BreakOperation node) => visit(node);
 
   @override
-  void visitCallOperation(CallOperation node) => visit(node);
+  void visitCall(CallOperation node) => visit(node);
 
   @override
-  void visitConditionalOperation(ConditionalOperation node) => visit(node);
+  void visitComment(CommentOperation node) => visit(node);
 
   @override
-  void visitConstantOperation(ConstantOperation node) => visit(node);
+  void visitConditional(ConditionalOperation node) => visit(node);
 
   @override
-  void visitListAccessOperation(ListAccessOperation node) => visit(node);
+  void visitConstant(ConstantOperation node) => visit(node);
 
   @override
-  void visitListOperation(ListOperation node) => visit(node);
+  void visitList(ListOperation node) => visit(node);
 
   @override
-  void visitLoopOperation(LoopOperation node) => visit(node);
+  void visitListAccess(ListAccessOperation node) => visit(node);
 
   @override
-  void visitMemberOperation(MemberOperation node) => visit(node);
+  void visitLoop(LoopOperation node) => visit(node);
 
   @override
-  void visitMethodOperation(MethodOperation node) => visit(node);
+  void visitMember(MemberOperation node) => visit(node);
 
   @override
-  void visitNopOperation(NopOperation node) => visit(node);
+  void visitMethod(MethodOperation node) => visit(node);
 
   @override
-  void visitParameterOperation(ParameterOperation node) => visit(node);
+  void visitNop(NopOperation node) => visit(node);
 
   @override
-  void visitReturnOperation(ReturnOperation node) => visit(node);
+  void visitParameter(ParameterOperation node) => visit(node);
 
   @override
-  void visitUnaryOperation(UnaryOperation node) => visit(node);
+  void visitReturn(ReturnOperation node) => visit(node);
 
   @override
-  void visitVariableOperation(VariableOperation node) => visit(node);
+  void visitUnary(UnaryOperation node) => visit(node);
+
+  @override
+  void visitVariable(VariableOperation node) => visit(node);
 }
