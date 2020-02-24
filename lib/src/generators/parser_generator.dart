@@ -18,18 +18,6 @@ class _Memo {
     this.success,
   });  
 }
-
-class _State {
-  final int c;
-
-  final int cp;
-
-  final int pos;
-
-  final bool predicate;
-
-  _State({this.c, this.cp, this.pos, this.predicate});
-}
 ''';
 
   final Grammar grammar;
@@ -51,8 +39,9 @@ class _State {
 
     List<MethodOperation> methods;
     if (options.isPostfix()) {
-      final experimentalGenerator = ExperimentalGenerator(grammar, options);
-      methods = experimentalGenerator.generate();
+      throw UnimplementedError();
+      //final experimentalGenerator = ExperimentalGenerator(grammar, options);
+      //methods = experimentalGenerator.generate();
     } else {
       final rulesToOperationsBuilder =
           RulesToOperationsGenerator(grammar, options);

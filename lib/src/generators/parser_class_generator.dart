@@ -21,24 +21,20 @@ class ParserClassGenerator {
       'static const _eof = 0x110000',
       'FormatException error',
       'int _c',
-      'List<int> _captures',
-      'int _capturePos',
-      'int _cp',
-      'int _failed',
-      'int _failurePos',
-      'bool _hasMalformed',
-      'String _input',
+      'List<String> _failures',
+      'int _fcount',
+      'int _fposEnd',
+      'int _fposMax',
+      'int _fposStart',
+      'List<int> _input',
       'List<bool> _memoizable',
       'List<List<_Memo>> _memos',
       'var _mresult',
       'int _pos',
       'bool _predicate',
-      'dynamic _result',
-      'List<_State> _states',
-      'int _statesPos',
+      'dynamic _result',      
       'bool _success',
-      'List<String> _terminals',
-      'int _terminalCount',
+      'String _text',
       'List<int> _trackCid',
       'List<int> _trackPos',
     ];
@@ -55,11 +51,12 @@ dynamic parse(String text) {
   if (text == null) {
     throw ArgumentError.notNull('text');
   }
-  _input = text;
-  _reset();
+  _text = text;
+  _input = _toRunes(text);
+  _reset();  
   final result = {{START}};
   _buildError();
-  _terminals = null;
+  _failures = null;
   _input = null;
   return result;
 }
@@ -86,152 +83,80 @@ void _buildError() {
 
   String getc(int position) {
     if (position < _input.length) {
-      return "'${escape(_input.codeUnitAt(position))}'";
+      return "'${escape(_input[position])}'";
     }
     return 'end of file';
   }
 
-  final temp = _terminals.take(_terminalCount).toList();
+  final temp = _failures.take(_fcount).toList();
   temp.sort((e1, e2) => e1.compareTo(e2));
   final terminals = temp.toSet();
+  final hasMalformed = _fposStart != _fposMax;
   if (terminals.isNotEmpty) {
-    if (!_hasMalformed) {
+    if (!hasMalformed) {
       final sb = StringBuffer();
       sb.write('Expected ');
       sb.write(terminals.join(', '));
       sb.write(' but found ');
-      sb.write(getc(_failurePos));
+      sb.write(getc(_fposStart));
       final message = sb.toString();
-      error = FormatException(message, _input, _failurePos);
+      error = FormatException(message, _text, _fposStart);
     } else {
-      final reason =
-          _failurePos < _input.length ? 'Malformed' : 'Unterminated';
+      final reason = _fposMax < _input.length ? 'Malformed' : 'Unterminated';
       final sb = StringBuffer();
       sb.write(reason);
       sb.write(' ');
       sb.write(terminals.join(', '));
       final message = sb.toString();
-      error = FormatException(message, _input, _failurePos);
+      error = FormatException(message, _text, _fposStart);
     }
   } else {
     final sb = StringBuffer();
     sb.write('Unexpected character ');
-    sb.write(getc(_failurePos));
+    sb.write(getc(_fposStart));
     final message = sb.toString();
-    error = FormatException(message, _input, _failurePos);
+    error = FormatException(message, _text, _fposStart);
   }
 }
 
-void _fail(int failed) {  
-  if (!_predicate) {
-    if (_failurePos < failed) {
-      _failurePos = failed;
-      _hasMalformed = false;
-      _terminalCount = 0;
+void _fail(int start, String name) {
+  if (_fposStart < start) {
+    _fposStart = start;
+    _fposMax = _fposEnd;
+    _fcount = 0;
+  } else if (_fposMax < _fposEnd) {
+    _fposStart = start;
+    _fposMax = _fposEnd;
+    _fcount = 0;
+  }
+
+  if (_fposStart == start && _fposEnd == _fposMax) {
+    if (_fcount >= _failures.length) {
+      _failures.length += 20;
     }
-    if (_failed < failed) {
-      _failed = failed;
-    }
-  }
-  _success = false;
-}
 
-void _failure(String name) {
-  var flagged = true;
-  final malformed = _failed > _pos;
-  if (malformed && !_hasMalformed) {
-    _hasMalformed = true;
-    _terminalCount = 0;    
-  } else if (_hasMalformed) {
-    flagged = false;
+    _failures[_fcount++] = name;
   }
-  if (flagged && _failed >= _failurePos) {
-    if (_terminals.length <= _terminalCount) {
-      _terminals.length += 50;
-    }
-    _terminals[_terminalCount++] = name;
-  }
-}
-
-void _getch() {
-  _cp = _pos;
-  var pos = _pos;
-  if (pos < _input.length) {
-    final leading = _input.codeUnitAt(pos++);
-    if ((leading & 0xFC00) == 0xD800 && _pos < _input.length) {
-      final trailing = _input.codeUnitAt(pos);
-      if ((trailing & 0xFC00) == 0xDC00) {
-        _c = 0x10000 + ((leading & 0x3FF) << 10) + (trailing & 0x3FF);
-        pos++;
-      } else {
-        _c = leading;
-      }
-    } else {
-      _c = leading;
-    }
-  } else {
-    _c = _eof;
-  }
-}
-
-int _matchAny() {
-  if (_cp != _pos) {
-    _getch();
-  }
-  int result;
-  if (_c != _eof) {
-    result = _c;
-    _pos += _c < 0xffff ? 1 : 2;
-    _c = null;
-    _success = true;
-  } else {
-    _fail(_pos);
-  }
-
-  return result;
-}
-
-int _matchChar(int c) {
-  if (_cp != _pos) {
-    _getch();
-  }
-  int result;
-  if (_c != _eof && _c == c) {
-    result = _c;
-    _pos += _c < 0xffff ? 1 : 2;
-    _c = null;
-    _success = true;
-  } else {    
-    _fail(_pos);    
-  }
-
-  return result;
 }
 
 int _matchRanges(List<int> ranges) {
-  if (_cp != _pos) {
-    _getch();
-  }
   int result;
   _success = false;
-  if (_c != _eof) {
-    for (var i = 0; i < ranges.length; i += 2) {
-      if (ranges[i] <= _c) {
-        if (ranges[i + 1] >= _c) {
-          result = _c;
-          _pos += _c < 0xffff ? 1 : 2;
-          _c = null;
-          _success = true;
-          break;
-        }
-      } else {
+  for (var i = 0; i < ranges.length; i += 2) {
+    if (ranges[i] <= _c) {
+      if (ranges[i + 1] >= _c) {
+        result = _c;
+        _c = _input[_pos += _c <= 0xffff ? 1 : 2];
+        _success = true;
         break;
       }
+    } else {
+      break;
     }
   }
 
-  if (!_success) {
-    _fail(_pos);
+  if (!_success && _fposEnd < _pos) {
+    _fposEnd = _pos;
   }
 
   return result;
@@ -240,22 +165,25 @@ int _matchRanges(List<int> ranges) {
 String _matchString(String text) {
   String result;
   final length = text.length;
-  final rest = _input.length - _pos;
+  final rest = _text.length - _pos;
   final count = length > rest ? rest : length;
   var pos = _pos;
   var i = 0;
   for (; i < count; i++, pos++) {
-    if (text.codeUnitAt(i) != _input.codeUnitAt(pos)) {
+    if (text.codeUnitAt(i) != _text.codeUnitAt(pos)) {
       break;
     }
   }
 
   if (i == length) {
-    _pos += length;
+    _c = _input[_pos += length];
     _success = true;
     result = text;
-  } else {    
-    _fail(_pos + i);
+  } else {
+    _success = false;
+    if (_fposEnd < _pos) {
+      _fposEnd = _pos;
+    }
   }
 
   return result;
@@ -266,11 +194,11 @@ bool _memoized(int id, int cid) {
   if (memos != null) {
     for (var i = 0; i < memos.length; i++) {
       final memo = memos[i];
-      if (memo.id == id) {
-        _cp = -1;
+      if (memo.id == id) {        
         _pos = memo.pos;
         _mresult = memo.result;
         _success = memo.success;  
+        _c = _input[_pos];
         return true;
       }
     }
@@ -305,7 +233,7 @@ void _memoize(int id, int pos, result) {
     _memos[pos] = memos;
   }
 
-  final memo = _Memo(    
+  final memo = _Memo(
     id: id,
     pos: _pos,
     result: result,
@@ -315,69 +243,52 @@ void _memoize(int id, int pos, result) {
   memos.add(memo);
 }
 
-dynamic _popState() {
-  if (_statesPos <= 0) {
-    throw StateError('Stack error');
-  }
-
-  final state = _states[--_statesPos];
-  _c = state.c;
-  _cp = state.cp;
-  _pos = state.pos;
-  _predicate = state.predicate;
-  return null;
-}
-
-void _pushState() {
-  if (_statesPos >= _states.length) {
-    _states.length += 20;
-  }
-
-  final state = _State(c: _c, cp: _cp, pos: _pos, predicate: _predicate);
-  _states[_statesPos++] = state;
-}
-
 void _reset() {
-  _c = _eof;
-  _captures = [];
-  _captures.length = 10;
-  _capturePos = 0;
-  _cp = -1;  
-  _failurePos = -1;
-  _hasMalformed = false;
+  _c = _input[0];  
+  _failures = [];
+  _failures.length = 20;
+  _fcount = 0;
+  _fposEnd = -1;
+  _fposMax = -1;  
+  _fposStart = -1;
   _memoizable = [];
   _memoizable.length = {{EXPR_COUNT}};
   _memos = [];
   _memos.length = _input.length + 1;
   _pos = 0;
-  _predicate = false;
-  _states = [];
-  _states.length = 20;
-  _statesPos = 0;
-  _terminalCount = 0;
-  _terminals = [];
-  _terminals.length = 20;
+  _predicate = false;  
   _trackCid = [];
   _trackCid.length = {{EXPR_COUNT}};
   _trackPos = [];
   _trackPos.length = {{EXPR_COUNT}};
 }
 
-void _startCapture() {
-  if (_capturePos >= _captures.length) {
-    _captures.length += 10;
+List<int> _toRunes(String source) {
+  final length = source.length;
+  final result = List<int>(length + 1);
+  for (var pos = 0; pos < length;) {
+    int c;
+    final start = pos;
+    final leading = source.codeUnitAt(pos++);
+    if ((leading & 0xFC00) == 0xD800 && pos < length) {
+      final trailing = source.codeUnitAt(pos);
+      if ((trailing & 0xFC00) == 0xDC00) {
+        c = 0x10000 + ((leading & 0x3FF) << 10) + (trailing & 0x3FF);
+        pos++;
+      } else {
+        c = leading;
+      }
+    } else {
+      c = leading;
+    }
+
+    result[start] = c;
   }
 
-  _captures[_capturePos++] = _pos;
+  result[length] = 0x110000;
+  return result;
 }
 
-int _stopCapture() {
-  if (_capturePos <= 0) {
-    throw StateError('Stack error');
-  }
-
-  return _captures[--_capturePos];
-}
 ''';
 
     final cid = start.id;

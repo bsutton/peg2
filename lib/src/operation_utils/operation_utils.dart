@@ -59,6 +59,19 @@ class OperationUtils {
     return op;
   }
 
+  ConditionalOperation addIfNotVar(BlockOperation block, Variable variable,
+      void Function(BlockOperation) fTrue,
+      [void Function(BlockOperation) fFalse]) {
+    final test = UnaryOperation(OperationKind.not, varOp(variable));
+    return addIf(block, test, fTrue, fFalse);
+  }
+
+  ConditionalOperation addIfVar(BlockOperation block, Variable variable,
+      void Function(BlockOperation) fTrue,
+      [void Function(BlockOperation) fFalse]) {
+    return addIf(block, varOp(variable), fTrue, fFalse);
+  }
+
   LoopOperation addLoop(BlockOperation block, void Function(BlockOperation) f) {
     final b = BlockOperation();
     final op = LoopOperation(b);
@@ -101,6 +114,11 @@ class OperationUtils {
     addOp(block, op);
   }
 
+  BinaryOperation binOp(OperationKind kind, Operation left, Operation right) {
+    final op = BinaryOperation(left, kind, right);
+    return op;
+  }
+
   CallOperation callOp(Operation function, List<Operation> arguments) {
     return CallOperation(function, arguments);
   }
@@ -109,17 +127,43 @@ class OperationUtils {
     return ConstantOperation(value);
   }
 
-  ConditionalOperation addIfNotVar(BlockOperation block, Variable variable,
-      void Function(BlockOperation) fTrue,
-      [void Function(BlockOperation) fFalse]) {
-    final test = UnaryOperation(OperationKind.not, varOp(variable));
-    return addIf(block, test, fTrue, fFalse);
+  UnaryOperation convertOp(Operation op, String type) {
+    return UnaryOperation(OperationKind.convert, op, type);
   }
 
-  ConditionalOperation addIfVar(BlockOperation block, Variable variable,
-      void Function(BlockOperation) fTrue,
-      [void Function(BlockOperation) fFalse]) {
-    return addIf(block, varOp(variable), fTrue, fFalse);
+  BinaryOperation equalOp(Operation left, Operation right) {
+    final op = BinaryOperation(left, OperationKind.equal, right);
+    return op;
+  }
+
+  BinaryOperation gteOp(Operation left, Operation right) {
+    final op = BinaryOperation(left, OperationKind.gte, right);
+    return op;
+  }
+
+  BinaryOperation gtOp(Operation left, Operation right) {
+    final op = BinaryOperation(left, OperationKind.gt, right);
+    return op;
+  }
+
+  BinaryOperation landOp(Operation left, Operation right) {
+    final op = BinaryOperation(left, OperationKind.land, right);
+    return op;
+  }
+
+  BinaryOperation lorOp(Operation left, Operation right) {
+    final op = BinaryOperation(left, OperationKind.lor, right);
+    return op;
+  }
+
+  BinaryOperation lteOp(Operation left, Operation right) {
+    final op = BinaryOperation(left, OperationKind.lte, right);
+    return op;
+  }
+
+  BinaryOperation ltOp(Operation left, Operation right) {
+    final op = BinaryOperation(left, OperationKind.lt, right);
+    return op;
   }
 
   MemberOperation mbrCallOp(
@@ -158,8 +202,8 @@ class OperationUtils {
     return result;
   }
 
-  UnaryOperation unaryOp(OperationKind kind, Operation op) {
-    return UnaryOperation(kind, op);
+  UnaryOperation unaryOp(OperationKind kind, Operation op, [String type]) {
+    return UnaryOperation(kind, op, type);
   }
 
   VariableOperation varOp(Variable variable) {

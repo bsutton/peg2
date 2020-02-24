@@ -106,7 +106,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
   MethodOperation _buildRule(ProductionRule rule) {
     varAlloc = getLocalVarAlloc();
     final cid = varAlloc.alloc();
-    final expressionId = rule.expression.id;
+    final id = rule.expression.id;
     productive = varAlloc.alloc();
     final name = getRuleMethodName(rule);
     final params = <ParameterOperation>[];
@@ -118,11 +118,9 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     final result = addMethod(returnType, name, params, (b) {
       block = b;
       if (options.memoize && rule.callers.length > 1) {
-        final memoizedCall = CallOperation(
-            varOp(m.memoized), [constOp(expressionId), varOp(cid)]);
-        addIf(b, memoizedCall, (b) {
-          final convert = UnaryOperation(
-              OperationKind.convert, varOp(m.mresult), returnType);
+        final memoized = callOp(varOp(m.memoized), [constOp(id), varOp(cid)]);
+        addIf(b, memoized, (b) {
+          final convert = convertOp(varOp(m.mresult), returnType);
           addReturn(b, convert);
         });
 
@@ -130,7 +128,8 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       }
 
       if (rule.kind == ProductionRuleKind.Terminal) {
-        addAssign(b, varOp(m.failed), constOp(-1));
+        addAssign(b, varOp(m.fposEnd), constOp(-1));
+        start ??= varAlloc.newVar(b, 'var', varOp(m.pos));
       }
 
       final result = varAlloc.newVar(b, returnType, null);
@@ -139,8 +138,9 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       addAssign(b, varOp(result), varOp(resultVar));
       if (rule.kind == ProductionRuleKind.Terminal) {
         addIfNotVar(b, m.success, (b) {
-          final failureCall = callOp(varOp(m.failure), [constOp(rule.name)]);
-          addOp(b, failureCall);
+          final params = [varOp(start), constOp(rule.name)];
+          final fail = callOp(varOp(m.fail), params);
+          addOp(b, fail);
         });
       }
 
@@ -149,9 +149,9 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         final test =
             BinaryOperation(listAccess, OperationKind.equal, constOp(true));
         addIf(b, test, (b) {
-          final memoizeCall = callOp(varOp(m.memoize),
-              [constOp(expressionId), varOp(start), varOp(result)]);
-          addOp(b, memoizeCall);
+          final memoize = callOp(
+              varOp(m.memoize), [constOp(id), varOp(start), varOp(result)]);
+          addOp(b, memoize);
         });
       }
 

@@ -34,6 +34,12 @@ class BinaryOperation extends Operation {
     switch (kind) {
       case OperationKind.assign:
       case OperationKind.equal:
+      case OperationKind.gt:
+      case OperationKind.gte:
+      case OperationKind.land:
+      case OperationKind.lt:
+      case OperationKind.lte:
+      case OperationKind.lor:
         break;
       default:
         _errorInvalidOpertionKin();
@@ -351,14 +357,24 @@ enum OperationKind {
   constant,
   convert,
   equal,
+  gt,
+  gte,
+  land,
   list,
   listAccess,
   loop,
+  lor,
+  lt,
+  lte,
   member,
   method,
   nop,
   not,
   parameter,
+  postDec,
+  postInc,
+  preDec,
+  preInc,
   return_,
   variable,
 }
@@ -416,6 +432,10 @@ class UnaryOperation extends Operation {
   UnaryOperation(this.kind, this.operand, [this.type]) {
     switch (kind) {
       case OperationKind.not:
+      case OperationKind.preDec:
+      case OperationKind.preInc:
+      case OperationKind.postDec:
+      case OperationKind.postInc:
         break;
       case OperationKind.convert:
         if (type == null) {

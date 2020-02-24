@@ -1,4 +1,4 @@
-optimize caller id assignment
+optimize caller id assignment?
 check duplicare semantic variables
 re-implement grammar.findStartRule
 add binary search for (long) ranges
@@ -7,5 +7,6 @@ add some kinds of grammar analyzers
 implement optimizer to remove "_succes = true" before calls to [_parseXXX, _matchXXX]
 implement lookup tables (using starting characters of expressions) for the ordered choice expressions to improve the performance by skip unnecessary (heavy) operations
 improve expression starting characters resolver (reduce number of starting characters)
-find bug in unused variables optimizer
-inline popState and pushState
+find bug in unused variables optimizer?
+remove loop in postfix choice with single expression
+exmaple postfix _e185 does not has return statement

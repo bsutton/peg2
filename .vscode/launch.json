@@ -17,7 +17,7 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "--parser=postfix",
+                //"--parser=postfix",
                 "example/example.peg",
                 "example/example.dart"
             ]

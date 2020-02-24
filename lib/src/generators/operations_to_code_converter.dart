@@ -33,6 +33,24 @@ class OperationsToCodeConverter extends OperationVisitor {
       case OperationKind.equal:
         sb.write('==');
         break;
+      case OperationKind.gt:
+        sb.write('>');
+        break;
+      case OperationKind.gte:
+        sb.write('>=');
+        break;
+      case OperationKind.land:
+        sb.write('&&');
+        break;
+      case OperationKind.lt:
+        sb.write('<');
+        break;
+      case OperationKind.lte:
+        sb.write('<=');
+        break;
+      case OperationKind.lor:
+        sb.write('||');
+        break;
       default:
         throw StateError('Unknown binary operation: ${node.kind}');
     }
@@ -232,16 +250,36 @@ class OperationsToCodeConverter extends OperationVisitor {
   void visitUnary(UnaryOperation node) {
     final sb = StringBuffer();
     switch (node.kind) {
-      case OperationKind.not:
-        sb.write('!');
-        node.operand.accept(this);
-        sb.write(_resultAsString());
-        break;
       case OperationKind.convert:
         node.operand.accept(this);
         sb.write(_resultAsString());
         sb.write(' as ');
         sb.write(node.type);
+        break;
+      case OperationKind.not:
+        sb.write('!');
+        node.operand.accept(this);
+        sb.write(_resultAsString());
+        break;
+      case OperationKind.preDec:
+        sb.write('--');
+        node.operand.accept(this);
+        sb.write(_resultAsString());
+        break;
+      case OperationKind.preInc:
+        sb.write('++');
+        node.operand.accept(this);
+        sb.write(_resultAsString());
+        break;
+      case OperationKind.postDec:
+        node.operand.accept(this);
+        sb.write(_resultAsString());
+        sb.write('--');
+        break;
+      case OperationKind.postInc:
+        node.operand.accept(this);
+        sb.write(_resultAsString());
+        sb.write('++');
         break;
       default:
         throw StateError('Unknown unary operation: ${node.kind}');

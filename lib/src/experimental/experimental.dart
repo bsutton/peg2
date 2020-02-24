@@ -116,27 +116,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
   }
 
   @override
-  void visitCapture(CaptureExpression node) {
-    if (!_isPostfixVisit) {
-      super.visitCapture(node);
-    } else {
-      _isPostfixVisit = false;
-      final varAlloc = getLocalVarAlloc();
-      _generatePostfixMethod(node, varAlloc, (b) {
-        final stopCapture = callOp(varOp(m.stopCapture), []);
-        final start = varAlloc.newVar(b, 'var', stopCapture);
-        addIfVar(b, m.success, (b) {
-          final substring = Variable('substring');
-          final callSubstring = mbrCallOp(
-              varOp(m.input), varOp(substring), [varOp(start), varOp(m.pos)]);
-          final ret = findMethodParameter(node, paramReturn);
-          addAssign(b, varOp(ret.variable), callSubstring);
-        });
-      });
-    }
-  }
-
-  @override
   void visitNonterminal(NonterminalExpression node) {
     _visitSymbolExpression(node);
   }
@@ -215,8 +194,8 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
       final methodVar = _getMethodVariable(node);
       // TODO: callerId
       final parameters = [constOp(0), constOp(true)];
-      final callExpr = callOp(varOp(methodVar), parameters);
-      resultVar = this.varAlloc.newVar(block, 'var', callExpr);
+      final call = callOp(varOp(methodVar), parameters);
+      resultVar = this.varAlloc.newVar(block, 'var', call);
     }
 
     final varAlloc = getLocalVarAlloc();
@@ -241,74 +220,144 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
             }
           }
         }
-        */
+      */
+
+      final contexts = <Expression, Map<String, Variable>>{};
+      Map<String, Variable> findContext(Expression expression) {
+        final result = contexts[expression];
+        if (result == null) {
+          throw StateError('Unable to find context: ${expression.runtimeType}');
+        }
+
+        return result;
+      }
+
+      void visit(BlockOperation b, List<Expression> choice, int index) {
+        if (index > choice.length - 1) {
+          return;
+        }
+
+        final expression = choice[index];
+        if (expression is StartExpression) {
+          final child = expression.expression;
+          if (child is AndPredicateExpression) {
+            final c = varAlloc.newVar(b, 'var', varOp(m.c));
+            final pos = varAlloc.newVar(b, 'var', varOp(m.pos));
+            final predicate = varAlloc.newVar(b, 'var', varOp(m.predicate));
+            final context = {
+              'c': c,
+              'pos': pos,
+              'predicate': predicate,
+            };
+
+            contexts[child] = context;
+            addAssign(b, varOp(m.predicate), constOp(true));
+          } else if (child is NotPredicateExpression) {
+            final c = varAlloc.newVar(b, 'var', varOp(m.c));
+            final pos = varAlloc.newVar(b, 'var', varOp(m.pos));
+            final predicate = varAlloc.newVar(b, 'var', varOp(m.predicate));
+            final context = {
+              'c': c,
+              'pos': pos,
+              'predicate': predicate,
+            };
+
+            contexts[child] = context;
+            addAssign(b, varOp(m.predicate), constOp(true));
+          } else if (child is CaptureExpression) {
+            final start = varAlloc.newVar(b, 'var', varOp(m.pos));
+            final prod = varAlloc.newVar(b, 'var', varOp(productive));
+            final context = {
+              'productive': prod,
+              'start': start,
+            };
+
+            contexts[child] = context;
+            addAssign(b, varOp(productive), constOp(false));
+          }
+        } else if (expression is AnyCharacterExpression ||
+            expression is CharacterClassExpression ||
+            expression is LiteralExpression) {
+          expression.accept(this);
+        } else if (expression is SingleExpression) {
+          if (expression is OptionalExpression) {
+            addAssign(b, varOp(m.success), constOp(true));
+          } else if (expression is AndPredicateExpression) {
+            final context = findContext(expression);
+            final c = context['c'];
+            final pos = context['pos'];
+            final predicate = context['predicate'];
+            addAssign(b, varOp(m.c), varOp(c));
+            addAssign(b, varOp(m.pos), varOp(pos));
+            addAssign(b, varOp(m.predicate), varOp(predicate));
+            resultVar = varAlloc.newVar(b, 'var', null);
+          } else if (expression is NotPredicateExpression) {
+            final context = findContext(expression);
+            final c = context['c'];
+            final pos = context['pos'];
+            final predicate = context['predicate'];
+            addAssign(b, varOp(m.c), varOp(c));
+            addAssign(b, varOp(m.pos), varOp(pos));
+            addAssign(b, varOp(m.predicate), varOp(predicate));
+            resultVar = varAlloc.newVar(b, 'var', null);
+            addAssign(b, varOp(m.success),
+                unaryOp(OperationKind.not, varOp(m.success)));
+          } else if (expression is CaptureExpression) {
+            final context = findContext(expression);
+            final start = context['start'];
+            final prod = context['productive'];
+            addAssign(b, varOp(productive), varOp(prod));
+            resultVar = varAlloc.newVar(b, 'String', null);
+            addIfVar(b, m.success, (b) {
+              final substring = Variable('substring');
+              final call = mbrCallOp(varOp(m.text), varOp(substring),
+                  [varOp(start), varOp(m.pos)]);
+              addAssign(b, varOp(resultVar), call);
+            });
+          } else {
+            _isPostfixVisit = true;
+            expression.accept(this);
+            final methodVar = _getMethodVariable(expression);
+            final parameters = [varOp(resultVar), constOp(true)];
+            final callExpr = callOp(varOp(methodVar), parameters);
+            resultVar = varAlloc.newVar(block, 'var', callExpr);
+          }
+        } else if (expression is SequenceExpression) {
+          if (expression.expressions.length > 1 ||
+              expression.actionIndex != null) {
+            expression.accept(this);
+            final methodVar = _getMethodVariable(expression);
+            final parameters = [varOp(resultVar), constOp(true)];
+            final callExpr = callOp(varOp(methodVar), parameters);
+            resultVar = varAlloc.newVar(block, 'var', callExpr);
+          } else {
+            // Skip
+          }
+        } else if (expression is OrderedChoiceExpression) {
+          // Finalize terminal
+        } else {
+          throw StateError('Invalid expresssion: ${expression.runtimeType}');
+        }
+
+        visit(b, choice, index + 1);
+      }
 
       final expressionChainResolver = ExpressionChainResolver();
       final root = expressionChainResolver.resolve(node);
       final choices = _flattenNode(root);
       final b = block;
-
-      // TODO
-      addAssign(b, varOp(m.failed), constOp(-1));
-
       addLoop(b, (b) {
         block = b;
         for (var i = 0; i < choices.length; i++) {
-          final choice =
-              choices[i].where((e) => e is! OrderedChoiceExpression).toList();
-          //var prefixCount = 0;
-          for (var j = 0; j < choice.length; j++) {
-            final expression = choice[j];
-            if (expression is StartExpression) {
-              final child = expression.expression;
-              if (child is AndPredicateExpression ||
-                  child is NotPredicateExpression) {
-                addCall(b, varOp(m.pushState), []);
-              } else if (child is CaptureExpression) {
-                addCall(b, varOp(m.startCapture), []);
-              }
-
-              //prefixCount++;
-            } else if (expression is AnyCharacterExpression ||
-                expression is CharacterClassExpression ||
-                expression is LiteralExpression) {
-              expression.accept(this);
-            } else if (expression is SingleExpression) {
-              if (expression is OptionalExpression) {
-                addAssign(b, varOp(m.success), constOp(true));
-              } else if (expression is AndPredicateExpression) {
-                final popState = callOp(varOp(m.popState), []);
-                resultVar = varAlloc.newVar(b, 'var', popState);
-              } else if (expression is NotPredicateExpression) {
-                final popState = callOp(varOp(m.popState), []);
-                resultVar = varAlloc.newVar(b, 'var', popState);
-                addAssign(b, varOp(m.success),
-                    unaryOp(OperationKind.not, varOp(m.success)));
-              } else {
-                _isPostfixVisit = true;
-                expression.accept(this);
-                final methodVar = _getMethodVariable(expression);
-                final parameters = [varOp(resultVar), constOp(true)];
-                final callExpr = callOp(varOp(methodVar), parameters);
-                resultVar = varAlloc.newVar(block, 'var', callExpr);
-              }
-            } else if (expression is SequenceExpression) {
-              if (expression.expressions.length > 1 ||
-                  expression.actionIndex != null) {
-                expression.accept(this);
-                final methodVar = _getMethodVariable(expression);
-                final parameters = [varOp(resultVar), constOp(true)];
-                final callExpr = callOp(varOp(methodVar), parameters);
-                resultVar = varAlloc.newVar(block, 'var', callExpr);
-              } else {
-                // Skip
-              }
-            } else {
-              throw StateError(
-                  'Invalid expresssion: ${expression.runtimeType}');
-            }
+          final choice = choices[i];
+          if (node.parent == null &&
+              node.rule.kind == ProductionRuleKind.Terminal) {
+            // ???
           }
 
+          addAssign(b, varOp(m.fposEnd), constOp(-1));
+
+          visit(b, choice, 0);
           if (i < choices.length - 1) {
             addIfVar(b, m.success, (b) {
               final returnParameter = findMethodParameter(node, paramReturn);

@@ -77,7 +77,6 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     final child = node.expression;
     final state = saveVars(b, varAlloc, [
       m.c,
-      m.cp,
       m.pos,
       m.predicate,
       productive,
@@ -93,8 +92,22 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
-    final matchAny = callOp(varOp(m.matchAny), []);
-    final result = varAlloc.newVar(block, 'var', matchAny);
+    final b = block;
+    final result = varAlloc.newVar(block, 'int', null);
+    final test = ltOp(varOp(m.c), varOp(m.eof));
+    addAssign(b, varOp(m.success), test);
+    addIfElse(b, varOp(m.success), (b) {
+      addAssign(b, varOp(result), varOp(m.c));
+      final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
+      final listAcc = ListAccessOperation(varOp(m.input), preInc);
+      addAssign(b, varOp(m.c), listAcc);
+    }, (b) {
+      final test = binOp(OperationKind.lt, varOp(m.fposEnd), varOp(m.pos));
+      addIf(b, test, (b) {
+        addAssign(b, varOp(m.fposEnd), varOp(m.pos));
+      });
+    });
+
     resultVar = result;
   }
 
@@ -107,10 +120,9 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     addAssign(b, varOp(productive), constOp(false));
     node.expression.accept(this);
     addIfVar(b, m.success, (b) {
-      final input = Variable('_input');
       final substring = Variable('substring');
       final callSubstring = mbrCallOp(
-          varOp(input), varOp(substring), [varOp(start), varOp(m.pos)]);
+          varOp(m.text), varOp(substring), [varOp(start), varOp(m.pos)]);
       addAssign(b, varOp(result), callSubstring);
     });
 
@@ -135,8 +147,88 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
     Variable result;
     if (simple && ranges.length == 2) {
-      final matchChar = callOp(varOp(m.matchChar), [constOp(ranges[0])]);
-      result = varAlloc.newVar(b, 'var', matchChar);
+      result = varAlloc.newVar(block, 'int', null);
+      final test = equalOp(varOp(m.c), constOp(ranges[0]));
+      addAssign(b, varOp(m.success), test);
+      addIfElse(b, varOp(m.success), (b) {
+        addAssign(b, varOp(result), constOp(ranges[0]));
+        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
+        final listAcc = ListAccessOperation(varOp(m.input), preInc);
+        addAssign(b, varOp(m.c), listAcc);
+      }, (b) {
+        final test = ltOp(varOp(m.fposEnd), varOp(m.pos));
+        addIf(b, test, (b) {
+          addAssign(b, varOp(m.fposEnd), varOp(m.pos));
+        });
+      });
+    } else if (simple && ranges.length < 10) {
+      result = varAlloc.newVar(block, 'int', null);
+      var left = equalOp(varOp(m.c), constOp(ranges[0]));
+      for (var i = 2; i < ranges.length; i += 2) {
+        final right = equalOp(varOp(m.c), constOp(ranges[i]));
+        left = lorOp(left, right);
+      }
+
+      addAssign(b, varOp(m.success), left);
+      addIfElse(b, varOp(m.success), (b) {
+        addAssign(b, varOp(result), varOp(m.c));
+        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
+        final listAcc = ListAccessOperation(varOp(m.input), preInc);
+        addAssign(b, varOp(m.c), listAcc);
+      }, (b) {
+        final test = ltOp(varOp(m.fposEnd), varOp(m.pos));
+        addIf(b, test, (b) {
+          addAssign(b, varOp(m.fposEnd), varOp(m.pos));
+        });
+      });
+    } else if (ranges.length == 2) {
+      result = varAlloc.newVar(block, 'int', null);
+      final left = gteOp(varOp(m.c), constOp(ranges[0]));
+      final right = lteOp(varOp(m.c), constOp(ranges[1]));
+      final test = landOp(left, right);
+      addAssign(b, varOp(m.success), test);
+      addIfElse(b, varOp(m.success), (b) {
+        addAssign(b, varOp(result), varOp(m.c));
+        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
+        final listAcc = ListAccessOperation(varOp(m.input), preInc);
+        addAssign(b, varOp(m.c), listAcc);
+      }, (b) {
+        final test = ltOp(varOp(m.fposEnd), varOp(m.pos));
+        addIf(b, test, (b) {
+          addAssign(b, varOp(m.fposEnd), varOp(m.pos));
+        });
+      });
+    } else if (ranges.length < 20) {
+      BinaryOperation op(int start, int end) {
+        if (start == end) {
+          return equalOp(varOp(m.c), constOp(start));
+        } else {
+          final left = gteOp(varOp(m.c), constOp(start));
+          final right = lteOp(varOp(m.c), constOp(end));
+          return landOp(left, right);
+        }
+      }
+
+      result = varAlloc.newVar(block, 'int', null);
+      var left = op(ranges[0], ranges[1]);
+      for (var i = 2; i < ranges.length; i += 2) {
+        final right = op(ranges[i], ranges[i + 1]);
+        left = lorOp(left, right);
+      }
+
+      addIfElse(b, left, (b) {
+        addAssign(b, varOp(m.success), constOp(true));
+        addAssign(b, varOp(result), varOp(m.c));
+        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
+        final listAcc = ListAccessOperation(varOp(m.input), preInc);
+        addAssign(b, varOp(m.c), listAcc);
+      }, (b) {
+        addAssign(b, varOp(m.success), constOp(false));
+        final test = ltOp(varOp(m.fposEnd), varOp(m.pos));
+        addIf(b, test, (b) {
+          addAssign(b, varOp(m.fposEnd), varOp(m.pos));
+        });
+      });
     } else {
       final elements = <ConstantOperation>[];
       for (var i = 0; i < ranges.length; i += 2) {
@@ -156,8 +248,44 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
   @override
   void visitLiteral(LiteralExpression node) {
     final b = block;
-    final matchString = callOp(varOp(m.matchString), [constOp(node.text)]);
-    final result = varAlloc.newVar(b, 'var', matchString);
+    final text = node.text;
+    final runes = text.runes;
+    Variable result;
+    if (runes.length == 1) {
+      final rune = runes.first;
+      result = varAlloc.newVar(b, 'String', null);
+      final test = equalOp(varOp(m.c), constOp(rune));
+      addAssign(b, varOp(m.success), test);
+      addIfElse(b, varOp(m.success), (b) {
+        addAssign(b, varOp(result), constOp(text));
+        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
+        final listAcc = ListAccessOperation(varOp(m.input), preInc);
+        addAssign(b, varOp(m.c), listAcc);
+      }, (b) {
+        final test = ltOp(varOp(m.fposEnd), varOp(m.pos));
+        addIf(b, test, (b) {
+          addAssign(b, varOp(m.fposEnd), varOp(m.pos));
+        });
+      });
+    } else if (runes.length > 1) {
+      final rune = runes.first;
+      result = varAlloc.newVar(b, 'String', null);
+      final test = equalOp(varOp(m.c), constOp(rune));
+      addIfElse(b, test, (b) {
+        final matchString = callOp(varOp(m.matchString), [constOp(text)]);
+        addAssign(b, varOp(result), matchString);
+      }, (b) {
+        addAssign(b, varOp(m.success), constOp(false));
+        final test = ltOp(varOp(m.fposEnd), varOp(m.pos));
+        addIf(b, test, (b) {
+          addAssign(b, varOp(m.fposEnd), varOp(m.pos));
+        });
+      });
+    } else {
+      result = varAlloc.newVar(block, 'var', constOp(''));
+      addAssign(b, varOp(m.success), constOp(true));
+    }
+
     resultVar = result;
   }
 
@@ -190,7 +318,6 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     final child = node.expression;
     final state = saveVars(b, varAlloc, [
       m.c,
-      m.cp,
       m.pos,
       m.predicate,
       productive,
@@ -261,8 +388,14 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     final expressions = node.expressions;
     final hasAction = node.actionIndex != null;
     final variables = <Expression, Variable>{};
-    final returnParam = findMethodParameter(node, paramReturn);
-    final result = returnParam.variable;
+    Variable result;
+    if (isPostfixGenerator) {
+      final returnParam = findMethodParameter(node, paramReturn);
+      result = returnParam.variable;
+    } else {
+      result = varAlloc.newVar(b, node.returnType, null);
+    }
+
     void Function(BlockOperation) onSuccess;
     void Function(BlockOperation) onFailure;
     final optionalCount =
@@ -279,7 +412,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
     Map<Variable, Variable> savedState;
     if (hasSavedState) {
-      savedState = saveVars(b, varAlloc, [m.c, m.cp, m.pos]);
+      savedState = saveVars(b, varAlloc, [m.c, m.pos]);
     }
 
     final results = <Expression, Variable>{};

@@ -1,6 +1,8 @@
 ## 0.1.11
 
 - Added new resolver: `ExpressionProductivenessResolver`
+- Improved performance of the `match` expressions
+- Improved failure tracking performance
 
 ## 0.1.10
 

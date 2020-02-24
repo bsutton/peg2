@@ -3,7 +3,7 @@ part of '../../operation_generators.dart';
 class ParserClassMembers {
   final c = Variable('_c');
 
-  final cp = Variable('_cp');
+  final eof = Variable('_eof');
 
   final matchAny = Variable('_matchAny');
 
@@ -13,9 +13,9 @@ class ParserClassMembers {
 
   final matchString = Variable('_matchString');
 
-  final failed = Variable('_failed');
+  final fail = Variable('_fail');
 
-  final failure = Variable('_failure');
+  final fposEnd = Variable('_fposEnd');
 
   final input = Variable('_input');
 
@@ -40,4 +40,6 @@ class ParserClassMembers {
   final stopCapture = Variable('_stopCapture');
 
   final success = Variable('_success');
+
+  final text = Variable('_text');
 }
