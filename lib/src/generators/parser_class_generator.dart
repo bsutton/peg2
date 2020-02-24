@@ -32,7 +32,7 @@ class ParserClassGenerator {
       'var _mresult',
       'int _pos',
       'bool _predicate',
-      'dynamic _result',      
+      'dynamic _result',
       'bool _success',
       'String _text',
       'List<int> _trackCid',
