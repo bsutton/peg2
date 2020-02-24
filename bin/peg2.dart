@@ -32,7 +32,8 @@ void main(List<String> args) {
       abbr: 'p', defaultsTo: false, help: 'Print grammar');
   argParser.addFlag('predict',
       defaultsTo: false,
-      help: 'Reduces the number of calls predicted by the start characters of the rules');
+      help:
+          'Reduces the number of calls predicted by the start characters of the rules');
   final argResults = argParser.parse(args);
   final printGrammar = argResults['print'] as bool;
   options.inlineNonterminals = argResults['inline-nonterminals'] as bool;
