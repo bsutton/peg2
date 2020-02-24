@@ -11,12 +11,17 @@ import 'peg2_parser.dart';
 void main(List<String> args) {
   final options = ParserGeneratorOptions();
   final argParser = ArgParser();
+  argParser.addFlag('inline-all',
+      defaultsTo: false, help: 'Convert all calls into inline expressions');
   argParser.addFlag('inline-nonterminals',
       defaultsTo: false,
       help: 'Convert nonterminal calls into inline expressions');
   argParser.addFlag('inline-subterminals',
       defaultsTo: false,
       help: 'Convert subterminal calls into inline expressions');
+  argParser.addFlag('inline-terminals',
+      defaultsTo: false,
+      help: 'Convert terminal calls into inline expressions');
   argParser.addFlag('memoize',
       defaultsTo: false, help: 'Memoize results of calls');
   argParser.addOption('parser',
@@ -25,12 +30,23 @@ void main(List<String> args) {
       help: 'Type of generated perser');
   argParser.addFlag('print',
       abbr: 'p', defaultsTo: false, help: 'Print grammar');
+  argParser.addFlag('predict',
+      defaultsTo: false,
+      help: 'Reduces the number of calls predicted by the start characters of the rules');
   final argResults = argParser.parse(args);
   final printGrammar = argResults['print'] as bool;
   options.inlineNonterminals = argResults['inline-nonterminals'] as bool;
   options.inlineSubterminals = argResults['inline-subterminals'] as bool;
+  options.inlineTerminals = argResults['inline-terminals'] as bool;
   options.memoize = argResults['memoize'] as bool;
   options.parserType = argResults['parser'] as String;
+  options.predict = argResults['predict'] as bool;
+  if (argResults['inline-all'] as bool) {
+    options.inlineNonterminals = true;
+    options.inlineSubterminals = true;
+    options.inlineTerminals = true;
+  }
+
   String inputFilename;
   String outputFilename;
   if (argResults.rest.length == 1) {

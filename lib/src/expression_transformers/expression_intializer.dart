@@ -35,9 +35,23 @@ class ExpressionInitializer extends ExpressionVisitor {
 
     final optionalExpressionResolver = OptionalExpressionResolver();
     optionalExpressionResolver.resolve(rules);
+
+    final expressionTransformationInitializer =
+        ExpressionTransformationInitializer();
+    expressionTransformationInitializer.initialize(rules);
+
+    final expressionProductivenessResolver = ExpressionProductivenessResolver();
+    expressionProductivenessResolver.resolve(grammar);
+
     final expressionStartCharactersResolver =
         ExpressionStartCharactersResolver();
     expressionStartCharactersResolver.resolve(rules);
+
+    final expressionSuccessfulnessResolver = ExpressionSuccessfulnessResolver();
+    expressionSuccessfulnessResolver.resolve(grammar);
+
+    final expressionReturnTypeResolver = ExpressionReturnTypeResolver();
+    expressionReturnTypeResolver.resolve(rules);
   }
 
   @override

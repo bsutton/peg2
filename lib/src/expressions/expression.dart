@@ -9,11 +9,9 @@ abstract class Expression {
 
   bool isOptional = false;
 
-  bool isOptionalOrPredicate = false;
-
-  bool isPredicate = false;
-
   bool isProductive = false;
+
+  bool isSuccessful = false;
 
   int level;
 

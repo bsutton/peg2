@@ -22,7 +22,8 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
       expression.accept(this);
     }
 
-    void diag() {
+    // ignore: unused_local_variable
+    final x = () {
       final nodes = <ExpressionNode>[];
       final expressionChainResolver = ExpressionChainResolver();
       for (final rule in grammar.rules) {
@@ -88,7 +89,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
               .join('\n'));
         }
       }
-    }
+    };
 
     final methods2 = _methods.values.toList();
     // TODO: Sort methods
@@ -351,7 +352,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
         for (var i = 0; i < choices.length; i++) {
           final choice = choices[i];
           if (node.parent == null &&
-              node.rule.kind == ProductionRuleKind.Terminal) {
+              node.rule.kind == ProductionRuleKind.terminal) {
             // ???
           }
 
@@ -383,10 +384,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
   void visitSequence(SequenceExpression node) {
     final varAlloc = getLocalVarAlloc();
     _generatePostfixMethod(node, varAlloc, (b) {
-      if (node.id == 42) {
-        var x = 0;
-      }
-
       productive = findMethodParameter(node, paramProductive).variable;
       super.visitSequence(node);
     });
@@ -539,16 +536,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     }
 
     return variable;
-  }
-
-  bool _hasChoiceMethod(OrderedChoiceExpression expression) {
-    var result = false;
-    final parent = expression.parent;
-    if (parent == null || expression.expressions.length > 1) {
-      result = true;
-    }
-
-    return result;
   }
 
   void _visitSymbolExpression(SymbolExpression node) {

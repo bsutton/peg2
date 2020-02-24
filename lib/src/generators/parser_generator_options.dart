@@ -5,6 +5,8 @@ class ParserGeneratorOptions {
 
   bool inlineSubterminals = false;
 
+  bool inlineTerminals = false;
+
   bool memoize = false;
 
   String name;
@@ -12,6 +14,8 @@ class ParserGeneratorOptions {
   bool optimizeOperations = true;
 
   String parserType = 'general';
+
+  bool predict = false;
 
   bool isPostfix() {
     switch (parserType) {

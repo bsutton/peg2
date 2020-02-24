@@ -17,6 +17,7 @@
             "request": "launch",
             "type": "dart",
             "args": [
+                //"--inline-all",
                 //"--parser=postfix",
                 "example/example.peg",
                 "example/example.dart"

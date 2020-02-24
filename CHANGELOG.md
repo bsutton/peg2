@@ -1,3 +1,9 @@
+## 0.1.12
+
+- Implemented experimental prediction feature, command line option `--predict`
+- Added feature: convert terminal calls into inline expressions, command line option `--inline-terminals`
+- Added feature: convert all calls into inline expressions, command line option `--inline-all`
+
 ## 0.1.11
 
 - Added new resolver: `ExpressionProductivenessResolver`

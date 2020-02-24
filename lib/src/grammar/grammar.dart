@@ -48,14 +48,5 @@ class Grammar {
   void _initialize() {
     final expressionInitializer = ExpressionInitializer();
     expressionInitializer.initialize(this);
-    final expressionTransformationInitializer =
-        ExpressionTransformationInitializer();
-    expressionTransformationInitializer.initialize(rules);
-
-    final expressionProductivenessResolver = ExpressionProductivenessResolver();
-    expressionProductivenessResolver.resolve(this);
-
-    final expressionReturnTypeResolver = ExpressionReturnTypeResolver();
-    expressionReturnTypeResolver.resolve(rules);
   }
 }

@@ -1,3 +1,3 @@
 part of '../../grammar.dart';
 
-enum ProductionRuleKind { Nonterminal, Terminal, Subterminal }
+enum ProductionRuleKind { nonterminal, terminal, subterminal }

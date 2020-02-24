@@ -25,14 +25,20 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       var skip = false;
       if (rule.callers.length == 1) {
         switch (rule.kind) {
-          case ProductionRuleKind.Nonterminal:
+          case ProductionRuleKind.nonterminal:
             if (options.inlineNonterminals) {
               skip = true;
             }
 
             break;
-          case ProductionRuleKind.Subterminal:
+          case ProductionRuleKind.subterminal:
             if (options.inlineSubterminals) {
+              skip = true;
+            }
+
+            break;
+          case ProductionRuleKind.terminal:
+            if (options.inlineTerminals) {
               skip = true;
             }
 
@@ -54,12 +60,12 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
   String getRuleMethodName(ProductionRule rule) {
     var name = rule.name;
     switch (rule.kind) {
-      case ProductionRuleKind.Nonterminal:
+      case ProductionRuleKind.nonterminal:
         break;
-      case ProductionRuleKind.Terminal:
+      case ProductionRuleKind.terminal:
         name = _getTerminalName(name, rule.id);
         break;
-      case ProductionRuleKind.Subterminal:
+      case ProductionRuleKind.subterminal:
         name = '\$\$' + name.substring(1);
     }
 
@@ -68,11 +74,27 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
   }
 
   @override
+  void visitNonterminal(NonterminalExpression node) {
+    final rule = node.expression.rule;
+    final inline = options.inlineNonterminals && rule.callers.length == 1;
+    _visitSymbol(node, inline);
+  }
+
+  @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
     final b = block;
     final expressions = node.expressions;
     final returnType = node.returnType;
     final result = varAlloc.newVar(b, returnType, null);
+    final rule = node.rule;
+    final isTerminal =
+        node.parent == null && rule.kind == ProductionRuleKind.terminal;
+    Variable start;
+    if (isTerminal) {
+      addAssign(b, varOp(m.fposEnd), constOp(-1));
+      start = varAlloc.newVar(b, 'var', varOp(m.pos));
+    }
+
     if (expressions.length > 1) {
       addLoop(b, (b) {
         block = b;
@@ -99,8 +121,30 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       addAssign(b, varOp(result), varOp(resultVar));
     }
 
+    if (isTerminal) {
+      addIfNotVar(b, m.success, (b) {
+        final params = [varOp(start), constOp(rule.name)];
+        final fail = callOp(varOp(m.fail), params);
+        addOp(b, fail);
+      });
+    }
+
     resultVar = result;
     block = b;
+  }
+
+  @override
+  void visitSubterminal(SubterminalExpression node) {
+    final rule = node.expression.rule;
+    final inline = options.inlineSubterminals && rule.callers.length == 1;
+    _visitSymbol(node, inline);
+  }
+
+  @override
+  void visitTerminal(TerminalExpression node) {
+    final rule = node.expression.rule;
+    final inline = options.inlineNonterminals && rule.callers.length == 1;
+    _visitSymbol(node, inline);
   }
 
   MethodOperation _buildRule(ProductionRule rule) {
@@ -127,23 +171,10 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         start = varAlloc.newVar(b, 'var', varOp(m.pos));
       }
 
-      if (rule.kind == ProductionRuleKind.Terminal) {
-        addAssign(b, varOp(m.fposEnd), constOp(-1));
-        start ??= varAlloc.newVar(b, 'var', varOp(m.pos));
-      }
-
       final result = varAlloc.newVar(b, returnType, null);
       final expression = rule.expression;
       expression.accept(this);
       addAssign(b, varOp(result), varOp(resultVar));
-      if (rule.kind == ProductionRuleKind.Terminal) {
-        addIfNotVar(b, m.success, (b) {
-          final params = [varOp(start), constOp(rule.name)];
-          final fail = callOp(varOp(m.fail), params);
-          addOp(b, fail);
-        });
-      }
-
       if (options.memoize && rule.callers.length > 1) {
         final listAccess = ListAccessOperation(varOp(m.memoizable), varOp(cid));
         final test =
@@ -282,5 +313,77 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     }
 
     return result;
+  }
+
+  void _visitSymbol(SymbolExpression node, bool inline) {
+    final b = block;
+    final rule = node.expression.rule;
+    final name = Variable(getRuleMethodName(rule));
+    final cid = node.id;
+    final startCharacters = node.startCharacters;
+    final charGroups = startCharacters.groups;
+    var surround = false;
+    if (options.predict) {
+      if (rule.kind == ProductionRuleKind.subterminal ||
+          rule.kind == ProductionRuleKind.terminal) {
+        if (charGroups.length < 10) {
+          surround = true;
+        }
+      }
+    }
+
+    void gen(BlockOperation b) {
+      final prev = block;
+      block = b;
+      if (inline) {
+        final child = rule.expression;
+        child.accept(this);
+      } else {
+        Operation isProductive;
+        if (node.isProductive) {
+          isProductive = notProductive ? constOp(false) : varOp(productive);
+        } else {
+          isProductive = constOp(false);
+        }
+
+        final methodCall = callOp(varOp(name), [constOp(cid), isProductive]);
+        final result = varAlloc.newVar(b, 'var', methodCall);
+        resultVar = result;
+      }
+
+      block = prev;
+    }
+
+    if (surround) {
+      final ranges = <int>[];
+      for (final group in charGroups) {
+        ranges.add(group.start);
+        ranges.add(group.end);
+      }
+
+      final test = rangesToBinaryTest(ranges);
+      final returnType = node.returnType;
+      final result = varAlloc.newVar(b, returnType, null);
+      final start = varAlloc.newVar(b, 'var', varOp(m.pos));
+      addIfElse(b, test, (b) {
+        gen(b);
+        addAssign(b, varOp(result), varOp(resultVar));
+      }, (b) {
+        if (rule.expression.isSuccessful) {
+          addAssign(b, varOp(m.success), constOp(true));
+        } else {
+          addAssign(b, varOp(m.success), constOp(false));
+          if (rule.kind == ProductionRuleKind.terminal) {
+            final params = [varOp(start), constOp(rule.name)];
+            final fail = callOp(varOp(m.fail), params);
+            addOp(b, fail);
+          }
+        }
+      });
+
+      resultVar = result;
+    } else {
+      gen(b);
+    }
   }
 }

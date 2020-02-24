@@ -71,6 +71,31 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
   String getRuleMethodName(ProductionRule rule);
 
+  Operation rangesToBinaryTest(List<int> ranges) {
+    Operation op(int start, int end) {
+      if (start == end) {
+        return equalOp(varOp(m.c), constOp(start));
+      } else {
+        final left = gteOp(varOp(m.c), constOp(start));
+        final right = lteOp(varOp(m.c), constOp(end));
+        return landOp(left, right);
+      }
+    }
+
+    if (ranges[0] == 0 && ranges[1] == 0x10ffff) {
+      // Allows match EOF
+      ranges[1] = 0x10ffff + 1;
+    }
+
+    var result = op(ranges[0], ranges[1]);
+    for (var i = 2; i < ranges.length; i += 2) {
+      final right = op(ranges[i], ranges[i + 1]);
+      result = lorOp(result, right);
+    }
+
+    return result;
+  }
+
   @override
   void visitAndPredicate(AndPredicateExpression node) {
     final b = block;
@@ -134,89 +159,15 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
   void visitCharacterClass(CharacterClassExpression node) {
     final b = block;
     final ranges = <int>[];
-    var simple = true;
     for (final range in node.ranges) {
-      final start = range[0];
-      final end = range[1];
-      ranges.add(start);
-      ranges.add(end);
-      if (start != end) {
-        simple = false;
-      }
+      ranges.addAll(range);
     }
 
     Variable result;
-    if (simple && ranges.length == 2) {
+    if (ranges.length <= 20) {
       result = varAlloc.newVar(block, 'int', null);
-      final test = equalOp(varOp(m.c), constOp(ranges[0]));
-      addAssign(b, varOp(m.success), test);
-      addIfElse(b, varOp(m.success), (b) {
-        addAssign(b, varOp(result), constOp(ranges[0]));
-        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
-        final listAcc = ListAccessOperation(varOp(m.input), preInc);
-        addAssign(b, varOp(m.c), listAcc);
-      }, (b) {
-        final test = ltOp(varOp(m.fposEnd), varOp(m.pos));
-        addIf(b, test, (b) {
-          addAssign(b, varOp(m.fposEnd), varOp(m.pos));
-        });
-      });
-    } else if (simple && ranges.length < 10) {
-      result = varAlloc.newVar(block, 'int', null);
-      var left = equalOp(varOp(m.c), constOp(ranges[0]));
-      for (var i = 2; i < ranges.length; i += 2) {
-        final right = equalOp(varOp(m.c), constOp(ranges[i]));
-        left = lorOp(left, right);
-      }
-
-      addAssign(b, varOp(m.success), left);
-      addIfElse(b, varOp(m.success), (b) {
-        addAssign(b, varOp(result), varOp(m.c));
-        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
-        final listAcc = ListAccessOperation(varOp(m.input), preInc);
-        addAssign(b, varOp(m.c), listAcc);
-      }, (b) {
-        final test = ltOp(varOp(m.fposEnd), varOp(m.pos));
-        addIf(b, test, (b) {
-          addAssign(b, varOp(m.fposEnd), varOp(m.pos));
-        });
-      });
-    } else if (ranges.length == 2) {
-      result = varAlloc.newVar(block, 'int', null);
-      final left = gteOp(varOp(m.c), constOp(ranges[0]));
-      final right = lteOp(varOp(m.c), constOp(ranges[1]));
-      final test = landOp(left, right);
-      addAssign(b, varOp(m.success), test);
-      addIfElse(b, varOp(m.success), (b) {
-        addAssign(b, varOp(result), varOp(m.c));
-        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
-        final listAcc = ListAccessOperation(varOp(m.input), preInc);
-        addAssign(b, varOp(m.c), listAcc);
-      }, (b) {
-        final test = ltOp(varOp(m.fposEnd), varOp(m.pos));
-        addIf(b, test, (b) {
-          addAssign(b, varOp(m.fposEnd), varOp(m.pos));
-        });
-      });
-    } else if (ranges.length < 20) {
-      BinaryOperation op(int start, int end) {
-        if (start == end) {
-          return equalOp(varOp(m.c), constOp(start));
-        } else {
-          final left = gteOp(varOp(m.c), constOp(start));
-          final right = lteOp(varOp(m.c), constOp(end));
-          return landOp(left, right);
-        }
-      }
-
-      result = varAlloc.newVar(block, 'int', null);
-      var left = op(ranges[0], ranges[1]);
-      for (var i = 2; i < ranges.length; i += 2) {
-        final right = op(ranges[i], ranges[i + 1]);
-        left = lorOp(left, right);
-      }
-
-      addIfElse(b, left, (b) {
+      final test = rangesToBinaryTest(ranges);
+      addIfElse(b, test, (b) {
         addAssign(b, varOp(m.success), constOp(true));
         addAssign(b, varOp(result), varOp(m.c));
         final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
@@ -287,29 +238,6 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     }
 
     resultVar = result;
-  }
-
-  @override
-  void visitNonterminal(NonterminalExpression node) {
-    final b = block;
-    final rule = node.expression.rule;
-    final name = Variable(getRuleMethodName(rule));
-    final cid = node.id;
-    if (options.inlineNonterminals && rule.callers.length == 1) {
-      final child = rule.expression;
-      child.accept(this);
-    } else {
-      Operation isProductive;
-      if (node.isProductive) {
-        isProductive = notProductive ? constOp(false) : varOp(productive);
-      } else {
-        isProductive = constOp(false);
-      }
-
-      final methodCall = callOp(varOp(name), [constOp(cid), isProductive]);
-      final result = varAlloc.newVar(b, 'var', methodCall);
-      resultVar = result;
-    }
   }
 
   @override
@@ -398,10 +326,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
     void Function(BlockOperation) onSuccess;
     void Function(BlockOperation) onFailure;
-    final optionalCount =
-        expressions.where((e) => e.isOptionalOrPredicate).length;
-    final allOptional = expressions.length == optionalCount;
-    var hasSavedState = !allOptional;
+    var hasSavedState = !node.isOptional;
     if (expressions.length == 1) {
       hasSavedState = false;
     }
@@ -487,47 +412,6 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     }
 
     block = b;
-    resultVar = result;
-  }
-
-  @override
-  void visitSubterminal(SubterminalExpression node) {
-    final b = block;
-    final rule = node.expression.rule;
-    final name = Variable(getRuleMethodName(rule));
-    final cid = node.id;
-    if (options.inlineSubterminals && rule.callers.length == 1) {
-      final child = rule.expression;
-      child.accept(this);
-    } else {
-      Operation isProductive;
-      if (node.isProductive) {
-        isProductive = notProductive ? constOp(false) : varOp(productive);
-      } else {
-        isProductive = constOp(false);
-      }
-
-      final methodCall = callOp(varOp(name), [constOp(cid), isProductive]);
-      final result = varAlloc.newVar(b, 'var', methodCall);
-      resultVar = result;
-    }
-  }
-
-  @override
-  void visitTerminal(TerminalExpression node) {
-    final b = block;
-    final rule = node.expression.rule;
-    final name = Variable(getRuleMethodName(rule));
-    final cid = node.id;
-    Operation isProductive;
-    if (node.isProductive) {
-      isProductive = notProductive ? constOp(false) : varOp(productive);
-    } else {
-      isProductive = constOp(false);
-    }
-
-    final methodCall = callOp(varOp(name), [constOp(cid), isProductive]);
-    final result = varAlloc.newVar(b, 'var', methodCall);
     resultVar = result;
   }
 

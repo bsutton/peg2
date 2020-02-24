@@ -10,3 +10,5 @@ improve expression starting characters resolver (reduce number of starting chara
 find bug in unused variables optimizer?
 remove loop in postfix choice with single expression
 exmaple postfix _e185 does not has return statement
+implement analyzer warning when terminal isSucessful
+implement analyzer warning when repetition child isSucessful
