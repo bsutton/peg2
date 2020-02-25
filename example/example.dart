@@ -12,7 +12,7 @@ void main() {
 }
 
 final _text = '''
-{"rocket": "🚀 flies to the stars"}
+{""
 ''';
 
 class ExampleParser {
@@ -83,13 +83,13 @@ class ExampleParser {
         case 09:
           return r'\t';
         case _eof:
-          return '';
+          return 'end of file';
       }
       return String.fromCharCode(c);
     }
 
     String getc(int position) {
-      if (position < _input.length) {
+      if (position < _text.length) {
         return "'${escape(_input[position])}'";
       }
       return 'end of file';
@@ -101,6 +101,7 @@ class ExampleParser {
     final hasMalformed = _fposStart != _fposMax;
     if (terminals.isNotEmpty) {
       if (!hasMalformed) {
+        final offset = _fposStart == _text.length ? _text.length - 1 : _fposStart;
         final sb = StringBuffer();
         sb.write('Expected ');
         sb.write(terminals.join(', '));
@@ -109,13 +110,13 @@ class ExampleParser {
         final message = sb.toString();
         error = FormatException(message, _text, _fposStart);
       } else {
-        final reason = _fposMax < _input.length ? 'Malformed' : 'Unterminated';
+        final reason = _fposMax == _text.length ? 'Unterminated' : 'Malformed';
         final sb = StringBuffer();
         sb.write(reason);
         sb.write(' ');
         sb.write(terminals.join(', '));
         final message = sb.toString();
-        error = FormatException(message, _text, _fposStart);
+        error = FormatException(message, _text, _fposMax);
       }
     } else {
       final sb = StringBuffer();
@@ -124,7 +125,7 @@ class ExampleParser {
       final message = sb.toString();
       error = FormatException(message, _text, _fposStart);
     }
-  }
+  }  
 
   void _fail(int start, String name) {
     if (_fposStart < start) {
@@ -189,7 +190,7 @@ class ExampleParser {
     } else {
       _success = false;
       if (_fposEnd < _pos) {
-        _fposEnd = _pos;
+        _fposEnd = _pos + i;
       }
     }
 
@@ -303,30 +304,28 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _pos;
     List<int> $7;
-    var $8 = _pos;
     if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-      var $9 = _parse_leading_spaces(3, false);
-      $7 = $9;
+      var $8 = _parse_leading_spaces(3, false);
+      $7 = $8;
     } else {
       _success = true;
     }
     _success = true;
-    var $10 = _parseValue(4, $1);
+    var $9 = _parseValue(4, $1);
     if (_success) {
-      dynamic $11;
-      var $12 = _pos;
+      dynamic $10;
       if (_c >= 0 && _c <= 1114112) {
-        var $13 = _parse_end_of_file(5, false);
-        $11 = $13;
+        var $11 = _parse_end_of_file(5, false);
+        $10 = $11;
       } else {
         _success = false;
-        _fail($12, '\'end of file\'');
+        _fposEnd = _pos;
+        _fail(_pos, '\'end of file\'');
       }
       if (_success) {
-        $4 = $10;
+        $4 = $9;
       }
     }
-    // NOP;
     if (!_success) {
       _c = $5;
       _pos = $6;
@@ -344,97 +343,104 @@ class ExampleParser {
       var $5 = _parseArray(8, $1);
       if (_success) {
         $4 = $5;
+      }
+      if (_success) {
         $3 = $4;
         break;
       }
-      // NOP;
       dynamic $6;
       dynamic $7;
-      var $8 = _pos;
       if (_c == 102) {
-        var $9 = _parse_false(10, $1);
-        $7 = $9;
+        var $8 = _parse_false(10, $1);
+        $7 = $8;
       } else {
         _success = false;
-        _fail($8, '\'false\'');
+        _fposEnd = _pos;
+        _fail(_pos, '\'false\'');
       }
       if (_success) {
         $6 = $7;
+      }
+      if (_success) {
         $3 = $6;
         break;
       }
-      // NOP;
+      dynamic $9;
       dynamic $10;
-      dynamic $11;
-      var $12 = _pos;
       if (_c == 110) {
-        var $13 = _parse_null(12, $1);
-        $11 = $13;
-      } else {
-        _success = false;
-        _fail($12, '\'null\'');
-      }
-      if (_success) {
+        var $11 = _parse_null(12, $1);
         $10 = $11;
-        $3 = $10;
+      } else {
+        _success = false;
+        _fposEnd = _pos;
+        _fail(_pos, '\'null\'');
+      }
+      if (_success) {
+        $9 = $10;
+      }
+      if (_success) {
+        $3 = $9;
         break;
       }
-      // NOP;
-      dynamic $14;
-      dynamic $15;
-      var $16 = _pos;
+      dynamic $12;
+      dynamic $13;
       if (_c == 116) {
-        var $17 = _parse_true(14, $1);
-        $15 = $17;
+        var $14 = _parse_true(14, $1);
+        $13 = $14;
       } else {
         _success = false;
-        _fail($16, '\'true\'');
+        _fposEnd = _pos;
+        _fail(_pos, '\'true\'');
       }
       if (_success) {
-        $14 = $15;
-        $3 = $14;
-        break;
+        $12 = $13;
       }
-      // NOP;
-      Map<String, dynamic> $18;
-      var $19 = _parseObject(16, $1);
       if (_success) {
-        $18 = $19;
-        $3 = $18;
+        $3 = $12;
         break;
       }
-      // NOP;
-      num $20;
-      num $21;
-      var $22 = _pos;
+      Map<String, dynamic> $15;
+      var $16 = _parseObject(16, $1);
+      if (_success) {
+        $15 = $16;
+      }
+      if (_success) {
+        $3 = $15;
+        break;
+      }
+      num $17;
+      num $18;
       if (_c == 45 || _c >= 48 && _c <= 57) {
-        var $23 = _parse_number(18, $1);
-        $21 = $23;
+        var $19 = _parse_number(18, $1);
+        $18 = $19;
       } else {
         _success = false;
-        _fail($22, '\'number\'');
+        _fposEnd = _pos;
+        _fail(_pos, '\'number\'');
+      }
+      if (_success) {
+        $17 = $18;
+      }
+      if (_success) {
+        $3 = $17;
+        break;
+      }
+      String $20;
+      String $21;
+      if (_c == 34) {
+        var $22 = _parse_string(20, $1);
+        $21 = $22;
+      } else {
+        _success = false;
+        _fposEnd = _pos;
+        _fail(_pos, '\'string\'');
       }
       if (_success) {
         $20 = $21;
-        $3 = $20;
-        break;
-      }
-      // NOP;
-      String $24;
-      String $25;
-      var $26 = _pos;
-      if (_c == 34) {
-        var $27 = _parse_string(20, $1);
-        $25 = $27;
-      } else {
-        _success = false;
-        _fail($26, '\'string\'');
       }
       if (_success) {
-        $24 = $25;
-        $3 = $24;
+        $3 = $20;
       }
-      // NOP;
       break;
     }
     $2 = $3;
@@ -448,33 +454,32 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _pos;
     String $7;
-    var $8 = _pos;
     if (_c == 91) {
-      var $9 = _parse_$LeftSquareBracket(23, false);
-      $7 = $9;
+      var $8 = _parse_$LeftSquareBracket(23, false);
+      $7 = $8;
     } else {
       _success = false;
-      _fail($8, '\'[\'');
+      _fposEnd = _pos;
+      _fail(_pos, '\'[\'');
     }
     if (_success) {
-      var $10 = _parseValues(25, $1);
+      var $9 = _parseValues(25, $1);
       _success = true;
-      String $11;
-      var $12 = _pos;
+      String $10;
       if (_c == 93) {
-        var $13 = _parse_$RightSquareBracket(26, false);
-        $11 = $13;
+        var $11 = _parse_$RightSquareBracket(26, false);
+        $10 = $11;
       } else {
         _success = false;
-        _fail($12, '\']\'');
+        _fposEnd = _pos;
+        _fail(_pos, '\']\'');
       }
       if (_success) {
-        var v = $10;
+        var v = $9;
         List $$;
         $$ = v ?? [];
         $4 = $$;
       }
-      // NOP;
     }
     if (!_success) {
       _c = $5;
@@ -503,18 +508,18 @@ class ExampleParser {
         var $11 = _c;
         var $12 = _pos;
         String $13;
-        var $14 = _pos;
         if (_c == 44) {
-          var $15 = _parse_$Comma(33, false);
-          $13 = $15;
+          var $14 = _parse_$Comma(33, false);
+          $13 = $14;
         } else {
           _success = false;
-          _fail($14, '\',\'');
+          _fposEnd = _pos;
+          _fail(_pos, '\',\'');
         }
         if (_success) {
-          var $16 = _parseValue(34, $1);
+          var $15 = _parseValue(34, $1);
           if (_success) {
-            $10 = $16;
+            $10 = $15;
           }
         }
         if (!_success) {
@@ -530,14 +535,13 @@ class ExampleParser {
         }
       }
       _success = true;
-      {
+      if (_success) {
         var v = $7;
         var n = $8;
         List $$;
         $$ = [v, ...n];
         $4 = $$;
       }
-      // NOP;
     }
     if (!_success) {
       _c = $5;
@@ -555,33 +559,32 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _pos;
     String $7;
-    var $8 = _pos;
     if (_c == 123) {
-      var $9 = _parse_$LeftBrace(37, false);
-      $7 = $9;
+      var $8 = _parse_$LeftBrace(37, false);
+      $7 = $8;
     } else {
       _success = false;
-      _fail($8, '\'{\'');
+      _fposEnd = _pos;
+      _fail(_pos, '\'{\'');
     }
     if (_success) {
-      var $10 = _parseMembers(39, $1);
+      var $9 = _parseMembers(39, $1);
       _success = true;
-      String $11;
-      var $12 = _pos;
+      String $10;
       if (_c == 125) {
-        var $13 = _parse_$RightBrace(40, false);
-        $11 = $13;
+        var $11 = _parse_$RightBrace(40, false);
+        $10 = $11;
       } else {
         _success = false;
-        _fail($12, '\'}\'');
+        _fposEnd = _pos;
+        _fail(_pos, '\'}\'');
       }
       if (_success) {
-        var m = $10;
+        var m = $9;
         Map<String, dynamic> $$;
         $$ = <String, dynamic>{}..addEntries(m ?? []);
         $4 = $$;
       }
-      // NOP;
     }
     if (!_success) {
       _c = $5;
@@ -610,18 +613,18 @@ class ExampleParser {
         var $11 = _c;
         var $12 = _pos;
         String $13;
-        var $14 = _pos;
         if (_c == 44) {
-          var $15 = _parse_$Comma(47, false);
-          $13 = $15;
+          var $14 = _parse_$Comma(47, false);
+          $13 = $14;
         } else {
           _success = false;
-          _fail($14, '\',\'');
+          _fposEnd = _pos;
+          _fail(_pos, '\',\'');
         }
         if (_success) {
-          var $16 = _parseMember(48, $1);
+          var $15 = _parseMember(48, $1);
           if (_success) {
-            $10 = $16;
+            $10 = $15;
           }
         }
         if (!_success) {
@@ -637,14 +640,13 @@ class ExampleParser {
         }
       }
       _success = true;
-      {
+      if (_success) {
         var m = $7;
         var n = $8;
         List<MapEntry<String, dynamic>> $$;
         $$ = [m, ...n];
         $4 = $$;
       }
-      // NOP;
     }
     if (!_success) {
       _c = $5;
@@ -662,29 +664,29 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _pos;
     String $7;
-    var $8 = _pos;
     if (_c == 34) {
-      var $9 = _parse_string(51, $1);
-      $7 = $9;
+      var $8 = _parse_string(51, $1);
+      $7 = $8;
     } else {
       _success = false;
-      _fail($8, '\'string\'');
+      _fposEnd = _pos;
+      _fail(_pos, '\'string\'');
     }
     if (_success) {
-      String $10;
-      var $11 = _pos;
+      String $9;
       if (_c == 58) {
-        var $12 = _parse_$Colon(52, false);
-        $10 = $12;
+        var $10 = _parse_$Colon(52, false);
+        $9 = $10;
       } else {
         _success = false;
-        _fail($11, '\':\'');
+        _fposEnd = _pos;
+        _fail(_pos, '\':\'');
       }
       if (_success) {
-        var $13 = _parseValue(53, $1);
+        var $11 = _parseValue(53, $1);
         if (_success) {
           var k = $7;
-          var v = $13;
+          var v = $11;
           MapEntry<String, dynamic> $$;
           $$ = MapEntry(k, v);
           $4 = $$;
@@ -758,10 +760,9 @@ class ExampleParser {
     }
     if (_success) {
       List<int> $9;
-      var $10 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $11 = _parse$$spacing(61, false);
-        $9 = $11;
+        var $10 = _parse$$spacing(61, false);
+        $9 = $10;
       } else {
         _success = true;
       }
@@ -790,10 +791,9 @@ class ExampleParser {
     var $4 = _pos;
     List<int> $5;
     List<int> $6;
-    var $7 = _pos;
     if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-      var $8 = _parse$$spacing(64, false);
-      $6 = $8;
+      var $7 = _parse$$spacing(64, false);
+      $6 = $7;
     } else {
       _success = true;
     }
@@ -827,10 +827,9 @@ class ExampleParser {
     }
     if (_success) {
       List<int> $9;
-      var $10 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $11 = _parse$$spacing(68, false);
-        $9 = $11;
+        var $10 = _parse$$spacing(68, false);
+        $9 = $10;
       } else {
         _success = true;
       }
@@ -871,10 +870,9 @@ class ExampleParser {
     }
     if (_success) {
       List<int> $9;
-      var $10 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $11 = _parse$$spacing(72, false);
-        $9 = $11;
+        var $10 = _parse$$spacing(72, false);
+        $9 = $10;
       } else {
         _success = true;
       }
@@ -921,10 +919,9 @@ class ExampleParser {
       }
       for (;;) {
         int $10;
-        var $11 = _pos;
         if (_c >= 32 && _c <= 33 || _c >= 35 && _c <= 1114111) {
-          var $12 = _parse$$char(77, $1);
-          $10 = $12;
+          var $11 = _parse$$char(77, $1);
+          $10 = $11;
         } else {
           _success = false;
         }
@@ -936,10 +933,10 @@ class ExampleParser {
         }
       }
       _success = true;
-      String $13;
+      String $12;
       _success = _c == 34;
       if (_success) {
-        $13 = '\"';
+        $12 = '\"';
         _c = _input[++_pos];
       } else {
         if (_fposEnd < _pos) {
@@ -947,11 +944,10 @@ class ExampleParser {
         }
       }
       if (_success) {
-        List<int> $14;
-        var $15 = _pos;
+        List<int> $13;
         if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-          var $16 = _parse$$spacing(79, false);
-          $14 = $16;
+          var $14 = _parse$$spacing(79, false);
+          $13 = $14;
         } else {
           _success = true;
         }
@@ -962,7 +958,6 @@ class ExampleParser {
           $5 = $$;
         }
       }
-      // NOP;
     }
     if (!_success) {
       _c = $6;
@@ -1020,10 +1015,11 @@ class ExampleParser {
       }
       if (_success) {
         $17 = $18;
+      }
+      if (_success) {
         $16 = $17;
         break;
       }
-      // NOP;
       int $19;
       var $20 = _c;
       var $21 = _pos;
@@ -1057,16 +1053,17 @@ class ExampleParser {
           }
         }
         _success = true;
-        $19 = $22;
-        // NOP;
+        if (_success) {
+          $19 = $22;
+        }
       }
       if (!_success) {
         _c = $20;
         _pos = $21;
-      } else {
+      }
+      if (_success) {
         $16 = $19;
       }
-      // NOP;
       break;
     }
     if (_success) {
@@ -1168,11 +1165,10 @@ class ExampleParser {
       }
       $33 = $34;
       _success = true;
-      $12 = $15;
-      // NOP;
-      // NOP;
+      if (_success) {
+        $12 = $15;
+      }
     }
-    // NOP;
     if (!_success) {
       _c = $13;
       _pos = $14;
@@ -1184,10 +1180,9 @@ class ExampleParser {
     $1 = $10;
     if (_success) {
       List<int> $41;
-      var $42 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $43 = _parse$$spacing(106, false);
-        $41 = $43;
+        var $42 = _parse$$spacing(106, false);
+        $41 = $42;
       } else {
         _success = true;
       }
@@ -1230,10 +1225,9 @@ class ExampleParser {
     }
     if (_success) {
       List<int> $9;
-      var $10 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $11 = _parse$$spacing(110, false);
-        $9 = $11;
+        var $10 = _parse$$spacing(110, false);
+        $9 = $10;
       } else {
         _success = true;
       }
@@ -1273,10 +1267,9 @@ class ExampleParser {
     }
     if (_success) {
       List<int> $9;
-      var $10 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $11 = _parse$$spacing(114, false);
-        $9 = $11;
+        var $10 = _parse$$spacing(114, false);
+        $9 = $10;
       } else {
         _success = true;
       }
@@ -1316,10 +1309,9 @@ class ExampleParser {
     }
     if (_success) {
       List<int> $9;
-      var $10 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $11 = _parse$$spacing(118, false);
-        $9 = $11;
+        var $10 = _parse$$spacing(118, false);
+        $9 = $10;
       } else {
         _success = true;
       }
@@ -1359,10 +1351,9 @@ class ExampleParser {
     }
     if (_success) {
       List<int> $9;
-      var $10 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $11 = _parse$$spacing(122, false);
-        $9 = $11;
+        var $10 = _parse$$spacing(122, false);
+        $9 = $10;
       } else {
         _success = true;
       }
@@ -1402,10 +1393,9 @@ class ExampleParser {
     }
     if (_success) {
       List<int> $9;
-      var $10 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $11 = _parse$$spacing(126, false);
-        $9 = $11;
+        var $10 = _parse$$spacing(126, false);
+        $9 = $10;
       } else {
         _success = true;
       }
@@ -1445,10 +1435,9 @@ class ExampleParser {
     }
     if (_success) {
       List<int> $9;
-      var $10 = _pos;
       if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        var $11 = _parse$$spacing(130, false);
-        $9 = $11;
+        var $10 = _parse$$spacing(130, false);
+        $9 = $10;
       } else {
         _success = true;
       }
@@ -1538,7 +1527,6 @@ class ExampleParser {
       }
       if (_success) {
         int $8;
-        var $9 = _pos;
         if (_c == 34 ||
             _c == 47 ||
             _c == 92 ||
@@ -1547,8 +1535,8 @@ class ExampleParser {
             _c == 110 ||
             _c == 114 ||
             _c >= 116 && _c <= 117) {
-          var $10 = _parse$$escaped(140, $1);
-          $8 = $10;
+          var $9 = _parse$$escaped(140, $1);
+          $8 = $9;
         } else {
           _success = false;
         }
@@ -1559,27 +1547,27 @@ class ExampleParser {
       if (!_success) {
         _c = $5;
         _pos = $6;
-      } else {
+      }
+      if (_success) {
         $3 = $4;
         break;
       }
-      // NOP;
+      int $10;
       int $11;
-      int $12;
-      var $13 = _pos;
       if (_c >= 32 && _c <= 33 ||
           _c >= 35 && _c <= 91 ||
           _c >= 93 && _c <= 1114111) {
-        var $14 = _parse$$unescaped(142, $1);
-        $12 = $14;
+        var $12 = _parse$$unescaped(142, $1);
+        $11 = $12;
       } else {
         _success = false;
       }
       if (_success) {
-        $11 = $12;
-        $3 = $11;
+        $10 = $11;
       }
-      // NOP;
+      if (_success) {
+        $3 = $10;
+      }
       break;
     }
     $2 = $3;
@@ -1604,10 +1592,11 @@ class ExampleParser {
       }
       if (_success) {
         $4 = $5;
+      }
+      if (_success) {
         $3 = $4;
         break;
       }
-      // NOP;
       int $6;
       int $7;
       if (_c == 92) {
@@ -1622,10 +1611,11 @@ class ExampleParser {
       }
       if (_success) {
         $6 = $7;
+      }
+      if (_success) {
         $3 = $6;
         break;
       }
-      // NOP;
       int $8;
       int $9;
       if (_c == 47) {
@@ -1640,10 +1630,11 @@ class ExampleParser {
       }
       if (_success) {
         $8 = $9;
+      }
+      if (_success) {
         $3 = $8;
         break;
       }
-      // NOP;
       int $10;
       int $11;
       if (_c == 98) {
@@ -1765,12 +1756,11 @@ class ExampleParser {
       }
       if (_success) {
         int $24;
-        var $25 = _pos;
         if (_c >= 48 && _c <= 57 ||
             _c >= 65 && _c <= 70 ||
             _c >= 97 && _c <= 102) {
-          var $26 = _parse$$hexdig4(162, $1);
-          $24 = $26;
+          var $25 = _parse$$hexdig4(162, $1);
+          $24 = $25;
         } else {
           _success = false;
         }
@@ -1781,10 +1771,10 @@ class ExampleParser {
       if (!_success) {
         _c = $21;
         _pos = $22;
-      } else {
+      }
+      if (_success) {
         $3 = $20;
       }
-      // NOP;
       break;
     }
     $2 = $3;
@@ -1798,51 +1788,47 @@ class ExampleParser {
     var $5 = _c;
     var $6 = _pos;
     int $7;
-    var $8 = _pos;
     if (_c >= 48 && _c <= 57 || _c >= 65 && _c <= 70 || _c >= 97 && _c <= 102) {
-      var $9 = _parse$$hexdig(165, $1);
-      $7 = $9;
+      var $8 = _parse$$hexdig(165, $1);
+      $7 = $8;
     } else {
       _success = false;
     }
     if (_success) {
-      int $10;
-      var $11 = _pos;
+      int $9;
       if (_c >= 48 && _c <= 57 ||
           _c >= 65 && _c <= 70 ||
           _c >= 97 && _c <= 102) {
-        var $12 = _parse$$hexdig(166, $1);
-        $10 = $12;
+        var $10 = _parse$$hexdig(166, $1);
+        $9 = $10;
       } else {
         _success = false;
       }
       if (_success) {
-        int $13;
-        var $14 = _pos;
+        int $11;
         if (_c >= 48 && _c <= 57 ||
             _c >= 65 && _c <= 70 ||
             _c >= 97 && _c <= 102) {
-          var $15 = _parse$$hexdig(167, $1);
-          $13 = $15;
+          var $12 = _parse$$hexdig(167, $1);
+          $11 = $12;
         } else {
           _success = false;
         }
         if (_success) {
-          int $16;
-          var $17 = _pos;
+          int $13;
           if (_c >= 48 && _c <= 57 ||
               _c >= 65 && _c <= 70 ||
               _c >= 97 && _c <= 102) {
-            var $18 = _parse$$hexdig(168, $1);
-            $16 = $18;
+            var $14 = _parse$$hexdig(168, $1);
+            $13 = $14;
           } else {
             _success = false;
           }
           if (_success) {
             var a = $7;
-            var b = $10;
-            var c = $13;
-            var d = $16;
+            var b = $9;
+            var c = $11;
+            var d = $13;
             int $$;
             $$ = a * 0xfff + b * 0xff + c * 0xf + d;
             $4 = $$;
@@ -1949,10 +1935,11 @@ class ExampleParser {
       }
       if (_success) {
         $4 = $5;
+      }
+      if (_success) {
         $3 = $4;
         break;
       }
-      // NOP;
       int $6;
       int $7;
       if (_c >= 35 && _c <= 91) {
@@ -1967,10 +1954,11 @@ class ExampleParser {
       }
       if (_success) {
         $6 = $7;
+      }
+      if (_success) {
         $3 = $6;
         break;
       }
-      // NOP;
       int $8;
       int $9;
       if (_c >= 93 && _c <= 1114111) {
@@ -1985,9 +1973,10 @@ class ExampleParser {
       }
       if (_success) {
         $8 = $9;
+      }
+      if (_success) {
         $3 = $8;
       }
-      // NOP;
       break;
     }
     $2 = $3;
@@ -2016,8 +2005,9 @@ class ExampleParser {
       }
     }
     _success = true;
-    $4 = $5;
-    // NOP;
+    if (_success) {
+      $4 = $5;
+    }
     $3 = $4;
     $2 = $3;
     return $2;
@@ -2040,6 +2030,99 @@ class _Memo {
     this.success,
   });
 }
+
+
+class Foo {
+  String message;
+
+  int offset;
+
+  var source;
+
+  String toString() {
+    String report = "FormatException";
+    if (message != null && "" != message) {
+      report = "$report: $message";
+    }
+    int offset = this.offset;
+    Object objectSource = this.source;
+    if (objectSource is String) {
+      String source = objectSource;
+      if (offset != null && (offset < 0 || offset > source.length)) {
+        offset = null;
+      }
+      // Source is string and offset is null or valid.
+      if (offset == null) {
+        if (source.length > 78) {
+          source = source.substring(0, 75) + "...";
+        }
+        return "$report\n$source";
+      }
+      int lineNum = 1;
+      int lineStart = 0;
+      bool previousCharWasCR = false;
+      for (int i = 0; i < offset; i++) {
+        int char = source.codeUnitAt(i);
+        if (char == 0x0a) {
+          if (lineStart != i || !previousCharWasCR) {
+            lineNum++;
+          }
+          lineStart = i + 1;
+          previousCharWasCR = false;
+        } else if (char == 0x0d) {
+          lineNum++;
+          lineStart = i + 1;
+          previousCharWasCR = true;
+        }
+      }
+      if (lineNum > 1) {
+        report += " (at line $lineNum, character ${offset - lineStart + 1})\n";
+      } else {
+        report += " (at character ${offset + 1})\n";
+      }
+      int lineEnd = source.length;
+      for (int i = offset; i < source.length; i++) {
+        int char = source.codeUnitAt(i);
+        if (char == 0x0a || char == 0x0d) {
+          lineEnd = i;
+          break;
+        }
+      }
+      int length = lineEnd - lineStart;
+      int start = lineStart;
+      int end = lineEnd;
+      String prefix = "";
+      String postfix = "";
+      if (length > 78) {
+        // Can't show entire line. Try to anchor at the nearest end, if
+        // one is within reach.
+        int index = offset - lineStart;
+        if (index < 75) {
+          end = start + 75;
+          postfix = "...";
+        } else if (end - offset < 75) {
+          start = end - 75;
+          prefix = "...";
+        } else {
+          // Neither end is near, just pick an area around the offset.
+          start = offset - 36;
+          end = offset + 36;
+          prefix = postfix = "...";
+        }
+      }
+      String slice = source.substring(start, end);
+      int markOffset = offset - start + prefix.length;
+      return "$report$prefix$slice$postfix\n${" " * markOffset}^\n";
+    } else {
+      // The source is not a string.
+      if (offset != null) {
+        report += " (at offset $offset)";
+      }
+      return report;
+    }
+  }
+}
+
 // ignore_for_file: prefer_final_locals
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field

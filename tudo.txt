@@ -12,3 +12,5 @@ remove loop in postfix choice with single expression
 exmaple postfix _e185 does not has return statement
 implement analyzer warning when terminal isSucessful
 implement analyzer warning when repetition child isSucessful
+literal should use testRange
+rename varAlloc to va

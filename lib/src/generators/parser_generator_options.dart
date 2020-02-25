@@ -11,7 +11,7 @@ class ParserGeneratorOptions {
 
   String name;
 
-  bool optimizeOperations = true;
+  bool optimizeCode = true;
 
   String parserType = 'general';
 

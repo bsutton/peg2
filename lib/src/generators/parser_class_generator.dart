@@ -76,13 +76,13 @@ void _buildError() {
       case 09:
         return r'\t';
       case _eof:
-        return '';
+        return 'end of file';
     }
     return String.fromCharCode(c);
   }
 
   String getc(int position) {
-    if (position < _input.length) {
+    if (position < _text.length) {
       return "'${escape(_input[position])}'";
     }
     return 'end of file';
@@ -102,13 +102,13 @@ void _buildError() {
       final message = sb.toString();
       error = FormatException(message, _text, _fposStart);
     } else {
-      final reason = _fposMax < _input.length ? 'Malformed' : 'Unterminated';
+      final reason = _fposMax == _text.length ? 'Unterminated' : 'Malformed';
       final sb = StringBuffer();
       sb.write(reason);
       sb.write(' ');
       sb.write(terminals.join(', '));
       final message = sb.toString();
-      error = FormatException(message, _text, _fposStart);
+      error = FormatException(message, _text, _fposMax);
     }
   } else {
     final sb = StringBuffer();
@@ -182,7 +182,7 @@ String _matchString(String text) {
   } else {
     _success = false;
     if (_fposEnd < _pos) {
-      _fposEnd = _pos;
+      _fposEnd = _pos + i;
     }
   }
 

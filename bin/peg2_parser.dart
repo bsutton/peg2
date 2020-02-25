@@ -367,9 +367,6 @@ class Peg2Parser {
         $4 = $$;
       }
     }
-    // NOP;
-    // NOP;
-    // NOP;
     if (!_success) {
       _c = $5;
       _pos = $6;
@@ -633,8 +630,6 @@ class Peg2Parser {
       $$ = _prefix(p, e, s);
       $4 = $$;
     }
-    // NOP;
-    // NOP;
     if (!_success) {
       _c = $5;
       _pos = $6;
@@ -973,8 +968,6 @@ class Peg2Parser {
       $$ = _prefix(p, e, s);
       $4 = $$;
     }
-    // NOP;
-    // NOP;
     if (!_success) {
       _c = $5;
       _pos = $6;
@@ -1719,12 +1712,10 @@ class Peg2Parser {
     var $14 = _parse$$IDENTIFIER(222, false);
     if (_success) {
       $10 = $13;
-    }
-    // NOP;
-    if (!_success) {
       _c = $11;
       _pos = $12;
     }
+    // NOP;
     $9 = $10;
     if (_success) {
       $6 = _text.substring($7, _pos);
@@ -1828,22 +1819,20 @@ class Peg2Parser {
         $10 = _text.substring($11, _pos);
       }
       $1 = $12;
+      String $17;
+      _success = _c == 125;
       if (_success) {
-        String $17;
-        _success = _c == 125;
-        if (_success) {
-          $17 = '}';
-          _c = _input[++_pos];
-        } else {
-          if (_fposEnd < _pos) {
-            _fposEnd = _pos;
-          }
+        $17 = '}';
+        _c = _input[++_pos];
+      } else {
+        if (_fposEnd < _pos) {
+          _fposEnd = _pos;
         }
+      }
+      if (_success) {
+        var $18 = _parse$$SPACING(236, false);
         if (_success) {
-          var $18 = _parse$$SPACING(236, false);
-          if (_success) {
-            $6 = $10;
-          }
+          $6 = $10;
         }
       }
     }
@@ -2177,21 +2166,19 @@ class Peg2Parser {
         $9 = _text.substring($10, _pos);
       }
       $1 = $11;
-      if (_success) {
-        String $16;
-        if (_c == 125) {
-          $16 = _matchString('}%');
-        } else {
-          _success = false;
-          if (_fposEnd < _pos) {
-            _fposEnd = _pos;
-          }
+      String $16;
+      if (_c == 125) {
+        $16 = _matchString('}%');
+      } else {
+        _success = false;
+        if (_fposEnd < _pos) {
+          _fposEnd = _pos;
         }
+      }
+      if (_success) {
+        var $17 = _parse$$SPACING(273, false);
         if (_success) {
-          var $17 = _parse$$SPACING(273, false);
-          if (_success) {
-            $5 = $9;
-          }
+          $5 = $9;
         }
       }
     }
@@ -2359,7 +2346,6 @@ class Peg2Parser {
           $5 = $$;
         }
       }
-      // NOP;
     }
     if (!_success) {
       _c = $6;
@@ -2413,22 +2399,20 @@ class Peg2Parser {
         $9 = _text.substring($10, _pos);
       }
       $1 = $11;
+      String $16;
+      _success = _c == 125;
       if (_success) {
-        String $16;
-        _success = _c == 125;
-        if (_success) {
-          $16 = '}';
-          _c = _input[++_pos];
-        } else {
-          if (_fposEnd < _pos) {
-            _fposEnd = _pos;
-          }
+        $16 = '}';
+        _c = _input[++_pos];
+      } else {
+        if (_fposEnd < _pos) {
+          _fposEnd = _pos;
         }
+      }
+      if (_success) {
+        var $17 = _parse$$SPACING(301, false);
         if (_success) {
-          var $17 = _parse$$SPACING(301, false);
-          if (_success) {
-            $5 = $9;
-          }
+          $5 = $9;
         }
       }
     }
@@ -2867,7 +2851,6 @@ class Peg2Parser {
         if (_success) {
           $5 = $8;
         }
-        // NOP;
       }
       if (!_success) {
         _c = $6;
@@ -2997,7 +2980,6 @@ class Peg2Parser {
       var $20 = _parse$$EOL(358, false);
       _success = true;
       $4 = $7;
-      // NOP;
       // NOP;
     }
     if (!_success) {

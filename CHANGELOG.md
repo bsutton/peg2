@@ -1,3 +1,8 @@
+## 0.1.16
+
+- Added command line option `--optimize-code`
+- Improved failure reporting
+
 ## 0.1.15
 
 - Fixed bug in generator `AnyCharcterExprtession` with the Unicode character greater then 0xffff

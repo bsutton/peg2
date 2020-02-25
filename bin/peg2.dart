@@ -24,6 +24,8 @@ void main(List<String> args) {
       help: 'Convert terminal calls into inline expressions');
   argParser.addFlag('memoize',
       defaultsTo: false, help: 'Memoize results of calls');
+  argParser.addFlag('optimize-code',
+      defaultsTo: true, help: 'Optimize generated code');
   argParser.addOption('parser',
       allowed: ['general', 'postfix'],
       defaultsTo: 'general',
@@ -40,6 +42,7 @@ void main(List<String> args) {
   options.inlineSubterminals = argResults['inline-subterminals'] as bool;
   options.inlineTerminals = argResults['inline-terminals'] as bool;
   options.memoize = argResults['memoize'] as bool;
+  options.optimizeCode = argResults['optimize-code'] as bool;
   options.parserType = argResults['parser'] as String;
   options.predict = argResults['predict'] as bool;
   if (argResults['inline-all'] as bool) {

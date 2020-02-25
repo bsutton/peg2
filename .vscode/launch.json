@@ -18,6 +18,7 @@
             "type": "dart",
             "args": [
                 "--predict",
+                "--no-optimize-code",
                 "example/example.peg",
                 "example/example.dart"
             ]

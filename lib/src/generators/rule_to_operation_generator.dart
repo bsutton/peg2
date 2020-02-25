@@ -82,7 +82,6 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
-    final b = block;
     final expressions = node.expressions;
     final returnType = node.returnType;
     final result = varAlloc.newVar(b, returnType, null);
@@ -97,10 +96,9 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
 
     if (expressions.length > 1) {
       addLoop(b, (b) {
-        block = b;
         for (var i = 0; i < expressions.length; i++) {
           final child = expressions[i];
-          child.accept(this);
+          runInBlock(b, () => child.accept(this));
           if (i < expressions.length - 1) {
             addIfVar(b, m.success, (b) {
               addAssign(b, varOp(result), varOp(resultVar));
@@ -130,7 +128,6 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     }
 
     resultVar = result;
-    block = b;
   }
 
   @override
@@ -160,7 +157,6 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     returnType ??= rule.expression.returnType;
     Variable start;
     final result = addMethod(returnType, name, params, (b) {
-      block = b;
       if (options.memoize && rule.callers.length > 1) {
         final memoized = callOp(varOp(m.memoized), [constOp(id), varOp(cid)]);
         addIf(b, memoized, (b) {
@@ -173,7 +169,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
 
       final result = varAlloc.newVar(b, returnType, null);
       final expression = rule.expression;
-      expression.accept(this);
+      runInBlock(b, () => expression.accept(this));
       addAssign(b, varOp(result), varOp(resultVar));
       if (options.memoize && rule.callers.length > 1) {
         final listAccess = ListAccessOperation(varOp(m.memoizable), varOp(cid));
@@ -316,7 +312,6 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
   }
 
   void _visitSymbol(SymbolExpression node, bool inline) {
-    final b = block;
     final rule = node.expression.rule;
     final name = Variable(getRuleMethodName(rule));
     final cid = node.id;
@@ -332,12 +327,10 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       }
     }
 
-    void gen(BlockOperation b) {
-      final prev = block;
-      block = b;
+    void genenarte() {
       if (inline) {
         final child = rule.expression;
-        child.accept(this);
+        acceptInBlock(b, varAlloc, child);
       } else {
         Operation isProductive;
         if (node.isProductive) {
@@ -350,8 +343,6 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         final result = varAlloc.newVar(b, 'var', methodCall);
         resultVar = result;
       }
-
-      block = prev;
     }
 
     if (surround) {
@@ -364,9 +355,9 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       final test = testRanges(ranges);
       final returnType = node.returnType;
       final result = varAlloc.newVar(b, returnType, null);
-      final start = varAlloc.newVar(b, 'var', varOp(m.pos));
+      //final start = varAlloc.newVar(b, 'var', varOp(m.pos));
       addIfElse(b, test, (b) {
-        gen(b);
+        runInBlock(b, genenarte);
         addAssign(b, varOp(result), varOp(resultVar));
       }, (b) {
         if (rule.expression.isSuccessful) {
@@ -374,7 +365,9 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         } else {
           addAssign(b, varOp(m.success), constOp(false));
           if (rule.kind == ProductionRuleKind.terminal) {
-            final params = [varOp(start), constOp(rule.name)];
+            addAssign(b, varOp(m.fposEnd), varOp(m.pos));
+            //final params = [varOp(start), constOp(rule.name)];
+            final params = [varOp(m.pos), constOp(rule.name)];
             final fail = callOp(varOp(m.fail), params);
             addOp(b, fail);
           }
@@ -383,7 +376,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
 
       resultVar = result;
     } else {
-      gen(b);
+      runInBlock(b, genenarte);
     }
   }
 }
