@@ -123,8 +123,10 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     addAssign(b, varOp(m.success), test);
     addIfElse(b, varOp(m.success), (b) {
       addAssign(b, varOp(result), varOp(m.c));
-      final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
-      final listAcc = ListAccessOperation(varOp(m.input), preInc);
+      final testC = lteOp(varOp(m.c), constOp(0xffff));
+      final ternary = TernaryOperation(testC, constOp(1), constOp(2));
+      final assignPos = addAssignOp(varOp(m.pos), ternary);
+      final listAcc = ListAccessOperation(varOp(m.input), assignPos);
       addAssign(b, varOp(m.c), listAcc);
     }, (b) {
       final test = binOp(OperationKind.lt, varOp(m.fposEnd), varOp(m.pos));

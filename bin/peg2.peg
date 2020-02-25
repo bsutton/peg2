@@ -59,8 +59,8 @@ Definition =
   ;
 
 ProductionRule NonterminalDefinition =
-  t:Type n:'non terminal name' '=' e:NonterminalExpression ';' { $$ = ProductionRule(n, ProductionRuleKind.Nonterminal, e, t); }
-  / n:'non terminal name' '=' e:NonterminalExpression ';' { $$ = ProductionRule(n, ProductionRuleKind.Nonterminal, e, null); }
+  t:Type n:'non terminal name' '=' e:NonterminalExpression ';' { $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, t); }
+  / n:'non terminal name' '=' e:NonterminalExpression ';' { $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, null); }
   ;
 
 OrderedChoiceExpression NonterminalExpression =
@@ -86,8 +86,8 @@ Expression NonterminalPrimary =
   ;
 
 ProductionRule TerminalDefinition =
-  t:Type n:'terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.Terminal, e, t); }
-  / n:'terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.Terminal, e, null); }
+  t:Type n:'terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.terminal, e, t); }
+  / n:'terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.terminal, e, null); }
   ;
 
 OrderedChoiceExpression Expression =
@@ -116,8 +116,8 @@ Expression Primary =
   ;
 
 ProductionRule SubterminalDefinition =
-  t:Type n:'sub terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.Subterminal, e, t); }
-  / n:'sub terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.Subterminal, e, null); }
+  t:Type n:'sub terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, t); }
+  / n:'sub terminal name' '=' e:Expression ';' { $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, null); }
   ;
 
 String Type =

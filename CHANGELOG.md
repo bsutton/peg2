@@ -1,3 +1,7 @@
+## 0.1.15
+
+- Fixed bug in generator `AnyCharcterExprtession` with the Unicode character greater then 0xffff
+
 ## 0.1.14
 
 - Fixed bug with an increment value of `_pos_`, the length of the Unicode character was not taken into account
