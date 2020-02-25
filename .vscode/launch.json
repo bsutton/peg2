@@ -12,14 +12,25 @@
             ]
         },
         {
-            "name": "create example",
+            "name": "build example",
+            "program": "bin/peg2.dart",
+            "request": "launch",
+            "type": "dart",
+            "args": [
+                "--predict",
+                "example/example.peg",
+                "example/example.dart"
+            ]
+        },
+        {
+            "name": "gen example",
             "program": "bin/peg2.dart",
             "request": "launch",
             "type": "dart",
             "args": [
                 //"--inline-all",
-                "--predict",
-                //"--parser=postfix",
+                //"--predict",
+                "--parser=postfix",
                 "example/example.peg",
                 "example/example.dart"
             ]
