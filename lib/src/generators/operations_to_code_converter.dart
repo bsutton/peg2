@@ -27,6 +27,9 @@ class OperationsToCodeConverter extends OperationVisitor {
     sb.write(_resultAsString());
     sb.write(' ');
     switch (node.kind) {
+      case OperationKind.addAssign:
+        sb.write('+=');
+        break;
       case OperationKind.assign:
         sb.write('=');
         break;
@@ -308,5 +311,26 @@ class OperationsToCodeConverter extends OperationVisitor {
     }
 
     throw StateError('Expected "Builder" result');
+  }
+
+  @override
+  void visitTernary(TernaryOperation node) {
+    final sb = StringBuffer();
+    node.test.accept(this);
+    sb.write(_resultAsString());
+    sb.write(' ? ');
+    switch (node.kind) {
+      case OperationKind.ternary:
+        node.ifTrue.accept(this);
+        sb.write(_resultAsString());
+        sb.write(' : ');
+        node.ifFalse.accept(this);
+        sb.write(_resultAsString());
+        break;
+      default:
+        throw StateError('Unknown ternary operation: ${node.kind}');
+    }
+
+    _result = sb.toString();
   }
 }

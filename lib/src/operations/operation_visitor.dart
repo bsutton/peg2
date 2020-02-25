@@ -33,6 +33,8 @@ abstract class OperationVisitor {
 
   void visitReturn(ReturnOperation node);
 
+  void visitTernary(TernaryOperation node);
+
   void visitUnary(UnaryOperation node);
 
   void visitVariable(VariableOperation node);

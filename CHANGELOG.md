@@ -1,3 +1,7 @@
+## 0.1.14
+
+- Fixed bug with an increment value of `_pos_`, the length of the Unicode character was not taken into account
+
 ## 0.1.12
 
 - Implemented experimental prediction feature, command line option `--predict`

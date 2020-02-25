@@ -71,7 +71,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
   String getRuleMethodName(ProductionRule rule);
 
-  Operation rangesToBinaryTest(List<int> ranges) {
+  Operation testRanges(List<int> ranges) {
     Operation op(int start, int end) {
       if (start == end) {
         return equalOp(varOp(m.c), constOp(start));
@@ -166,12 +166,14 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     Variable result;
     if (ranges.length <= 20) {
       result = varAlloc.newVar(block, 'int', null);
-      final test = rangesToBinaryTest(ranges);
+      final test = testRanges(ranges);
       addIfElse(b, test, (b) {
         addAssign(b, varOp(m.success), constOp(true));
         addAssign(b, varOp(result), varOp(m.c));
-        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
-        final listAcc = ListAccessOperation(varOp(m.input), preInc);
+        final testC = lteOp(varOp(m.c), constOp(0xffff));
+        final ternary = TernaryOperation(testC, constOp(1), constOp(2));
+        final assignPos = addAssignOp(varOp(m.pos), ternary);
+        final listAcc = ListAccessOperation(varOp(m.input), assignPos);
         addAssign(b, varOp(m.c), listAcc);
       }, (b) {
         addAssign(b, varOp(m.success), constOp(false));
@@ -209,8 +211,14 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       addAssign(b, varOp(m.success), test);
       addIfElse(b, varOp(m.success), (b) {
         addAssign(b, varOp(result), constOp(text));
-        final preInc = unaryOp(OperationKind.preInc, varOp(m.pos));
-        final listAcc = ListAccessOperation(varOp(m.input), preInc);
+        Operation posAssign;
+        if (rune <= 0xffff) {
+          posAssign = unaryOp(OperationKind.preInc, varOp(m.pos));
+        } else {
+          posAssign = addAssignOp(varOp(m.pos), constOp(2));
+        }
+
+        final listAcc = ListAccessOperation(varOp(m.input), posAssign);
         addAssign(b, varOp(m.c), listAcc);
       }, (b) {
         final test = ltOp(varOp(m.fposEnd), varOp(m.pos));

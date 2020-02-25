@@ -8,6 +8,11 @@ class OperationUtils {
     return op;
   }
 
+  BinaryOperation addAssignOp(Operation left, Operation right) {
+    final op = BinaryOperation(left, OperationKind.addAssign, right);
+    return op;
+  }
+
   BreakOperation addBreak(BlockOperation block) {
     final op = BreakOperation();
     addOp(block, op);

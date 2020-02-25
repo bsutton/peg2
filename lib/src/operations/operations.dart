@@ -32,6 +32,7 @@ class BinaryOperation extends Operation {
 
   BinaryOperation(this.left, this._kind, this.right) {
     switch (kind) {
+      case OperationKind.addAssign:
       case OperationKind.assign:
       case OperationKind.equal:
       case OperationKind.gt:
@@ -348,6 +349,7 @@ abstract class Operation {
 
 enum OperationKind {
   action,
+  addAssign,
   assign,
   block,
   break_,
@@ -376,6 +378,7 @@ enum OperationKind {
   preDec,
   preInc,
   return_,
+  ternary,
   variable,
 }
 
@@ -418,6 +421,31 @@ class ReturnOperation extends Operation {
   @override
   void visitChildren(OperationVisitor visitor) {
     operation?.accept(visitor);
+  }
+}
+
+class TernaryOperation extends Operation {
+  Operation ifFalse;
+
+  Operation ifTrue;
+
+  Operation test;
+
+  TernaryOperation(this.test, this.ifTrue, this.ifFalse);
+
+  @override
+  OperationKind get kind => OperationKind.ternary;
+
+  @override
+  void accept(OperationVisitor visitor) {
+    visitor.visitTernary(this);
+  }
+
+  @override
+  void visitChildren(OperationVisitor visitor) {
+    test.accept(visitor);
+    ifTrue.accept(visitor);
+    ifFalse?.accept(visitor);
   }
 }
 

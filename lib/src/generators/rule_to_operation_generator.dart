@@ -361,7 +361,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         ranges.add(group.end);
       }
 
-      final test = rangesToBinaryTest(ranges);
+      final test = testRanges(ranges);
       final returnType = node.returnType;
       final result = varAlloc.newVar(b, returnType, null);
       final start = varAlloc.newVar(b, 'var', varOp(m.pos));

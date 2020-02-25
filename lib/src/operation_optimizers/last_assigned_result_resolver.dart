@@ -16,14 +16,19 @@ class LastAssignedResultResolver extends SimpleOperationVisitor {
   @override
   void visitBinary(BinaryOperation node) {
     super.visitBinary(node);
-    if (node.kind == OperationKind.assign) {
-      if (node.left is VariableOperation) {
-        final left = node.left as VariableOperation;
-        final variable = left.variable;
-        _result[variable] = node.right;
-        node.parent.variableUsage(variable, -1, VariableUsage.read);
-        node.parent.variableUsage(variable, 1, VariableUsage.write);
-      }
+    switch (node.kind) {
+      case OperationKind.assign:
+        if (node.left is VariableOperation) {
+          final left = node.left as VariableOperation;
+          final variable = left.variable;
+          _result[variable] = node.right;
+          node.parent.variableUsage(variable, -1, VariableUsage.read);
+          node.parent.variableUsage(variable, 1, VariableUsage.write);
+        }
+
+        break;
+      default:
+        break;
     }
 
     node.variableResults = {..._result};

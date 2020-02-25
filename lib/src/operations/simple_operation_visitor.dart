@@ -1,6 +1,6 @@
 part of '../../operations.dart';
 
-abstract class SimpleOperationVisitor extends OperationVisitor {
+class SimpleOperationVisitor extends OperationVisitor {
   void visit(Operation node) {
     node.visitChildren(this);
   }
@@ -52,6 +52,9 @@ abstract class SimpleOperationVisitor extends OperationVisitor {
 
   @override
   void visitReturn(ReturnOperation node) => visit(node);
+
+  @override
+  void visitTernary(TernaryOperation node) => visit(node);
 
   @override
   void visitUnary(UnaryOperation node) => visit(node);
