@@ -12,7 +12,7 @@ void main() {
 }
 
 final _text = '''
-{"foo": "🚀start"}
+{"rocket": "🚀 flies to the stars"}
 ''';
 
 class ExampleParser {
