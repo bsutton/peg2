@@ -12,7 +12,7 @@ void main() {
 }
 
 final _text = '''
-{""
+{"rocket": "🚀 flies to the stars"}
 ''';
 
 class ExampleParser {
@@ -95,37 +95,139 @@ class ExampleParser {
       return 'end of file';
     }
 
+    String report(String message, String source, int start) {
+      if (start < 0 || start > source.length) {
+        start = null;
+      }
+
+      final sb = StringBuffer();
+      sb.write(message);
+      var line = 0;
+      var col = 0;
+      var lineStart = 0;
+      var started = false;
+      if (start != null) {
+        for (var i = 0; i < source.length; i++) {
+          final c = source.codeUnitAt(i);
+          if (!started) {
+            started = true;
+            lineStart = i;
+            line++;
+            col = 1;
+          } else {
+            col++;
+          }
+          if (c == 10) {
+            started = false;
+          }
+          if (start == i) {
+            break;
+          }
+        }
+      }
+
+      if (start == null) {
+        sb.writeln('.');
+      } else if (line == 0 || start == source.length) {
+        sb.writeln(' (at end of file):');
+      } else {
+        sb.write(' (at line ');
+        sb.write(line);
+        sb.write(', column ');
+        sb.write(col);
+        sb.writeln('):');
+      }
+
+      List<int> escape(int c) {
+        switch (c) {
+          case 9:
+            return [92, 116];
+          case 10:
+            return [92, 110];
+          case 13:
+            return [92, 114];
+          default:
+            return [c];
+        }
+      }
+
+      const max = 70;
+      if (start != null) {
+        final c1 = <int>[];
+        final c2 = <int>[];
+        final half = max ~/ 2;
+        var cr = false;
+        for (var i = start; i >= lineStart && c1.length < half; i--) {
+          if (i == source.length) {
+            c2.insert(0, 94);
+          } else {
+            final c = source.codeUnitAt(i);
+            final escaped = escape(c);
+            c1.insertAll(0, escaped);
+            if (c == 10) {
+              cr = true;
+            }
+
+            var r = i == start ? 94 : 32;
+            for (var k = 0; k < escaped.length; k++) {
+              c2.insert(0, r);
+            }
+          }
+        }
+
+        for (var i = start + 1;
+            i < source.length && c1.length < max && !cr;
+            i++) {
+          final c = source.codeUnitAt(i);
+          final escaped = escape(c);
+          c1.addAll(escaped);
+          if (c == 10) {
+            break;
+          }
+        }
+
+        var text1 = String.fromCharCodes(c1);
+        var text2 = String.fromCharCodes(c2);
+        sb.writeln(text1);
+        sb.writeln(text2);
+      }
+
+      return sb.toString();
+    }
+
     final temp = _failures.take(_fcount).toList();
     temp.sort((e1, e2) => e1.compareTo(e2));
     final terminals = temp.toSet();
     final hasMalformed = _fposStart != _fposMax;
     if (terminals.isNotEmpty) {
       if (!hasMalformed) {
-        final offset = _fposStart == _text.length ? _text.length - 1 : _fposStart;
         final sb = StringBuffer();
         sb.write('Expected ');
         sb.write(terminals.join(', '));
         sb.write(' but found ');
         sb.write(getc(_fposStart));
-        final message = sb.toString();
-        error = FormatException(message, _text, _fposStart);
+        final title = sb.toString();
+        final message = report(title, _text, _fposStart);
+        error = FormatException(message);
       } else {
         final reason = _fposMax == _text.length ? 'Unterminated' : 'Malformed';
         final sb = StringBuffer();
         sb.write(reason);
         sb.write(' ');
         sb.write(terminals.join(', '));
-        final message = sb.toString();
-        error = FormatException(message, _text, _fposMax);
+        final title = sb.toString();
+        final message = report(title, _text, _fposStart);
+        error = FormatException(message);
       }
     } else {
       final sb = StringBuffer();
       sb.write('Unexpected character ');
       sb.write(getc(_fposStart));
-      final message = sb.toString();
-      error = FormatException(message, _text, _fposStart);
+      final title = sb.toString();
+      final message = report(title, _text, _fposStart);
+      error = FormatException(message);
     }
-  }  
+  }
 
   void _fail(int start, String name) {
     if (_fposStart < start) {
@@ -2030,99 +2132,6 @@ class _Memo {
     this.success,
   });
 }
-
-
-class Foo {
-  String message;
-
-  int offset;
-
-  var source;
-
-  String toString() {
-    String report = "FormatException";
-    if (message != null && "" != message) {
-      report = "$report: $message";
-    }
-    int offset = this.offset;
-    Object objectSource = this.source;
-    if (objectSource is String) {
-      String source = objectSource;
-      if (offset != null && (offset < 0 || offset > source.length)) {
-        offset = null;
-      }
-      // Source is string and offset is null or valid.
-      if (offset == null) {
-        if (source.length > 78) {
-          source = source.substring(0, 75) + "...";
-        }
-        return "$report\n$source";
-      }
-      int lineNum = 1;
-      int lineStart = 0;
-      bool previousCharWasCR = false;
-      for (int i = 0; i < offset; i++) {
-        int char = source.codeUnitAt(i);
-        if (char == 0x0a) {
-          if (lineStart != i || !previousCharWasCR) {
-            lineNum++;
-          }
-          lineStart = i + 1;
-          previousCharWasCR = false;
-        } else if (char == 0x0d) {
-          lineNum++;
-          lineStart = i + 1;
-          previousCharWasCR = true;
-        }
-      }
-      if (lineNum > 1) {
-        report += " (at line $lineNum, character ${offset - lineStart + 1})\n";
-      } else {
-        report += " (at character ${offset + 1})\n";
-      }
-      int lineEnd = source.length;
-      for (int i = offset; i < source.length; i++) {
-        int char = source.codeUnitAt(i);
-        if (char == 0x0a || char == 0x0d) {
-          lineEnd = i;
-          break;
-        }
-      }
-      int length = lineEnd - lineStart;
-      int start = lineStart;
-      int end = lineEnd;
-      String prefix = "";
-      String postfix = "";
-      if (length > 78) {
-        // Can't show entire line. Try to anchor at the nearest end, if
-        // one is within reach.
-        int index = offset - lineStart;
-        if (index < 75) {
-          end = start + 75;
-          postfix = "...";
-        } else if (end - offset < 75) {
-          start = end - 75;
-          prefix = "...";
-        } else {
-          // Neither end is near, just pick an area around the offset.
-          start = offset - 36;
-          end = offset + 36;
-          prefix = postfix = "...";
-        }
-      }
-      String slice = source.substring(start, end);
-      int markOffset = offset - start + prefix.length;
-      return "$report$prefix$slice$postfix\n${" " * markOffset}^\n";
-    } else {
-      // The source is not a string.
-      if (offset != null) {
-        report += " (at offset $offset)";
-      }
-      return report;
-    }
-  }
-}
-
 // ignore_for_file: prefer_final_locals
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
