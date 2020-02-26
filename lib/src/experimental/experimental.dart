@@ -6,8 +6,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   Map<String, Variable> _methodVariables;
 
-  bool _isPostfixVisit = false;
-
   final Grammar grammar;
 
   ExperimentalGenerator(this.grammar, ParserGeneratorOptions options)
@@ -19,6 +17,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     _methodVariables = {};
     for (final rule in grammar.rules) {
       final expression = rule.expression;
+      va = newVarAlloc();
       expression.accept(this);
     }
 
@@ -109,53 +108,11 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
   }
 
   @override
-  void visitOneOrMore(OneOrMoreExpression node) {
-    final child = node.expression;
-    if (!_isPostfixVisit) {
-      super.visitOneOrMore(node);
-    } else {
-      _isPostfixVisit = false;
-      _generatePostfixMethod(node, getLocalVarAlloc(), (b) {
-        final returnType = node.returnType;
-        final result = varAlloc.newVar(b, returnType, null);
-        addIfVar(b, m.success, (b) {
-          addIfElse(b, varOp(productive), (b) {
-            addAssign(b, varOp(result), ListOperation(null, []));
-            final add = Variable('add');
-            addMbrCall(b, varOp(result), varOp(add), [varOp(resultVar)]);
-          });
-
-          addLoop(b, (b) {
-            acceptInBlock(b, varAlloc, child);
-            addIfNotVar(b, m.success, (b) {
-              addAssign(b, varOp(m.success), constOp(true));
-              addBreak(b);
-            });
-
-            addIfElse(b, varOp(productive), (b) {
-              final add = Variable('add');
-              addMbrCall(b, varOp(result), varOp(add), [varOp(resultVar)]);
-            });
-          });
-        });
-      });
-    }
-  }
-
-  @override
-  void visitOptional(OptionalExpression node) {
-    if (!_isPostfixVisit) {
-      super.visitOptional(node);
-    } else {
-      _isPostfixVisit = false;
-      _generatePostfixMethod(node, getLocalVarAlloc(), (b) {
-        addAssign(b, varOp(m.success), constOp(true));
-      });
-    }
-  }
-
-  @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
+    if (node.id == 6 || node.id == 27) {
+      var x = 0;
+    }
+
     final expressions = node.expressions;
     for (final child in expressions) {
       child.accept(this);
@@ -166,10 +123,10 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
       // TODO: callerId
       final parameters = [constOp(0), constOp(true)];
       final call = callOp(varOp(methodVar), parameters);
-      resultVar = varAlloc.newVar(b, 'var', call);
+      resultVar = va.newVar(b, 'var', call);
     }
 
-    _generateChoiceMethod(node, getLocalVarAlloc(), (b) {
+    _generateChoiceMethod(node, newVarAlloc(), (b) {
       /*
         final list = SparseList<List<Expression>>();
         for (var i = 0; i < expressions.length; i++) {
@@ -202,8 +159,17 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
         return result;
       }
 
+      final c = va.newVar(b, 'var', varOp(m.c));
+      final pos = va.newVar(b, 'var', varOp(m.pos));
+      Expression prev;
       void visit(BlockOperation b, List<Expression> choice, int index) {
         if (index > choice.length - 1) {
+          addIfVar(b, m.success, (b) {
+            final returnParameter = findMethodParameter(node, paramReturn);
+            addAssign(b, varOp(returnParameter.variable), varOp(resultVar));
+            addBreak(b);
+          });
+
           return;
         }
 
@@ -211,9 +177,9 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
         if (expression is StartExpression) {
           final child = expression.expression;
           if (child is AndPredicateExpression) {
-            final c = varAlloc.newVar(b, 'var', varOp(m.c));
-            final pos = varAlloc.newVar(b, 'var', varOp(m.pos));
-            final predicate = varAlloc.newVar(b, 'var', varOp(m.predicate));
+            final c = va.newVar(b, 'var', varOp(m.c));
+            final pos = va.newVar(b, 'var', varOp(m.pos));
+            final predicate = va.newVar(b, 'var', varOp(m.predicate));
             final context = {
               'c': c,
               'pos': pos,
@@ -223,9 +189,9 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
             contexts[child] = context;
             addAssign(b, varOp(m.predicate), constOp(true));
           } else if (child is NotPredicateExpression) {
-            final c = varAlloc.newVar(b, 'var', varOp(m.c));
-            final pos = varAlloc.newVar(b, 'var', varOp(m.pos));
-            final predicate = varAlloc.newVar(b, 'var', varOp(m.predicate));
+            final c = va.newVar(b, 'var', varOp(m.c));
+            final pos = va.newVar(b, 'var', varOp(m.pos));
+            final predicate = va.newVar(b, 'var', varOp(m.predicate));
             final context = {
               'c': c,
               'pos': pos,
@@ -235,8 +201,8 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
             contexts[child] = context;
             addAssign(b, varOp(m.predicate), constOp(true));
           } else if (child is CaptureExpression) {
-            final start = varAlloc.newVar(b, 'var', varOp(m.pos));
-            final prod = varAlloc.newVar(b, 'var', varOp(productive));
+            final start = va.newVar(b, 'var', varOp(m.pos));
+            final prod = va.newVar(b, 'var', varOp(productive));
             final context = {
               'productive': prod,
               'start': start,
@@ -248,7 +214,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
         } else if (expression is AnyCharacterExpression ||
             expression is CharacterClassExpression ||
             expression is LiteralExpression) {
-          acceptInBlock(b, varAlloc, expression);
+          acceptInBlock(b, va, expression);
         } else if (expression is SingleExpression) {
           if (expression is OptionalExpression) {
             addAssign(b, varOp(m.success), constOp(true));
@@ -260,7 +226,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
             addAssign(b, varOp(m.c), varOp(c));
             addAssign(b, varOp(m.pos), varOp(pos));
             addAssign(b, varOp(m.predicate), varOp(predicate));
-            resultVar = varAlloc.newVar(b, 'var', null);
+            resultVar = va.newVar(b, 'var', null);
           } else if (expression is NotPredicateExpression) {
             final context = findContext(expression);
             final c = context['c'];
@@ -269,7 +235,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
             addAssign(b, varOp(m.c), varOp(c));
             addAssign(b, varOp(m.pos), varOp(pos));
             addAssign(b, varOp(m.predicate), varOp(predicate));
-            resultVar = varAlloc.newVar(b, 'var', null);
+            resultVar = va.newVar(b, 'var', null);
             addAssign(b, varOp(m.success),
                 unaryOp(OperationKind.not, varOp(m.success)));
           } else if (expression is CaptureExpression) {
@@ -277,33 +243,103 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
             final start = context['start'];
             final prod = context['productive'];
             addAssign(b, varOp(productive), varOp(prod));
-            resultVar = varAlloc.newVar(b, 'String', null);
+            resultVar = va.newVar(b, 'String', null);
             addIfVar(b, m.success, (b) {
               final substring = Variable('substring');
               final call = mbrCallOp(varOp(m.text), varOp(substring),
                   [varOp(start), varOp(m.pos)]);
               addAssign(b, varOp(resultVar), call);
             });
+          } else if (expression is OneOrMoreExpression) {
+            final child = expression.expression;
+            final returnType = expression.returnType;
+            final result = va.newVar(b, returnType, null);
+            addIfVar(b, m.success, (b) {
+              addIfElse(b, varOp(productive), (b) {
+                addAssign(b, varOp(result), ListOperation(null, []));
+                final add = Variable('add');
+                addMbrCall(b, varOp(result), varOp(add), [varOp(resultVar)]);
+              });
+
+              addLoop(b, (b) {
+                acceptInBlock(b, va, child);
+                addIfNotVar(b, m.success, (b) {
+                  addAssign(b, varOp(m.success), constOp(true));
+                  addBreak(b);
+                });
+
+                addIfElse(b, varOp(productive), (b) {
+                  final add = Variable('add');
+                  addMbrCall(b, varOp(result), varOp(add), [varOp(resultVar)]);
+                });
+              });
+            });
+          } else if (expression is ZeroOrMoreExpression) {
+            final child = expression.expression;
+            final returnType = expression.returnType;
+            final result = va.newVar(b, returnType, null);
+            addIfVar(b, m.success, (b) {
+              addIfElse(b, varOp(productive), (b) {
+                addAssign(b, varOp(result), ListOperation(null, []));
+              });
+
+              addLoop(b, (b) {
+                acceptInBlock(b, va, child);
+                addIfNotVar(b, m.success, addBreak);
+                addIfElse(b, varOp(productive), (b) {
+                  final add = Variable('add');
+                  addMbrCall(b, varOp(result), varOp(add), [varOp(resultVar)]);
+                });
+              });
+            });
+
+            addAssign(b, varOp(m.success), constOp(true));
+            resultVar = result;
           } else {
-            _isPostfixVisit = true;
-            acceptInBlock(b, varAlloc, expression);
-            final methodVar = _getMethodVariable(expression);
-            final parameters = [varOp(resultVar), constOp(true)];
-            final callExpr = callOp(varOp(methodVar), parameters);
-            resultVar = varAlloc.newVar(b, 'var', callExpr);
+            throw StateError('Invalid expresssion: ${expression.runtimeType}');
           }
         } else if (expression is SequenceExpression) {
-          acceptInBlock(b, varAlloc, expression);
-          final methodVar = _getMethodVariable(expression);
-          final parameters = [varOp(resultVar), constOp(true)];
-          final callExpr = callOp(varOp(methodVar), parameters);
-          resultVar = varAlloc.newVar(b, 'var', callExpr);
+          final returnType = expression.returnType;
+          final result = va.newVar(b, returnType, null);
+          addIfVar(b, m.success, (b) {
+            acceptInBlock(b, va, expression);
+            final methodVar = _getMethodVariable(expression);
+            final parameters = [varOp(resultVar), constOp(true)];
+            final call = callOp(varOp(methodVar), parameters);
+            addAssign(b, varOp(result), call);
+            resultVar = result;
+          });
         } else if (expression is OrderedChoiceExpression) {
-          // Finalize terminal
+          final rule = expression.rule;
+          final isTerminal = expression.parent == null &&
+              rule.kind == ProductionRuleKind.terminal;
+          if (prev is OrderedChoiceExpression) {
+            if (isTerminal) {
+              addIfNotVar(b, m.success, (b) {
+                if (isTerminal) {
+                  final params = [varOp(pos), constOp(rule.name)];
+                  final fail = callOp(varOp(m.fail), params);
+                  addOp(b, fail);
+                }
+              });
+            }
+          } else {
+            addIfNotVar(b, m.success, (b) {
+              addAssign(b, varOp(m.c), varOp(c));
+              addAssign(b, varOp(m.pos), varOp(pos));
+              final rule = expression.rule;
+              if (isTerminal) {
+                final params = [varOp(pos), constOp(rule.name)];
+                final fail = callOp(varOp(m.fail), params);
+                addOp(b, fail);
+              }
+            });
+          }
         } else {
           throw StateError('Invalid expresssion: ${expression.runtimeType}');
         }
 
+        prev = expression;
         visit(b, choice, index + 1);
       }
 
@@ -311,16 +347,46 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
       final root = expressionChainResolver.resolve(node);
       final choices = _flattenNode(root);
       addLoop(b, (b) {
-        for (var i = 0; i < choices.length; i++) {
-          final choice = choices[i];
-          if (node.parent == null &&
-              node.rule.kind == ProductionRuleKind.terminal) {
-            // ???
+        bool reduce(Expression expression) {
+          if (expression is SequenceExpression) {
+            if (expression.expressions.length == 1) {
+              if (expression.actionIndex == null) {
+                // This is just a wrapper. Remove it.
+                return false;
+              }
+            }
           }
 
-          addAssign(b, varOp(m.fposEnd), constOp(-1));
+          return true;
+        }
 
+        for (var i = 0; i < choices.length; i++) {
+          final choice = choices[i].where(reduce).toList();
+          final terminals = choice.reversed.where((e) {
+            if (e is OrderedChoiceExpression) {
+              if (e.parent == null) {
+                if (e.rule.kind == ProductionRuleKind.terminal) {
+                  return true;
+                }
+              }
+            }
+
+            return false;
+          });
+
+          if (terminals.length == 1) {
+            addAssign(b, varOp(m.fposEnd), constOp(-1));
+          } else if (terminals.length > 1) {
+            throw StateError('To many terminals');
+          }
+
+          prev = null;
           visit(b, choice, 0);
+          if (i >= choices.length - 1) {
+            addBreak(b);
+          }
+
+          /*
           if (i < choices.length - 1) {
             addIfVar(b, m.success, (b) {
               final returnParameter = findMethodParameter(node, paramReturn);
@@ -335,6 +401,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
             addBreak(b);
           }
+          */
         }
       });
     });
@@ -342,7 +409,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   @override
   void visitSequence(SequenceExpression node) {
-    final varAlloc = getLocalVarAlloc();
+    final varAlloc = newVarAlloc();
     _generatePostfixMethod(node, varAlloc, (b) {
       productive = findMethodParameter(node, paramProductive).variable;
       super.visitSequence(node);
@@ -357,38 +424,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
   @override
   void visitTerminal(TerminalExpression node) {
     _visitSymbolExpression(node);
-  }
-
-  @override
-  void visitZeroOrMore(ZeroOrMoreExpression node) {
-    final child = node.expression;
-    if (!_isPostfixVisit) {
-      super.visitZeroOrMore(node);
-    } else {
-      _isPostfixVisit = false;
-      final varAlloc = getLocalVarAlloc();
-      _generatePostfixMethod(node, varAlloc, (b) {
-        final returnType = node.returnType;
-        final result = varAlloc.newVar(b, returnType, null);
-        addIfVar(b, m.success, (b) {
-          addIfElse(b, varOp(productive), (b) {
-            addAssign(b, varOp(result), ListOperation(null, []));
-          });
-
-          addLoop(b, (b) {
-            acceptInBlock(b, varAlloc, child);
-            addIfNotVar(b, m.success, addBreak);
-            addIfElse(b, varOp(productive), (b) {
-              final add = Variable('add');
-              addMbrCall(b, varOp(result), varOp(add), [varOp(resultVar)]);
-            });
-          });
-        });
-
-        addAssign(b, varOp(m.success), constOp(true));
-        resultVar = result;
-      });
-    }
   }
 
   List<List<Expression>> _flattenNode(ExpressionNode node) {
@@ -422,7 +457,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
 
   void _generateMethod(
       Expression expression,
-      VariableAllocator varAlloc,
+      VariableAllocator va,
       Map<String, ParameterOperation> parameters,
       void Function(BlockOperation) f) {
     final variable = _getMethodVariable(expression);
@@ -443,16 +478,19 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     _methods[expression] = method;
     final rv = resultVar;
     final b = method.body;
-    final returnVariable = varAlloc.alloc();
+    final returnVariable = va.alloc();
     final returnParam = ParameterOperation(returnType, returnVariable);
     addMethodParameter(expression, paramReturn, returnParam);
     addOp(b, returnParam);
+    final pva = this.va;
+    this.va = va;
     runInBlock(b, () => f(b));
+    this.va = pva;
     addReturn(b, varOp(returnVariable));
     resultVar = rv;
   }
 
-  void _generatePostfixMethod(Expression expression, VariableAllocator varAlloc,
+  void _generatePostfixMethod(Expression expression, VariableAllocator va,
       void Function(BlockOperation) f) {
     var postfixType = 'var';
     if (expression is SingleExpression) {
@@ -466,14 +504,14 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
           'Unable to generate postfix nethod for expression: ${expression.runtimeType}');
     }
 
-    final postfix = ParameterOperation(postfixType, varAlloc.alloc());
-    final productive = ParameterOperation('bool', varAlloc.alloc());
+    final postfix = ParameterOperation(postfixType, va.alloc());
+    final productive = ParameterOperation('bool', va.alloc());
     final parameters = {
       paramPostfix: postfix,
       paramProductive: productive,
     };
 
-    _generateMethod(expression, varAlloc, parameters, f);
+    _generateMethod(expression, va, parameters, f);
   }
 
   String _getExpressionMethodName(Expression expression) {
@@ -500,8 +538,8 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     returnType ??= rule.expression.returnType;
     final name = _getMethodVariable(expression);
     final parameters = [constOp(0), constOp(true)];
-    final callRule = callOp(varOp(name), parameters);
-    final result = varAlloc.newVar(b, returnType, callRule);
+    final call = callOp(varOp(name), parameters);
+    final result = va.newVar(b, returnType, call);
     resultVar = result;
   }
 }

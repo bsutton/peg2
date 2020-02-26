@@ -131,7 +131,9 @@ class ExpressionChainResolver extends ExpressionVisitor {
     final current = ExpressionNode(expression);
     parent.addChild(current);
     _parent = current;
-    _startExpressions.add(StartExpression(expression));
+    final start = StartExpression(expression);
+    start.rule = expression.rule;
+    _startExpressions.add(start);
     final child = expression.expression;
     child.accept(this);
     _parent = parent;

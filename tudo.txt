@@ -6,11 +6,13 @@ implement optimization of variable usage (via replacement)
 add some kinds of grammar analyzers
 implement optimizer to remove "_succes = true" before calls to [_parseXXX, _matchXXX]
 implement lookup tables (using starting characters of expressions) for the ordered choice expressions to improve the performance by skip unnecessary (heavy) operations
-improve expression starting characters resolver (reduce number of starting characters)
 find bug in unused variables optimizer?
 remove loop in postfix choice with single expression
 exmaple postfix _e185 does not has return statement
 implement analyzer warning when terminal isSucessful
 implement analyzer warning when repetition child isSucessful
 literal should use testRange
-rename varAlloc to va
+does not generate unused rules in postfix generator
+improve error message formatter (for Unicode)
+find bug with "break"
+duplicate methods in postfix e6 e27

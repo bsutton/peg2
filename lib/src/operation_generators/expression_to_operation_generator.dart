@@ -26,7 +26,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
   Variable resultVar;
 
-  VariableAllocator varAlloc;
+  VariableAllocator va;
 
   ExpressionToOperationGenerator(this.options);
 
@@ -63,7 +63,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     return parameters[name];
   }
 
-  VariableAllocator getLocalVarAlloc() {
+  VariableAllocator newVarAlloc() {
     var lastVariableId = 0;
     final result = VariableAllocator(() {
       final name = '\$${lastVariableId++}';
@@ -110,7 +110,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
   @override
   void visitAndPredicate(AndPredicateExpression node) {
     final child = node.expression;
-    final state = saveVars(b, varAlloc, [
+    final state = saveVars(b, va, [
       m.c,
       m.pos,
       m.predicate,
@@ -120,14 +120,14 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     addAssign(b, varOp(m.predicate), constOp(true));
     addAssign(b, varOp(productive), constOp(false));
     child.accept(this);
-    final result = varAlloc.newVar(b, 'var', null);
+    final result = va.newVar(b, 'var', null);
     restoreVars(b, state);
     resultVar = result;
   }
 
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
-    final result = varAlloc.newVar(b, 'int', null);
+    final result = va.newVar(b, 'int', null);
     final test = ltOp(varOp(m.c), varOp(m.eof));
     addAssign(b, varOp(m.success), test);
     addIfElse(b, varOp(m.success), (b) {
@@ -149,9 +149,9 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
   @override
   void visitCapture(CaptureExpression node) {
-    final result = varAlloc.newVar(b, 'String', null);
-    final start = varAlloc.newVar(b, 'var', varOp(m.pos));
-    final saved = saveVars(b, varAlloc, [productive]);
+    final result = va.newVar(b, 'String', null);
+    final start = va.newVar(b, 'var', varOp(m.pos));
+    final saved = saveVars(b, va, [productive]);
     addAssign(b, varOp(productive), constOp(false));
     node.expression.accept(this);
     addIfVar(b, m.success, (b) {
@@ -174,7 +174,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
     Variable result;
     if (ranges.length <= 20) {
-      result = varAlloc.newVar(b, 'int', null);
+      result = va.newVar(b, 'int', null);
       final test = testRanges(ranges);
       addIfElse(b, test, (b) {
         addAssign(b, varOp(m.success), constOp(true));
@@ -199,9 +199,9 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       }
 
       final listOp = ListOperation(null, elements);
-      final list = varAlloc.newVar(b, 'const', listOp);
+      final list = va.newVar(b, 'const', listOp);
       final matchRanges = callOp(varOp(m.matchRanges), [varOp(list)]);
-      result = varAlloc.newVar(b, 'var', matchRanges);
+      result = va.newVar(b, 'var', matchRanges);
     }
 
     resultVar = result;
@@ -214,7 +214,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     Variable result;
     if (runes.length == 1) {
       final rune = runes.first;
-      result = varAlloc.newVar(b, 'String', null);
+      result = va.newVar(b, 'String', null);
       final test = equalOp(varOp(m.c), constOp(rune));
       addAssign(b, varOp(m.success), test);
       addIfElse(b, varOp(m.success), (b) {
@@ -236,7 +236,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       });
     } else if (runes.length > 1) {
       final rune = runes.first;
-      result = varAlloc.newVar(b, 'String', null);
+      result = va.newVar(b, 'String', null);
       final test = equalOp(varOp(m.c), constOp(rune));
       addIfElse(b, test, (b) {
         final matchString = callOp(varOp(m.matchString), [constOp(text)]);
@@ -249,7 +249,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
         });
       });
     } else {
-      result = varAlloc.newVar(b, 'var', constOp(''));
+      result = va.newVar(b, 'var', constOp(''));
       addAssign(b, varOp(m.success), constOp(true));
     }
 
@@ -259,7 +259,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
   @override
   void visitNotPredicate(NotPredicateExpression node) {
     final child = node.expression;
-    final state = saveVars(b, varAlloc, [
+    final state = saveVars(b, va, [
       m.c,
       m.pos,
       m.predicate,
@@ -269,7 +269,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     addAssign(b, varOp(m.predicate), constOp(true));
     addAssign(b, varOp(productive), constOp(false));
     child.accept(this);
-    resultVar = varAlloc.newVar(b, 'var', null);
+    resultVar = va.newVar(b, 'var', null);
     addAssign(
         b, varOp(m.success), unaryOp(OperationKind.not, varOp(m.success)));
     restoreVars(b, state);
@@ -279,7 +279,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
   void visitOneOrMore(OneOrMoreExpression node) {
     final child = node.expression;
     final returnType = node.returnType;
-    final result = varAlloc.newVar(b, returnType, null);
+    final result = va.newVar(b, returnType, null);
     if (node.isProductive) {
       addIfElse(b, varOp(productive), (b) {
         addAssign(b, varOp(result), ListOperation(null, []));
@@ -288,9 +288,9 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       // Do nothing
     }
 
-    final passed = varAlloc.newVar(b, 'var', constOp(false));
+    final passed = va.newVar(b, 'var', constOp(false));
     addLoop(b, (b) {
-      acceptInBlock(b, varAlloc, child);
+      acceptInBlock(b, va, child);
       addIfNotVar(b, m.success, (b) {
         addAssign(b, varOp(m.success), varOp(passed));
         addIfNotVar(b, m.success, (b) {
@@ -332,7 +332,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       final returnParam = findMethodParameter(node, paramReturn);
       result = returnParam.variable;
     } else {
-      result = varAlloc.newVar(b, node.returnType, null);
+      result = va.newVar(b, node.returnType, null);
     }
 
     void Function(BlockOperation) onSuccess;
@@ -348,7 +348,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
     Map<Variable, Variable> savedState;
     if (hasSavedState) {
-      savedState = saveVars(b, varAlloc, [m.c, m.pos]);
+      savedState = saveVars(b, va, [m.c, m.pos]);
     }
 
     final results = <Expression, Variable>{};
@@ -364,10 +364,10 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
           final parameter = findMethodParameter(node, paramPostfix);
           resultVar = parameter.variable;
         } else {
-          acceptInBlock(b, varAlloc, child);
+          acceptInBlock(b, va, child);
         }
       } else {
-        acceptInBlock(b, varAlloc, child);
+        acceptInBlock(b, va, child);
       }
 
       results[child] = resultVar;
@@ -436,7 +436,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
   void visitZeroOrMore(ZeroOrMoreExpression node) {
     final child = node.expression;
     final returnType = node.returnType;
-    final result = varAlloc.newVar(b, returnType, null);
+    final result = va.newVar(b, returnType, null);
     if (node.isProductive) {
       addIfElse(b, varOp(productive), (b) {
         addAssign(b, varOp(result), ListOperation(null, []));
@@ -446,7 +446,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     }
 
     addLoop(b, (b) {
-      acceptInBlock(b, varAlloc, child);
+      acceptInBlock(b, va, child);
       addIfNotVar(b, m.success, addBreak);
       if (node.isProductive) {
         addIfElse(b, varOp(productive), (b) {

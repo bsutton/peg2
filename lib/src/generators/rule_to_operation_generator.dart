@@ -84,14 +84,14 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
   void visitOrderedChoice(OrderedChoiceExpression node) {
     final expressions = node.expressions;
     final returnType = node.returnType;
-    final result = varAlloc.newVar(b, returnType, null);
+    final result = va.newVar(b, returnType, null);
     final rule = node.rule;
     final isTerminal =
         node.parent == null && rule.kind == ProductionRuleKind.terminal;
     Variable start;
     if (isTerminal) {
       addAssign(b, varOp(m.fposEnd), constOp(-1));
-      start = varAlloc.newVar(b, 'var', varOp(m.pos));
+      start = va.newVar(b, 'var', varOp(m.pos));
     }
 
     if (expressions.length > 1) {
@@ -145,10 +145,10 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
   }
 
   MethodOperation _buildRule(ProductionRule rule) {
-    varAlloc = getLocalVarAlloc();
-    final cid = varAlloc.alloc();
+    va = newVarAlloc();
+    final cid = va.alloc();
     final id = rule.expression.id;
-    productive = varAlloc.alloc();
+    productive = va.alloc();
     final name = getRuleMethodName(rule);
     final params = <ParameterOperation>[];
     params.add(ParameterOperation('int', cid));
@@ -164,10 +164,10 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
           addReturn(b, convert);
         });
 
-        start = varAlloc.newVar(b, 'var', varOp(m.pos));
+        start = va.newVar(b, 'var', varOp(m.pos));
       }
 
-      final result = varAlloc.newVar(b, returnType, null);
+      final result = va.newVar(b, returnType, null);
       final expression = rule.expression;
       runInBlock(b, () => expression.accept(this));
       addAssign(b, varOp(result), varOp(resultVar));
@@ -330,7 +330,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     void genenarte() {
       if (inline) {
         final child = rule.expression;
-        acceptInBlock(b, varAlloc, child);
+        acceptInBlock(b, va, child);
       } else {
         Operation isProductive;
         if (node.isProductive) {
@@ -340,7 +340,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         }
 
         final methodCall = callOp(varOp(name), [constOp(cid), isProductive]);
-        final result = varAlloc.newVar(b, 'var', methodCall);
+        final result = va.newVar(b, 'var', methodCall);
         resultVar = result;
       }
     }
@@ -354,7 +354,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
 
       final test = testRanges(ranges);
       final returnType = node.returnType;
-      final result = varAlloc.newVar(b, returnType, null);
+      final result = va.newVar(b, returnType, null);
       //final start = varAlloc.newVar(b, 'var', varOp(m.pos));
       addIfElse(b, test, (b) {
         runInBlock(b, genenarte);
