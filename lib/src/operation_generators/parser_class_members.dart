@@ -35,6 +35,8 @@ class ParserClassMembers {
 
   final pushState = Variable('_pushState');
 
+  final silence = Variable('_silence');
+
   final startCapture = Variable('_startCapture');
 
   final stopCapture = Variable('_stopCapture');

@@ -15,4 +15,4 @@ literal should use testRange
 does not generate unused rules in postfix generator
 improve error message formatter (for Unicode)
 find bug with "break"
-duplicate methods in postfix e6 e27
+use silence in postfix generator

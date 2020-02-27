@@ -190,9 +190,13 @@ class OperationUtils {
     return variable;
   }
 
+  UnaryOperation notOp(Operation op) {
+    return UnaryOperation(OperationKind.not, op);
+  }
+
   void restoreVars(BlockOperation block, Map<Variable, Variable> variables) {
     for (final key in variables.keys) {
-      addAssign(block, varOp(variables[key]), varOp(key));
+      addAssign(block, varOp(key), varOp(variables[key]));
     }
   }
 
@@ -201,7 +205,7 @@ class OperationUtils {
     final result = <Variable, Variable>{};
     for (final element in identifiers) {
       final variable = newVar(block, 'var', varAlloc, varOp(element));
-      result[variable] = element;
+      result[element] = variable;
     }
 
     return result;

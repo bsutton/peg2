@@ -5,6 +5,8 @@ abstract class Expression {
 
   int index;
 
+  bool isSilentMode = false;
+
   bool isLast = false;
 
   bool isOptional = false;

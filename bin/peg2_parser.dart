@@ -112,16 +112,116 @@ class Peg2Parser {
         case 09:
           return r'\t';
         case _eof:
-          return '';
+          return 'end of file';
       }
       return String.fromCharCode(c);
     }
 
     String getc(int position) {
-      if (position < _input.length) {
+      if (position < _text.length) {
         return "'${escape(_input[position])}'";
       }
       return 'end of file';
+    }
+
+    String report(String message, String source, int start) {
+      if (start < 0 || start > source.length) {
+        start = null;
+      }
+
+      final sb = StringBuffer();
+      sb.write(message);
+      var line = 0;
+      var col = 0;
+      var lineStart = 0;
+      var started = false;
+      if (start != null) {
+        for (var i = 0; i < source.length; i++) {
+          final c = source.codeUnitAt(i);
+          if (!started) {
+            started = true;
+            lineStart = i;
+            line++;
+            col = 1;
+          } else {
+            col++;
+          }
+          if (c == 10) {
+            started = false;
+          }
+          if (start == i) {
+            break;
+          }
+        }
+      }
+
+      if (start == null) {
+        sb.writeln('.');
+      } else if (line == 0 || start == source.length) {
+        sb.writeln(' (at end of file):');
+      } else {
+        sb.write(' (at line ');
+        sb.write(line);
+        sb.write(', column ');
+        sb.write(col);
+        sb.writeln('):');
+      }
+
+      List<int> escape(int c) {
+        switch (c) {
+          case 9:
+            return [92, 116];
+          case 10:
+            return [92, 110];
+          case 13:
+            return [92, 114];
+          default:
+            return [c];
+        }
+      }
+
+      const max = 70;
+      if (start != null) {
+        final c1 = <int>[];
+        final c2 = <int>[];
+        final half = max ~/ 2;
+        var cr = false;
+        for (var i = start; i >= lineStart && c1.length < half; i--) {
+          if (i == source.length) {
+            c2.insert(0, 94);
+          } else {
+            final c = source.codeUnitAt(i);
+            final escaped = escape(c);
+            c1.insertAll(0, escaped);
+            if (c == 10) {
+              cr = true;
+            }
+
+            var r = i == start ? 94 : 32;
+            for (var k = 0; k < escaped.length; k++) {
+              c2.insert(0, r);
+            }
+          }
+        }
+
+        for (var i = start + 1;
+            i < source.length && c1.length < max && !cr;
+            i++) {
+          final c = source.codeUnitAt(i);
+          final escaped = escape(c);
+          c1.addAll(escaped);
+          if (c == 10) {
+            break;
+          }
+        }
+
+        var text1 = String.fromCharCodes(c1);
+        var text2 = String.fromCharCodes(c2);
+        sb.writeln(text1);
+        sb.writeln(text2);
+      }
+
+      return sb.toString();
     }
 
     final temp = _failures.take(_fcount).toList();
@@ -135,23 +235,26 @@ class Peg2Parser {
         sb.write(terminals.join(', '));
         sb.write(' but found ');
         sb.write(getc(_fposStart));
-        final message = sb.toString();
-        error = FormatException(message, _text, _fposStart);
+        final title = sb.toString();
+        final message = report(title, _text, _fposStart);
+        error = FormatException(message);
       } else {
-        final reason = _fposMax < _input.length ? 'Malformed' : 'Unterminated';
+        final reason = _fposMax == _text.length ? 'Unterminated' : 'Malformed';
         final sb = StringBuffer();
         sb.write(reason);
         sb.write(' ');
         sb.write(terminals.join(', '));
-        final message = sb.toString();
-        error = FormatException(message, _text, _fposStart);
+        final title = sb.toString();
+        final message = report(title, _text, _fposStart);
+        error = FormatException(message);
       }
     } else {
       final sb = StringBuffer();
       sb.write('Unexpected character ');
       sb.write(getc(_fposStart));
-      final message = sb.toString();
-      error = FormatException(message, _text, _fposStart);
+      final title = sb.toString();
+      final message = report(title, _text, _fposStart);
+      error = FormatException(message);
     }
   }
 
@@ -218,7 +321,7 @@ class Peg2Parser {
     } else {
       _success = false;
       if (_fposEnd < _pos) {
-        _fposEnd = _pos;
+        _fposEnd = _pos + i;
       }
     }
 

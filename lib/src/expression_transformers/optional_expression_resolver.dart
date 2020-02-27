@@ -20,6 +20,7 @@ class OptionalExpressionResolver extends ExpressionVisitor {
   @override
   void visitAndPredicate(AndPredicateExpression node) {
     final child = node.expression;
+    _setIsSilentMode(child, true);
     child.accept(this);
     _setIsOptional(node, false);
   }
@@ -32,6 +33,7 @@ class OptionalExpressionResolver extends ExpressionVisitor {
   @override
   void visitCapture(CaptureExpression node) {
     final child = node.expression;
+    _setIsSilentMode(child, node.isSilentMode);
     child.accept(this);
     _setIsOptional(node, child.isOptional);
   }
@@ -55,6 +57,7 @@ class OptionalExpressionResolver extends ExpressionVisitor {
   @override
   void visitNotPredicate(NotPredicateExpression node) {
     final child = node.expression;
+    _setIsSilentMode(child, true);
     child.accept(this);
     _setIsOptional(node, false);
   }
@@ -62,6 +65,7 @@ class OptionalExpressionResolver extends ExpressionVisitor {
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
     final child = node.expression;
+    _setIsSilentMode(child, node.isSilentMode);
     child.accept(this);
     _setIsOptional(node, child.isOptional);
   }
@@ -69,6 +73,7 @@ class OptionalExpressionResolver extends ExpressionVisitor {
   @override
   void visitOptional(OptionalExpression node) {
     final child = node.expression;
+    _setIsSilentMode(child, true);
     child.accept(this);
     _setIsOptional(node, true);
   }
@@ -79,6 +84,7 @@ class OptionalExpressionResolver extends ExpressionVisitor {
     final length = expressions.length;
     for (var i = 0; i < length; i++) {
       final child = expressions[i];
+      _setIsSilentMode(child, node.isSilentMode);
       child.accept(this);
     }
 
@@ -92,6 +98,7 @@ class OptionalExpressionResolver extends ExpressionVisitor {
     final length = expressions.length;
     for (var i = 0; i < length; i++) {
       final child = expressions[i];
+      _setIsSilentMode(child, node.isSilentMode);
       child.accept(this);
     }
 
@@ -114,6 +121,7 @@ class OptionalExpressionResolver extends ExpressionVisitor {
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
     final child = node.expression;
+    _setIsSilentMode(child, true);
     child.accept(this);
     _setIsOptional(node, true);
   }
@@ -123,6 +131,15 @@ class OptionalExpressionResolver extends ExpressionVisitor {
       if (node.isOptional != isOptional) {
         _hasModifications = true;
         node.isOptional = isOptional;
+      }
+    }
+  }
+
+  void _setIsSilentMode(Expression node, bool isSilentMode) {
+    if (isSilentMode) {
+      if (node.isSilentMode != isSilentMode) {
+        _hasModifications = true;
+        node.isSilentMode = isSilentMode;
       }
     }
   }

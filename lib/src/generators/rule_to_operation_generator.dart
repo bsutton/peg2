@@ -120,7 +120,10 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     }
 
     if (isTerminal) {
-      addIfNotVar(b, m.success, (b) {
+      final testSilence = notOp(varOp(m.silence));
+      final testSuccess = notOp(varOp(m.success));
+      final test = landOp(testSilence, testSuccess);
+      addIf(b, test, (b) {
         final params = [varOp(start), constOp(rule.name)];
         final fail = callOp(varOp(m.fail), params);
         addOp(b, fail);
@@ -317,17 +320,17 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     final cid = node.id;
     final startCharacters = node.startCharacters;
     final charGroups = startCharacters.groups;
-    var surround = false;
+    var predict = false;
     if (options.predict) {
       if (rule.kind == ProductionRuleKind.subterminal ||
           rule.kind == ProductionRuleKind.terminal) {
         if (charGroups.length < 10) {
-          surround = true;
+          predict = true;
         }
       }
     }
 
-    void genenarte() {
+    void generate() {
       if (inline) {
         final child = rule.expression;
         acceptInBlock(b, va, child);
@@ -345,7 +348,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       }
     }
 
-    if (surround) {
+    if (predict) {
       final ranges = <int>[];
       for (final group in charGroups) {
         ranges.add(group.start);
@@ -355,9 +358,8 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       final test = testRanges(ranges);
       final returnType = node.returnType;
       final result = va.newVar(b, returnType, null);
-      //final start = varAlloc.newVar(b, 'var', varOp(m.pos));
       addIfElse(b, test, (b) {
-        runInBlock(b, genenarte);
+        runInBlock(b, generate);
         addAssign(b, varOp(result), varOp(resultVar));
       }, (b) {
         if (rule.expression.isSuccessful) {
@@ -365,18 +367,20 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         } else {
           addAssign(b, varOp(m.success), constOp(false));
           if (rule.kind == ProductionRuleKind.terminal) {
-            addAssign(b, varOp(m.fposEnd), varOp(m.pos));
-            //final params = [varOp(start), constOp(rule.name)];
-            final params = [varOp(m.pos), constOp(rule.name)];
-            final fail = callOp(varOp(m.fail), params);
-            addOp(b, fail);
+            final test = notOp(varOp(m.silence));
+            addIf(b, test, (b) {
+              addAssign(b, varOp(m.fposEnd), varOp(m.pos));
+              final params = [varOp(m.pos), constOp(rule.name)];
+              final fail = callOp(varOp(m.fail), params);
+              addOp(b, fail);
+            });
           }
         }
       });
 
       resultVar = result;
     } else {
-      runInBlock(b, genenarte);
+      runInBlock(b, generate);
     }
   }
 }

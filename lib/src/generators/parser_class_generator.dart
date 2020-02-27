@@ -33,6 +33,7 @@ class ParserClassGenerator {
       'int _pos',
       'bool _predicate',
       'dynamic _result',
+      'bool _silence',
       'bool _success',
       'String _text',
       'List<int> _trackCid',
@@ -258,7 +259,7 @@ int _matchRanges(List<int> ranges) {
     }
   }
 
-  if (!_success && _fposEnd < _pos) {
+  if (!_success && !_silence && _fposEnd < _pos) {
     _fposEnd = _pos;
   }
 
@@ -284,7 +285,7 @@ String _matchString(String text) {
     result = text;
   } else {
     _success = false;
-    if (_fposEnd < _pos) {
+    if (!_silence && _fposEnd < _pos) {
       _fposEnd = _pos + i;
     }
   }
@@ -360,6 +361,7 @@ void _reset() {
   _memos.length = _input.length + 1;
   _pos = 0;
   _predicate = false;  
+  _silence = false;
   _trackCid = [];
   _trackCid.length = {{EXPR_COUNT}};
   _trackPos = [];
