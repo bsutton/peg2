@@ -7,27 +7,37 @@ class UnusedVariablesRemover extends SimpleOperationVisitor {
 
   @override
   void visitParameter(ParameterOperation node) {
-    super.visitParameter(node);
+    if (node.frozen) {
+      return;
+    }
+
     final parent = node.parent;
     final variable = node.variable;
-    var reads = parent.readings[variable];
-    var writes = parent.writings[variable];
-    reads ??= 0;
-    writes ??= 0;
-    if (reads == 0 && writes == 0) {
-      final operationReplacer = OperationReplacer();
-      if (node.operation == null) {
-        if (parent is BlockOperation) {
-          operationReplacer.replace(node, NopOperation());
-        }
-      } else {
-        switch (node.operation.kind) {
-          case OperationKind.call:
-            final operationReplacer = OperationReplacer();
-            operationReplacer.replace(node, node.operation);
-            break;
-          default:
-            break;
+    final variablesUsage = parent.variablesUsage;
+    final readCount = variablesUsage.getReadCount(variable);
+    final writeCount = variablesUsage.getWriteCount(variable);
+    if (readCount == 0 && writeCount == 0) {
+      if (parent is BlockOperation) {
+        final operationReplacer = OperationReplacer();
+        final operation = node.operation;
+        if (operation == null) {
+          if (parent is BlockOperation) {
+            operationReplacer.replace(node, NopOperation());
+          }
+        } else {
+          switch (operation.kind) {
+            case OperationKind.call:
+              final operationReplacer = OperationReplacer();
+              operationReplacer.replace(node, node.operation);
+              break;
+            case OperationKind.constant:
+            case OperationKind.variable:
+              final operationReplacer = OperationReplacer();
+              operationReplacer.replace(node, NopOperation());
+              break;
+            default:
+              break;
+          }
         }
       }
     }

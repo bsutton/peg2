@@ -185,13 +185,18 @@ class OperationUtils {
   Variable newVar(BlockOperation block, String type, VariableAllocator varAlloc,
       Operation value) {
     final variable = varAlloc.alloc();
-    final parameter = ParameterOperation(type, variable, value);
+    final parameter = paramOp(type, variable, value);
     addOp(block, parameter);
     return variable;
   }
 
   UnaryOperation notOp(Operation op) {
     return UnaryOperation(OperationKind.not, op);
+  }
+
+  ParameterOperation paramOp(
+      String type, Variable variable, Operation operation) {
+    return ParameterOperation(type, variable, operation);
   }
 
   void restoreVars(BlockOperation block, Map<Variable, Variable> variables) {

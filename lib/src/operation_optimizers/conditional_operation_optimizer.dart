@@ -70,10 +70,10 @@ class ConditionalOperationOptimizer {
   }
 
   bool _hasWritings(BlockOperation block, List<Variable> variables) {
-    final writings = block.writings;
+    final variablesUsage = block.variablesUsage;
     for (final variable in variables) {
-      final count = writings[variable];
-      if (count != null && count > 0) {
+      final count = variablesUsage.getWriteCount(variable);
+      if (count > 0) {
         return true;
       }
     }
@@ -86,7 +86,7 @@ class ConditionalOperationOptimizer {
     operationInitializer.initialize(operation);
 
     // TODO: Rename
-    final resolver = LastAssignedResultResolver();
+    final resolver = VariableUsageResolver();
     resolver.resolve(operation);
   }
 

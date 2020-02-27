@@ -484,8 +484,8 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       Map<Expression, Variable> variables) {
     for (final expression in variables.keys) {
       final variable = Variable(expression.variable);
-      final parameter =
-          ParameterOperation('var', variable, varOp(variables[expression]));
+      final parameter = paramOp('var', variable, varOp(variables[expression]));
+      parameter.frozen = true;
       b.operations.add(parameter);
     }
 

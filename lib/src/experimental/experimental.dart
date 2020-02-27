@@ -107,11 +107,76 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     _visitSymbolExpression(node);
   }
 
+  void visitOrderedChoice_2(OrderedChoiceExpression node) {
+    final expressions = node.expressions;
+    if (expressions.length > 1) {
+      final list = SparseList<List<Expression>>();
+      for (var i = 0; i < expressions.length; i++) {
+        final child = expressions[i];
+        for (final srcGroup in child.startCharacters.getGroups()) {
+          final allSpace = list.getAllSpace(srcGroup);
+          for (final dstGroup in allSpace) {
+            var key = dstGroup.key;
+            if (key == null) {
+              key = [child];
+            } else {
+              key.add(child);
+            }
+
+            final newGroup = GroupedRangeList<List<Expression>>(
+                dstGroup.start, dstGroup.end, key);
+            list.addGroup(newGroup);
+          }
+        }
+      }
+
+      final states = <List<Expression>>[];
+      int addState(List<Expression> expressions) {
+        for (var i = 0; i < states.length; i++) {
+          final state = states[i];
+          if (expressions.length == state.length) {
+            var found = true;
+            for (var j = 0; j < expressions.length; j++) {
+              if (expressions[j] != state[j]) {
+                found = false;
+                break;
+              }
+            }
+
+            if (found) {
+              return i;
+            }
+          }
+        }
+
+        states.add(expressions);
+        return states.length - 1;
+      }
+
+      final failExpressions = <Expression>{};
+      for (final expression in expressions) {
+        final startCharacters = expression.startCharacters;
+        if (startCharacters.groupCount == 1) {
+          final group = startCharacters.groups.first;
+          if (group.start == 0 && group.end == 0x10ffff) {
+            failExpressions.add(expression);
+          }
+        }
+      }
+
+      final rangesAndStates = <int>[];
+      for (var group in list.groups) {
+        rangesAndStates.add(group.start);
+        rangesAndStates.add(group.end);
+        final state = addState(group.key);
+        rangesAndStates.add(state);
+      }
+    }
+  }
+
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
-    if (node.id == 6 || node.id == 27) {
-      var x = 0;
-    }
+    visitOrderedChoice_2(node);
 
     final expressions = node.expressions;
     for (final child in expressions) {
@@ -127,28 +192,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
     }
 
     _generateChoiceMethod(node, newVarAlloc(), (b) {
-      /*
-        final list = SparseList<List<Expression>>();
-        for (var i = 0; i < expressions.length; i++) {
-          final child = expressions[i];
-          for (final srcGroup in child.startCharacters.getGroups()) {
-            final allSpace = list.getAllSpace(srcGroup);
-            for (final dstGroup in allSpace) {
-              var key = dstGroup.key;
-              if (key == null) {
-                key = [child];
-              } else {
-                key.add(child);
-              }
-
-              final newGroup = GroupedRangeList<List<Expression>>(
-                  dstGroup.start, dstGroup.end, key);
-              list.addGroup(newGroup);
-            }
-          }
-        }
-      */
-
       final contexts = <Expression, Map<String, Variable>>{};
       Map<String, Variable> findContext(Expression expression) {
         final result = contexts[expression];

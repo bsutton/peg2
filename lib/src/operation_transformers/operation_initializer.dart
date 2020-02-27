@@ -1,24 +1,27 @@
 part of '../../operation_transformers.dart';
 
 class OperationInitializer extends SimpleOperationVisitor {
-  Operation parent;
+  Operation _parent;
 
   void initialize(Operation operation) {
-    operation.accept(this);
+    _parent = operation;
+    operation.visitChildren(this);
   }
 
   @override
   void visit(Operation node) {
-    node.parent = parent;
-    parent = node;
+    node.parent = _parent;
+    _parent = node;
     super.visit(node);
-    parent = node.parent;
+    _parent = node.parent;
   }
 
   @override
   void visitMethod(MethodOperation node) {
     node.parent = null;
-    parent = node;
+    final parent = _parent;
+    _parent = node;
     node.visitChildren(this);
+    _parent = parent;
   }
 }

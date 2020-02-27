@@ -39,7 +39,10 @@ class _Memo {
 
     List<MethodOperation> methods;
     if (options.isPostfix()) {
-      //throw UnimplementedError();
+      print('Warning!!!');
+      print(
+          'The postfix generator is under development and may generate unpredictable results.');
+      print('It is not recommended to use it.');
       final experimentalGenerator = ExperimentalGenerator(grammar, options);
       methods = experimentalGenerator.generate();
     } else {

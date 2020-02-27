@@ -16,6 +16,18 @@ class ActionOperation extends Operation {
   }
 
   @override
+  bool replaceChild(Operation from, Operation to) {
+    for (var i = 0; i < arguments.length; i++) {
+      final argument = arguments[i];
+      if (_relaceChild(argument, from, to, () => arguments[i] = to)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  @override
   void visitChildren(OperationVisitor visitor) {
     for (final argument in arguments) {
       argument.accept(visitor);
@@ -56,6 +68,19 @@ class BinaryOperation extends Operation {
   }
 
   @override
+  bool replaceChild(Operation from, Operation to) {
+    if (_relaceChild(left, from, to, () => left = to)) {
+      return true;
+    }
+
+    if (_relaceChild(right, from, to, () => right = to)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
   void visitChildren(OperationVisitor visitor) {
     left.accept(visitor);
     right.accept(visitor);
@@ -77,6 +102,18 @@ class BlockOperation extends Operation {
   @override
   void accept(OperationVisitor visitor) {
     visitor.visitBlock(this);
+  }
+
+  @override
+  bool replaceChild(Operation from, Operation to) {
+    for (var i = 0; i < operations.length; i++) {
+      final operation = operations[i];
+      if (_relaceChild(operation, from, to, () => operations[i] = to)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @override
@@ -110,6 +147,18 @@ class CallOperation extends Operation {
   @override
   void accept(OperationVisitor visitor) {
     visitor.visitCall(this);
+  }
+
+  @override
+  bool replaceChild(Operation from, Operation to) {
+    for (var i = 0; i < arguments.length; i++) {
+      final argument = arguments[i];
+      if (_relaceChild(argument, from, to, () => arguments[i] = to)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @override
@@ -155,6 +204,15 @@ class ConditionalOperation extends Operation {
   }
 
   @override
+  bool replaceChild(Operation from, Operation to) {
+    if (_relaceChild(test, from, to, () => test = to)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
   void visitChildren(OperationVisitor visitor) {
     test.accept(visitor);
     ifTrue.accept(visitor);
@@ -192,6 +250,19 @@ class ListAccessOperation extends Operation {
   }
 
   @override
+  bool replaceChild(Operation from, Operation to) {
+    if (_relaceChild(list, from, to, () => list = to)) {
+      return true;
+    }
+
+    if (_relaceChild(index, from, to, () => index = to)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
   void visitChildren(OperationVisitor visitor) {
     list.accept(visitor);
     index.accept(visitor);
@@ -211,6 +282,18 @@ class ListOperation extends Operation {
   @override
   void accept(OperationVisitor visitor) {
     visitor.visitList(this);
+  }
+
+  @override
+  bool replaceChild(Operation from, Operation to) {
+    for (var i = 0; i < elements.length; i++) {
+      final element = elements[i];
+      if (_relaceChild(element, from, to, () => elements[i] = to)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   @override
@@ -255,6 +338,19 @@ class MemberOperation extends Operation {
   @override
   void accept(OperationVisitor visitor) {
     visitor.visitMember(this);
+  }
+
+  @override
+  bool replaceChild(Operation from, Operation to) {
+    if (_relaceChild(owner, from, to, () => owner = to)) {
+      return true;
+    }
+
+    if (_relaceChild(member, from, to, () => member = to)) {
+      return true;
+    }
+
+    return false;
   }
 
   @override
@@ -308,34 +404,18 @@ class NopOperation extends Operation {
 abstract class Operation {
   Operation parent;
 
-  Map<Variable, int> readings = {};
+  VariablesUsage variablesUsage;
 
-  Map<Variable, Operation> variableResults = {};
-
-  Map<Variable, int> writings = {};
+  Operation() {
+    variablesUsage = VariablesUsage(this);
+  }
 
   OperationKind get kind;
 
   void accept(OperationVisitor visitor);
 
-  void variableUsage(Variable variable, int count, VariableUsage usage) {
-    Map<Variable, int> stat;
-    if (usage == VariableUsage.read) {
-      stat = readings;
-    } else if (usage == VariableUsage.write) {
-      stat = writings;
-    } else {
-      throw StateError('Unknown variable usage kind: $usage');
-    }
-
-    if (stat[variable] == null) {
-      stat[variable] = 0;
-    }
-
-    stat[variable] += count;
-    if (parent != null) {
-      parent.variableUsage(variable, count, usage);
-    }
+  bool replaceChild(Operation from, Operation to) {
+    throw UnsupportedError('replaceChild');
   }
 
   void visitChildren(OperationVisitor visitor) {
@@ -344,6 +424,18 @@ abstract class Operation {
 
   void _errorInvalidOpertionKin() {
     throw StateError('Invalid opertion kind: $kind');
+  }
+
+  bool _relaceChild(
+      Operation op, Operation from, Operation to, void Function() replace) {
+    if (op == from) {
+      from.parent = null;
+      to.parent = this;
+      replace();
+      return true;
+    }
+
+    return false;
   }
 }
 
@@ -383,13 +475,17 @@ enum OperationKind {
 }
 
 class ParameterOperation extends Operation {
+  bool frozen = false;
+
   Operation operation;
 
   String type;
 
   Variable variable;
 
-  ParameterOperation(this.type, this.variable, [this.operation]);
+  ParameterOperation(this.type, this.variable, [this.operation]) {
+    variable.declaration = this;
+  }
 
   @override
   OperationKind get kind => OperationKind.parameter;
@@ -397,6 +493,15 @@ class ParameterOperation extends Operation {
   @override
   void accept(OperationVisitor visitor) {
     visitor.visitParameter(this);
+  }
+
+  @override
+  bool replaceChild(Operation from, Operation to) {
+    if (_relaceChild(operation, from, to, () => operation = to)) {
+      return true;
+    }
+
+    return false;
   }
 
   @override
@@ -416,6 +521,15 @@ class ReturnOperation extends Operation {
   @override
   void accept(OperationVisitor visitor) {
     visitor.visitReturn(this);
+  }
+
+  @override
+  bool replaceChild(Operation from, Operation to) {
+    if (_relaceChild(operation, from, to, () => operation = to)) {
+      return true;
+    }
+
+    return false;
   }
 
   @override
@@ -439,6 +553,23 @@ class TernaryOperation extends Operation {
   @override
   void accept(OperationVisitor visitor) {
     visitor.visitTernary(this);
+  }
+
+  @override
+  bool replaceChild(Operation from, Operation to) {
+    if (_relaceChild(test, from, to, () => test = to)) {
+      return true;
+    }
+
+    if (_relaceChild(ifTrue, from, to, () => ifTrue = to)) {
+      return true;
+    }
+
+    if (_relaceChild(ifFalse, from, to, () => ifFalse = to)) {
+      return true;
+    }
+
+    return false;
   }
 
   @override
@@ -482,15 +613,31 @@ class UnaryOperation extends Operation {
   }
 
   @override
+  bool replaceChild(Operation from, Operation to) {
+    if (_relaceChild(operand, from, to, () => operand = to)) {
+      return true;
+    }
+
+    return false;
+  }
+
+  @override
   void visitChildren(OperationVisitor visitor) {
     operand.accept(visitor);
   }
 }
 
 class Variable {
+  ParameterOperation declaration;
+
   String name;
 
   Variable(this.name);
+
+  @override
+  String toString() {
+    return name;
+  }
 }
 
 class VariableOperation extends Operation {
@@ -511,4 +658,62 @@ class VariableOperation extends Operation {
   }
 }
 
-enum VariableUsage { read, write }
+class VariablesUsage {
+  final Operation parent;
+
+  Map<Variable, int> readings = {};
+
+  Map<Variable, int> writings = {};
+
+  VariablesUsage(this.parent);
+
+  void addReadCount(Variable variable, int count) {
+    count += getReadCount(variable);
+    setReadCount(variable, count);
+  }
+
+  void addWriteCount(Variable variable, int count) {
+    count += getWriteCount(variable);
+    setWriteCount(variable, count);
+  }
+
+  int getReadCount(Variable variable) {
+    var count = readings[variable];
+    count ??= 0;
+    return count;
+  }
+
+  int getWriteCount(Variable variable) {
+    var count = writings[variable];
+    count ??= 0;
+    return count;
+  }
+
+  void setReadCount(Variable variable, int count) {
+    final prev = getReadCount(variable);
+    if (count == 0) {
+      readings.remove(variable);
+    } else {
+      readings[variable] = count;
+    }
+
+    final delta = count - prev;
+    if (parent.parent != null) {
+      parent.parent.variablesUsage.addReadCount(variable, delta);
+    }
+  }
+
+  void setWriteCount(Variable variable, int count) {
+    final prev = getReadCount(variable);
+    if (count == 0) {
+      writings.remove(variable);
+    } else {
+      writings[variable] = count;
+    }
+
+    final delta = count - prev;
+    if (parent.parent != null) {
+      parent.parent.variablesUsage.addWriteCount(variable, delta);
+    }
+  }
+}
