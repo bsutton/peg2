@@ -7,9 +7,9 @@ class VariableAllocator {
 
   VariableAllocator(this.allocName);
 
-  Variable alloc() {
+  Variable alloc([bool frozen = false]) {
     final name = allocName();
-    return Variable(name);
+    return Variable(name, frozen);
   }
 
   Variable newVar(BlockOperation block, String type, Operation value) {

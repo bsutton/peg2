@@ -189,7 +189,7 @@ class OperationsToCodeConverter extends OperationVisitor {
   }
 
   @override
-  void visitMember(MemberOperation node) {
+  void visitMemberAccess(MemberAccessOperation node) {
     final sb = StringBuffer();
     node.owner.accept(this);
     sb.write(_resultAsString());
@@ -224,6 +224,8 @@ class OperationsToCodeConverter extends OperationVisitor {
     } else {
       _result = '// NOP';
     }
+
+    _result = '';
   }
 
   @override

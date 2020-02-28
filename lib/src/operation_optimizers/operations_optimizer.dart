@@ -2,21 +2,21 @@ part of '../../operation_optimizers.dart';
 
 class OperationsOptimizer {
   void optimize(BlockOperation operation) {
-    _resolveVariablesUsage(operation);
-    final conditionalOperationOptimizer = ConditionalOperationOptimizer();
-    conditionalOperationOptimizer.optimize(operation);
-
-    _resolveVariablesUsage(operation);
+    var stats = _resolveVariablesUsage(operation);
     final variableUsageOptimizer = VariableUsageOptimizer();
-    variableUsageOptimizer.optimize(operation);
+    variableUsageOptimizer.optimize(operation, stats);
 
-    _resolveVariablesUsage(operation);
-    //final unusedVariablesRemover = UnusedVariablesRemover();
-    //unusedVariablesRemover.remove(operation);
+    stats = _resolveVariablesUsage(operation);
+    final unusedVariablesRemover = UnusedVariablesRemover();
+    unusedVariablesRemover.remove(operation, stats);
+
+    stats = _resolveVariablesUsage(operation);
+    final conditionalOperationOptimizer = ConditionalOperationOptimizer();
+    conditionalOperationOptimizer.optimize(operation, stats);
   }
 
-  void _resolveVariablesUsage(Operation operation) {
+  VariablesStats _resolveVariablesUsage(Operation operation) {
     final variableUsageResolver = VariablesUsageResolver();
-    variableUsageResolver.resolve(operation);
+    return variableUsageResolver.resolve(operation, VariablesStats());
   }
 }

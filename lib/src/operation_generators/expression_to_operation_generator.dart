@@ -482,16 +482,14 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
   void _buildAction(BlockOperation b, SequenceExpression node, Variable result,
       Map<Expression, Variable> variables) {
     for (final expression in variables.keys) {
-      final variable = Variable(expression.variable);
+      final variable = Variable(expression.variable, true);
       final parameter = paramOp('var', variable, varOp(variables[expression]));
-      parameter.frozen = true;
       b.operations.add(parameter);
     }
 
-    final $$ = Variable('\$\$');
+    final $$ = Variable('\$\$', true);
     final returnType = node.returnType;
     final parameter = paramOp(returnType, $$, null);
-    parameter.frozen = true;
     b.operations.add(parameter);
     final code = <String>[];
     final lineSplitter = LineSplitter();

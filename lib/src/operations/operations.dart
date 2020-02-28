@@ -325,19 +325,19 @@ class LoopOperation extends Operation {
   }
 }
 
-class MemberOperation extends Operation {
+class MemberAccessOperation extends Operation {
   Operation member;
 
   Operation owner;
 
-  MemberOperation(this.owner, this.member);
+  MemberAccessOperation(this.owner, this.member);
 
   @override
-  OperationKind get kind => OperationKind.member;
+  OperationKind get kind => OperationKind.memberAccess;
 
   @override
   void accept(OperationVisitor visitor) {
-    visitor.visitMember(this);
+    visitor.visitMemberAccess(this);
   }
 
   @override
@@ -408,15 +408,22 @@ class NopOperation extends Operation {
 abstract class Operation {
   Operation parent;
 
-  VariablesUsage variablesUsage;
-
-  Operation() {
-    variablesUsage = VariablesUsage(this);
-  }
-
   OperationKind get kind;
 
   void accept(OperationVisitor visitor);
+
+  MethodOperation getMethod() {
+    var parent = this.parent;
+    while (true) {
+      if (parent is MethodOperation) {
+        return parent;
+      } else if (parent == null) {
+        return null;
+      }
+
+      parent = parent.parent;
+    }
+  }
 
   bool replaceChild(Operation from, Operation to) {
     throw UnsupportedError('replaceChild');
@@ -464,7 +471,7 @@ enum OperationKind {
   lor,
   lt,
   lte,
-  member,
+  memberAccess,
   method,
   nop,
   not,
@@ -479,8 +486,6 @@ enum OperationKind {
 }
 
 class ParameterOperation extends Operation {
-  bool frozen = false;
-
   Operation operation;
 
   String type;
@@ -632,11 +637,13 @@ class UnaryOperation extends Operation {
 }
 
 class Variable {
+  bool frozen;
+
   ParameterOperation declaration;
 
   String name;
 
-  Variable(this.name);
+  Variable(this.name, [this.frozen = false]);
 
   @override
   String toString() {
@@ -659,65 +666,5 @@ class VariableOperation extends Operation {
   @override
   void accept(OperationVisitor visitor) {
     visitor.visitVariable(this);
-  }
-}
-
-class VariablesUsage {
-  final Operation parent;
-
-  Map<Variable, int> readings = {};
-
-  Map<Variable, int> writings = {};
-
-  VariablesUsage(this.parent);
-
-  void addReadCount(Variable variable, int count) {
-    count += getReadCount(variable);
-    setReadCount(variable, count);
-  }
-
-  void addWriteCount(Variable variable, int count) {
-    count += getWriteCount(variable);
-    setWriteCount(variable, count);
-  }
-
-  int getReadCount(Variable variable) {
-    var count = readings[variable];
-    count ??= 0;
-    return count;
-  }
-
-  int getWriteCount(Variable variable) {
-    var count = writings[variable];
-    count ??= 0;
-    return count;
-  }
-
-  void setReadCount(Variable variable, int count) {
-    final prev = getReadCount(variable);
-    if (count == 0) {
-      readings.remove(variable);
-    } else {
-      readings[variable] = count;
-    }
-
-    final delta = count - prev;
-    if (parent.parent != null) {
-      parent.parent.variablesUsage.addReadCount(variable, delta);
-    }
-  }
-
-  void setWriteCount(Variable variable, int count) {
-    final prev = getReadCount(variable);
-    if (count == 0) {
-      writings.remove(variable);
-    } else {
-      writings[variable] = count;
-    }
-
-    final delta = count - prev;
-    if (parent.parent != null) {
-      parent.parent.variablesUsage.addWriteCount(variable, delta);
-    }
   }
 }

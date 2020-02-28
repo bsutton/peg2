@@ -39,7 +39,7 @@ class SimpleOperationVisitor extends OperationVisitor {
   void visitLoop(LoopOperation node) => visit(node);
 
   @override
-  void visitMember(MemberOperation node) => visit(node);
+  void visitMemberAccess(MemberAccessOperation node) => visit(node);
 
   @override
   void visitMethod(MethodOperation node) => visit(node);

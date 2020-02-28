@@ -149,17 +149,13 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
 
   MethodOperation _buildRule(ProductionRule rule) {
     va = newVarAlloc();
-    final cid = va.alloc();
+    final cid = va.alloc(true);
     final id = rule.expression.id;
-    productive = va.alloc();
+    productive = va.alloc(true);
     final name = getRuleMethodName(rule);
     final params = <ParameterOperation>[];
     params.add(ParameterOperation('int', cid));
     params.add(ParameterOperation('bool', productive));
-    for (final param in params) {
-      param.frozen = true;
-    }
-
     var returnType = rule.returnType;
     returnType ??= rule.expression.returnType;
     Variable start;

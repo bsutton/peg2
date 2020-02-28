@@ -2,6 +2,9 @@
 
 - Added command line option `--optimize-code`
 - Improved failure reporting
+- Added new optimizer: `VariableUsageOptimizer`
+- Improved optimizer: `UnusedVariablesRemover`
+- Improved optimizer: `ConditionalOperationOptimizer`, added functionality to remove empty statement blocks
 
 ## 0.1.15
 

@@ -88,16 +88,16 @@ class OperationUtils {
     return op;
   }
 
-  MemberOperation addMbrCall(BlockOperation block, Operation owner,
+  MemberAccessOperation addMbrCall(BlockOperation block, Operation owner,
       VariableOperation method, List<Operation> arguments) {
     final op = mbrCallOp(owner, method, arguments);
     addOp(block, op);
     return op;
   }
 
-  MemberOperation addMember(
+  MemberAccessOperation addMember(
       BlockOperation block, Operation owner, Operation member) {
-    final op = MemberOperation(owner, member);
+    final op = MemberAccessOperation(owner, member);
     addOp(block, op);
     return op;
   }
@@ -189,15 +189,15 @@ class OperationUtils {
     return op;
   }
 
-  MemberOperation mbrCallOp(
-      Operation owner, VariableOperation method, List<Operation> arguments) {
-    final member = callOp(method, arguments);
-    return mbrOp(owner, member);
+  MemberAccessOperation mbrAccOp(Operation owner, Operation member) {
+    final op = MemberAccessOperation(owner, member);
+    return op;
   }
 
-  MemberOperation mbrOp(Operation owner, Operation member) {
-    final op = MemberOperation(owner, member);
-    return op;
+  MemberAccessOperation mbrCallOp(
+      Operation owner, VariableOperation method, List<Operation> arguments) {
+    final member = callOp(method, arguments);
+    return mbrAccOp(owner, member);
   }
 
   Variable newVar(BlockOperation block, String type, VariableAllocator varAlloc,

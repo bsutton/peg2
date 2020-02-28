@@ -433,8 +433,6 @@ class Peg2Parser {
 
   Grammar _parseGrammar(int $0, bool $1) {
     Grammar $2;
-    // NOP;
-    // NOP;
     var $5 = _c;
     var $6 = _pos;
     var $7 = _silence;
@@ -486,49 +484,29 @@ class Peg2Parser {
       _c = $5;
       _pos = $6;
     }
-    // NOP;
-    // NOP;
     return $2;
   }
 
   ProductionRule _parseDefinition(int $0, bool $1) {
     ProductionRule $2;
-    // NOP;
     for (;;) {
-      // NOP;
       $2 = _parseNonterminalDefinition(13, $1);
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $2 = _parseTerminalDefinition(15, $1);
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $2 = _parseSubterminalDefinition(17, $1);
-      if (_success) {
-        // NOP;
-        // NOP;
-      }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
   ProductionRule _parseNonterminalDefinition(int $0, bool $1) {
     ProductionRule $2;
-    // NOP;
     for (;;) {
-      // NOP;
       var $5 = _c;
       var $6 = _pos;
       var $7 = _parseType(20, $1);
@@ -556,11 +534,8 @@ class Peg2Parser {
         _c = $5;
         _pos = $6;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       var $13 = _c;
       var $14 = _pos;
       var $15 = _parse_non_terminal_name(26, $1);
@@ -583,13 +558,9 @@ class Peg2Parser {
       if (!_success) {
         _c = $13;
         _pos = $14;
-      } else {
-        // NOP;
       }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
@@ -599,8 +570,6 @@ class Peg2Parser {
     }
     var $2 = _pos;
     OrderedChoiceExpression $3;
-    // NOP;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
     var $8 = _parseNonterminalSequence(32, $1);
@@ -613,21 +582,16 @@ class Peg2Parser {
       }
       for (;;) {
         SequenceExpression $11;
-        // NOP;
         var $13 = _c;
         var $14 = _pos;
         _parse_$Slash(36, false);
         if (_success) {
           $11 = _parseNonterminalSequence(37, $1);
-          if (_success) {
-            // NOP;
-          }
         }
         if (!_success) {
           _c = $13;
           _pos = $14;
         }
-        // NOP;
         if (!_success) {
           break;
         }
@@ -649,8 +613,6 @@ class Peg2Parser {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(30, $2, $3);
     }
@@ -663,8 +625,6 @@ class Peg2Parser {
     }
     var $2 = _pos;
     SequenceExpression $3;
-    // NOP;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
     List<Expression> $8;
@@ -704,8 +664,6 @@ class Peg2Parser {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(38, $2, $3);
     }
@@ -714,8 +672,6 @@ class Peg2Parser {
 
   Expression _parseNonterminalPrefix(int $0, bool $1) {
     Expression $2;
-    // NOP;
-    // NOP;
     var $5 = _c;
     var $6 = _pos;
     var $7 = _silence;
@@ -727,21 +683,11 @@ class Peg2Parser {
     _silence = true;
     String $10;
     for (;;) {
-      // NOP;
       $10 = _parse_$Ampersand(51, $1);
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $10 = _parse_$ExclamationMark(53, $1);
-      if (_success) {
-        // NOP;
-        // NOP;
-      }
-      // NOP;
       break;
     }
     _success = true;
@@ -759,15 +705,11 @@ class Peg2Parser {
       _c = $5;
       _pos = $6;
     }
-    // NOP;
-    // NOP;
     return $2;
   }
 
   Expression _parseNonterminalSuffix(int $0, bool $1) {
     Expression $2;
-    // NOP;
-    // NOP;
     var $5 = _c;
     var $6 = _pos;
     var $7 = _parseNonterminalPrimary(57, $1);
@@ -776,29 +718,15 @@ class Peg2Parser {
       _silence = true;
       String $9;
       for (;;) {
-        // NOP;
         $9 = _parse_$QuestionMark(61, $1);
         if (_success) {
-          // NOP;
-          // NOP;
           break;
         }
-        // NOP;
-        // NOP;
         $9 = _parse_$Asterisk(63, $1);
         if (_success) {
-          // NOP;
-          // NOP;
           break;
         }
-        // NOP;
-        // NOP;
         $9 = _parse_$PlusSign(65, $1);
-        if (_success) {
-          // NOP;
-          // NOP;
-        }
-        // NOP;
         break;
       }
       _success = true;
@@ -815,16 +743,12 @@ class Peg2Parser {
       _c = $5;
       _pos = $6;
     }
-    // NOP;
-    // NOP;
     return $2;
   }
 
   Expression _parseNonterminalPrimary(int $0, bool $1) {
     Expression $2;
-    // NOP;
     for (;;) {
-      // NOP;
       var $5 = _parse_non_terminal_name(68, $1);
       if (_success) {
         var n = $5;
@@ -833,10 +757,8 @@ class Peg2Parser {
         $2 = $$;
       }
       if (_success) {
-        // NOP;
         break;
       }
-      // NOP;
       var $7 = _parse_terminal_name(70, $1);
       if (_success) {
         var n = $7;
@@ -845,10 +767,8 @@ class Peg2Parser {
         $2 = $$;
       }
       if (_success) {
-        // NOP;
         break;
       }
-      // NOP;
       var $9 = _c;
       var $10 = _pos;
       _parse_$LeftParenthesis(72, false);
@@ -856,29 +776,20 @@ class Peg2Parser {
         $2 = _parseNonterminalExpression(73, $1);
         if (_success) {
           _parse_$RightParenthesis(74, false);
-          if (_success) {
-            // NOP;
-          }
         }
       }
       if (!_success) {
         _c = $9;
         _pos = $10;
-      } else {
-        // NOP;
       }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
   ProductionRule _parseTerminalDefinition(int $0, bool $1) {
     ProductionRule $2;
-    // NOP;
     for (;;) {
-      // NOP;
       var $5 = _c;
       var $6 = _pos;
       var $7 = _parseType(77, $1);
@@ -906,11 +817,8 @@ class Peg2Parser {
         _c = $5;
         _pos = $6;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       var $13 = _c;
       var $14 = _pos;
       var $15 = _parse_terminal_name(83, $1);
@@ -933,13 +841,9 @@ class Peg2Parser {
       if (!_success) {
         _c = $13;
         _pos = $14;
-      } else {
-        // NOP;
       }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
@@ -949,8 +853,6 @@ class Peg2Parser {
     }
     var $2 = _pos;
     OrderedChoiceExpression $3;
-    // NOP;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
     var $8 = _parseSequence(89, $1);
@@ -963,21 +865,16 @@ class Peg2Parser {
       }
       for (;;) {
         SequenceExpression $11;
-        // NOP;
         var $13 = _c;
         var $14 = _pos;
         _parse_$Slash(93, false);
         if (_success) {
           $11 = _parseSequence(94, $1);
-          if (_success) {
-            // NOP;
-          }
         }
         if (!_success) {
           _c = $13;
           _pos = $14;
         }
-        // NOP;
         if (!_success) {
           break;
         }
@@ -999,8 +896,6 @@ class Peg2Parser {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(87, $2, $3);
     }
@@ -1013,8 +908,6 @@ class Peg2Parser {
     }
     var $2 = _pos;
     SequenceExpression $3;
-    // NOP;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
     List<Expression> $8;
@@ -1054,8 +947,6 @@ class Peg2Parser {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(95, $2, $3);
     }
@@ -1064,8 +955,6 @@ class Peg2Parser {
 
   Expression _parsePrefix(int $0, bool $1) {
     Expression $2;
-    // NOP;
-    // NOP;
     var $5 = _c;
     var $6 = _pos;
     var $7 = _silence;
@@ -1077,21 +966,11 @@ class Peg2Parser {
     _silence = true;
     String $10;
     for (;;) {
-      // NOP;
       $10 = _parse_$Ampersand(108, $1);
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $10 = _parse_$ExclamationMark(110, $1);
-      if (_success) {
-        // NOP;
-        // NOP;
-      }
-      // NOP;
       break;
     }
     _success = true;
@@ -1109,15 +988,11 @@ class Peg2Parser {
       _c = $5;
       _pos = $6;
     }
-    // NOP;
-    // NOP;
     return $2;
   }
 
   Expression _parseSuffix(int $0, bool $1) {
     Expression $2;
-    // NOP;
-    // NOP;
     var $5 = _c;
     var $6 = _pos;
     var $7 = _parsePrimary(114, $1);
@@ -1126,29 +1001,15 @@ class Peg2Parser {
       _silence = true;
       String $9;
       for (;;) {
-        // NOP;
         $9 = _parse_$QuestionMark(118, $1);
         if (_success) {
-          // NOP;
-          // NOP;
           break;
         }
-        // NOP;
-        // NOP;
         $9 = _parse_$Asterisk(120, $1);
         if (_success) {
-          // NOP;
-          // NOP;
           break;
         }
-        // NOP;
-        // NOP;
         $9 = _parse_$PlusSign(122, $1);
-        if (_success) {
-          // NOP;
-          // NOP;
-        }
-        // NOP;
         break;
       }
       _success = true;
@@ -1165,16 +1026,12 @@ class Peg2Parser {
       _c = $5;
       _pos = $6;
     }
-    // NOP;
-    // NOP;
     return $2;
   }
 
   Expression _parsePrimary(int $0, bool $1) {
     Expression $2;
-    // NOP;
     for (;;) {
-      // NOP;
       var $5 = _parse_sub_terminal_name(125, $1);
       if (_success) {
         var n = $5;
@@ -1183,10 +1040,8 @@ class Peg2Parser {
         $2 = $$;
       }
       if (_success) {
-        // NOP;
         break;
       }
-      // NOP;
       var $7 = _c;
       var $8 = _pos;
       _parse_$LeftParenthesis(127, false);
@@ -1194,36 +1049,22 @@ class Peg2Parser {
         $2 = _parseExpression(128, $1);
         if (_success) {
           _parse_$RightParenthesis(129, false);
-          if (_success) {
-            // NOP;
-          }
         }
       }
       if (!_success) {
         _c = $7;
         _pos = $8;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $2 = _parse_literal(131, $1);
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $2 = _parse_character_class(133, $1);
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       _parse_$Period(135, $1);
       if (_success) {
         Expression $$;
@@ -1231,10 +1072,8 @@ class Peg2Parser {
         $2 = $$;
       }
       if (_success) {
-        // NOP;
         break;
       }
-      // NOP;
       var $19 = _c;
       var $20 = _pos;
       _parse_$LessThanSign(137, false);
@@ -1253,21 +1092,15 @@ class Peg2Parser {
       if (!_success) {
         _c = $19;
         _pos = $20;
-      } else {
-        // NOP;
       }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
   ProductionRule _parseSubterminalDefinition(int $0, bool $1) {
     ProductionRule $2;
-    // NOP;
     for (;;) {
-      // NOP;
       var $5 = _c;
       var $6 = _pos;
       var $7 = _parseType(142, $1);
@@ -1295,11 +1128,8 @@ class Peg2Parser {
         _c = $5;
         _pos = $6;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       var $13 = _c;
       var $14 = _pos;
       var $15 = _parse_sub_terminal_name(148, $1);
@@ -1322,13 +1152,9 @@ class Peg2Parser {
       if (!_success) {
         _c = $13;
         _pos = $14;
-      } else {
-        // NOP;
       }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
@@ -1338,8 +1164,6 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
     var $8 = _parseTypeName(154, $1);
@@ -1347,7 +1171,6 @@ class Peg2Parser {
       var $9 = _silence;
       _silence = true;
       List<String> $10;
-      // NOP;
       var $12 = _c;
       var $13 = _pos;
       _parse_$LessThanSign(158, false);
@@ -1355,16 +1178,12 @@ class Peg2Parser {
         $10 = _parseTypeArguments(159, $1);
         if (_success) {
           _parse_$GreaterThanSign(160, false);
-          if (_success) {
-            // NOP;
-          }
         }
       }
       if (!_success) {
         _c = $12;
         _pos = $13;
       }
-      // NOP;
       _success = true;
       _silence = $9;
       if (_success) {
@@ -1379,8 +1198,6 @@ class Peg2Parser {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(152, $2, $3);
     }
@@ -1389,9 +1206,7 @@ class Peg2Parser {
 
   String _parseTypeName(int $0, bool $1) {
     String $2;
-    // NOP;
     for (;;) {
-      // NOP;
       var $5 = _c;
       var $6 = _pos;
       var $7 = _parse_library_prefix(163, $1);
@@ -1412,27 +1227,16 @@ class Peg2Parser {
         _c = $5;
         _pos = $6;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $2 = _parse_type_name(167, $1);
-      if (_success) {
-        // NOP;
-        // NOP;
-      }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
   List<String> _parseTypeArguments(int $0, bool $1) {
     List<String> $2;
-    // NOP;
-    // NOP;
     var $5 = _c;
     var $6 = _pos;
     var $7 = _parseType(170, $1);
@@ -1445,21 +1249,16 @@ class Peg2Parser {
       }
       for (;;) {
         String $10;
-        // NOP;
         var $12 = _c;
         var $13 = _pos;
         _parse_$Comma(174, false);
         if (_success) {
           $10 = _parseType(175, $1);
-          if (_success) {
-            // NOP;
-          }
         }
         if (!_success) {
           _c = $12;
           _pos = $13;
         }
-        // NOP;
         if (!_success) {
           break;
         }
@@ -1481,8 +1280,6 @@ class Peg2Parser {
       _c = $5;
       _pos = $6;
     }
-    // NOP;
-    // NOP;
     return $2;
   }
 
@@ -1492,28 +1289,21 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
     $3 = _parse$$IDENTIFIER(178, $1);
     if (_success) {
       _parse$$SPACING(179, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'non terminal name\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(176, $2, $3);
     }
@@ -1526,24 +1316,17 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     var $10 = _pos;
     var $11 = $1;
     $1 = false;
-    int $12;
-    // NOP;
     var $14 = _c;
     var $15 = _pos;
-    // NOP;
     if (_c == 39) {
       _success = true;
-      $12 = _c;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
@@ -1552,11 +1335,8 @@ class Peg2Parser {
       }
     }
     if (_success) {
-      List $17;
       var $18 = false;
       for (;;) {
-        dynamic $19;
-        // NOP;
         var $21 = _c;
         var $22 = _pos;
         var $23 = _c;
@@ -1567,10 +1347,8 @@ class Peg2Parser {
         _predicate = true;
         $1 = false;
         _silence = true;
-        int $28;
         if (_c == 39) {
           _success = true;
-          $28 = _c;
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
@@ -1578,7 +1356,6 @@ class Peg2Parser {
             _fposEnd = _pos;
           }
         }
-        // NOP;
         _silence = $26;
         _c = $23;
         _pos = $24;
@@ -1588,29 +1365,20 @@ class Peg2Parser {
         _success = !_success;
         if (_success) {
           _parse$$TERMINAL_CHAR(191, false);
-          if (_success) {
-            // NOP;
-          }
         }
         if (!_success) {
           _c = $21;
           _pos = $22;
         }
-        // NOP;
         if (!_success) {
           _success = $18;
-          if (!_success) {
-            $17 = null;
-          }
           break;
         }
         $18 = true;
       }
       if (_success) {
-        int $31;
         if (_c == 39) {
           _success = true;
-          $31 = _c;
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
@@ -1618,35 +1386,26 @@ class Peg2Parser {
             _fposEnd = _pos;
           }
         }
-        if (_success) {
-          // NOP;
-        }
       }
     }
     if (!_success) {
       _c = $14;
       _pos = $15;
     }
-    // NOP;
     if (_success) {
       $3 = _text.substring($10, _pos);
     }
     $1 = $11;
     if (_success) {
       _parse$$SPACING(193, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'terminal name\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(180, $2, $3);
     }
@@ -1659,24 +1418,17 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     var $10 = _pos;
     var $11 = $1;
     $1 = false;
-    int $12;
-    // NOP;
     var $14 = _c;
     var $15 = _pos;
-    // NOP;
     if (_c == 64) {
       _success = true;
-      $12 = _c;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
@@ -1686,34 +1438,25 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$IDENTIFIER(200, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $14;
       _pos = $15;
     }
-    // NOP;
     if (_success) {
       $3 = _text.substring($10, _pos);
     }
     $1 = $11;
     if (_success) {
       _parse$$SPACING(201, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'sub terminal name\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(194, $2, $3);
     }
@@ -1726,18 +1469,14 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
     $3 = _parse$$IDENTIFIER(204, $1);
     if (_success) {
-      String $10;
       if (_c == 58) {
         _success = true;
-        $10 = ':';
         _c = _input[++_pos];
       } else {
         _success = false;
@@ -1745,19 +1484,14 @@ class Peg2Parser {
           _fposEnd = _pos;
         }
       }
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'semantic value\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(202, $2, $3);
     }
@@ -1770,28 +1504,21 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     var $10 = _pos;
     var $11 = $1;
     $1 = false;
-    String $12;
-    // NOP;
     var $14 = _c;
     var $15 = _pos;
-    $12 = _parse$$IDENTIFIER(211, false);
+    _parse$$IDENTIFIER(211, false);
     if (_success) {
       var $17 = _silence;
       _silence = true;
-      int $18;
       if (_c == 63) {
         _success = true;
-        $18 = _c;
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
@@ -1801,34 +1528,25 @@ class Peg2Parser {
       }
       _success = true;
       _silence = $17;
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $14;
       _pos = $15;
     }
-    // NOP;
     if (_success) {
       $3 = _text.substring($10, _pos);
     }
     $1 = $11;
     if (_success) {
       _parse$$SPACING(214, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'type name\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(206, $2, $3);
     }
@@ -1837,24 +1555,17 @@ class Peg2Parser {
 
   String _parse_library_prefix(int $0, bool $1) {
     String $2;
-    // NOP;
     _fposEnd = -1;
     var $4 = _pos;
-    // NOP;
-    // NOP;
     var $7 = _pos;
     var $8 = $1;
     $1 = false;
-    int $9;
-    // NOP;
     var $11 = _c;
     var $12 = _pos;
     var $13 = _silence;
     _silence = true;
-    // NOP;
     if (_c == 95) {
       _success = true;
-      $9 = _c;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
@@ -1865,25 +1576,17 @@ class Peg2Parser {
     _success = true;
     _silence = $13;
     _parse$$IDENTIFIER(222, false);
-    if (_success) {
-      // NOP;
+    if (!_success) {
       _c = $11;
       _pos = $12;
     }
-    // NOP;
-    // NOP;
     if (_success) {
       $2 = _text.substring($7, _pos);
     }
     $1 = $8;
-    if (_success) {
-      // NOP;
-    }
-    // NOP;
     if (!_silence && !_success) {
       _fail($4, '\'library prefix\'');
     }
-    // NOP;
     return $2;
   }
 
@@ -1893,13 +1596,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 59) {
       _success = true;
       $3 = ';';
@@ -1912,19 +1612,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(226, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\';\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(223, $2, $3);
     }
@@ -1937,16 +1632,12 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    String $9;
     if (_c == 123) {
       _success = true;
-      $9 = '{';
       _c = _input[++_pos];
     } else {
       _success = false;
@@ -1955,13 +1646,9 @@ class Peg2Parser {
       }
     }
     if (_success) {
-      // NOP;
       var $11 = _pos;
       var $12 = $1;
       $1 = false;
-      List $13;
-      // NOP;
-      // NOP;
       var $16 = _silence;
       _silence = true;
       for (;;) {
@@ -1973,17 +1660,11 @@ class Peg2Parser {
       _success = true;
       _silence = $16;
       if (_success) {
-        // NOP;
-      }
-      // NOP;
-      if (_success) {
         $3 = _text.substring($11, _pos);
       }
       $1 = $12;
-      String $18;
       if (_c == 125) {
         _success = true;
-        $18 = '}';
         _c = _input[++_pos];
       } else {
         _success = false;
@@ -1993,20 +1674,15 @@ class Peg2Parser {
       }
       if (_success) {
         _parse$$SPACING(236, false);
-        if (_success) {
-          // NOP;
-        }
       }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'action\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(227, $2, $3);
     }
@@ -2019,13 +1695,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 38) {
       _success = true;
       $3 = '&';
@@ -2038,19 +1711,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(240, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'&\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(237, $2, $3);
     }
@@ -2059,16 +1727,12 @@ class Peg2Parser {
 
   Expression _parse_character_class(int $0, bool $1) {
     Expression $2;
-    // NOP;
     _fposEnd = -1;
     var $4 = _pos;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
-    String $8;
     if (_c == 91) {
       _success = true;
-      $8 = '[';
       _c = _input[++_pos];
     } else {
       _success = false;
@@ -2084,7 +1748,6 @@ class Peg2Parser {
       var $10 = false;
       for (;;) {
         List<int> $11;
-        // NOP;
         var $13 = _c;
         var $14 = _pos;
         var $15 = _c;
@@ -2095,10 +1758,8 @@ class Peg2Parser {
         _predicate = true;
         $1 = false;
         _silence = true;
-        String $20;
         if (_c == 93) {
           _success = true;
-          $20 = ']';
           _c = _input[++_pos];
         } else {
           _success = false;
@@ -2106,7 +1767,6 @@ class Peg2Parser {
             _fposEnd = _pos;
           }
         }
-        // NOP;
         _silence = $18;
         _c = $15;
         _pos = $16;
@@ -2116,15 +1776,11 @@ class Peg2Parser {
         _success = !_success;
         if (_success) {
           $11 = _parse$$RANGE(249, $1);
-          if (_success) {
-            // NOP;
-          }
         }
         if (!_success) {
           _c = $13;
           _pos = $14;
         }
-        // NOP;
         if (!_success) {
           _success = $10;
           if (!_success) {
@@ -2138,10 +1794,8 @@ class Peg2Parser {
         $10 = true;
       }
       if (_success) {
-        String $23;
         if (_c == 93) {
           _success = true;
-          $23 = ']';
           _c = _input[++_pos];
         } else {
           _success = false;
@@ -2164,11 +1818,9 @@ class Peg2Parser {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($4, '\'character class\'');
     }
-    // NOP;
     return $2;
   }
 
@@ -2178,13 +1830,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 41) {
       _success = true;
       $3 = ')';
@@ -2197,19 +1846,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(255, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\')\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(252, $2, $3);
     }
@@ -2222,13 +1866,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 46) {
       _success = true;
       $3 = '.';
@@ -2241,19 +1882,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(259, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'.\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(256, $2, $3);
     }
@@ -2262,10 +1898,8 @@ class Peg2Parser {
 
   dynamic _parse_end_of_file(int $0, bool $1) {
     dynamic $2;
-    // NOP;
     _fposEnd = -1;
     var $4 = _pos;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
     var $8 = _predicate;
@@ -2274,10 +1908,8 @@ class Peg2Parser {
     _predicate = true;
     $1 = false;
     _silence = true;
-    int $11;
     if (_c < _eof) {
       _success = true;
-      $11 = _c;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
@@ -2285,7 +1917,6 @@ class Peg2Parser {
         _fposEnd = _pos;
       }
     }
-    // NOP;
     _silence = $9;
     _c = $6;
     _pos = $7;
@@ -2293,29 +1924,21 @@ class Peg2Parser {
     _silence = $9;
     $1 = $10;
     _success = !_success;
-    if (_success) {
-      // NOP;
-    }
-    // NOP;
     if (!_silence && !_success) {
       _fail($4, '\'end of file\'');
     }
-    // NOP;
     return $2;
   }
 
   String _parse_globals(int $0, bool $1) {
     String $2;
-    // NOP;
     _fposEnd = -1;
     var $4 = _pos;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
-    String $8;
     if (_c == 37) {
       _success = true;
-      $8 = _matchString('%{');
+      _matchString('%{');
     } else {
       _success = false;
       if (!_silence && _fposEnd < _pos) {
@@ -2323,13 +1946,9 @@ class Peg2Parser {
       }
     }
     if (_success) {
-      // NOP;
       var $10 = _pos;
       var $11 = $1;
       $1 = false;
-      List $12;
-      // NOP;
-      // NOP;
       var $15 = _silence;
       _silence = true;
       for (;;) {
@@ -2341,17 +1960,12 @@ class Peg2Parser {
       _success = true;
       _silence = $15;
       if (_success) {
-        // NOP;
-      }
-      // NOP;
-      if (_success) {
         $2 = _text.substring($10, _pos);
       }
       $1 = $11;
-      String $17;
       if (_c == 125) {
         _success = true;
-        $17 = _matchString('}%');
+        _matchString('}%');
       } else {
         _success = false;
         if (!_silence && _fposEnd < _pos) {
@@ -2360,38 +1974,26 @@ class Peg2Parser {
       }
       if (_success) {
         _parse$$SPACING(273, false);
-        if (_success) {
-          // NOP;
-        }
       }
     }
     if (!_success) {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($4, '\'globals\'');
     }
-    // NOP;
     return $2;
   }
 
   List _parse_leading_spaces(int $0, bool $1) {
     List $2;
-    // NOP;
     _fposEnd = -1;
     var $4 = _pos;
-    // NOP;
     $2 = _parse$$SPACING(276, false);
-    if (_success) {
-      // NOP;
-    }
-    // NOP;
     if (!_silence && !_success) {
       _fail($4, '\'leading spaces\'');
     }
-    // NOP;
     return $2;
   }
 
@@ -2401,13 +2003,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 61) {
       _success = true;
       $3 = '=';
@@ -2420,19 +2019,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(280, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'=\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(277, $2, $3);
     }
@@ -2441,16 +2035,12 @@ class Peg2Parser {
 
   Expression _parse_literal(int $0, bool $1) {
     Expression $2;
-    // NOP;
     _fposEnd = -1;
     var $4 = _pos;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
-    int $8;
     if (_c == 34) {
       _success = true;
-      $8 = _c;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
@@ -2467,7 +2057,6 @@ class Peg2Parser {
       }
       for (;;) {
         int $11;
-        // NOP;
         var $13 = _c;
         var $14 = _pos;
         var $15 = _c;
@@ -2478,10 +2067,8 @@ class Peg2Parser {
         _predicate = true;
         $1 = false;
         _silence = true;
-        int $20;
         if (_c == 34) {
           _success = true;
-          $20 = _c;
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
@@ -2489,7 +2076,6 @@ class Peg2Parser {
             _fposEnd = _pos;
           }
         }
-        // NOP;
         _silence = $18;
         _c = $15;
         _pos = $16;
@@ -2499,15 +2085,11 @@ class Peg2Parser {
         _success = !_success;
         if (_success) {
           $11 = _parse$$LITERAL_CHAR(289, $1);
-          if (_success) {
-            // NOP;
-          }
         }
         if (!_success) {
           _c = $13;
           _pos = $14;
         }
-        // NOP;
         if (!_success) {
           break;
         }
@@ -2517,10 +2099,8 @@ class Peg2Parser {
       }
       _success = true;
       _silence = $10;
-      int $23;
       if (_c == 34) {
         _success = true;
-        $23 = _c;
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
@@ -2542,26 +2122,20 @@ class Peg2Parser {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($4, '\'literal\'');
     }
-    // NOP;
     return $2;
   }
 
   String _parse_members(int $0, bool $1) {
     String $2;
-    // NOP;
     _fposEnd = -1;
     var $4 = _pos;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
-    String $8;
     if (_c == 123) {
       _success = true;
-      $8 = '{';
       _c = _input[++_pos];
     } else {
       _success = false;
@@ -2570,13 +2144,9 @@ class Peg2Parser {
       }
     }
     if (_success) {
-      // NOP;
       var $10 = _pos;
       var $11 = $1;
       $1 = false;
-      List $12;
-      // NOP;
-      // NOP;
       var $15 = _silence;
       _silence = true;
       for (;;) {
@@ -2588,17 +2158,11 @@ class Peg2Parser {
       _success = true;
       _silence = $15;
       if (_success) {
-        // NOP;
-      }
-      // NOP;
-      if (_success) {
         $2 = _text.substring($10, _pos);
       }
       $1 = $11;
-      String $17;
       if (_c == 125) {
         _success = true;
-        $17 = '}';
         _c = _input[++_pos];
       } else {
         _success = false;
@@ -2608,20 +2172,15 @@ class Peg2Parser {
       }
       if (_success) {
         _parse$$SPACING(301, false);
-        if (_success) {
-          // NOP;
-        }
       }
     }
     if (!_success) {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($4, '\'members\'');
     }
-    // NOP;
     return $2;
   }
 
@@ -2631,13 +2190,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 33) {
       _success = true;
       $3 = '!';
@@ -2650,19 +2206,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(305, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'!\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(302, $2, $3);
     }
@@ -2675,13 +2226,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 40) {
       _success = true;
       $3 = '(';
@@ -2694,19 +2242,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(309, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'(\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(306, $2, $3);
     }
@@ -2719,13 +2262,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 43) {
       _success = true;
       $3 = '+';
@@ -2738,19 +2278,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(313, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'+\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(310, $2, $3);
     }
@@ -2759,13 +2294,10 @@ class Peg2Parser {
 
   String _parse_$Comma(int $0, bool $1) {
     String $2;
-    // NOP;
     _fposEnd = -1;
     var $4 = _pos;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
-    // NOP;
     if (_c == 44) {
       _success = true;
       $2 = ',';
@@ -2778,19 +2310,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(317, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($4, '\',\'');
     }
-    // NOP;
     return $2;
   }
 
@@ -2800,13 +2327,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 63) {
       _success = true;
       $3 = '?';
@@ -2819,19 +2343,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(321, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'?\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(318, $2, $3);
     }
@@ -2844,13 +2363,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 47) {
       _success = true;
       $3 = '/';
@@ -2863,19 +2379,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(325, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'/\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(322, $2, $3);
     }
@@ -2888,13 +2399,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 42) {
       _success = true;
       $3 = '*';
@@ -2907,19 +2415,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(329, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'*\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(326, $2, $3);
     }
@@ -2932,13 +2435,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 60) {
       _success = true;
       $3 = '<';
@@ -2951,19 +2451,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(333, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'<\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(330, $2, $3);
     }
@@ -2976,13 +2471,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
     _fposEnd = -1;
     var $5 = _pos;
-    // NOP;
     var $7 = _c;
     var $8 = _pos;
-    // NOP;
     if (_c == 62) {
       _success = true;
       $3 = '>';
@@ -2995,19 +2487,14 @@ class Peg2Parser {
     }
     if (_success) {
       _parse$$SPACING(337, false);
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $7;
       _pos = $8;
     }
-    // NOP;
     if (!_silence && !_success) {
       _fail($5, '\'>\'');
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(334, $2, $3);
     }
@@ -3020,12 +2507,9 @@ class Peg2Parser {
     }
     var $2 = _pos;
     dynamic $3;
-    // NOP;
     for (;;) {
-      // NOP;
       var $6 = _c;
       var $7 = _pos;
-      // NOP;
       if (_c == 123) {
         _success = true;
         $3 = '{';
@@ -3037,7 +2521,6 @@ class Peg2Parser {
         }
       }
       if (_success) {
-        // NOP;
         var $10 = _silence;
         _silence = true;
         for (;;) {
@@ -3048,10 +2531,8 @@ class Peg2Parser {
         }
         _success = true;
         _silence = $10;
-        String $12;
         if (_c == 125) {
           _success = true;
-          $12 = '}';
           _c = _input[++_pos];
         } else {
           _success = false;
@@ -3059,19 +2540,13 @@ class Peg2Parser {
             _fposEnd = _pos;
           }
         }
-        if (_success) {
-          // NOP;
-        }
       }
       if (!_success) {
         _c = $6;
         _pos = $7;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       var $14 = _c;
       var $15 = _pos;
       var $16 = _c;
@@ -3082,10 +2557,8 @@ class Peg2Parser {
       _predicate = true;
       $1 = false;
       _silence = true;
-      String $21;
       if (_c == 125) {
         _success = true;
-        $21 = '}';
         _c = _input[++_pos];
       } else {
         _success = false;
@@ -3093,7 +2566,6 @@ class Peg2Parser {
           _fposEnd = _pos;
         }
       }
-      // NOP;
       _silence = $19;
       _c = $16;
       _pos = $17;
@@ -3102,10 +2574,8 @@ class Peg2Parser {
       $1 = $20;
       _success = !_success;
       if (_success) {
-        int $23;
         if (_c < _eof) {
           _success = true;
-          $23 = _c;
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
@@ -3113,20 +2583,13 @@ class Peg2Parser {
             _fposEnd = _pos;
           }
         }
-        if (_success) {
-          // NOP;
-        }
       }
       if (!_success) {
         _c = $14;
         _pos = $15;
-      } else {
-        // NOP;
       }
-      // NOP;
       break;
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(338, $2, $3);
     }
@@ -3135,11 +2598,8 @@ class Peg2Parser {
 
   String _parse$$COMMENT(int $0, bool $1) {
     String $2;
-    // NOP;
-    // NOP;
     var $5 = _c;
     var $6 = _pos;
-    // NOP;
     if (_c == 35) {
       _success = true;
       $2 = '#';
@@ -3151,12 +2611,9 @@ class Peg2Parser {
       }
     }
     if (_success) {
-      // NOP;
       var $9 = _silence;
       _silence = true;
       for (;;) {
-        dynamic $10;
-        // NOP;
         var $12 = _c;
         var $13 = _pos;
         var $14 = _c;
@@ -3168,7 +2625,6 @@ class Peg2Parser {
         $1 = false;
         _silence = true;
         _parse$$EOL(355, false);
-        // NOP;
         _silence = $17;
         _c = $14;
         _pos = $15;
@@ -3177,10 +2633,8 @@ class Peg2Parser {
         $1 = $18;
         _success = !_success;
         if (_success) {
-          int $21;
           if (_c < _eof) {
             _success = true;
-            $21 = _c;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
@@ -3188,15 +2642,11 @@ class Peg2Parser {
               _fposEnd = _pos;
             }
           }
-          if (_success) {
-            // NOP;
-          }
         }
         if (!_success) {
           _c = $12;
           _pos = $13;
         }
-        // NOP;
         if (!_success) {
           break;
         }
@@ -3208,16 +2658,11 @@ class Peg2Parser {
       _parse$$EOL(358, false);
       _success = true;
       _silence = $22;
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $5;
       _pos = $6;
     }
-    // NOP;
-    // NOP;
     return $2;
   }
 
@@ -3227,10 +2672,7 @@ class Peg2Parser {
     }
     var $2 = _pos;
     dynamic $3;
-    // NOP;
     for (;;) {
-      // NOP;
-      // NOP;
       if (_c == 13) {
         _success = true;
         $3 = _matchString('\r\n');
@@ -3241,13 +2683,8 @@ class Peg2Parser {
         }
       }
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
-      // NOP;
       if (_c == 10 || _c == 13) {
         _success = true;
         $3 = _c;
@@ -3258,14 +2695,8 @@ class Peg2Parser {
           _fposEnd = _pos;
         }
       }
-      if (_success) {
-        // NOP;
-        // NOP;
-      }
-      // NOP;
       break;
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(359, $2, $3);
     }
@@ -3274,8 +2705,6 @@ class Peg2Parser {
 
   dynamic _parse$$GLOBALS_BODY(int $0, bool $1) {
     dynamic $2;
-    // NOP;
-    // NOP;
     var $5 = _c;
     var $6 = _pos;
     var $7 = _c;
@@ -3286,17 +2715,15 @@ class Peg2Parser {
     _predicate = true;
     $1 = false;
     _silence = true;
-    String $12;
     if (_c == 125) {
       _success = true;
-      $12 = _matchString('}%');
+      _matchString('}%');
     } else {
       _success = false;
       if (!_silence && _fposEnd < _pos) {
         _fposEnd = _pos;
       }
     }
-    // NOP;
     _silence = $10;
     _c = $7;
     _pos = $8;
@@ -3305,10 +2732,8 @@ class Peg2Parser {
     $1 = $11;
     _success = !_success;
     if (_success) {
-      int $14;
       if (_c < _eof) {
         _success = true;
-        $14 = _c;
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
@@ -3316,16 +2741,11 @@ class Peg2Parser {
           _fposEnd = _pos;
         }
       }
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $5;
       _pos = $6;
     }
-    // NOP;
-    // NOP;
     return $2;
   }
 
@@ -3335,14 +2755,10 @@ class Peg2Parser {
     }
     var $2 = _pos;
     int $3;
-    // NOP;
-    // NOP;
     var $6 = _c;
     var $7 = _pos;
-    int $8;
     if (_c == 92) {
       _success = true;
-      $8 = _c;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
@@ -3351,10 +2767,8 @@ class Peg2Parser {
       }
     }
     if (_success) {
-      String $9;
       if (_c == 117) {
         _success = true;
-        $9 = 'u';
         _c = _input[++_pos];
       } else {
         _success = false;
@@ -3367,17 +2781,12 @@ class Peg2Parser {
         var $11 = _pos;
         var $12 = $1;
         $1 = false;
-        List<int> $13;
-        // NOP;
-        // NOP;
         var $16 = false;
         for (;;) {
-          int $17;
           if (_c >= 48 && _c <= 57 ||
               _c >= 65 && _c <= 70 ||
               _c >= 97 && _c <= 102) {
             _success = true;
-            $17 = _c;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
@@ -3387,17 +2796,10 @@ class Peg2Parser {
           }
           if (!_success) {
             _success = $16;
-            if (!_success) {
-              $13 = null;
-            }
             break;
           }
           $16 = true;
         }
-        if (_success) {
-          // NOP;
-        }
-        // NOP;
         if (_success) {
           $10 = _text.substring($11, _pos);
         }
@@ -3414,8 +2816,6 @@ class Peg2Parser {
       _c = $6;
       _pos = $7;
     }
-    // NOP;
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(369, $2, $3);
     }
@@ -3428,19 +2828,13 @@ class Peg2Parser {
     }
     var $2 = _pos;
     String $3;
-    // NOP;
-    // NOP;
-    // NOP;
     var $7 = _pos;
     var $8 = $1;
     $1 = false;
-    int $9;
-    // NOP;
     var $11 = _c;
     var $12 = _pos;
-    $9 = _parse$$IDENT_START(383, false);
+    _parse$$IDENT_START(383, false);
     if (_success) {
-      // NOP;
       var $15 = _silence;
       _silence = true;
       for (;;) {
@@ -3451,24 +2845,15 @@ class Peg2Parser {
       }
       _success = true;
       _silence = $15;
-      if (_success) {
-        // NOP;
-      }
     }
     if (!_success) {
       _c = $11;
       _pos = $12;
     }
-    // NOP;
     if (_success) {
       $3 = _text.substring($7, _pos);
     }
     $1 = $8;
-    if (_success) {
-      // NOP;
-    }
-    // NOP;
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(378, $2, $3);
     }
@@ -3477,18 +2862,11 @@ class Peg2Parser {
 
   int _parse$$IDENT_CONT(int $0, bool $1) {
     int $2;
-    // NOP;
     for (;;) {
-      // NOP;
       $2 = _parse$$IDENT_START(388, false);
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
-      // NOP;
       if (_c >= 48 && _c <= 57 || _c == 95) {
         _success = true;
         $2 = _c;
@@ -3499,14 +2877,8 @@ class Peg2Parser {
           _fposEnd = _pos;
         }
       }
-      if (_success) {
-        // NOP;
-        // NOP;
-      }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
@@ -3516,9 +2888,6 @@ class Peg2Parser {
     }
     var $2 = _pos;
     int $3;
-    // NOP;
-    // NOP;
-    // NOP;
     if (_c >= 65 && _c <= 90 || _c >= 97 && _c <= 122) {
       _success = true;
       $3 = _c;
@@ -3529,11 +2898,6 @@ class Peg2Parser {
         _fposEnd = _pos;
       }
     }
-    if (_success) {
-      // NOP;
-    }
-    // NOP;
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(391, $2, $3);
     }
@@ -3542,15 +2906,11 @@ class Peg2Parser {
 
   int _parse$$LITERAL_CHAR(int $0, bool $1) {
     int $2;
-    // NOP;
     for (;;) {
-      // NOP;
       var $5 = _c;
       var $6 = _pos;
-      String $7;
       if (_c == 92) {
         _success = true;
-        $7 = '\\';
         _c = _input[++_pos];
       } else {
         _success = false;
@@ -3581,19 +2941,12 @@ class Peg2Parser {
         _c = $5;
         _pos = $6;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $2 = _parse$$HEX_NUMBER(399, $1);
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       var $12 = _c;
       var $13 = _pos;
       var $14 = _c;
@@ -3604,10 +2957,8 @@ class Peg2Parser {
       _predicate = true;
       $1 = false;
       _silence = true;
-      String $19;
       if (_c == 92) {
         _success = true;
-        $19 = '\\';
         _c = _input[++_pos];
       } else {
         _success = false;
@@ -3615,7 +2966,6 @@ class Peg2Parser {
           _fposEnd = _pos;
         }
       }
-      // NOP;
       _silence = $17;
       _c = $14;
       _pos = $15;
@@ -3633,7 +2983,6 @@ class Peg2Parser {
         $1 = false;
         _silence = true;
         _parse$$EOL(404, false);
-        // NOP;
         _silence = $24;
         _c = $21;
         _pos = $22;
@@ -3642,7 +2991,6 @@ class Peg2Parser {
         $1 = $25;
         _success = !_success;
         if (_success) {
-          // NOP;
           if (_c < _eof) {
             _success = true;
             $2 = _c;
@@ -3653,37 +3001,26 @@ class Peg2Parser {
               _fposEnd = _pos;
             }
           }
-          if (_success) {
-            // NOP;
-          }
         }
       }
       if (!_success) {
         _c = $12;
         _pos = $13;
-      } else {
-        // NOP;
       }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
   List<int> _parse$$RANGE(int $0, bool $1) {
     List<int> $2;
-    // NOP;
     for (;;) {
-      // NOP;
       var $5 = _c;
       var $6 = _pos;
       var $7 = _parse$$RANGE_CHAR(408, $1);
       if (_success) {
-        String $8;
         if (_c == 45) {
           _success = true;
-          $8 = '-';
           _c = _input[++_pos];
         } else {
           _success = false;
@@ -3706,11 +3043,8 @@ class Peg2Parser {
         _c = $5;
         _pos = $6;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       var $11 = _parse$$RANGE_CHAR(412, $1);
       if (_success) {
         var c = $11;
@@ -3718,12 +3052,8 @@ class Peg2Parser {
         $$ = [c, c];
         $2 = $$;
       }
-      if (_success) {
-        // NOP;
-      }
       break;
     }
-    // NOP;
     return $2;
   }
 
@@ -3733,15 +3063,11 @@ class Peg2Parser {
     }
     var $2 = _pos;
     int $3;
-    // NOP;
     for (;;) {
-      // NOP;
       var $6 = _c;
       var $7 = _pos;
-      String $8;
       if (_c == 92) {
         _success = true;
-        $8 = '\\';
         _c = _input[++_pos];
       } else {
         _success = false;
@@ -3776,19 +3102,12 @@ class Peg2Parser {
         _c = $6;
         _pos = $7;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $3 = _parse$$HEX_NUMBER(418, $1);
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       var $13 = _c;
       var $14 = _pos;
       var $15 = _c;
@@ -3799,10 +3118,8 @@ class Peg2Parser {
       _predicate = true;
       $1 = false;
       _silence = true;
-      String $20;
       if (_c == 92) {
         _success = true;
-        $20 = '\\';
         _c = _input[++_pos];
       } else {
         _success = false;
@@ -3810,7 +3127,6 @@ class Peg2Parser {
           _fposEnd = _pos;
         }
       }
-      // NOP;
       _silence = $18;
       _c = $15;
       _pos = $16;
@@ -3828,7 +3144,6 @@ class Peg2Parser {
         $1 = false;
         _silence = true;
         _parse$$EOL(423, false);
-        // NOP;
         _silence = $25;
         _c = $22;
         _pos = $23;
@@ -3837,7 +3152,6 @@ class Peg2Parser {
         $1 = $26;
         _success = !_success;
         if (_success) {
-          // NOP;
           if (_c < _eof) {
             _success = true;
             $3 = _c;
@@ -3848,21 +3162,14 @@ class Peg2Parser {
               _fposEnd = _pos;
             }
           }
-          if (_success) {
-            // NOP;
-          }
         }
       }
       if (!_success) {
         _c = $13;
         _pos = $14;
-      } else {
-        // NOP;
       }
-      // NOP;
       break;
     }
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(413, $2, $3);
     }
@@ -3871,10 +3178,7 @@ class Peg2Parser {
 
   dynamic _parse$$SPACE(int $0, bool $1) {
     dynamic $2;
-    // NOP;
     for (;;) {
-      // NOP;
-      // NOP;
       if (_c == 9 || _c == 32) {
         _success = true;
         $2 = _c;
@@ -3886,21 +3190,11 @@ class Peg2Parser {
         }
       }
       if (_success) {
-        // NOP;
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
       $2 = _parse$$EOL(429, false);
-      if (_success) {
-        // NOP;
-        // NOP;
-      }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 
@@ -3910,29 +3204,15 @@ class Peg2Parser {
     }
     var $2 = _pos;
     List $3;
-    // NOP;
-    // NOP;
-    // NOP;
     var $7 = _silence;
     _silence = true;
     for (;;) {
-      dynamic $8;
       for (;;) {
-        // NOP;
-        $8 = _parse$$SPACE(435, false);
+        _parse$$SPACE(435, false);
         if (_success) {
-          // NOP;
-          // NOP;
           break;
         }
-        // NOP;
-        // NOP;
-        $8 = _parse$$COMMENT(437, false);
-        if (_success) {
-          // NOP;
-          // NOP;
-        }
-        // NOP;
+        _parse$$COMMENT(437, false);
         break;
       }
       if (!_success) {
@@ -3941,11 +3221,6 @@ class Peg2Parser {
     }
     _success = true;
     _silence = $7;
-    if (_success) {
-      // NOP;
-    }
-    // NOP;
-    // NOP;
     if (_memoizable[$0] == true) {
       _memoize(430, $2, $3);
     }
@@ -3954,15 +3229,12 @@ class Peg2Parser {
 
   int _parse$$TERMINAL_CHAR(int $0, bool $1) {
     int $2;
-    // NOP;
     for (;;) {
-      // NOP;
       var $5 = _c;
       var $6 = _pos;
-      String $7;
       if (_c == 47) {
         _success = true;
-        $7 = _matchString('//');
+        _matchString('//');
       } else {
         _success = false;
         if (!_silence && _fposEnd < _pos) {
@@ -3970,7 +3242,6 @@ class Peg2Parser {
         }
       }
       if (_success) {
-        // NOP;
         if (_c == 39) {
           _success = true;
           $2 = _c;
@@ -3981,20 +3252,13 @@ class Peg2Parser {
             _fposEnd = _pos;
           }
         }
-        if (_success) {
-          // NOP;
-        }
       }
       if (!_success) {
         _c = $5;
         _pos = $6;
       } else {
-        // NOP;
         break;
       }
-      // NOP;
-      // NOP;
-      // NOP;
       if (_c >= 32 && _c <= 38 || _c >= 40 && _c <= 126) {
         _success = true;
         $2 = _c;
@@ -4005,14 +3269,8 @@ class Peg2Parser {
           _fposEnd = _pos;
         }
       }
-      if (_success) {
-        // NOP;
-        // NOP;
-      }
-      // NOP;
       break;
     }
-    // NOP;
     return $2;
   }
 }

@@ -2,8 +2,12 @@ part of '../../operation_optimizers.dart';
 
 class VariablesUsageResolver extends SimpleOperationVisitor
     with OperationUtils {
-  void resolve(Operation operation) {
+  VariablesStats _stats;
+
+  VariablesStats resolve(Operation operation, VariablesStats stats) {
+    _stats = stats;
     operation.accept(this);
+    return _stats;
   }
 
   @override
@@ -15,8 +19,8 @@ class VariablesUsageResolver extends SimpleOperationVisitor
         final left = getOp<VariableOperation>(node.left);
         if (left != null) {
           final variable = left.variable;
-          final variablesUsage = node.variablesUsage;
-          variablesUsage.addReadCount(variable, -1);
+          final stat = _stats.getStat(node);
+          stat.addReadCount(variable, -1);
         }
 
         break;
@@ -26,10 +30,21 @@ class VariablesUsageResolver extends SimpleOperationVisitor
   }
 
   @override
+  void visitMemberAccess(MemberAccessOperation node) {
+    super.visitMemberAccess(node);
+    final member = getOp<VariableOperation>(node.member);
+    if (member != null) {
+      final variable = member.variable;
+      final stat = _stats.getStat(node);
+      stat.addReadCount(variable, -1);
+    }
+  }
+
+  @override
   void visitVariable(VariableOperation node) {
     super.visitVariable(node);
     final variable = node.variable;
-    final variablesUsage = node.variablesUsage;
-    variablesUsage.addReadCount(variable, 1);
+    final stat = _stats.getStat(node);
+    stat.addReadCount(variable, 1);
   }
 }

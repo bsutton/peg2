@@ -23,7 +23,7 @@ abstract class OperationVisitor {
 
   void visitLoop(LoopOperation node);
 
-  void visitMember(MemberOperation node);
+  void visitMemberAccess(MemberAccessOperation node);
 
   void visitMethod(MethodOperation node);
 

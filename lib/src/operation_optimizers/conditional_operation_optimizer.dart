@@ -1,7 +1,10 @@
 part of '../../operation_optimizers.dart';
 
-class ConditionalOperationOptimizer {
-  void optimize(BlockOperation operation) {
+class ConditionalOperationOptimizer with OperationUtils {
+  VariablesStats _stats;
+
+  void optimize(BlockOperation operation, VariablesStats stats) {
+    _stats = stats;
     _optimizeBlock(operation);
   }
 
@@ -23,12 +26,12 @@ class ConditionalOperationOptimizer {
   void _combineConditionals(BlockOperation block) {
     final operations = block.operations;
     for (var i = 0; i < operations.length; i++) {
-      final loop = _getOp<LoopOperation>(operations[i]);
+      final loop = getOp<LoopOperation>(operations[i]);
       if (loop != null) {
         _combineConditionals(loop.body);
       }
 
-      final prev = _getOp<ConditionalOperation>(operations[i]);
+      final prev = getOp<ConditionalOperation>(operations[i]);
       if (prev == null) {
         continue;
       }
@@ -42,7 +45,7 @@ class ConditionalOperationOptimizer {
         break;
       }
 
-      final next = _getOp<ConditionalOperation>(operations[i + 1]);
+      final next = getOp<ConditionalOperation>(operations[i + 1]);
       if (next == null) {
         continue;
       }
@@ -61,18 +64,10 @@ class ConditionalOperationOptimizer {
     }
   }
 
-  T _getOp<T>(Operation operation) {
-    if (operation is T) {
-      return operation as T;
-    }
-
-    return null;
-  }
-
   bool _hasWritings(BlockOperation block, List<Variable> variables) {
-    final variablesUsage = block.variablesUsage;
+    final stat = _stats.getStat(block);
     for (final variable in variables) {
-      final count = variablesUsage.getWriteCount(variable);
+      final count = stat.getWriteCount(variable);
       if (count > 0) {
         return true;
       }
@@ -84,10 +79,18 @@ class ConditionalOperationOptimizer {
   void _initialize(Operation operation) {
     final operationInitializer = OperationInitializer();
     operationInitializer.initialize(operation);
-
-    // TODO: Rename
     final resolver = VariablesUsageResolver();
-    resolver.resolve(operation);
+    resolver.resolve(operation, _stats);
+  }
+
+  bool _isBlockEmpty(BlockOperation block) {
+    for (final operation in block.operations) {
+      if (operation is! NopOperation) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   bool _isBlockEndsWithGoto(BlockOperation block) {
@@ -99,7 +102,7 @@ class ConditionalOperationOptimizer {
           //case OperationKind.continue_:
           return true;
         case OperationKind.conditional:
-          final cond = _getOp<ConditionalOperation>(operation);
+          final cond = getOp<ConditionalOperation>(operation);
           if (_isBlockEndsWithGoto(cond.ifTrue)) {
             return true;
           }
@@ -112,7 +115,7 @@ class ConditionalOperationOptimizer {
 
           return false;
         case OperationKind.loop:
-          final loop = _getOp<LoopOperation>(operation);
+          final loop = getOp<LoopOperation>(operation);
           return _isBlockEndsWithGoto(loop.body);
         case OperationKind.return_:
           return true;
@@ -127,13 +130,13 @@ class ConditionalOperationOptimizer {
   }
 
   bool _isEqualNot(Operation op1, Operation op2, List<Variable> variables) {
-    final unary1 = _getOp<UnaryOperation>(op1);
-    final unary2 = _getOp<UnaryOperation>(op2);
+    final unary1 = getOp<UnaryOperation>(op1);
+    final unary2 = getOp<UnaryOperation>(op2);
     if (unary1 != null && unary2 != null) {
       if (unary1.kind == OperationKind.not &&
           unary2.kind == OperationKind.not) {
         if (_isEqualVariables(unary1.operand, unary2.operand)) {
-          final variable = _getOp<VariableOperation>(unary1.operand);
+          final variable = getOp<VariableOperation>(unary1.operand);
           variables.add(variable.variable);
           return true;
         }
@@ -144,8 +147,8 @@ class ConditionalOperationOptimizer {
   }
 
   bool _isEqualVariables(Operation op1, Operation op2) {
-    final variable1 = _getOp<VariableOperation>(op1);
-    final variable2 = _getOp<VariableOperation>(op1);
+    final variable1 = getOp<VariableOperation>(op1);
+    final variable2 = getOp<VariableOperation>(op1);
     if (variable1 != null && variable2 != null) {
       return variable1.variable == variable2.variable;
     }
@@ -166,8 +169,8 @@ class ConditionalOperationOptimizer {
     for (final op in ops) {
       switch (op.kind) {
         case OperationKind.not:
-          final unary = _getOp<UnaryOperation>(op);
-          final variable = _getOp<VariableOperation>(unary.operand);
+          final unary = getOp<UnaryOperation>(op);
+          final variable = getOp<VariableOperation>(unary.operand);
           if (variable == null) {
             return false;
           }
@@ -175,7 +178,7 @@ class ConditionalOperationOptimizer {
           set.add(variable.variable);
           break;
         case OperationKind.variable:
-          final variable = _getOp<VariableOperation>(op);
+          final variable = getOp<VariableOperation>(op);
           set.add(variable.variable);
           break;
         default:
@@ -217,7 +220,7 @@ class ConditionalOperationOptimizer {
       final operation = operations[i];
       switch (operation.kind) {
         case OperationKind.assign:
-          final binary = _getOp<BinaryOperation>(operation);
+          final binary = getOp<BinaryOperation>(operation);
           if (!_isSimpleBinary(binary)) {
             return false;
           }
@@ -234,6 +237,7 @@ class ConditionalOperationOptimizer {
   }
 
   void _optimizeBlock(BlockOperation block) {
+    _removeEmptyBlocks(block);
     _removeConditionals(block);
     _combineConditionals(block);
   }
@@ -277,7 +281,7 @@ class ConditionalOperationOptimizer {
     if (_isEqualVariables(prevTest, nextTest)) {
       if (_isSimpleBlock(prevBlock)) {
         if (!_isBlockEndsWithGoto(prevBlock)) {
-          final variable = _getOp<VariableOperation>(prev.test);
+          final variable = getOp<VariableOperation>(prev.test);
           if (!_hasWritings(prevBlock, [variable.variable])) {
             _appendToBlock(nextBlock, prevBlock);
             _removeFromBlock(block, [next]);
@@ -319,12 +323,12 @@ class ConditionalOperationOptimizer {
   void _removeConditionals(BlockOperation block) {
     final operations = block.operations;
     for (var i = 0; i < operations.length; i++) {
-      final loop = _getOp<LoopOperation>(operations[i]);
+      final loop = getOp<LoopOperation>(operations[i]);
       if (loop != null) {
         _removeConditionals(loop.body);
       }
 
-      final conditional = _getOp<ConditionalOperation>(operations[i]);
+      final conditional = getOp<ConditionalOperation>(operations[i]);
       if (conditional != null) {
         _removeConditionals(conditional.ifTrue);
         if (conditional.ifFalse != null) {
@@ -336,7 +340,7 @@ class ConditionalOperationOptimizer {
         break;
       }
 
-      final next = _getOp<ConditionalOperation>(operations[i + 1]);
+      final next = getOp<ConditionalOperation>(operations[i + 1]);
       if (next == null) {
         continue;
       }
@@ -345,7 +349,7 @@ class ConditionalOperationOptimizer {
         continue;
       }
 
-      final binary = _getOp<BinaryOperation>(operations[i]);
+      final binary = getOp<BinaryOperation>(operations[i]);
       if (binary == null) {
         continue;
       }
@@ -354,12 +358,12 @@ class ConditionalOperationOptimizer {
         continue;
       }
 
-      final left = _getOp<VariableOperation>(binary.left);
+      final left = getOp<VariableOperation>(binary.left);
       if (left == null) {
         continue;
       }
 
-      final right = _getOp<ConstantOperation>(binary.right);
+      final right = getOp<ConstantOperation>(binary.right);
       if (right == null) {
         continue;
       }
@@ -368,7 +372,7 @@ class ConditionalOperationOptimizer {
         continue;
       }
 
-      final test = _getOp<VariableOperation>(next.test);
+      final test = getOp<VariableOperation>(next.test);
       if (test == null) {
         continue;
       }
@@ -389,6 +393,52 @@ class ConditionalOperationOptimizer {
 
       _removeFromBlock(block, [next]);
       i--;
+    }
+  }
+
+  void _removeEmptyBlocks(BlockOperation block) {
+    final operations = block.operations;
+    for (var i = 0; i < operations.length; i++) {
+      final current = operations[i];
+      final loop = getOp<LoopOperation>(current);
+      if (loop != null) {
+        final body = loop.body;
+        _removeEmptyBlocks(body);
+        if (_isBlockEmpty(body)) {
+          _removeFromBlock(block, [loop]);
+        }
+
+        continue;
+      }
+
+      final conditional = getOp<ConditionalOperation>(current);
+      if (conditional != null) {
+        final ifTrue = conditional.ifTrue;
+        _removeEmptyBlocks(ifTrue);
+        final isIfTrueEmpty = _isBlockEmpty(ifTrue);
+        final ifFalse = conditional.ifFalse;
+        var isIfFalseEmpty = true;
+        if (ifFalse != null) {
+          _removeEmptyBlocks(ifFalse);
+          isIfFalseEmpty = _isBlockEmpty(ifFalse);
+        }
+
+        if (isIfTrueEmpty && isIfFalseEmpty) {
+          _removeFromBlock(block, [conditional]);
+        }
+
+        continue;
+      }
+
+      final b = getOp<BlockOperation>(current);
+      if (b != null) {
+        _removeEmptyBlocks(b);
+        if (_isBlockEmpty(b)) {
+          _removeFromBlock(block, [b]);
+        }
+
+        continue;
+      }
     }
   }
 

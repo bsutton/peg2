@@ -1,30 +1,34 @@
 part of '../../operation_optimizers.dart';
 
 class VariableUsageOptimizer with OperationUtils {
-  void optimize(BlockOperation operation) {
+  VariablesStats _stats; 
+
+  void optimize(BlockOperation operation, VariablesStats stats) {
+    _stats = stats;
     final usedBelow = <Variable>{};
     final operations = operation.operations;
     for (var i = operations.length - 1; i >= 0; i--) {
       final current = operations[i];
       final binary = _getOp<BinaryOperation>(current);
       if (binary == null || binary.kind != OperationKind.assign) {
-        usedBelow.addAll(current.variablesUsage.readings.keys);
+        final stat = _stats.getStat(current);
+        usedBelow.addAll(stat.readings.keys);
         switch (current.kind) {
           case OperationKind.block:
             final op = _getOp<BlockOperation>(current);
-            optimize(op);
+            optimize(op, _stats);
             break;
           case OperationKind.conditional:
             final op = _getOp<ConditionalOperation>(current);
-            optimize(op.ifTrue);
+            optimize(op.ifTrue, _stats);
             if (op.ifFalse != null) {
-              optimize(op.ifFalse);
+              optimize(op.ifFalse, _stats);
             }
 
             break;
           case OperationKind.loop:
             final op = _getOp<LoopOperation>(current);
-            optimize(op.body);
+            optimize(op.body, _stats);
             break;
           default:
         }
@@ -35,7 +39,8 @@ class VariableUsageOptimizer with OperationUtils {
       final left = _getOp<VariableOperation>(binary.left);
       final right = _getOp<VariableOperation>(binary.right);
       if (left == null || right == null) {
-        usedBelow.addAll(current.variablesUsage.readings.keys);
+        final stat = _stats.getStat(current);
+        usedBelow.addAll(stat.readings.keys);
         continue;
       }
 
@@ -46,14 +51,13 @@ class VariableUsageOptimizer with OperationUtils {
       }
 
       final rightDeclaration = rightVariable.declaration;
-      if (rightDeclaration == null || rightDeclaration.frozen) {
+      if (rightVariable.frozen) {
         continue;
       }
 
-      final leftDeclaration = leftVariable.declaration;
-      if (leftDeclaration == null || leftDeclaration.frozen) {
+      if (leftVariable.frozen) {
         continue;
-      }
+      }      
 
       final rightDeclarationParent = rightDeclaration.parent;
       if (_isVariableUsedInOperation(rightDeclarationParent, leftVariable)) {
@@ -64,13 +68,11 @@ class VariableUsageOptimizer with OperationUtils {
       final variableReplacer = _VariableReplacer();
       variableReplacer.replace(
           rightDeclarationParent, rightVariable, leftVariable);
-
       _replaceParameter(rightDeclaration, leftVariable);
-
-      //final assign = binOp(OperationKind.assign, varOp(leftVariable), varOp(leftVariable));
-      _replaceAssign(binary, NopOperation('${leftVariable} = ${rightVariable}'));
+      _replaceAssign(
+          binary, NopOperation('${leftVariable} = ${rightVariable}'));
       final variableUsageResolver = VariablesUsageResolver();
-      variableUsageResolver.resolve(rightDeclarationParent);
+      variableUsageResolver.resolve(rightDeclarationParent, _stats);
     }
   }
 
@@ -83,16 +85,17 @@ class VariableUsageOptimizer with OperationUtils {
   }
 
   bool _isVariableUsedInOperation(Operation operation, Variable variable) {
-    final variablesUsage = operation.variablesUsage;
-    final readCount = variablesUsage.getReadCount(variable);
-    final writeCount = variablesUsage.getWriteCount(variable);
-    return readCount == 0 && writeCount == 0;
+    final stat = _stats.getStat(operation);
+    final readCount = stat.getReadCount(variable);
+    final writeCount = stat.getWriteCount(variable);
+    return readCount != 0 && writeCount != 0;
   }
 
   void _replaceParameter(ParameterOperation parameter, Variable variable) {
     final operation = parameter.operation;
     if (operation == null) {
-      _replaceOperation(parameter, NopOperation());
+      _replaceOperation(
+          parameter, NopOperation('${parameter.type} ${parameter.variable}'));
     } else {
       final assign = binOp(OperationKind.assign, varOp(variable), operation);
       _replaceOperation(parameter, assign);

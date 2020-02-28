@@ -10,7 +10,8 @@ class OperationReplacer extends SimpleOperationVisitor {
     _to = to;
     final parent = from.parent;
     parent.accept(this);
-    _initialize(to);
+    final operationInitializer = OperationInitializer();
+    operationInitializer.initialize(to);
   }
 
   @override
@@ -39,17 +40,17 @@ class OperationReplacer extends SimpleOperationVisitor {
   }
 
   @override
-  void visitListAccess(ListAccessOperation node) {
-    _replace(node);
-  }
-
-  @override
   void visitList(ListOperation node) {
     _replace(node);
   }
 
   @override
-  void visitMember(MemberOperation node) {
+  void visitListAccess(ListAccessOperation node) {
+    _replace(node);
+  }
+
+  @override
+  void visitMemberAccess(MemberAccessOperation node) {
     _replace(node);
   }
 
@@ -64,18 +65,13 @@ class OperationReplacer extends SimpleOperationVisitor {
   }
 
   @override
-  void visitUnary(UnaryOperation node) {
-    _replace(node);
-  }
-
-  @override
   void visitTernary(TernaryOperation node) {
     _replace(node);
   }
 
-  void _initialize(Operation operation) {
-    final operationInitializer = OperationInitializer();
-    operationInitializer.initialize(operation);
+  @override
+  void visitUnary(UnaryOperation node) {
+    _replace(node);
   }
 
   void _replace(Operation node) {
