@@ -158,9 +158,9 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     void generate(BlockOperation b) {
       addAssign(b, varOp(result), varOp(m.c));
       final testC = lteOp(varOp(m.c), constOp(0xffff));
-      final ternary = TernaryOperation(testC, constOp(1), constOp(2));
+      final ternary = ternaryOp(testC, constOp(1), constOp(2));
       final assignPos = addAssignOp(varOp(m.pos), ternary);
-      final listAcc = ListAccessOperation(varOp(m.input), assignPos);
+      final listAcc = listAccOp(varOp(m.input), assignPos);
       addAssign(b, varOp(m.c), listAcc);
     }
 
@@ -200,9 +200,9 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       void generate(BlockOperation b) {
         addAssign(b, varOp(result), varOp(m.c));
         final testC = lteOp(varOp(m.c), constOp(0xffff));
-        final ternary = TernaryOperation(testC, constOp(1), constOp(2));
+        final ternary = ternaryOp(testC, constOp(1), constOp(2));
         final assignPos = addAssignOp(varOp(m.pos), ternary);
-        final listAcc = ListAccessOperation(varOp(m.input), assignPos);
+        final listAcc = listAccOp(varOp(m.input), assignPos);
         addAssign(b, varOp(m.c), listAcc);
       }
 
@@ -210,13 +210,13 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     } else {
       final elements = <ConstantOperation>[];
       for (var i = 0; i < ranges.length; i += 2) {
-        elements.add(ConstantOperation(ranges[i]));
-        elements.add(ConstantOperation(ranges[i + 1]));
+        elements.add(constOp(ranges[i]));
+        elements.add(constOp(ranges[i + 1]));
       }
 
-      final listOp = ListOperation(null, elements);
-      final list = va.newVar(b, 'const', listOp);
-      final matchRanges = callOp(varOp(m.matchRanges), [varOp(list)]);
+      final list = listOp(null, elements);
+      final chars = va.newVar(b, 'const', list);
+      final matchRanges = callOp(varOp(m.matchRanges), [varOp(chars)]);
       result = va.newVar(b, 'var', matchRanges);
     }
 
@@ -236,12 +236,12 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
         addAssign(b, varOp(result), constOp(text));
         Operation posAssign;
         if (rune <= 0xffff) {
-          posAssign = unaryOp(OperationKind.preInc, varOp(m.pos));
+          posAssign = preIncOp(varOp(m.pos));
         } else {
           posAssign = addAssignOp(varOp(m.pos), constOp(2));
         }
 
-        final listAcc = ListAccessOperation(varOp(m.input), posAssign);
+        final listAcc = listAccOp(varOp(m.input), posAssign);
         addAssign(b, varOp(m.c), listAcc);
       }
 
@@ -294,7 +294,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     final result = va.newVar(b, returnType, null);
     if (node.isProductive) {
       addIfElse(b, varOp(productive), (b) {
-        addAssign(b, varOp(result), ListOperation(null, []));
+        addAssign(b, varOp(result), listOp(null, []));
       });
     } else {
       // Do nothing
@@ -418,8 +418,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
           } else {
             onSuccess = (b) {
               if (node.isProductive) {
-                final list =
-                    ListOperation(null, variables.values.map(varOp).toList());
+                final list = listOp(null, variables.values.map(varOp).toList());
                 addAssign(b, varOp(result), list);
               } else {
                 // TODO:
@@ -456,7 +455,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     addAssign(b, varOp(m.silence), constOp(true));
     if (node.isProductive) {
       addIfElse(b, varOp(productive), (b) {
-        addAssign(b, varOp(result), ListOperation(null, []));
+        addAssign(b, varOp(result), listOp(null, []));
       });
     } else {
       // Do nothing
@@ -491,7 +490,8 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
     final $$ = Variable('\$\$');
     final returnType = node.returnType;
-    final parameter = ParameterOperation(returnType, $$);
+    final parameter = paramOp(returnType, $$, null);
+    parameter.frozen = true;
     b.operations.add(parameter);
     final code = <String>[];
     final lineSplitter = LineSplitter();

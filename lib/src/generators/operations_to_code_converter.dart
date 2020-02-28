@@ -218,7 +218,12 @@ class OperationsToCodeConverter extends OperationVisitor {
 
   @override
   void visitNop(NopOperation node) {
-    _result = '// NOP';
+    final text = node.text;
+    if (text != null) {
+      _result = '// $text';
+    } else {
+      _result = '// NOP';
+    }
   }
 
   @override
@@ -244,6 +249,27 @@ class OperationsToCodeConverter extends OperationVisitor {
       node.operation.accept(this);
       sb.write(' ');
       sb.write(_result);
+    }
+
+    _result = sb.toString();
+  }
+
+  @override
+  void visitTernary(TernaryOperation node) {
+    final sb = StringBuffer();
+    node.test.accept(this);
+    sb.write(_resultAsString());
+    sb.write(' ? ');
+    switch (node.kind) {
+      case OperationKind.ternary:
+        node.ifTrue.accept(this);
+        sb.write(_resultAsString());
+        sb.write(' : ');
+        node.ifFalse.accept(this);
+        sb.write(_resultAsString());
+        break;
+      default:
+        throw StateError('Unknown ternary operation: ${node.kind}');
     }
 
     _result = sb.toString();
@@ -311,26 +337,5 @@ class OperationsToCodeConverter extends OperationVisitor {
     }
 
     throw StateError('Expected "Builder" result');
-  }
-
-  @override
-  void visitTernary(TernaryOperation node) {
-    final sb = StringBuffer();
-    node.test.accept(this);
-    sb.write(_resultAsString());
-    sb.write(' ? ');
-    switch (node.kind) {
-      case OperationKind.ternary:
-        node.ifTrue.accept(this);
-        sb.write(_resultAsString());
-        sb.write(' : ');
-        node.ifFalse.accept(this);
-        sb.write(_resultAsString());
-        break;
-      default:
-        throw StateError('Unknown ternary operation: ${node.kind}');
-    }
-
-    _result = sb.toString();
   }
 }

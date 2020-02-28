@@ -86,7 +86,7 @@ class ConditionalOperationOptimizer {
     operationInitializer.initialize(operation);
 
     // TODO: Rename
-    final resolver = VariableUsageResolver();
+    final resolver = VariablesUsageResolver();
     resolver.resolve(operation);
   }
 

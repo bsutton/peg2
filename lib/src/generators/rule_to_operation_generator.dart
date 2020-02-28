@@ -156,6 +156,10 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     final params = <ParameterOperation>[];
     params.add(ParameterOperation('int', cid));
     params.add(ParameterOperation('bool', productive));
+    for (final param in params) {
+      param.frozen = true;
+    }
+
     var returnType = rule.returnType;
     returnType ??= rule.expression.returnType;
     Variable start;

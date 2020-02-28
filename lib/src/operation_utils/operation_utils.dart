@@ -141,6 +141,14 @@ class OperationUtils {
     return op;
   }
 
+  T getOp<T extends Operation>(Operation operation) {
+    if (operation is T) {
+      return operation;
+    }
+
+    return null;
+  }
+
   BinaryOperation gteOp(Operation left, Operation right) {
     final op = BinaryOperation(left, OperationKind.gte, right);
     return op;
@@ -153,6 +161,16 @@ class OperationUtils {
 
   BinaryOperation landOp(Operation left, Operation right) {
     final op = BinaryOperation(left, OperationKind.land, right);
+    return op;
+  }
+
+  ListAccessOperation listAccOp(Operation list, Operation index) {
+    final op = ListAccessOperation(list, index);
+    return op;
+  }
+
+  ListOperation listOp(String type, List<Operation> elements) {
+    final op = ListOperation(type, elements);
     return op;
   }
 
@@ -199,6 +217,22 @@ class OperationUtils {
     return ParameterOperation(type, variable, operation);
   }
 
+  UnaryOperation postDecOp(Operation op, [String type]) {
+    return UnaryOperation(OperationKind.postDec, op, type);
+  }
+
+  UnaryOperation postIncOp(Operation op, [String type]) {
+    return UnaryOperation(OperationKind.postInc, op, type);
+  }
+
+  UnaryOperation preDecOp(Operation op, [String type]) {
+    return UnaryOperation(OperationKind.preDec, op, type);
+  }
+
+  UnaryOperation preIncOp(Operation op, [String type]) {
+    return UnaryOperation(OperationKind.preInc, op, type);
+  }
+
   void restoreVars(BlockOperation block, Map<Variable, Variable> variables) {
     for (final key in variables.keys) {
       addAssign(block, varOp(key), varOp(variables[key]));
@@ -214,6 +248,12 @@ class OperationUtils {
     }
 
     return result;
+  }
+
+  TernaryOperation ternaryOp(
+      Operation test, Operation ifTrue, Operation ifFalse) {
+    final op = TernaryOperation(test, ifTrue, ifFalse);
+    return op;
   }
 
   UnaryOperation unaryOp(OperationKind kind, Operation op, [String type]) {

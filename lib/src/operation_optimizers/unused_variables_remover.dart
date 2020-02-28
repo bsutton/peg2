@@ -1,8 +1,34 @@
 part of '../../operation_optimizers.dart';
 
-class UnusedVariablesRemover extends SimpleOperationVisitor {
+class UnusedVariablesRemover extends SimpleOperationVisitor
+    with OperationUtils {
   void remove(Operation operation) {
     operation.accept(this);
+  }
+
+  @override
+  void visitBinary(BinaryOperation node) {
+    if (node.kind != OperationKind.assign) {
+      return;
+    }
+
+    final left = getOp<VariableOperation>(node.left);
+    if (left == null) {
+      return;
+    }
+
+    final variablesUsage = node.variablesUsage;
+    final readCount = variablesUsage.getReadCount(left.variable);
+    if (readCount != 0) {
+      return;
+    }
+
+    final right = node.right;
+    if (right.kind == OperationKind.call) {
+      if (left.variable.name == '\$9') {
+        var x = 0;
+      }
+    }
   }
 
   @override

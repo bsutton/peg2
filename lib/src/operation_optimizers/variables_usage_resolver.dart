@@ -1,6 +1,7 @@
 part of '../../operation_optimizers.dart';
 
-class VariableUsageResolver extends SimpleOperationVisitor {
+class VariablesUsageResolver extends SimpleOperationVisitor
+    with OperationUtils {
   void resolve(Operation operation) {
     operation.accept(this);
   }
@@ -10,12 +11,12 @@ class VariableUsageResolver extends SimpleOperationVisitor {
     super.visitBinary(node);
     switch (node.kind) {
       case OperationKind.assign:
-        if (node.left is VariableOperation) {
-          final left = node.left as VariableOperation;
+      case OperationKind.addAssign:
+        final left = getOp<VariableOperation>(node.left);
+        if (left != null) {
           final variable = left.variable;
           final variablesUsage = node.variablesUsage;
           variablesUsage.addReadCount(variable, -1);
-          variablesUsage.addReadCount(variable, 1);
         }
 
         break;

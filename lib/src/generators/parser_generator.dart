@@ -58,7 +58,7 @@ class _Memo {
 
     if (options.optimizeCode) {
       for (final method in methods) {
-        final operationsOptimizer = OperationOptimizer();
+        final operationsOptimizer = OperationsOptimizer();
         operationsOptimizer.optimize(method.body);
       }
     }

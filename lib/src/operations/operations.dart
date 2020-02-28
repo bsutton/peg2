@@ -392,6 +392,10 @@ class MethodOperation extends Operation {
 }
 
 class NopOperation extends Operation {
+  String text;
+
+  NopOperation([this.text]);
+
   @override
   OperationKind get kind => OperationKind.nop;
 

@@ -1,6 +1,6 @@
 part of '../../operation_optimizers.dart';
 
-class VariableUsageOptimizer {
+class VariableUsageOptimizer with OperationUtils {
   void optimize(BlockOperation operation) {
     final usedBelow = <Variable>{};
     final operations = operation.operations;
@@ -55,39 +55,22 @@ class VariableUsageOptimizer {
         continue;
       }
 
-      var failed = false;
-      for (var j = i - 1; j >= 0; j--) {
-        final current = operations[j];
-        final variablesUsage = current.variablesUsage;
-        final readCount = variablesUsage.getReadCount(leftVariable);
-        final writeCount = variablesUsage.getWriteCount(leftVariable);
-        if (readCount != 0 || writeCount != 0) {
-          failed = true;
-          break;
-        }
-      }
-
-      usedBelow.add(rightVariable);
-      if (failed) {
+      final rightDeclarationParent = rightDeclaration.parent;
+      if (_isVariableUsedInOperation(rightDeclarationParent, leftVariable)) {
+        usedBelow.add(rightVariable);
         continue;
       }
 
-      for (var j = i - 1; j >= 0; j--) {
-        final current = operations[j];
-        final variableReplacer = _VariableReplacer();
-        variableReplacer.replace(current, rightVariable, leftVariable);
-      }
+      final variableReplacer = _VariableReplacer();
+      variableReplacer.replace(
+          rightDeclarationParent, rightVariable, leftVariable);
 
-      // $4 = $$
+      _replaceParameter(rightDeclaration, leftVariable);
 
-      final operationReplacer = OperationReplacer();
-      operationReplacer.replace(current, NopOperation());
-      if (rightDeclaration.parent == null) {
-        throw StateError('Invalid parameter declaration');
-      }
-
-      final variableUsageResolver = VariableUsageResolver();
-      variableUsageResolver.resolve(rightDeclaration.parent);
+      //final assign = binOp(OperationKind.assign, varOp(leftVariable), varOp(leftVariable));
+      _replaceAssign(binary, NopOperation('${leftVariable} = ${rightVariable}'));
+      final variableUsageResolver = VariablesUsageResolver();
+      variableUsageResolver.resolve(rightDeclarationParent);
     }
   }
 
@@ -97,6 +80,32 @@ class VariableUsageOptimizer {
     }
 
     return null;
+  }
+
+  bool _isVariableUsedInOperation(Operation operation, Variable variable) {
+    final variablesUsage = operation.variablesUsage;
+    final readCount = variablesUsage.getReadCount(variable);
+    final writeCount = variablesUsage.getWriteCount(variable);
+    return readCount == 0 && writeCount == 0;
+  }
+
+  void _replaceParameter(ParameterOperation parameter, Variable variable) {
+    final operation = parameter.operation;
+    if (operation == null) {
+      _replaceOperation(parameter, NopOperation());
+    } else {
+      final assign = binOp(OperationKind.assign, varOp(variable), operation);
+      _replaceOperation(parameter, assign);
+    }
+  }
+
+  void _replaceAssign(BinaryOperation from, Operation to) {
+    _replaceOperation(from, to);
+  }
+
+  void _replaceOperation(Operation from, Operation to) {
+    final operationReplacer = OperationReplacer();
+    operationReplacer.replace(from, to);
   }
 }
 

@@ -17,3 +17,4 @@ find bug with "break"
 use silence in postfix generator
 does not generate unused global parser methods
 make some classes private?
+add block optimzer (remove empty blocks and their parent statements)
