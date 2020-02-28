@@ -1,7 +1,7 @@
 part of '../../operation_optimizers.dart';
 
 class VariableUsageOptimizer with OperationUtils {
-  VariablesStats _stats; 
+  VariablesStats _stats;
 
   void optimize(BlockOperation operation, VariablesStats stats) {
     _stats = stats;
@@ -9,17 +9,17 @@ class VariableUsageOptimizer with OperationUtils {
     final operations = operation.operations;
     for (var i = operations.length - 1; i >= 0; i--) {
       final current = operations[i];
-      final binary = _getOp<BinaryOperation>(current);
+      final binary = getOp<BinaryOperation>(current);
       if (binary == null || binary.kind != OperationKind.assign) {
         final stat = _stats.getStat(current);
         usedBelow.addAll(stat.readings.keys);
         switch (current.kind) {
           case OperationKind.block:
-            final op = _getOp<BlockOperation>(current);
+            final op = getOp<BlockOperation>(current);
             optimize(op, _stats);
             break;
           case OperationKind.conditional:
-            final op = _getOp<ConditionalOperation>(current);
+            final op = getOp<ConditionalOperation>(current);
             optimize(op.ifTrue, _stats);
             if (op.ifFalse != null) {
               optimize(op.ifFalse, _stats);
@@ -27,7 +27,7 @@ class VariableUsageOptimizer with OperationUtils {
 
             break;
           case OperationKind.loop:
-            final op = _getOp<LoopOperation>(current);
+            final op = getOp<LoopOperation>(current);
             optimize(op.body, _stats);
             break;
           default:
@@ -36,8 +36,8 @@ class VariableUsageOptimizer with OperationUtils {
         continue;
       }
 
-      final left = _getOp<VariableOperation>(binary.left);
-      final right = _getOp<VariableOperation>(binary.right);
+      final left = getOp<VariableOperation>(binary.left);
+      final right = getOp<VariableOperation>(binary.right);
       if (left == null || right == null) {
         final stat = _stats.getStat(current);
         usedBelow.addAll(stat.readings.keys);
@@ -50,15 +50,15 @@ class VariableUsageOptimizer with OperationUtils {
         continue;
       }
 
-      final rightDeclaration = rightVariable.declaration;
       if (rightVariable.frozen) {
         continue;
       }
 
       if (leftVariable.frozen) {
         continue;
-      }      
+      }
 
+      final rightDeclaration = rightVariable.declaration;
       final rightDeclarationParent = rightDeclaration.parent;
       if (_isVariableUsedInOperation(rightDeclarationParent, leftVariable)) {
         usedBelow.add(rightVariable);
@@ -74,14 +74,6 @@ class VariableUsageOptimizer with OperationUtils {
       final variableUsageResolver = VariablesUsageResolver();
       variableUsageResolver.resolve(rightDeclarationParent, _stats);
     }
-  }
-
-  T _getOp<T extends Operation>(Operation operation) {
-    if (operation is T) {
-      return operation;
-    }
-
-    return null;
   }
 
   bool _isVariableUsedInOperation(Operation operation, Variable variable) {

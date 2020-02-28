@@ -457,5 +457,3 @@ class ConditionalOperationOptimizer with OperationUtils {
     _initialize(block);
   }
 }
-
-enum TestResult { ifIf, ifElse }
