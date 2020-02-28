@@ -9,10 +9,10 @@ implement lookup tables (using starting characters of expressions) for the order
 find bug in unused variables optimizer?
 remove loop in postfix choice with single expression
 exmaple postfix _e185 does not has return statement
-implement analyzer warning when terminal isSucessful
-implement analyzer warning when repetition child isSucessful
-literal should use testRange
+implement analyzer warning when terminal isSucessful (zero length terminal)
+implement analyzer warning when repetition child isSucessful (infinite loop)
 does not generate unused rules in postfix generator
 improve error message formatter (for Unicode)
 find bug with "break"
 use silence in postfix generator
+does not generate unused global parser methods

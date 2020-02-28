@@ -8,8 +8,8 @@ class OperationOptimizer {
     final conditionalOperationOptimizer = ConditionalOperationOptimizer();
     conditionalOperationOptimizer.optimize(operation);
 
-    //final variableOperationPropagator = VariableOperationPropagator();
-    //variableOperationPropagator.propagate(operation);
+    //final variableUsageOptimizer = VariableUsageOptimizer();
+    //variableUsageOptimizer.optimize(operation);
 
     final unusedVariablesRemover = UnusedVariablesRemover();
     unusedVariablesRemover.remove(operation);

@@ -90,12 +90,31 @@ class ConditionalOperationOptimizer {
     resolver.resolve(operation);
   }
 
-  bool _isBlockEndsWithBreak(BlockOperation block) {
+  bool _isBlockEndsWithGoto(BlockOperation block) {
     final operations = block.operations;
     for (var i = operations.length - 1; i >= 0; i--) {
       final operation = operations[i];
       switch (operation.kind) {
         case OperationKind.break_:
+          //case OperationKind.continue_:
+          return true;
+        case OperationKind.conditional:
+          final cond = _getOp<ConditionalOperation>(operation);
+          if (_isBlockEndsWithGoto(cond.ifTrue)) {
+            return true;
+          }
+
+          if (cond.ifFalse != null) {
+            if (_isBlockEndsWithGoto(cond.ifFalse)) {
+              return true;
+            }
+          }
+
+          return false;
+        case OperationKind.loop:
+          final loop = _getOp<LoopOperation>(operation);
+          return _isBlockEndsWithGoto(loop.body);
+        case OperationKind.return_:
           return true;
         case OperationKind.nop:
           continue;
@@ -232,7 +251,7 @@ class ConditionalOperationOptimizer {
     final variables = <Variable>[];
     if (_isEqualNot(prevTest, nextTest, variables)) {
       if (_isSimpleBlock(prevBlock)) {
-        if (!_isBlockEndsWithBreak(prevBlock)) {
+        if (!_isBlockEndsWithGoto(prevBlock)) {
           if (!_hasWritings(prevBlock, variables)) {
             _appendToBlock(nextBlock, prevBlock);
             _removeFromBlock(block, [next]);
@@ -257,7 +276,7 @@ class ConditionalOperationOptimizer {
     final nextBlock = next.ifTrue;
     if (_isEqualVariables(prevTest, nextTest)) {
       if (_isSimpleBlock(prevBlock)) {
-        if (!_isBlockEndsWithBreak(prevBlock)) {
+        if (!_isBlockEndsWithGoto(prevBlock)) {
           final variable = _getOp<VariableOperation>(prev.test);
           if (!_hasWritings(prevBlock, [variable.variable])) {
             _appendToBlock(nextBlock, prevBlock);
@@ -284,7 +303,7 @@ class ConditionalOperationOptimizer {
     final variables = <Variable>[];
     if (_isPotentialIfElse(prevTest, nextTest, variables)) {
       if (_isSimpleBlock(prevBlock)) {
-        if (!_isBlockEndsWithBreak(prevBlock)) {
+        if (!_isBlockEndsWithGoto(prevBlock)) {
           if (!_hasWritings(prevBlock, variables)) {
             _addElse(prev, nextBlock);
             _removeFromBlock(block, [next]);

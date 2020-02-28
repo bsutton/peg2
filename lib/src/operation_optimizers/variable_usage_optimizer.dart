@@ -1,30 +1,30 @@
 part of '../../operation_optimizers.dart';
 
-class VariableOperationPropagator {
-  void propagate(BlockOperation operation) {
-    final used = <Variable>{};
+class VariableUsageOptimizer {
+  void optimize(BlockOperation operation) {
+    final usedBelow = <Variable>{};
     final operations = operation.operations;
     for (var i = operations.length - 1; i >= 0; i--) {
       final current = operations[i];
       final binary = _getOp<BinaryOperation>(current);
       if (binary == null || binary.kind != OperationKind.assign) {
-        used.addAll(current.variablesUsage.readings.keys);
+        usedBelow.addAll(current.variablesUsage.readings.keys);
         switch (current.kind) {
           case OperationKind.block:
             final op = _getOp<BlockOperation>(current);
-            propagate(op);
+            optimize(op);
             break;
           case OperationKind.conditional:
             final op = _getOp<ConditionalOperation>(current);
-            propagate(op.ifTrue);
+            optimize(op.ifTrue);
             if (op.ifFalse != null) {
-              propagate(op.ifFalse);
+              optimize(op.ifFalse);
             }
 
             break;
           case OperationKind.loop:
             final op = _getOp<LoopOperation>(current);
-            propagate(op.body);
+            optimize(op.body);
             break;
           default:
         }
@@ -35,22 +35,23 @@ class VariableOperationPropagator {
       final left = _getOp<VariableOperation>(binary.left);
       final right = _getOp<VariableOperation>(binary.right);
       if (left == null || right == null) {
-        used.addAll(current.variablesUsage.readings.keys);
+        usedBelow.addAll(current.variablesUsage.readings.keys);
         continue;
       }
 
       final leftVariable = left.variable;
       final rightVariable = right.variable;
-      if (used.contains(rightVariable)) {
+      if (usedBelow.contains(rightVariable)) {
         continue;
       }
 
-      if (leftVariable.name == '_c') {
-        var x = 0;
+      final rightDeclaration = rightVariable.declaration;
+      if (rightDeclaration == null || rightDeclaration.frozen) {
+        continue;
       }
 
-      final declaration = rightVariable.declaration;
-      if (declaration == null || declaration.frozen) {
+      final leftDeclaration = leftVariable.declaration;
+      if (leftDeclaration == null || leftDeclaration.frozen) {
         continue;
       }
 
@@ -63,15 +64,13 @@ class VariableOperationPropagator {
         if (readCount != 0 || writeCount != 0) {
           failed = true;
           break;
-        }        
+        }
       }
 
-      used.add(rightVariable);
+      usedBelow.add(rightVariable);
       if (failed) {
         continue;
       }
-
-      print('${leftVariable.name} = ${rightVariable.name}');
 
       for (var j = i - 1; j >= 0; j--) {
         final current = operations[j];
@@ -79,14 +78,16 @@ class VariableOperationPropagator {
         variableReplacer.replace(current, rightVariable, leftVariable);
       }
 
+      // $4 = $$
+
       final operationReplacer = OperationReplacer();
       operationReplacer.replace(current, NopOperation());
-      if (declaration.parent == null) {
+      if (rightDeclaration.parent == null) {
         throw StateError('Invalid parameter declaration');
       }
 
       final variableUsageResolver = VariableUsageResolver();
-      variableUsageResolver.resolve(declaration.parent);
+      variableUsageResolver.resolve(rightDeclaration.parent);
     }
   }
 
