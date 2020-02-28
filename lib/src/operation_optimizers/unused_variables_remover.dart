@@ -62,6 +62,7 @@ class UnusedVariablesRemover extends SimpleOperationVisitor
     } else {
       switch (operation.kind) {
         case OperationKind.constant:
+        case OperationKind.list:
         case OperationKind.variable:
           _replaceOperation(node, NopOperation());
           break;
