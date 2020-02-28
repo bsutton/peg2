@@ -16,3 +16,4 @@ improve error message formatter (for Unicode)
 find bug with "break"
 use silence in postfix generator
 does not generate unused global parser methods
+make some classes private?
