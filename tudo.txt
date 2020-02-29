@@ -21,3 +21,4 @@ add resolver of unused rules
 !!!reimplement handling first expression in sequenses to increase performance (reducing repeated fail checks)
 use bit masks in fast check in predict?
 move fail(terminal) from end of sequence to end of choice?
+optimize internal check if repetitions cannot be non productive (ro reduce generated code)
