@@ -17,7 +17,8 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "--predict",
+                //"--inline-all",
+                //"--predict",
                 //"--no-optimize-code",
                 "example/example.peg",
                 "example/example.dart"

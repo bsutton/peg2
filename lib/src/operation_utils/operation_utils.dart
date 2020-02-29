@@ -128,6 +128,11 @@ class OperationUtils {
     return CallOperation(function, arguments);
   }
 
+  ConditionalOperation condOp(Operation test, BlockOperation ifTrue,
+      [BlockOperation ifFalse]) {
+    return ConditionalOperation(test, ifTrue, ifFalse);
+  }
+
   ConstantOperation<T> constOp<T>(T value) {
     return ConstantOperation(value);
   }

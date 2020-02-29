@@ -88,12 +88,12 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     final rule = node.rule;
     final isTerminal =
         node.parent == null && rule.kind == ProductionRuleKind.terminal;
-    Variable start;
     if (isTerminal) {
       addAssign(b, varOp(m.fposEnd), constOp(-1));
-      start = va.newVar(b, 'var', varOp(m.pos));
     }
 
+    final ifNotSuccess = BlockOperation();
+    final savedVars = saveVars(b, va, [m.c, m.pos]);
     if (expressions.length > 1) {
       addLoop(b, (b) {
         for (var i = 0; i < expressions.length; i++) {
@@ -103,10 +103,14 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
             addIfVar(b, m.success, (b) {
               addAssign(b, varOp(result), varOp(resultVar));
               addBreak(b);
+            }, (b) {
+              restoreVars(b, savedVars);
             });
           } else {
             addIfVar(b, m.success, (b) {
               addAssign(b, varOp(result), varOp(resultVar));
+            }, (b) {
+              restoreVars(b, savedVars);
             });
 
             addBreak(b);
@@ -117,17 +121,22 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       final child = expressions[0];
       child.accept(this);
       addAssign(b, varOp(result), varOp(resultVar));
+      restoreVars(ifNotSuccess, savedVars);
     }
 
     if (isTerminal) {
-      final testSilence = notOp(varOp(m.silence));
-      final testSuccess = notOp(varOp(m.success));
-      final test = landOp(testSilence, testSuccess);
-      addIf(b, test, (b) {
-        final params = [varOp(start), constOp(rule.name)];
+      final test = notOp(varOp(m.silence));
+      addIf(ifNotSuccess, test, (b) {
+        final params = [varOp(savedVars[m.pos]), constOp(rule.name)];
         final fail = callOp(varOp(m.fail), params);
         addOp(b, fail);
       });
+    }
+
+    if (ifNotSuccess.operations.isNotEmpty) {
+      final test = notOp(varOp(m.success));
+      final end = condOp(test, ifNotSuccess);
+      addOp(b, end);
     }
 
     resultVar = result;

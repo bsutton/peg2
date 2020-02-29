@@ -1,3 +1,7 @@
+## 0.1.17
+
+- Improved (changed) algorithm for generating expressions `SequenceExpression` and  `OrderedChoiceExpression`, reduced amount of generated code
+
 ## 0.1.16
 
 - Added command line option `--optimize-code`

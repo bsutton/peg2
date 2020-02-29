@@ -351,21 +351,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     }
 
     void Function(BlockOperation) onSuccess;
-    void Function(BlockOperation) onFailure;
-    var hasSavedState = !node.isOptional;
-    if (expressions.length == 1) {
-      hasSavedState = false;
-    }
-
-    if (isPostfixGenerator) {
-      hasSavedState = false;
-    }
-
-    Map<Variable, Variable> savedState;
-    if (hasSavedState) {
-      savedState = saveVars(b, va, [m.c, m.pos]);
-    }
-
+    Operation atEnd;
     final results = <Expression, Variable>{};
     void plunge(BlockOperation b, List<Expression> seq, int index) {
       if (index > seq.length - 1) {
@@ -400,49 +386,40 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
         }
       } else {
         if (hasAction) {
-          onSuccess = (b) {
+          addIfVar(b, m.success, (b) {
             _buildAction(b, node, result, variables);
-          };
+          });
         } else {
           if (variables.isEmpty) {
-            onSuccess = (b) {
-              final variable = results.values.first;
-              addAssign(b, varOp(result), varOp(variable));
-            };
+            final variable = results.values.first;
+            addAssign(b, varOp(result), varOp(variable));
           } else if (variables.length == 1) {
-            onSuccess = (b) {
-              final expression = variables.keys.first;
-              final variable = results[expression];
-              addAssign(b, varOp(result), varOp(variable));
-            };
+            final expression = variables.keys.first;
+            final variable = results[expression];
+            addAssign(b, varOp(result), varOp(variable));
           } else {
-            onSuccess = (b) {
-              if (node.isProductive) {
+            if (node.isProductive) {
+              addIfVar(b, m.success, (b) {
                 final list = listOp(null, variables.values.map(varOp).toList());
                 addAssign(b, varOp(result), list);
-              } else {
-                // TODO:
-                addAssign(b, varOp(result), null);
-              }
-            };
+              });
+            } else {
+              //addAssign(b, varOp(result), null);
+            }
           }
         }
 
-        addIfVar(b, m.success, onSuccess);
+        if (onSuccess != null) {
+          addIfVar(b, m.success, onSuccess);
+        }
+
+        if (atEnd != null) {
+          //
+        }
       }
     }
 
     runInBlock(b, () => plunge(b, expressions, 0));
-    if (hasSavedState) {
-      onFailure = (b) {
-        restoreVars(b, savedState);
-      };
-    }
-
-    if (onFailure != null) {
-      addIfNotVar(b, m.success, onFailure);
-    }
-
     resultVar = result;
   }
 
