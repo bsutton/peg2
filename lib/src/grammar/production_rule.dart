@@ -1,9 +1,19 @@
 part of '../../grammar.dart';
 
 class ProductionRule {
+  final Set<ProductionRule> allCallees = {};
+
+  final Set<ProductionRule> allCallers = {};
+
+  final Set<ProductionRule> directCallees = {};
+
+  final Set<ProductionRule> directCallers = {};
+
   final Set<SymbolExpression> callers = {};
 
-  OrderedChoiceExpression expression;
+  final OrderedChoiceExpression expression;
+
+  bool isStartingRule;
 
   final ProductionRuleKind kind;
 

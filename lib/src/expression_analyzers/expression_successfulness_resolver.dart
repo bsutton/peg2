@@ -1,20 +1,15 @@
-part of '../../expression_transformers.dart';
+part of '../../expression_analyzers.dart';
 
-class ExpressionProductivenessResolver extends ExpressionVisitor {
+class ExpressionSuccessfulnessResolver extends ExpressionVisitor {
   bool _hasModifications;
 
   void resolve(Grammar grammar) {
-    final start = grammar.start;
     final rules = grammar.rules;
     _hasModifications = true;
     while (_hasModifications) {
       _hasModifications = false;
       for (var rule in rules) {
         final expression = rule.expression;
-        if (rule == start) {
-          _setIsProductive(expression, true);
-        }
-
         expression.accept(this);
       }
     }
@@ -33,6 +28,8 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
   @override
   void visitCapture(CaptureExpression node) {
     node.visitChildren(this);
+    final child = node.expression;
+    _setIsSuccessful(node, child.isSuccessful);
   }
 
   @override
@@ -47,9 +44,9 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
 
   @override
   void visitNonterminal(NonterminalExpression node) {
-    final expression = node.expression;
-    _setIsProductive(expression, node.isProductive);
     node.visitChildren(this);
+    final expression = node.expression;
+    _setIsSuccessful(node, expression.isSuccessful);
   }
 
   @override
@@ -59,84 +56,80 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
 
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
-    final child = node.expression;
-    _setIsProductive(child, node.isProductive);
     node.visitChildren(this);
+    final child = node.expression;
+    _setIsSuccessful(node, child.isSuccessful);
   }
 
   @override
   void visitOptional(OptionalExpression node) {
-    final child = node.expression;
-    _setIsProductive(child, node.isProductive);
     node.visitChildren(this);
+    _setIsSuccessful(node, true);
   }
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
+    node.visitChildren(this);
     final expressions = node.expressions;
+    var count = 0;
     for (var i = 0; i < expressions.length; i++) {
       final child = expressions[i];
-      _setIsProductive(child, node.isProductive);
+      if (child.isSuccessful) {
+        count++;
+      }
     }
 
-    node.visitChildren(this);
+    if (count == expressions.length) {
+      _setIsSuccessful(node, true);
+    }
   }
 
   @override
   void visitSequence(SequenceExpression node) {
+    node.visitChildren(this);
     final expressions = node.expressions;
-    final varCount = expressions.where((e) => e.variable != null).length;
-    final hasAction = node.actionIndex != null;
-    final isProductive = node.isProductive;
+    var count = 0;
+    var skip = false;
     for (var i = 0; i < expressions.length; i++) {
       final child = expressions[i];
-      if (hasAction) {
-        if (i == 0 && varCount == 0) {
-          child.isProductive = true;
+      if (!skip) {
+        if (child.isSuccessful) {
+          count++;
         } else {
-          if (child.variable != null) {
-            child.isProductive = true;
-          }
-        }
-      } else {
-        if (i == 0 && varCount == 0) {
-          _setIsProductive(child, isProductive);
-        } else {
-          if (child.variable != null) {
-            _setIsProductive(child, isProductive);
-          }
+          skip = true;
         }
       }
     }
 
-    node.visitChildren(this);
+    if (count == expressions.length) {
+      _setIsSuccessful(node, true);
+    }
   }
 
   @override
   void visitSubterminal(SubterminalExpression node) {
-    final expression = node.expression;
-    _setIsProductive(expression, node.isProductive);
     node.visitChildren(this);
+    final expression = node.expression;
+    _setIsSuccessful(node, expression.isSuccessful);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    final expression = node.expression;
-    _setIsProductive(expression, node.isProductive);
     node.visitChildren(this);
+    final expression = node.expression;
+    _setIsSuccessful(node, expression.isSuccessful);
   }
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
-    final expression = node.expression;
-    _setIsProductive(expression, node.isProductive);
     node.visitChildren(this);
+    _setIsSuccessful(node, true);
   }
 
-  void _setIsProductive(Expression node, bool isProductive) {
-    if (!node.isProductive) {
-      if (node.isProductive != isProductive) {
-        node.isProductive = isProductive;
+  void _setIsSuccessful(Expression node, bool isSuccessful) {
+    if (!node.isSuccessful) {
+      if (node.isSuccessful != isSuccessful) {
+        node.isSuccessful = isSuccessful;
         _hasModifications = true;
       }
     }

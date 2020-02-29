@@ -115,16 +115,6 @@ num
 
 # Sub terminals
 
-int
-@digit =
-  [0-9] { $$ = $$ - 48; }
-  ;
-
-int
-@digit1_9 =
-  [1-9] { $$ = $$ - 48; }
-  ;
-
 @char =
   [\\] r:@escaped
   / @unescaped

@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:dart_style/dart_style.dart';
 
-import 'analyzers.dart';
 import 'code_builder.dart';
 import 'experimental.dart';
 import 'expressions.dart';

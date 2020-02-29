@@ -93,7 +93,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     }
 
     final ifNotSuccess = BlockOperation();
-    final savedVars = saveVars(b, va, [m.c, m.pos]);
+    final savedVars = saveVarsEx(b, va, [m.c, m.pos], node);
     if (expressions.length > 1) {
       addLoop(b, (b) {
         for (var i = 0; i < expressions.length; i++) {
@@ -158,15 +158,16 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
 
   MethodOperation _buildRule(ProductionRule rule) {
     va = newVarAlloc();
+    final expression = rule.expression;
     final cid = va.alloc(true);
-    final id = rule.expression.id;
+    final id = expression.id;
     productive = va.alloc(true);
     final name = getRuleMethodName(rule);
     final params = <ParameterOperation>[];
     params.add(ParameterOperation('int', cid));
     params.add(ParameterOperation('bool', productive));
     var returnType = rule.returnType;
-    returnType ??= rule.expression.returnType;
+    returnType ??= expression.returnType;
     Variable start;
     final result = addMethod(returnType, name, params, (b) {
       if (options.memoize && rule.callers.length > 1) {
@@ -176,11 +177,11 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
           addReturn(b, convert);
         });
 
-        start = va.newVar(b, 'var', varOp(m.pos));
+        start = va.newVar(b, 'final', varOp(m.pos));
+        addToContext(expression, m.pos, start);
       }
 
       final result = va.newVar(b, returnType, null);
-      final expression = rule.expression;
       runInBlock(b, () => expression.accept(this));
       addAssign(b, varOp(result), varOp(resultVar));
       if (options.memoize && rule.callers.length > 1) {
@@ -352,7 +353,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         }
 
         final methodCall = callOp(varOp(name), [constOp(cid), isProductive]);
-        final result = va.newVar(b, 'var', methodCall);
+        final result = va.newVar(b, 'final', methodCall);
         resultVar = result;
       }
     }

@@ -27,16 +27,6 @@ class _Memo {
   ParserGenerator(this.grammar, this.options);
 
   String generate() {
-    final grammarAnalyzer = GrammarAnalyzer();
-    final grammarErrors = grammarAnalyzer.analyze(grammar);
-    if (grammarErrors.isNotEmpty) {
-      for (var error in grammarErrors) {
-        print(error);
-      }
-
-      return null;
-    }
-
     List<MethodOperation> methods;
     if (options.isPostfix()) {
       print('Warning!!!');
@@ -81,10 +71,10 @@ class _Memo {
     parserClassBuilder.build(libraryBuilder, methodBuilders);
     final classes = lineSplitter.convert(_classes);
     libraryBuilder.addAll(classes);
-    libraryBuilder.add('// ignore_for_file: prefer_final_locals');
+    libraryBuilder.add('');
+    //libraryBuilder.add('// ignore_for_file: prefer_final_locals');
     libraryBuilder.add('// ignore_for_file: unused_element');
     libraryBuilder.add('// ignore_for_file: unused_field');
-    libraryBuilder.add('// ignore_for_file: unused_local_variable');
     final formatter = DartFormatter();
     var source = libraryBuilder.build(0).join('\n');
     try {

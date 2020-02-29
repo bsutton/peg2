@@ -162,7 +162,7 @@ dynamic parse(String text) {
               cr = true;
             }
 
-            var r = i == start ? 94 : 32;
+            final r = i == start ? 94 : 32;
             for (var k = 0; k < escaped.length; k++) {
               c2.insert(0, r);
             }
@@ -180,8 +180,8 @@ dynamic parse(String text) {
           }
         }
 
-        var text1 = String.fromCharCodes(c1);
-        var text2 = String.fromCharCodes(c2);
+        final text1 = String.fromCharCodes(c1);
+        final text2 = String.fromCharCodes(c2);
         sb.writeln(text1);
         sb.writeln(text2);
       }
@@ -312,8 +312,8 @@ bool _memoized(int id, int cid) {
     return false;
   }
 
-  var lastCid = _trackCid[id];
-  var lastPos = _trackPos[id];
+  final lastCid = _trackCid[id];
+  final lastPos = _trackPos[id];
   _trackCid[id] = cid;
   _trackPos[id] = _pos;
   if (lastCid == null) {    

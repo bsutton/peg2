@@ -1,4 +1,4 @@
-part of '../../expression_transformers.dart';
+part of '../../expression_analyzers.dart';
 
 class OptionalExpressionResolver extends ExpressionVisitor {
   bool _hasModifications;

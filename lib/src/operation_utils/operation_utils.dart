@@ -248,7 +248,7 @@ class OperationUtils {
       VariableAllocator varAlloc, List<Variable> identifiers) {
     final result = <Variable, Variable>{};
     for (final element in identifiers) {
-      final variable = newVar(block, 'var', varAlloc, varOp(element));
+      final variable = newVar(block, 'final', varAlloc, varOp(element));
       result[element] = variable;
     }
 

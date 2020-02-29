@@ -1,3 +1,10 @@
+## 0.1.18
+
+- Removed (as unnecessary) analyzer directive `ignore_for_file: unused_local_variable` from generated code
+- Removed (as unnecessary) analyzer directive `ignore_for_file: prefer_final_locals` from generated code
+
+
+
 ## 0.1.17
 
 - Improved (changed) algorithm for generating expressions `SequenceExpression` and  `OrderedChoiceExpression`, reduced amount of generated code

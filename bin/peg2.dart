@@ -75,12 +75,25 @@ void main(List<String> args) {
 
   final grammarText = inputFile.readAsStringSync();
   final parser = Peg2Parser();
-  final result = parser.parse(grammarText) as Grammar;
+  final grammar = parser.parse(grammarText) as Grammar;
   if (parser.error != null) {
     throw parser.error;
   }
 
-  final grammar = result;
+  final errors = grammar.errors;
+  for (final error in errors) {
+    print('Error: $error');
+  }
+
+  final warnings = grammar.warnings;
+  for (final warning in warnings) {
+    print('Warning: $warning');
+  }
+
+  if (errors.isNotEmpty) {
+    exit(-1);
+  }
+
   if (printGrammar) {
     _printGrammar(grammar);
   }

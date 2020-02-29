@@ -23,7 +23,7 @@ abstract class Expression {
 
   ProductionRule rule;
 
-  SparseBoolList startCharacters = SparseBoolList();
+  final SparseBoolList startCharacters = SparseBoolList();
 
   String variable;
 

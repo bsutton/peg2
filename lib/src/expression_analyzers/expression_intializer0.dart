@@ -1,6 +1,6 @@
-part of '../../expression_transformers.dart';
+part of '../../expression_analyzers.dart';
 
-class ExpressionInitializer extends ExpressionVisitor {
+class ExpressionInitializer0 extends ExpressionVisitor {
   int _actionIndex;
 
   int _expressionId;
@@ -32,26 +32,6 @@ class ExpressionInitializer extends ExpressionVisitor {
     }
 
     grammar.expressionCount = _expressionId;
-
-    final optionalExpressionResolver = OptionalExpressionResolver();
-    optionalExpressionResolver.resolve(rules);
-
-    final expressionTransformationInitializer =
-        ExpressionTransformationInitializer();
-    expressionTransformationInitializer.initialize(rules);
-
-    final expressionProductivenessResolver = ExpressionProductivenessResolver();
-    expressionProductivenessResolver.resolve(grammar);
-
-    final expressionStartCharactersResolver =
-        ExpressionStartCharactersResolver();
-    expressionStartCharactersResolver.resolve(rules);
-
-    final expressionSuccessfulnessResolver = ExpressionSuccessfulnessResolver();
-    expressionSuccessfulnessResolver.resolve(grammar);
-
-    final expressionReturnTypeResolver = ExpressionReturnTypeResolver();
-    expressionReturnTypeResolver.resolve(rules);
   }
 
   @override
@@ -113,6 +93,7 @@ class ExpressionInitializer extends ExpressionVisitor {
 
   @override
   void visitSequence(SequenceExpression node) {
+    _initializeNode(node);
     final expressions = node.expressions;
     final length = expressions.length;
     for (var i = 0; i < length; i++) {
@@ -120,7 +101,6 @@ class ExpressionInitializer extends ExpressionVisitor {
       child.index = i;
     }
 
-    _initializeNode(node);
     if (node.actionSource != null) {
       node.actionIndex = _actionIndex++;
     }
