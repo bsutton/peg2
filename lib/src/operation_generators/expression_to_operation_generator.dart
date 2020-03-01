@@ -390,6 +390,10 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
   void visitOptional(OptionalExpression node) {
     final child = node.expression;
     child.accept(this);
+    if (child.isOptional) {
+      var x = 0;
+    }
+
     addAssign(b, varOp(m.success), constOp(true));
   }
 

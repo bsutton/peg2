@@ -258,12 +258,10 @@ String _matchString(String text) {
     }
   }
 
-  if (i == length) {
-    _c = _input[_pos += length];
-    _success = true;
+  if (_success = i == length) {
+    _c = _input[_pos += length];    
     result = text;
-  } else {
-    _success = false;
+  } else {    
     _failure = _pos + i;
   }
 

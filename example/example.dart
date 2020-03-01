@@ -263,12 +263,10 @@ class ExampleParser {
       }
     }
 
-    if (i == length) {
+    if (_success = i == length) {
       _c = _input[_pos += length];
-      _success = true;
       result = text;
     } else {
-      _success = false;
       _failure = _pos + i;
     }
 
