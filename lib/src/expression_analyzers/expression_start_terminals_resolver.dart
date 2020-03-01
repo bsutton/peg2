@@ -71,6 +71,7 @@ class ExpressionStartTerminalsResolver extends SimpleExpressionVisitor {
     final child = node.expression;
     final rule = child.rule;
     _addTerminals(node, [rule]);
+    _addTerminals(node.expression, [rule]);
   }
 
   void _addTerminals(Expression node, Iterable<ProductionRule> terminals) {

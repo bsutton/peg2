@@ -193,7 +193,15 @@ class ConditionalOperation extends Operation {
 
   Operation test;
 
-  ConditionalOperation(this.test, this.ifTrue, [this.ifFalse]);
+  ConditionalOperation(this.test, this.ifTrue, [this.ifFalse]) {
+    if (test == null) {
+      throw ArgumentError.notNull('test');
+    }
+
+    if (ifTrue == null) {
+      throw ArgumentError.notNull('ifTrue');
+    }
+  }
 
   @override
   OperationKind get kind => OperationKind.conditional;
@@ -223,7 +231,13 @@ class ConditionalOperation extends Operation {
 class ConstantOperation<T> extends Operation {
   T value;
 
-  ConstantOperation(this.value);
+  ConstantOperation(this.value) {
+    if (value is num || value is bool || value is String || value == null) {
+      //
+    } else {
+      throw ArgumentError('Unknown constant type: ${value.runtimeType}');
+    }
+  }
 
   @override
   OperationKind get kind => OperationKind.constant;

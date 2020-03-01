@@ -21,21 +21,16 @@ class ParserClassGenerator {
       'static const _eof = 0x110000',
       'FormatException error',
       'int _c',
-      'List<String> _failures',
-      'int _fcount',
-      'int _fposEnd',
-      'int _fposMax',
-      'int _fposStart',
+      'int _error',
+      'List<String> _expected',
+      'int _failure',
       'List<int> _input',
       'List<bool> _memoizable',
       'List<List<_Memo>> _memos',
       'var _mresult',
       'int _pos',
       'bool _predicate',
-      'int _report',
-      'int _reporter',
       'dynamic _result',
-      'bool _silence',
       'bool _success',
       'String _text',
       'List<int> _trackCid',
@@ -59,189 +54,169 @@ dynamic parse(String text) {
   _reset();  
   final result = {{START}};
   _buildError();
-  _failures = null;
+  _expected = null;
   _input = null;
   return result;
 }
 
-  void _buildError() {
-    if (_success) {
-      error = null;
-      return;
+void _buildError() {
+  if (_success) {
+    error = null;
+    return;
+  }
+
+  String escape(int c) {
+    switch (c) {
+      case 10:
+        return r'\n';
+      case 13:
+        return r'\r';
+      case 09:
+        return r'\t';
+      case _eof:
+        return 'end of file';
+    }
+    return String.fromCharCode(c);
+  }
+
+  String getc(int position) {
+    if (position < _text.length) {
+      return "'${escape(_input[position])}'";
+    }
+    return 'end of file';
+  }
+
+  String report(String message, String source, int start) {
+    if (start < 0 || start > source.length) {
+      start = null;
     }
 
-    String escape(int c) {
+    final sb = StringBuffer();
+    sb.write(message);
+    var line = 0;
+    var col = 0;
+    var lineStart = 0;
+    var started = false;
+    if (start != null) {
+      for (var i = 0; i < source.length; i++) {
+        final c = source.codeUnitAt(i);
+        if (!started) {
+          started = true;
+          lineStart = i;
+          line++;
+          col = 1;
+        } else {
+          col++;
+        }
+        if (c == 10) {
+          started = false;
+        }
+        if (start == i) {
+          break;
+        }
+      }
+    }
+
+    if (start == null) {
+      sb.writeln('.');
+    } else if (line == 0 || start == source.length) {
+      sb.writeln(' (at end of file):');
+    } else {
+      sb.write(' (at line ');
+      sb.write(line);
+      sb.write(', column ');
+      sb.write(col);
+      sb.writeln('):');
+    }
+
+    List<int> escape(int c) {
       switch (c) {
+        case 9:
+          return [92, 116];
         case 10:
-          return r'\n';
+          return [92, 110];
         case 13:
-          return r'\r';
-        case 09:
-          return r'\t';
-        case _eof:
-          return 'end of file';
+          return [92, 114];
+        default:
+          return [c];
       }
-      return String.fromCharCode(c);
     }
 
-    String getc(int position) {
-      if (position < _text.length) {
-        return "'${escape(_input[position])}'";
-      }
-      return 'end of file';
-    }
-
-    String report(String message, String source, int start) {
-      if (start < 0 || start > source.length) {
-        start = null;
-      }
-
-      final sb = StringBuffer();
-      sb.write(message);
-      var line = 0;
-      var col = 0;
-      var lineStart = 0;
-      var started = false;
-      if (start != null) {
-        for (var i = 0; i < source.length; i++) {
-          final c = source.codeUnitAt(i);
-          if (!started) {
-            started = true;
-            lineStart = i;
-            line++;
-            col = 1;
-          } else {
-            col++;
-          }
-          if (c == 10) {
-            started = false;
-          }
-          if (start == i) {
-            break;
-          }
-        }
-      }
-
-      if (start == null) {
-        sb.writeln('.');
-      } else if (line == 0 || start == source.length) {
-        sb.writeln(' (at end of file):');
-      } else {
-        sb.write(' (at line ');
-        sb.write(line);
-        sb.write(', column ');
-        sb.write(col);
-        sb.writeln('):');
-      }
-
-      List<int> escape(int c) {
-        switch (c) {
-          case 9:
-            return [92, 116];
-          case 10:
-            return [92, 110];
-          case 13:
-            return [92, 114];
-          default:
-            return [c];
-        }
-      }
-
-      const max = 70;
-      if (start != null) {
-        final c1 = <int>[];
-        final c2 = <int>[];
-        final half = max ~/ 2;
-        var cr = false;
-        for (var i = start; i >= lineStart && c1.length < half; i--) {
-          if (i == source.length) {
-            c2.insert(0, 94);
-          } else {
-            final c = source.codeUnitAt(i);
-            final escaped = escape(c);
-            c1.insertAll(0, escaped);
-            if (c == 10) {
-              cr = true;
-            }
-
-            final r = i == start ? 94 : 32;
-            for (var k = 0; k < escaped.length; k++) {
-              c2.insert(0, r);
-            }
-          }
-        }
-
-        for (var i = start + 1;
-            i < source.length && c1.length < max && !cr;
-            i++) {
+    const max = 70;
+    if (start != null) {
+      final c1 = <int>[];
+      final c2 = <int>[];
+      final half = max ~/ 2;
+      var cr = false;
+      for (var i = start; i >= lineStart && c1.length < half; i--) {
+        if (i == source.length) {
+          c2.insert(0, 94);
+        } else {
           final c = source.codeUnitAt(i);
           final escaped = escape(c);
-          c1.addAll(escaped);
+          c1.insertAll(0, escaped);
           if (c == 10) {
-            break;
+            cr = true;
+          }
+
+          final r = i == start ? 94 : 32;
+          for (var k = 0; k < escaped.length; k++) {
+            c2.insert(0, r);
           }
         }
-
-        final text1 = String.fromCharCodes(c1);
-        final text2 = String.fromCharCodes(c2);
-        sb.writeln(text1);
-        sb.writeln(text2);
       }
 
-      return sb.toString();
+      for (var i = start + 1;
+          i < source.length && c1.length < max && !cr;
+          i++) {
+        final c = source.codeUnitAt(i);
+        final escaped = escape(c);
+        c1.addAll(escaped);
+        if (c == 10) {
+          break;
+        }
+      }
+
+      final text1 = String.fromCharCodes(c1);
+      final text2 = String.fromCharCodes(c2);
+      sb.writeln(text1);
+      sb.writeln(text2);
     }
 
-    final temp = _failures.take(_fcount).toList();
-    temp.sort((e1, e2) => e1.compareTo(e2));
-    final terminals = temp.toSet();
-    final hasMalformed = _fposStart != _fposMax;
-    if (terminals.isNotEmpty) {
-      if (!hasMalformed) {
-        final sb = StringBuffer();
-        sb.write('Expected ');
-        sb.write(terminals.join(', '));
-        sb.write(' but found ');
-        sb.write(getc(_fposStart));
-        final title = sb.toString();
-        final message = report(title, _text, _fposStart);
-        error = FormatException(message);
-      } else {
-        final reason = _fposMax == _text.length ? 'Unterminated' : 'Malformed';
-        final sb = StringBuffer();
-        sb.write(reason);
-        sb.write(' ');
-        sb.write(terminals.join(', '));
-        final title = sb.toString();
-        final message = report(title, _text, _fposStart);
-        error = FormatException(message);
-      }
-    } else {
+    return sb.toString();
+  }
+
+  final temp = _expected.toList();
+  temp.sort((e1, e2) => e1.compareTo(e2));
+  final expected = temp.toSet();
+  final hasMalformed = false;
+  if (expected.isNotEmpty) {
+    if (!hasMalformed) {
       final sb = StringBuffer();
-      sb.write('Unexpected character ');
-      sb.write(getc(_fposStart));
+      sb.write('Expected ');
+      sb.write(expected.join(', '));
+      sb.write(' but found ');
+      sb.write(getc(_error));
       final title = sb.toString();
-      final message = report(title, _text, _fposStart);
+      final message = report(title, _text, _error);
+      error = FormatException(message);
+    } else {
+      final reason = _error == _text.length ? 'Unterminated' : 'Malformed';
+      final sb = StringBuffer();
+      sb.write(reason);
+      sb.write(' ');
+      sb.write(expected.join(', '));
+      final title = sb.toString();
+      final message = report(title, _text, _error);
       error = FormatException(message);
     }
-  }
-
-void _fail(int start, String name) {
-  if (_fposStart < start) {
-    _fposStart = start;
-    _fposMax = _fposEnd;
-    _fcount = 0;
-  } else if (_fposMax < _fposEnd) {
-    _fposStart = start;
-    _fposMax = _fposEnd;
-    _fcount = 0;
-  }
-
-  if (_fposStart == start && _fposEnd == _fposMax) {
-    if (_fcount >= _failures.length) {
-      _failures.length += 20;
-    }
-
-    _failures[_fcount++] = name;
+  } else {
+    final sb = StringBuffer();
+    sb.write('Unexpected character ');
+    sb.write(getc(_error));
+    final title = sb.toString();
+    final message = report(title, _text, _error);
+    error = FormatException(message);
   }
 }
 
@@ -261,8 +236,8 @@ int _matchRanges(List<int> ranges) {
     }
   }
 
-  if (!_success && !_silence && _fposEnd < _pos) {
-    _fposEnd = _pos;
+  if (!_success && _error < _pos) {
+    _failure = _pos;
   }
 
   return result;
@@ -287,8 +262,8 @@ String _matchString(String text) {
     result = text;
   } else {
     _success = false;
-    if (!_silence && _fposEnd < _pos) {
-      _fposEnd = _pos + i;
+    if (_failure < _pos + i) {
+      _failure = _pos + i;
     }
   }
 
@@ -350,22 +325,16 @@ void _memoize(int id, int pos, result) {
 }
 
 void _reset() {
-  _c = _input[0];  
-  _failures = [];
-  _failures.length = 20;
-  _fcount = 0;
-  _fposEnd = -1;
-  _fposMax = -1;  
-  _fposStart = -1;
+  _c = _input[0];
+  _error = 0;
+  _expected = const [];
+  _failure = -1;
   _memoizable = [];
   _memoizable.length = {{EXPR_COUNT}};
   _memos = [];
   _memos.length = _input.length + 1;
   _pos = 0;
   _predicate = false;
-  _report = -1;
-  _reporter = 0;
-  _silence = false;
   _trackCid = [];
   _trackCid.length = {{EXPR_COUNT}};
   _trackPos = [];

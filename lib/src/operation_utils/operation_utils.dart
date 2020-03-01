@@ -141,7 +141,7 @@ class OperationUtils {
     return UnaryOperation(OperationKind.convert, op, type);
   }
 
-  BinaryOperation equalOp(Operation left, Operation right) {
+  BinaryOperation eqOp(Operation left, Operation right) {
     final op = BinaryOperation(left, OperationKind.equal, right);
     return op;
   }

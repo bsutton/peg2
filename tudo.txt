@@ -16,9 +16,7 @@ does not generate unused global parser methods
 make some classes private?
 add command line option "optimize-size"
 add resolver of unused rules
-!!!reimplement handling sequenses in choices to increase performance (reducing repeated fail checks)
-!!!reimplement handling first expression in sequenses to increase performance (reducing repeated fail checks)
 use bit masks in fast check in predict?
-move fail(terminal) from end of sequence to end of choice?
 optimize internal check if repetitions cannot be non productive (ro reduce generated code)
-predacate should have access to parent expressions contect, to c "and" "pos" (ro reduce generated code)
+inplement malformed terminals reporting
+

@@ -88,22 +88,17 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     final rule = node.rule;
     final isTerminal =
         node.parent == null && rule.kind == ProductionRuleKind.terminal;
-    final isNonterminal =
-        node.parent == null && rule.kind == ProductionRuleKind.nonterminal;
+    final isNonterminal = rule.kind == ProductionRuleKind.nonterminal;
     if (isTerminal) {
-      addAssign(b, varOp(m.fposEnd), constOp(-1));
-    }
-
-    if (isNonterminal) {
-      final test = ltOp(varOp(m.report), varOp(m.pos));
-      addIf(b, test, (b) {
-        addAssign(b, varOp(m.report), varOp(m.pos));
-        addAssign(b, varOp(m.reporter), constOp(node.id));
-      });
+      addAssign(b, varOp(m.failure), constOp(-1));
     }
 
     final ifNotSuccess = BlockOperation();
     final savedVars = saveVarsEx(b, va, [m.c, m.pos], node);
+    final context = getContext(node);
+    var start = context[m.pos];
+    start ??= va.newVar(b, 'final', varOp(m.pos));
+    addToContext(node, m.pos, start);
     if (expressions.length > 1) {
       addLoop(b, (b) {
         for (var i = 0; i < expressions.length; i++) {
@@ -134,20 +129,27 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       restoreVars(ifNotSuccess, savedVars);
     }
 
+    final startTerminals = node.startTerminals;
     if (isTerminal) {
-      final test = notOp(varOp(m.silence));
+      final test = gteOp(varOp(m.failure), varOp(m.error));
       addIf(ifNotSuccess, test, (b) {
-        final params = [varOp(savedVars[m.pos]), constOp(rule.name)];
-        final fail = callOp(varOp(m.fail), params);
-        addOp(b, fail);
+        final terminals = startTerminals.map((e) => e.name);
+        final elements = terminals.map(constOp).toList();
+        final list = listOp('const', elements);
+        addAssign(b, varOp(m.expected), list);
+        final test = gtOp(varOp(m.failure), varOp(m.error));
+        addIf(b, test, (b) {
+          addAssign(b, varOp(m.error), varOp(m.failure));
+        });
       });
-    }
-
-    if (isNonterminal) {
-      final startTerminals = node.startTerminals;
-      final test = equalOp(varOp(m.reporter), constOp(node.id));
+    } else if (isNonterminal) {
+      //test = gteOp(varOp(start), varOp(m.error));
+      final test = eqOp(varOp(start), varOp(m.error));
       addIf(ifNotSuccess, test, (b) {
-        addOp(b, NopOperation('${startTerminals.join(', ')}'));
+        final terminals = startTerminals.map((e) => e.name);
+        final elements = terminals.map(constOp).toList();
+        final list = listOp('const', elements);
+        addAssign(b, varOp(m.expected), list);
       });
     }
 
@@ -394,15 +396,15 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
           addAssign(b, varOp(m.success), constOp(true));
         } else {
           addAssign(b, varOp(m.success), constOp(false));
-          if (rule.kind == ProductionRuleKind.terminal) {
-            final test = notOp(varOp(m.silence));
-            addIf(b, test, (b) {
-              addAssign(b, varOp(m.fposEnd), varOp(m.pos));
-              final params = [varOp(m.pos), constOp(rule.name)];
-              final fail = callOp(varOp(m.fail), params);
-              addOp(b, fail);
-            });
-          }
+          //if (rule.kind == ProductionRuleKind.terminal) {
+          //  final test = notOp(varOp(m.silence));
+          //  addIf(b, test, (b) {
+          //    addAssign(b, varOp(m.error), varOp(m.pos));
+          //    final params = [varOp(m.pos), constOp(rule.name)];
+          //    final fail = callOp(varOp(m.fail), params);
+          //    addOp(b, fail);
+          //  });
+          //}
         }
       });
 

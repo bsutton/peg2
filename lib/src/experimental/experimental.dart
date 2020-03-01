@@ -360,9 +360,9 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
             if (isTerminal) {
               addIfNotVar(b, m.success, (b) {
                 if (isTerminal) {
-                  final params = [varOp(pos), constOp(rule.name)];
-                  final fail = callOp(varOp(m.fail), params);
-                  addOp(b, fail);
+                  //final params = [varOp(pos), constOp(rule.name)];
+                  //final fail = callOp(varOp(m.fail), params);
+                  //addOp(b, fail);
                 }
               });
             }
@@ -370,12 +370,6 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
             addIfNotVar(b, m.success, (b) {
               addAssign(b, varOp(m.c), varOp(c));
               addAssign(b, varOp(m.pos), varOp(pos));
-              final rule = expression.rule;
-              if (isTerminal) {
-                final params = [varOp(pos), constOp(rule.name)];
-                final fail = callOp(varOp(m.fail), params);
-                addOp(b, fail);
-              }
             });
           }
         } else {
@@ -418,7 +412,7 @@ class ExperimentalGenerator extends ExpressionToOperationGenerator
           });
 
           if (terminals.length == 1) {
-            addAssign(b, varOp(m.fposEnd), constOp(-1));
+            addAssign(b, varOp(m.error), constOp(-1));
           } else if (terminals.length > 1) {
             throw StateError('To many terminals');
           }

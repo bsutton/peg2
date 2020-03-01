@@ -5,6 +5,12 @@ class ParserClassMembers {
 
   final eof = Variable('_eof', true);
 
+  final error = Variable('_error', true);
+
+  final expected = Variable('_expected', true);
+
+  final failure = Variable('_failure', true);
+
   final matchAny = Variable('_matchAny', true);
 
   final matchChar = Variable('_matchChar', true);
@@ -12,10 +18,6 @@ class ParserClassMembers {
   final matchRanges = Variable('_matchRanges', true);
 
   final matchString = Variable('_matchString', true);
-
-  final fail = Variable('_fail', true);
-
-  final fposEnd = Variable('_fposEnd', true);
 
   final input = Variable('_input', true);
 
@@ -34,10 +36,6 @@ class ParserClassMembers {
   final report = Variable('_report', true);
 
   final reporter = Variable('_reporter', true);
-
-  final silence = Variable('_silence', true);
-
-  final startCapture = Variable('_startCapture', true);
 
   final success = Variable('_success', true);
 
