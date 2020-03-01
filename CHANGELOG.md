@@ -2,8 +2,7 @@
 
 - Removed (as unnecessary) analyzer directive `ignore_for_file: unused_local_variable` from generated code
 - Removed (as unnecessary) analyzer directive `ignore_for_file: prefer_final_locals` from generated code
-
-
+- Reworked and improved error handling system, it has become simpler, clearer, more reliable and a little faster
 
 ## 0.1.17
 

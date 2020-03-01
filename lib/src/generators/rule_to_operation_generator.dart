@@ -133,23 +133,24 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     if (isTerminal) {
       final test = gteOp(varOp(m.failure), varOp(m.error));
       addIf(ifNotSuccess, test, (b) {
-        final terminals = startTerminals.map((e) => e.name);
-        final elements = terminals.map(constOp).toList();
-        final list = listOp('const', elements);
-        addAssign(b, varOp(m.expected), list);
         final test = gtOp(varOp(m.failure), varOp(m.error));
         addIf(b, test, (b) {
           addAssign(b, varOp(m.error), varOp(m.failure));
+          addAssign(b, varOp(m.expected), listOp(null, []));
         });
+
+        final add = Variable('add');
+        final name = rule.name;
+        addMbrCall(b, varOp(m.expected), varOp(add), [constOp(name)]);
       });
     } else if (isNonterminal) {
-      //test = gteOp(varOp(start), varOp(m.error));
       final test = eqOp(varOp(start), varOp(m.error));
       addIf(ifNotSuccess, test, (b) {
         final terminals = startTerminals.map((e) => e.name);
         final elements = terminals.map(constOp).toList();
         final list = listOp('const', elements);
-        addAssign(b, varOp(m.expected), list);
+        final addAll = Variable('addAll');
+        addMbrCall(b, varOp(m.expected), varOp(addAll), [list]);
       });
     }
 

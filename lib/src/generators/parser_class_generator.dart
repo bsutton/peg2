@@ -329,7 +329,7 @@ void _memoize(int id, int pos, result) {
 void _reset() {
   _c = _input[0];
   _error = 0;
-  _expected = const [];
+  _expected = [];
   _failure = -1;
   _memoizable = [];
   _memoizable.length = {{EXPR_COUNT}};

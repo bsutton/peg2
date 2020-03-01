@@ -12,7 +12,7 @@ void main() {
 }
 
 final _text = '''
-
+{"rocket": "🚀 flies to the stars"}
 ''';
 
 class ExampleParser {
@@ -334,7 +334,7 @@ class ExampleParser {
   void _reset() {
     _c = _input[0];
     _error = 0;
-    _expected = const [];
+    _expected = [];
     _failure = -1;
     _memoizable = [];
     _memoizable.length = 181;
@@ -388,7 +388,7 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if ($5 == _error) {
-        _expected = const [
+        _expected.addAll(const [
           '\'false\'',
           '\'null\'',
           '\'true\'',
@@ -396,7 +396,7 @@ class ExampleParser {
           '\'string\'',
           '\'[\'',
           '\'{\''
-        ];
+        ]);
       }
     }
     return $2;
@@ -459,7 +459,7 @@ class ExampleParser {
     }
     if (!_success) {
       if ($5 == _error) {
-        _expected = const [
+        _expected.addAll(const [
           '\'false\'',
           '\'null\'',
           '\'true\'',
@@ -467,7 +467,7 @@ class ExampleParser {
           '\'string\'',
           '\'[\'',
           '\'{\''
-        ];
+        ]);
       }
     }
     return $2;
@@ -493,7 +493,7 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if ($5 == _error) {
-        _expected = const ['\'[\''];
+        _expected.addAll(const ['\'[\'']);
       }
     }
     return $2;
@@ -521,7 +521,7 @@ class ExampleParser {
           _c = $10;
           _pos = $11;
           if ($11 == _error) {
-            _expected = const ['\',\''];
+            _expected.addAll(const ['\',\'']);
           }
         }
         if (!_success) {
@@ -544,7 +544,7 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if ($5 == _error) {
-        _expected = const [
+        _expected.addAll(const [
           '\'false\'',
           '\'null\'',
           '\'true\'',
@@ -552,7 +552,7 @@ class ExampleParser {
           '\'string\'',
           '\'[\'',
           '\'{\''
-        ];
+        ]);
       }
     }
     return $2;
@@ -578,7 +578,7 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if ($5 == _error) {
-        _expected = const ['\'{\''];
+        _expected.addAll(const ['\'{\'']);
       }
     }
     return $2;
@@ -606,7 +606,7 @@ class ExampleParser {
           _c = $10;
           _pos = $11;
           if ($11 == _error) {
-            _expected = const ['\',\''];
+            _expected.addAll(const ['\',\'']);
           }
         }
         if (!_success) {
@@ -629,7 +629,7 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if ($5 == _error) {
-        _expected = const ['\'string\''];
+        _expected.addAll(const ['\'string\'']);
       }
     }
     return $2;
@@ -657,7 +657,7 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if ($5 == _error) {
-        _expected = const ['\'string\''];
+        _expected.addAll(const ['\'string\'']);
       }
     }
     return $2;
@@ -690,10 +690,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'end of file\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'end of file\'');
       }
     }
     return $2;
@@ -725,10 +726,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'false\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'false\'');
       }
     }
     return $2;
@@ -744,10 +746,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'leading spaces\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'leading spaces\'');
       }
     }
     return $2;
@@ -779,10 +782,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'null\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'null\'');
       }
     }
     return $2;
@@ -814,10 +818,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'true\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'true\'');
       }
     }
     return $2;
@@ -875,10 +880,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'string\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'string\'');
       }
     }
     return $2;
@@ -1045,10 +1051,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'number\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'number\'');
       }
     }
     return $2;
@@ -1076,10 +1083,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'{\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'{\'');
       }
     }
     return $2;
@@ -1107,10 +1115,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'}\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'}\'');
       }
     }
     return $2;
@@ -1138,10 +1147,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\'[\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\'[\'');
       }
     }
     return $2;
@@ -1169,10 +1179,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\']\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\']\'');
       }
     }
     return $2;
@@ -1200,10 +1211,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\',\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\',\'');
       }
     }
     return $2;
@@ -1231,10 +1243,11 @@ class ExampleParser {
       _c = $4;
       _pos = $5;
       if (_failure >= _error) {
-        _expected = const ['\':\''];
         if (_failure > _error) {
           _error = _failure;
+          _expected = [];
         }
+        _expected.add('\':\'');
       }
     }
     return $2;
