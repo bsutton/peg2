@@ -337,15 +337,15 @@ class ExampleParser {
     _expected = [];
     _failure = -1;
     _memoizable = [];
-    _memoizable.length = 181;
+    _memoizable.length = 183;
     _memos = [];
     _memos.length = _input.length + 1;
     _pos = 0;
     _predicate = false;
     _trackCid = [];
-    _trackCid.length = 181;
+    _trackCid.length = 183;
     _trackPos = [];
-    _trackPos.length = 181;
+    _trackPos.length = 183;
   }
 
   List<int> _toRunes(String source) {
@@ -1007,9 +1007,19 @@ class ExampleParser {
         }
       }
       if (_success) {
-        var $37 = false;
+        if (_c == 43 || _c == 45) {
+          _success = true;
+          _c = _input[_pos += _c <= 65535 ? 1 : 2];
+        } else {
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
+        }
+        _success = true;
+        var $38 = false;
         for (;;) {
-          if (_c == 32 || _c >= 43 && _c <= 93) {
+          if (_c >= 48 && _c <= 57) {
             _success = true;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
@@ -1019,10 +1029,10 @@ class ExampleParser {
             }
           }
           if (!_success) {
-            _success = $37;
+            _success = $38;
             break;
           }
-          $37 = true;
+          $38 = true;
         }
       }
       if (!_success) {
@@ -1039,7 +1049,7 @@ class ExampleParser {
     }
     $1 = $8;
     if (_success) {
-      _parse$$spacing(106, false);
+      _parse$$spacing(108, false);
       if (_success) {
         final n = $7;
         num $$;
@@ -1077,7 +1087,7 @@ class ExampleParser {
       }
     }
     if (_success) {
-      _parse$$spacing(110, false);
+      _parse$$spacing(112, false);
     }
     if (!_success) {
       _c = $4;
@@ -1109,7 +1119,7 @@ class ExampleParser {
       }
     }
     if (_success) {
-      _parse$$spacing(114, false);
+      _parse$$spacing(116, false);
     }
     if (!_success) {
       _c = $4;
@@ -1141,7 +1151,7 @@ class ExampleParser {
       }
     }
     if (_success) {
-      _parse$$spacing(118, false);
+      _parse$$spacing(120, false);
     }
     if (!_success) {
       _c = $4;
@@ -1173,7 +1183,7 @@ class ExampleParser {
       }
     }
     if (_success) {
-      _parse$$spacing(122, false);
+      _parse$$spacing(124, false);
     }
     if (!_success) {
       _c = $4;
@@ -1205,7 +1215,7 @@ class ExampleParser {
       }
     }
     if (_success) {
-      _parse$$spacing(126, false);
+      _parse$$spacing(128, false);
     }
     if (!_success) {
       _c = $4;
@@ -1237,7 +1247,7 @@ class ExampleParser {
       }
     }
     if (_success) {
-      _parse$$spacing(130, false);
+      _parse$$spacing(132, false);
     }
     if (!_success) {
       _c = $4;
@@ -1268,7 +1278,7 @@ class ExampleParser {
         }
       }
       if (_success) {
-        $2 = _parse$$escaped(134, $1);
+        $2 = _parse$$escaped(136, $1);
       }
       if (_success) {
         break;
@@ -1276,7 +1286,7 @@ class ExampleParser {
         _c = $4;
         _pos = $5;
       }
-      $2 = _parse$$unescaped(136, $1);
+      $2 = _parse$$unescaped(138, $1);
       if (_success) {
       } else {
         _c = $4;
@@ -1450,7 +1460,7 @@ class ExampleParser {
         }
       }
       if (_success) {
-        $2 = _parse$$hexdig4(156, $1);
+        $2 = _parse$$hexdig4(158, $1);
       }
       if (_success) {
       } else {
@@ -1466,13 +1476,13 @@ class ExampleParser {
     int $2;
     final $4 = _c;
     final $5 = _pos;
-    final $7 = _parse$$hexdig(159, $1);
+    final $7 = _parse$$hexdig(161, $1);
     if (_success) {
-      final $8 = _parse$$hexdig(160, $1);
+      final $8 = _parse$$hexdig(162, $1);
       if (_success) {
-        final $9 = _parse$$hexdig(161, $1);
+        final $9 = _parse$$hexdig(163, $1);
         if (_success) {
-          final $10 = _parse$$hexdig(162, $1);
+          final $10 = _parse$$hexdig(164, $1);
           if (_success) {
             final a = $7;
             final b = $8;

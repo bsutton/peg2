@@ -3085,11 +3085,7 @@ class Peg2Parser {
       }
       if (_success) {
         int $8;
-        if (_c == 45 ||
-            _c >= 92 && _c <= 93 ||
-            _c == 110 ||
-            _c == 114 ||
-            _c == 116) {
+        if (_c >= 92 && _c <= 93 || _c == 110 || _c == 114 || _c == 116) {
           _success = true;
           $8 = _c;
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
@@ -3123,9 +3119,9 @@ class Peg2Parser {
       final $13 = $1;
       _predicate = true;
       $1 = false;
-      if (_c == 92) {
+      if (_c >= 92 && _c <= 93) {
         _success = true;
-        _c = _input[++_pos];
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
         if (_failure < _pos) {

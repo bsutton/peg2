@@ -1,5 +1,9 @@
 ## 0.1.18
 
+- Minor changes (corrections) to the grammar file `peg2.peg`
+
+## 0.1.18
+
 - Removed (as unnecessary) analyzer directive `ignore_for_file: unused_local_variable` from generated code
 - Removed (as unnecessary) analyzer directive `ignore_for_file: prefer_final_locals` from generated code
 - Reworked and improved error handling system, it has become simpler, clearer, more reliable and a little faster

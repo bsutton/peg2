@@ -34,8 +34,8 @@
                 //"--predict",
                 "--no-optimize-code",
                 "--parser=postfix",
-                "example/example.peg",
-                "example/example.dart"
+                "example/a.peg",
+                "example/a.dart"
             ]
         },
         {
