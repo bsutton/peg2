@@ -2,9 +2,9 @@ part of '../../generators.dart';
 
 class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     with OperationUtils {
-  Map<Expression, ProductionRule> _topExpressions;
-
   final Grammar grammar;
+
+  Map<Expression, ProductionRule> _topExpressions;
 
   RulesToOperationsGenerator(this.grammar, ParserGeneratorOptions options)
       : super(options);
@@ -23,7 +23,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     final result = <MethodOperation>[];
     for (final rule in rules) {
       var skip = false;
-      if (rule.callers.length == 1) {
+      if (rule.directCallers.length == 1) {
         switch (rule.kind) {
           case ProductionRuleKind.nonterminal:
             if (options.inlineNonterminals) {
@@ -76,7 +76,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
   @override
   void visitNonterminal(NonterminalExpression node) {
     final rule = node.expression.rule;
-    final inline = options.inlineNonterminals && rule.callers.length == 1;
+    final inline = options.inlineNonterminals && rule.directCallers.length == 1;
     _visitSymbol(node, inline);
   }
 
@@ -86,11 +86,13 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     final returnType = node.returnType;
     final result = va.newVar(b, returnType, null);
     final rule = node.rule;
-    final isTerminal =
+    final isTopTerminal =
         node.parent == null && rule.kind == ProductionRuleKind.terminal;
+    final isTerminal = rule.kind == ProductionRuleKind.terminal;
     final isNonterminal = rule.kind == ProductionRuleKind.nonterminal;
+    Variable failure;
     if (isTerminal) {
-      addAssign(b, varOp(m.failure), constOp(-1));
+      failure = va.newVar(b, 'var', varOp(m.pos));
     }
 
     final ifNotSuccess = BlockOperation();
@@ -104,6 +106,13 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         for (var i = 0; i < expressions.length; i++) {
           final child = expressions[i];
           runInBlock(b, () => child.accept(this));
+          if (isTerminal) {
+            final test = ltOp(varOp(failure), varOp(m.failure));
+            addIf(b, test, (b) {
+              addAssign(b, varOp(failure), varOp(m.failure));
+            });
+          }
+
           if (i < expressions.length - 1) {
             addIfVar(b, m.success, (b) {
               addAssign(b, varOp(result), varOp(resultVar));
@@ -118,6 +127,10 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
               restoreVars(b, savedVars);
             });
 
+            if (isTerminal) {
+              addAssign(b, varOp(m.failure), varOp(failure));
+            }
+
             addBreak(b);
           }
         }
@@ -130,15 +143,15 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     }
 
     final startTerminals = node.startTerminals;
-    if (isTerminal) {
-      final test = gteOp(varOp(m.failure), varOp(m.error));
-      addIf(ifNotSuccess, test, (b) {
-        final test = gtOp(varOp(m.failure), varOp(m.error));
-        addIf(b, test, (b) {
-          addAssign(b, varOp(m.error), varOp(m.failure));
-          addAssign(b, varOp(m.expected), listOp(null, []));
-        });
+    if (isTopTerminal) {
+      final test1 = ltOp(varOp(m.error), varOp(m.failure));
+      addIf(ifNotSuccess, test1, (b) {
+        addAssign(b, varOp(m.error), varOp(m.failure));
+        addAssign(b, varOp(m.expected), listOp(null, []));
+      });
 
+      final test2 = eqOp(varOp(m.error), varOp(m.failure));
+      addIf(ifNotSuccess, test2, (b) {
         final add = Variable('add');
         final name = rule.name;
         addMbrCall(b, varOp(m.expected), varOp(add), [constOp(name)]);
@@ -147,10 +160,17 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       final test = eqOp(varOp(start), varOp(m.error));
       addIf(ifNotSuccess, test, (b) {
         final terminals = startTerminals.map((e) => e.name);
-        final elements = terminals.map(constOp).toList();
-        final list = listOp('const', elements);
-        final addAll = Variable('addAll');
-        addMbrCall(b, varOp(m.expected), varOp(addAll), [list]);
+        if (terminals.length == 1) {
+          final terminal = terminals.first;
+          final name = constOp(terminal);
+          final add = Variable('add');
+          addMbrCall(b, varOp(m.expected), varOp(add), [name]);
+        } else {
+          final elements = terminals.map(constOp).toList();
+          final list = listOp('const', elements);
+          final addAll = Variable('addAll');
+          addMbrCall(b, varOp(m.expected), varOp(addAll), [list]);
+        }
       });
     }
 
@@ -166,14 +186,14 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
   @override
   void visitSubterminal(SubterminalExpression node) {
     final rule = node.expression.rule;
-    final inline = options.inlineSubterminals && rule.callers.length == 1;
+    final inline = options.inlineSubterminals && rule.directCallers.length == 1;
     _visitSymbol(node, inline);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
     final rule = node.expression.rule;
-    final inline = options.inlineNonterminals && rule.callers.length == 1;
+    final inline = options.inlineNonterminals && rule.directCallers.length == 1;
     _visitSymbol(node, inline);
   }
 
@@ -191,7 +211,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     returnType ??= expression.returnType;
     Variable start;
     final result = addMethod(returnType, name, params, (b) {
-      if (options.memoize && rule.callers.length > 1) {
+      if (options.memoize && rule.directCallers.length > 1) {
         final memoized = callOp(varOp(m.memoized), [constOp(id), varOp(cid)]);
         addIf(b, memoized, (b) {
           final convert = convertOp(varOp(m.mresult), returnType);
@@ -205,7 +225,7 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
       final result = va.newVar(b, returnType, null);
       runInBlock(b, () => expression.accept(this));
       addAssign(b, varOp(result), varOp(resultVar));
-      if (options.memoize && rule.callers.length > 1) {
+      if (options.memoize && rule.directCallers.length > 1) {
         final listAccess = ListAccessOperation(varOp(m.memoizable), varOp(cid));
         final test =
             BinaryOperation(listAccess, OperationKind.equal, constOp(true));

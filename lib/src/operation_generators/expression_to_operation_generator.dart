@@ -4,7 +4,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
     with OperationUtils {
   BlockOperation b;
 
-  final Map<Expression, Map<Variable, Variable>> _contexts = {};
+  Variable localFailure;
 
   bool isPostfixGenerator = false;
 
@@ -29,6 +29,8 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
   Variable resultVar;
 
   VariableAllocator va;
+
+  final Map<Expression, Map<Variable, Variable>> _contexts = {};
 
   ExpressionToOperationGenerator(this.options);
 
@@ -80,15 +82,11 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
   void generateTestRangesByTest(BlockOperation b, Operation test,
       void Function(BlockOperation b) ifTrue) {
-    addIfElse(b, test, (b) {
-      addAssign(b, varOp(m.success), constOp(true));
+    final testSuccess = binOp(OperationKind.assign, varOp(m.success), test);
+    addIfElse(b, testSuccess, (b) {
       runInBlock(b, () => ifTrue(b));
     }, (b) {
-      addAssign(b, varOp(m.success), constOp(false));
-      final test = ltOp(varOp(m.failure), varOp(m.pos));
-      addIf(b, test, (b) {
-        addAssign(b, varOp(m.failure), varOp(m.pos));
-      });
+      addAssign(b, varOp(m.failure), varOp(m.pos));
     });
   }
 
@@ -251,13 +249,26 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
 
     Variable result;
     if (ranges.length <= 20) {
+      var hasLongChars = false;
+      for (var i = 0; i < ranges.length; i += 2) {
+        if (ranges[i] > 0xffff || ranges[i + 1] > 0xffff) {
+          hasLongChars = true;
+        }
+      }
+
       result = va.newVar(b, 'int', null);
 
       void generate(BlockOperation b) {
         addAssign(b, varOp(result), varOp(m.c));
-        final testC = lteOp(varOp(m.c), constOp(0xffff));
-        final ternary = ternaryOp(testC, constOp(1), constOp(2));
-        final assignPos = addAssignOp(varOp(m.pos), ternary);
+        Operation assignPos;
+        if (hasLongChars) {
+          final testC = lteOp(varOp(m.c), constOp(0xffff));
+          final ternary = ternaryOp(testC, constOp(1), constOp(2));
+          assignPos = addAssignOp(varOp(m.pos), ternary);
+        } else {
+          assignPos = preIncOp(varOp(m.pos));
+        }
+
         final listAcc = listAccOp(varOp(m.input), assignPos);
         addAssign(b, varOp(m.c), listAcc);
       }
@@ -393,6 +404,7 @@ abstract class ExpressionToOperationGenerator extends ExpressionVisitor
       result = returnParam.variable;
     } else {
       result = va.newVar(b, node.returnType, null);
+      localFailure = va.newVar(b, 'int', null);
     }
 
     void Function(BlockOperation) onSuccess;

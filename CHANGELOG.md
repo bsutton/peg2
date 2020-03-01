@@ -1,3 +1,7 @@
+## 0.1.20
+
+- Fixed bugs in analyzer `InvocationsResolver`, the analyzer has been reworked
+
 ## 0.1.19
 
 - Minor changes (corrections) to the grammar file `peg2.peg`

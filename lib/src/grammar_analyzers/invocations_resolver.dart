@@ -30,7 +30,7 @@ class InvocationsResolver extends SimpleExpressionVisitor {
     _visit(node);
   }
 
-  void _add(Set<ProductionRule> data, Iterable<ProductionRule> elements) {
+  void _add<T>(Set<T> data, Iterable<T> elements) {
     for (final element in elements) {
       if (data.add(element)) {
         _hasModifications = true;
@@ -48,7 +48,7 @@ class InvocationsResolver extends SimpleExpressionVisitor {
   }
 
   void _addCallers(
-      ProductionRule rule, Iterable<ProductionRule> rules, bool direct) {
+      ProductionRule rule, Iterable<SymbolExpression> rules, bool direct) {
     if (direct) {
       _add(rule.directCallers, rules);
     }
@@ -57,11 +57,12 @@ class InvocationsResolver extends SimpleExpressionVisitor {
   }
 
   void _visit(SymbolExpression node) {
-    final caller = node.rule;
-    final callee = node.expression.rule;
-    _addCallers(callee, [caller], true);
-    _addCallees(caller, [callee], true);
-    _addCallers(callee, caller.allCallers, false);
-    _addCallees(caller, callee.allCallees, false);
+    final caller = node;
+    final callerRule = node.rule;
+    final calleeRule = node.expression.rule;
+    _addCallers(calleeRule, [caller], true);
+    _addCallees(callerRule, [calleeRule], true);
+    _addCallers(calleeRule, callerRule.allCallers, false);
+    _addCallees(callerRule, calleeRule.allCallees, false);
   }
 }

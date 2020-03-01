@@ -238,7 +238,7 @@ int _matchRanges(List<int> ranges) {
     }
   }
 
-  if (!_success && _error < _pos) {
+  if (!_success) {
     _failure = _pos;
   }
 
@@ -264,9 +264,7 @@ String _matchString(String text) {
     result = text;
   } else {
     _success = false;
-    if (_failure < _pos + i) {
-      _failure = _pos + i;
-    }
+    _failure = _pos + i;
   }
 
   return result;

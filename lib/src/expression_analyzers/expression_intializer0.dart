@@ -68,7 +68,6 @@ class ExpressionInitializer0 extends ExpressionVisitor {
     }
 
     node.expression = rule.expression;
-    rule.callers.add(node);
   }
 
   @override
@@ -115,7 +114,6 @@ class ExpressionInitializer0 extends ExpressionVisitor {
     }
 
     node.expression = rule.expression;
-    rule.callers.add(node);
   }
 
   @override
@@ -127,7 +125,6 @@ class ExpressionInitializer0 extends ExpressionVisitor {
     }
 
     node.expression = rule.expression;
-    rule.callers.add(node);
   }
 
   @override

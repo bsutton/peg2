@@ -33,10 +33,6 @@ class ParserClassMembers {
 
   final predicate = Variable('_predicate', true);
 
-  final report = Variable('_report', true);
-
-  final reporter = Variable('_reporter', true);
-
   final success = Variable('_success', true);
 
   final text = Variable('_text', true);

@@ -3,13 +3,11 @@ part of '../../grammar.dart';
 class ProductionRule {
   final Set<ProductionRule> allCallees = {};
 
-  final Set<ProductionRule> allCallers = {};
+  final Set<SymbolExpression> allCallers = {};
 
   final Set<ProductionRule> directCallees = {};
 
-  final Set<ProductionRule> directCallers = {};
-
-  final Set<SymbolExpression> callers = {};
+  final Set<SymbolExpression> directCallers = {};
 
   final OrderedChoiceExpression expression;
 
