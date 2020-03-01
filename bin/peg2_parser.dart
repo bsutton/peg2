@@ -55,7 +55,7 @@ class Peg2Parser {
 
   List<String> _expected;
 
-  List<String> _failures;
+  int _failure;
 
   List<int> _input;
 
@@ -69,13 +69,7 @@ class Peg2Parser {
 
   bool _predicate;
 
-  int _report;
-
-  int _reporter;
-
   dynamic _result;
-
-  bool _silence;
 
   bool _success;
 
@@ -94,7 +88,7 @@ class Peg2Parser {
     _reset();
     final result = _parseGrammar(0, true);
     _buildError();
-    _failures = null;
+    _expected = null;
     _input = null;
     return result;
   }
@@ -160,7 +154,9 @@ class Peg2Parser {
       if (start == null) {
         sb.writeln('.');
       } else if (line == 0 || start == source.length) {
-        sb.writeln(' (at end of file):');
+        sb.write(' (at offset ');
+        sb.write(start);
+        sb.writeln('):');
       } else {
         sb.write(' (at line ');
         sb.write(line);
@@ -236,26 +232,26 @@ class Peg2Parser {
         sb.write('Expected ');
         sb.write(expected.join(', '));
         sb.write(' but found ');
-        sb.write(getc(_report));
+        sb.write(getc(_error));
         final title = sb.toString();
-        final message = report(title, _text, _report);
+        final message = report(title, _text, _error);
         error = FormatException(message);
       } else {
-        final reason = _report == _text.length ? 'Unterminated' : 'Malformed';
+        final reason = _error == _text.length ? 'Unterminated' : 'Malformed';
         final sb = StringBuffer();
         sb.write(reason);
         sb.write(' ');
         sb.write(expected.join(', '));
         final title = sb.toString();
-        final message = report(title, _text, _report);
+        final message = report(title, _text, _error);
         error = FormatException(message);
       }
     } else {
       final sb = StringBuffer();
       sb.write('Unexpected character ');
-      sb.write(getc(_report));
+      sb.write(getc(_error));
       final title = sb.toString();
-      final message = report(title, _text, _report);
+      final message = report(title, _text, _error);
       error = FormatException(message);
     }
   }
@@ -276,8 +272,8 @@ class Peg2Parser {
       }
     }
 
-    if (!_success && !_silence && _error < _pos) {
-      _error = _pos;
+    if (!_success && _error < _pos) {
+      _failure = _pos;
     }
 
     return result;
@@ -302,8 +298,8 @@ class Peg2Parser {
       result = text;
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos + i;
+      if (_failure < _pos + i) {
+        _failure = _pos + i;
       }
     }
 
@@ -366,17 +362,15 @@ class Peg2Parser {
 
   void _reset() {
     _c = _input[0];
-    _error = -1;
-    _expected = const [];
+    _error = 0;
+    _expected = [];
+    _failure = -1;
     _memoizable = [];
     _memoizable.length = 444;
     _memos = [];
     _memos.length = _input.length + 1;
     _pos = 0;
     _predicate = false;
-    _report = -1;
-    _reporter = -1;
-    _silence = false;
     _trackCid = [];
     _trackCid.length = 444;
     _trackPos = [];
@@ -411,52 +405,39 @@ class Peg2Parser {
 
   Grammar _parseGrammar(int $0, bool $1) {
     Grammar $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 0;
-    }
     final $4 = _c;
     final $5 = _pos;
-    final $7 = _silence;
-    _silence = true;
     _parse_leading_spaces(3, false);
     _success = true;
-    _silence = $7;
-    final $9 = _silence;
-    _silence = true;
-    final $10 = _parse_globals(5, $1);
+    final $8 = _parse_globals(5, $1);
     _success = true;
-    _silence = $9;
-    final $11 = _silence;
-    _silence = true;
-    final $12 = _parse_members(7, $1);
+    final $9 = _parse_members(7, $1);
     _success = true;
-    _silence = $11;
-    List<ProductionRule> $13;
+    List<ProductionRule> $10;
     if ($1) {
-      $13 = [];
+      $10 = [];
     }
-    var $14 = false;
+    var $11 = false;
     for (;;) {
-      final $15 = _parseDefinition(9, $1);
+      final $12 = _parseDefinition(9, $1);
       if (!_success) {
-        _success = $14;
+        _success = $11;
         if (!_success) {
-          $13 = null;
+          $10 = null;
         }
         break;
       }
       if ($1) {
-        $13.add($15);
+        $10.add($12);
       }
-      $14 = true;
+      $11 = true;
     }
     if (_success) {
       _parse_end_of_file(10, false);
       if (_success) {
-        final g = $10;
-        final m = $12;
-        final d = $13;
+        final g = $8;
+        final m = $9;
+        final d = $10;
         Grammar $$;
         $$ = Grammar(d, g, m);
         $2 = $$;
@@ -465,15 +446,14 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (_reporter == 0) {
-        _expected = const [
+      if ($5 == _error) {
+        _expected.addAll(const [
           '\'non terminal name\'',
           '\'terminal name\'',
           '\'sub terminal name\'',
           '\'library prefix\'',
           '\'type name\''
-        ];
-        _reporter = -1;
+        ]);
       }
     }
     return $2;
@@ -481,10 +461,6 @@ class Peg2Parser {
 
   ProductionRule _parseDefinition(int $0, bool $1) {
     ProductionRule $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 11;
-    }
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
@@ -511,15 +487,14 @@ class Peg2Parser {
       break;
     }
     if (!_success) {
-      if (_reporter == 11) {
-        _expected = const [
+      if ($5 == _error) {
+        _expected.addAll(const [
           '\'non terminal name\'',
           '\'terminal name\'',
           '\'sub terminal name\'',
           '\'library prefix\'',
           '\'type name\''
-        ];
-        _reporter = -1;
+        ]);
       }
     }
     return $2;
@@ -527,10 +502,6 @@ class Peg2Parser {
 
   ProductionRule _parseNonterminalDefinition(int $0, bool $1) {
     ProductionRule $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 18;
-    }
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
@@ -586,93 +557,73 @@ class Peg2Parser {
       break;
     }
     if (!_success) {
-      if (_reporter == 18) {
-        _expected = const [
+      if ($5 == _error) {
+        _expected.addAll(const [
           '\'non terminal name\'',
           '\'library prefix\'',
           '\'type name\''
-        ];
-        _reporter = -1;
+        ]);
       }
     }
     return $2;
   }
 
   OrderedChoiceExpression _parseNonterminalExpression(int $0, bool $1) {
-    if (_memoized(30, $0)) {
-      return _mresult as OrderedChoiceExpression;
-    }
-    final $2 = _pos;
-    OrderedChoiceExpression $3;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 30;
-    }
-    final $5 = _c;
+    OrderedChoiceExpression $2;
+    final $4 = _c;
+    final $5 = _pos;
     final $7 = _parseNonterminalSequence(32, $1);
     if (_success) {
       List<SequenceExpression> $8;
-      final $9 = _silence;
-      _silence = true;
       if ($1) {
         $8 = [];
       }
       for (;;) {
-        SequenceExpression $10;
-        final $11 = _c;
-        final $12 = _pos;
+        SequenceExpression $9;
+        final $10 = _c;
+        final $11 = _pos;
         _parse_$Slash(36, false);
         if (_success) {
-          $10 = _parseNonterminalSequence(37, $1);
+          $9 = _parseNonterminalSequence(37, $1);
         }
         if (!_success) {
-          _c = $11;
-          _pos = $12;
+          _c = $10;
+          _pos = $11;
+          if ($11 == _error) {
+            _expected.addAll(const ['\'/\'']);
+          }
+        }
+        if (!_success) {
           break;
         }
         if ($1) {
-          $8.add($10);
+          $8.add($9);
         }
       }
       _success = true;
-      _silence = $9;
-      if (_success) {
+      {
         final e = $7;
         final n = $8;
         OrderedChoiceExpression $$;
         $$ = OrderedChoiceExpression([e, ...n]);
-        $3 = $$;
+        $2 = $$;
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (_reporter == 30) {
-        _expected = const [
-          '\'non terminal name\'',
-          '\'terminal name\'',
-          '\'(\''
-        ];
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(30, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   SequenceExpression _parseNonterminalSequence(int $0, bool $1) {
-    if (_memoized(38, $0)) {
-      return _mresult as SequenceExpression;
-    }
-    final $2 = _pos;
-    SequenceExpression $3;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 38;
-    }
-    final $5 = _c;
+    SequenceExpression $2;
+    final $4 = _c;
+    final $5 = _pos;
     List<Expression> $7;
     if ($1) {
       $7 = [];
@@ -693,78 +644,64 @@ class Peg2Parser {
       $8 = true;
     }
     if (_success) {
-      final $10 = _silence;
-      _silence = true;
-      final $11 = _parse_action(43, $1);
+      final $10 = _parse_action(43, $1);
       _success = true;
-      _silence = $10;
-      if (_success) {
+      {
         final e = $7;
-        final a = $11;
+        final a = $10;
         SequenceExpression $$;
         $$ = SequenceExpression(e, a);
-        $3 = $$;
+        $2 = $$;
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (_reporter == 38) {
-        _expected = const [
-          '\'non terminal name\'',
-          '\'terminal name\'',
-          '\'(\''
-        ];
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(38, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   Expression _parseNonterminalPrefix(int $0, bool $1) {
     Expression $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 44;
-    }
     final $4 = _c;
     final $5 = _pos;
-    final $7 = _silence;
-    _silence = true;
-    final $8 = _parse_semantic_value(47, $1);
+    final $7 = _parse_semantic_value(47, $1);
     _success = true;
-    _silence = $7;
-    final $9 = _silence;
-    _silence = true;
-    String $10;
-    final $11 = _c;
-    final $12 = _pos;
+    String $8;
+    final $9 = _c;
+    final $10 = _pos;
+    final $11 = _pos;
     for (;;) {
-      $10 = _parse_$Ampersand(51, $1);
+      $8 = _parse_$Ampersand(51, $1);
       if (_success) {
         break;
       } else {
-        _c = $11;
-        _pos = $12;
+        _c = $9;
+        _pos = $10;
       }
-      $10 = _parse_$ExclamationMark(53, $1);
+      $8 = _parse_$ExclamationMark(53, $1);
       if (_success) {
       } else {
-        _c = $11;
-        _pos = $12;
+        _c = $9;
+        _pos = $10;
       }
       break;
     }
+    if (!_success) {
+      if ($11 == _error) {
+        _expected.addAll(const ['\'&\'', '\'!\'']);
+      }
+    }
     _success = true;
-    _silence = $9;
-    final $17 = _parseNonterminalSuffix(54, $1);
+    final $16 = _parseNonterminalSuffix(54, $1);
     if (_success) {
-      final s = $8;
-      final p = $10;
-      final e = $17;
+      final s = $7;
+      final p = $8;
+      final e = $16;
       Expression $$;
       $$ = _prefix(p, e, s);
       $2 = $$;
@@ -772,13 +709,9 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (_reporter == 44) {
-        _expected = const [
-          '\'non terminal name\'',
-          '\'terminal name\'',
-          '\'(\''
-        ];
-        _reporter = -1;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
       }
     }
     return $2;
@@ -786,47 +719,46 @@ class Peg2Parser {
 
   Expression _parseNonterminalSuffix(int $0, bool $1) {
     Expression $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 55;
-    }
     final $4 = _c;
     final $5 = _pos;
     final $7 = _parseNonterminalPrimary(57, $1);
     if (_success) {
-      final $8 = _silence;
-      _silence = true;
-      String $9;
-      final $10 = _c;
+      String $8;
+      final $9 = _c;
+      final $10 = _pos;
       final $11 = _pos;
       for (;;) {
-        $9 = _parse_$QuestionMark(61, $1);
+        $8 = _parse_$QuestionMark(61, $1);
         if (_success) {
           break;
         } else {
-          _c = $10;
-          _pos = $11;
+          _c = $9;
+          _pos = $10;
         }
-        $9 = _parse_$Asterisk(63, $1);
+        $8 = _parse_$Asterisk(63, $1);
         if (_success) {
           break;
         } else {
-          _c = $10;
-          _pos = $11;
+          _c = $9;
+          _pos = $10;
         }
-        $9 = _parse_$PlusSign(65, $1);
+        $8 = _parse_$PlusSign(65, $1);
         if (_success) {
         } else {
-          _c = $10;
-          _pos = $11;
+          _c = $9;
+          _pos = $10;
         }
         break;
       }
+      if (!_success) {
+        if ($11 == _error) {
+          _expected.addAll(const ['\'?\'', '\'*\'', '\'+\'']);
+        }
+      }
       _success = true;
-      _silence = $8;
-      if (_success) {
+      {
         final e = $7;
-        final s = $9;
+        final s = $8;
         Expression $$;
         $$ = _suffix(s, e);
         $2 = $$;
@@ -835,13 +767,9 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (_reporter == 55) {
-        _expected = const [
-          '\'non terminal name\'',
-          '\'terminal name\'',
-          '\'(\''
-        ];
-        _reporter = -1;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
       }
     }
     return $2;
@@ -849,10 +777,6 @@ class Peg2Parser {
 
   Expression _parseNonterminalPrimary(int $0, bool $1) {
     Expression $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 66;
-    }
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
@@ -897,13 +821,9 @@ class Peg2Parser {
       break;
     }
     if (!_success) {
-      if (_reporter == 66) {
-        _expected = const [
-          '\'non terminal name\'',
-          '\'terminal name\'',
-          '\'(\''
-        ];
-        _reporter = -1;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
       }
     }
     return $2;
@@ -911,10 +831,6 @@ class Peg2Parser {
 
   ProductionRule _parseTerminalDefinition(int $0, bool $1) {
     ProductionRule $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 75;
-    }
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
@@ -970,96 +886,76 @@ class Peg2Parser {
       break;
     }
     if (!_success) {
-      if (_reporter == 75) {
-        _expected = const [
-          '\'terminal name\'',
-          '\'library prefix\'',
-          '\'type name\''
-        ];
-        _reporter = -1;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'terminal name\'', '\'library prefix\'', '\'type name\'']);
       }
     }
     return $2;
   }
 
   OrderedChoiceExpression _parseExpression(int $0, bool $1) {
-    if (_memoized(87, $0)) {
-      return _mresult as OrderedChoiceExpression;
-    }
-    final $2 = _pos;
-    OrderedChoiceExpression $3;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 87;
-    }
-    final $5 = _c;
+    OrderedChoiceExpression $2;
+    final $4 = _c;
+    final $5 = _pos;
     final $7 = _parseSequence(89, $1);
     if (_success) {
       List<SequenceExpression> $8;
-      final $9 = _silence;
-      _silence = true;
       if ($1) {
         $8 = [];
       }
       for (;;) {
-        SequenceExpression $10;
-        final $11 = _c;
-        final $12 = _pos;
+        SequenceExpression $9;
+        final $10 = _c;
+        final $11 = _pos;
         _parse_$Slash(93, false);
         if (_success) {
-          $10 = _parseSequence(94, $1);
+          $9 = _parseSequence(94, $1);
         }
         if (!_success) {
-          _c = $11;
-          _pos = $12;
+          _c = $10;
+          _pos = $11;
+          if ($11 == _error) {
+            _expected.addAll(const ['\'/\'']);
+          }
+        }
+        if (!_success) {
           break;
         }
         if ($1) {
-          $8.add($10);
+          $8.add($9);
         }
       }
       _success = true;
-      _silence = $9;
-      if (_success) {
+      {
         final e = $7;
         final n = $8;
         OrderedChoiceExpression $$;
         $$ = OrderedChoiceExpression([e, ...n]);
-        $3 = $$;
+        $2 = $$;
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (_reporter == 87) {
-        _expected = const [
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const [
           '\'sub terminal name\'',
           '\'(\'',
           '\'literal\'',
           '\'character class\'',
           '\'.\'',
           '\'<\''
-        ];
-        _reporter = -1;
+        ]);
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(87, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   SequenceExpression _parseSequence(int $0, bool $1) {
-    if (_memoized(95, $0)) {
-      return _mresult as SequenceExpression;
-    }
-    final $2 = _pos;
-    SequenceExpression $3;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 95;
-    }
-    final $5 = _c;
+    SequenceExpression $2;
+    final $4 = _c;
+    final $5 = _pos;
     List<Expression> $7;
     if ($1) {
       $7 = [];
@@ -1080,81 +976,70 @@ class Peg2Parser {
       $8 = true;
     }
     if (_success) {
-      final $10 = _silence;
-      _silence = true;
-      final $11 = _parse_action(100, $1);
+      final $10 = _parse_action(100, $1);
       _success = true;
-      _silence = $10;
-      if (_success) {
+      {
         final e = $7;
-        final a = $11;
+        final a = $10;
         SequenceExpression $$;
         $$ = SequenceExpression(e, a);
-        $3 = $$;
+        $2 = $$;
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (_reporter == 95) {
-        _expected = const [
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const [
           '\'sub terminal name\'',
           '\'(\'',
           '\'literal\'',
           '\'character class\'',
           '\'.\'',
           '\'<\''
-        ];
-        _reporter = -1;
+        ]);
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(95, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   Expression _parsePrefix(int $0, bool $1) {
     Expression $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 101;
-    }
     final $4 = _c;
     final $5 = _pos;
-    final $7 = _silence;
-    _silence = true;
-    final $8 = _parse_semantic_value(104, $1);
+    final $7 = _parse_semantic_value(104, $1);
     _success = true;
-    _silence = $7;
-    final $9 = _silence;
-    _silence = true;
-    String $10;
-    final $11 = _c;
-    final $12 = _pos;
+    String $8;
+    final $9 = _c;
+    final $10 = _pos;
+    final $11 = _pos;
     for (;;) {
-      $10 = _parse_$Ampersand(108, $1);
+      $8 = _parse_$Ampersand(108, $1);
       if (_success) {
         break;
       } else {
-        _c = $11;
-        _pos = $12;
+        _c = $9;
+        _pos = $10;
       }
-      $10 = _parse_$ExclamationMark(110, $1);
+      $8 = _parse_$ExclamationMark(110, $1);
       if (_success) {
       } else {
-        _c = $11;
-        _pos = $12;
+        _c = $9;
+        _pos = $10;
       }
       break;
     }
+    if (!_success) {
+      if ($11 == _error) {
+        _expected.addAll(const ['\'&\'', '\'!\'']);
+      }
+    }
     _success = true;
-    _silence = $9;
-    final $17 = _parseSuffix(111, $1);
+    final $16 = _parseSuffix(111, $1);
     if (_success) {
-      final s = $8;
-      final p = $10;
-      final e = $17;
+      final s = $7;
+      final p = $8;
+      final e = $16;
       Expression $$;
       $$ = _prefix(p, e, s);
       $2 = $$;
@@ -1162,16 +1047,15 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (_reporter == 101) {
-        _expected = const [
+      if ($5 == _error) {
+        _expected.addAll(const [
           '\'sub terminal name\'',
           '\'(\'',
           '\'literal\'',
           '\'character class\'',
           '\'.\'',
           '\'<\''
-        ];
-        _reporter = -1;
+        ]);
       }
     }
     return $2;
@@ -1179,47 +1063,46 @@ class Peg2Parser {
 
   Expression _parseSuffix(int $0, bool $1) {
     Expression $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 112;
-    }
     final $4 = _c;
     final $5 = _pos;
     final $7 = _parsePrimary(114, $1);
     if (_success) {
-      final $8 = _silence;
-      _silence = true;
-      String $9;
-      final $10 = _c;
+      String $8;
+      final $9 = _c;
+      final $10 = _pos;
       final $11 = _pos;
       for (;;) {
-        $9 = _parse_$QuestionMark(118, $1);
+        $8 = _parse_$QuestionMark(118, $1);
         if (_success) {
           break;
         } else {
-          _c = $10;
-          _pos = $11;
+          _c = $9;
+          _pos = $10;
         }
-        $9 = _parse_$Asterisk(120, $1);
+        $8 = _parse_$Asterisk(120, $1);
         if (_success) {
           break;
         } else {
-          _c = $10;
-          _pos = $11;
+          _c = $9;
+          _pos = $10;
         }
-        $9 = _parse_$PlusSign(122, $1);
+        $8 = _parse_$PlusSign(122, $1);
         if (_success) {
         } else {
-          _c = $10;
-          _pos = $11;
+          _c = $9;
+          _pos = $10;
         }
         break;
       }
+      if (!_success) {
+        if ($11 == _error) {
+          _expected.addAll(const ['\'?\'', '\'*\'', '\'+\'']);
+        }
+      }
       _success = true;
-      _silence = $8;
-      if (_success) {
+      {
         final e = $7;
-        final s = $9;
+        final s = $8;
         Expression $$;
         $$ = _suffix(s, e);
         $2 = $$;
@@ -1228,16 +1111,15 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (_reporter == 112) {
-        _expected = const [
+      if ($5 == _error) {
+        _expected.addAll(const [
           '\'sub terminal name\'',
           '\'(\'',
           '\'literal\'',
           '\'character class\'',
           '\'.\'',
           '\'<\''
-        ];
-        _reporter = -1;
+        ]);
       }
     }
     return $2;
@@ -1245,10 +1127,6 @@ class Peg2Parser {
 
   Expression _parsePrimary(int $0, bool $1) {
     Expression $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 123;
-    }
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
@@ -1325,16 +1203,15 @@ class Peg2Parser {
       break;
     }
     if (!_success) {
-      if (_reporter == 123) {
-        _expected = const [
+      if ($5 == _error) {
+        _expected.addAll(const [
           '\'sub terminal name\'',
           '\'(\'',
           '\'literal\'',
           '\'character class\'',
           '\'.\'',
           '\'<\''
-        ];
-        _reporter = -1;
+        ]);
       }
     }
     return $2;
@@ -1342,10 +1219,6 @@ class Peg2Parser {
 
   ProductionRule _parseSubterminalDefinition(int $0, bool $1) {
     ProductionRule $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 140;
-    }
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
@@ -1401,77 +1274,62 @@ class Peg2Parser {
       break;
     }
     if (!_success) {
-      if (_reporter == 140) {
-        _expected = const [
+      if ($5 == _error) {
+        _expected.addAll(const [
           '\'sub terminal name\'',
           '\'library prefix\'',
           '\'type name\''
-        ];
-        _reporter = -1;
+        ]);
       }
     }
     return $2;
   }
 
   String _parseType(int $0, bool $1) {
-    if (_memoized(152, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 152;
-    }
-    final $5 = _c;
+    String $2;
+    final $4 = _c;
+    final $5 = _pos;
     final $7 = _parseTypeName(154, $1);
     if (_success) {
-      final $8 = _silence;
-      _silence = true;
-      List<String> $9;
-      final $10 = _c;
+      List<String> $8;
+      final $9 = _c;
+      final $10 = _pos;
       final $11 = _pos;
       _parse_$LessThanSign(158, false);
       if (_success) {
-        $9 = _parseTypeArguments(159, $1);
+        $8 = _parseTypeArguments(159, $1);
         if (_success) {
           _parse_$GreaterThanSign(160, false);
         }
       }
       if (!_success) {
-        _c = $10;
-        _pos = $11;
+        _c = $9;
+        _pos = $10;
+        if ($11 == _error) {
+          _expected.addAll(const ['\'<\'']);
+        }
       }
       _success = true;
-      _silence = $8;
-      if (_success) {
+      {
         final n = $7;
-        final a = $9;
+        final a = $8;
         String $$;
         $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
-        $3 = $$;
+        $2 = $$;
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (_reporter == 152) {
-        _expected = const ['\'library prefix\'', '\'type name\''];
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const ['\'library prefix\'', '\'type name\'']);
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(152, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parseTypeName(int $0, bool $1) {
     String $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 161;
-    }
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
@@ -1504,9 +1362,8 @@ class Peg2Parser {
       break;
     }
     if (!_success) {
-      if (_reporter == 161) {
-        _expected = const ['\'library prefix\'', '\'type name\''];
-        _reporter = -1;
+      if ($5 == _error) {
+        _expected.addAll(const ['\'library prefix\'', '\'type name\'']);
       }
     }
     return $2;
@@ -1514,40 +1371,38 @@ class Peg2Parser {
 
   List<String> _parseTypeArguments(int $0, bool $1) {
     List<String> $2;
-    if (_report < _pos) {
-      _report = _pos;
-      _reporter = 168;
-    }
     final $4 = _c;
     final $5 = _pos;
     final $7 = _parseType(170, $1);
     if (_success) {
       List<String> $8;
-      final $9 = _silence;
-      _silence = true;
       if ($1) {
         $8 = [];
       }
       for (;;) {
-        String $10;
-        final $11 = _c;
-        final $12 = _pos;
+        String $9;
+        final $10 = _c;
+        final $11 = _pos;
         _parse_$Comma(174, false);
         if (_success) {
-          $10 = _parseType(175, $1);
+          $9 = _parseType(175, $1);
         }
         if (!_success) {
-          _c = $11;
-          _pos = $12;
+          _c = $10;
+          _pos = $11;
+          if ($11 == _error) {
+            _expected.addAll(const ['\',\'']);
+          }
+        }
+        if (!_success) {
           break;
         }
         if ($1) {
-          $8.add($10);
+          $8.add($9);
         }
       }
       _success = true;
-      _silence = $9;
-      if (_success) {
+      {
         final t = $7;
         final n = $8;
         List<String> $$;
@@ -1558,49 +1413,41 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (_reporter == 168) {
-        _expected = const ['\'library prefix\'', '\'type name\''];
-        _reporter = -1;
+      if ($5 == _error) {
+        _expected.addAll(const ['\'library prefix\'', '\'type name\'']);
       }
     }
     return $2;
   }
 
   String _parse_non_terminal_name(int $0, bool $1) {
-    if (_memoized(176, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
-    $3 = _parse$$IDENTIFIER(178, $1);
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
+    $2 = _parse$$IDENTIFIER(178, $1);
     if (_success) {
       _parse$$SPACING(179, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'non terminal name\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'non terminal name\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(176, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_terminal_name(int $0, bool $1) {
-    if (_memoized(180, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     final $8 = $1;
     $1 = false;
     if (_c == 39) {
@@ -1608,8 +1455,8 @@ class Peg2Parser {
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
@@ -1618,26 +1465,22 @@ class Peg2Parser {
         final $15 = _c;
         final $16 = _pos;
         final $18 = _predicate;
-        final $19 = _silence;
-        final $20 = $1;
+        final $19 = $1;
         _predicate = true;
         $1 = false;
-        _silence = true;
         if (_c == 39) {
           _success = true;
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
-        _silence = $19;
         _c = $15;
         _pos = $16;
         _predicate = $18;
-        _silence = $19;
-        $1 = $20;
+        $1 = $19;
         _success = !_success;
         if (_success) {
           _parse$$TERMINAL_CHAR(191, false);
@@ -1656,45 +1499,41 @@ class Peg2Parser {
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
+      _c = $4;
+      _pos = $5;
     } else {
-      $3 = _text.substring($2, _pos);
+      $2 = _text.substring($5, _pos);
     }
     $1 = $8;
     if (_success) {
       _parse$$SPACING(193, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'terminal name\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'terminal name\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(180, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_sub_terminal_name(int $0, bool $1) {
-    if (_memoized(194, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     final $8 = $1;
     $1 = false;
     if (_c == 64) {
@@ -1702,144 +1541,129 @@ class Peg2Parser {
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$IDENTIFIER(200, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
+      _c = $4;
+      _pos = $5;
     } else {
-      $3 = _text.substring($2, _pos);
+      $2 = _text.substring($5, _pos);
     }
     $1 = $8;
     if (_success) {
       _parse$$SPACING(201, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'sub terminal name\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'sub terminal name\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(194, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_semantic_value(int $0, bool $1) {
-    if (_memoized(202, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
-    $3 = _parse$$IDENTIFIER(204, $1);
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
+    $2 = _parse$$IDENTIFIER(204, $1);
     if (_success) {
       if (_c == 58) {
         _success = true;
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'semantic value\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'semantic value\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(202, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_type_name(int $0, bool $1) {
-    if (_memoized(206, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     final $8 = $1;
     $1 = false;
     _parse$$IDENTIFIER(211, false);
     if (_success) {
-      final $12 = _silence;
-      _silence = true;
       if (_c == 63) {
         _success = true;
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       _success = true;
-      _silence = $12;
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
+      _c = $4;
+      _pos = $5;
     } else {
-      $3 = _text.substring($2, _pos);
+      $2 = _text.substring($5, _pos);
     }
     $1 = $8;
     if (_success) {
       _parse$$SPACING(214, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'type name\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'type name\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(206, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_library_prefix(int $0, bool $1) {
     String $2;
-    _error = -1;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
     final $8 = $1;
     $1 = false;
-    final $11 = _silence;
-    _silence = true;
     if (_c == 95) {
       _success = true;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     _success = true;
-    _silence = $11;
     _parse$$IDENTIFIER(222, false);
     if (!_success) {
       _c = $4;
@@ -1851,66 +1675,61 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'library prefix\''];
-        _report = _error;
-        _reporter = -1;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'library prefix\'');
       }
     }
     return $2;
   }
 
   String _parse_$Semicolon(int $0, bool $1) {
-    if (_memoized(223, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 59) {
       _success = true;
-      $3 = ';';
+      $2 = ';';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(226, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\';\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\';\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(223, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_action(int $0, bool $1) {
-    if (_memoized(227, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 123) {
       _success = true;
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
@@ -1918,8 +1737,6 @@ class Peg2Parser {
       final $10 = _pos;
       $1 = false;
       final $12 = _c;
-      final $15 = _silence;
-      _silence = true;
       for (;;) {
         _parse$$ACTION_BODY(234, false);
         if (!_success) {
@@ -1927,12 +1744,11 @@ class Peg2Parser {
         }
       }
       _success = true;
-      _silence = $15;
       if (!_success) {
         _c = $12;
         _pos = $10;
       } else {
-        $3 = _text.substring($10, _pos);
+        $2 = _text.substring($10, _pos);
       }
       $1 = $9;
       if (_c == 125) {
@@ -1940,8 +1756,8 @@ class Peg2Parser {
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -1949,59 +1765,54 @@ class Peg2Parser {
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'action\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'action\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(227, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$Ampersand(int $0, bool $1) {
-    if (_memoized(237, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 38) {
       _success = true;
-      $3 = '&';
+      $2 = '&';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(240, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'&\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'&\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(237, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   Expression _parse_character_class(int $0, bool $1) {
     Expression $2;
-    _error = -1;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
     if (_c == 91) {
@@ -2009,8 +1820,8 @@ class Peg2Parser {
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
@@ -2024,26 +1835,22 @@ class Peg2Parser {
         final $11 = _c;
         final $12 = _pos;
         final $14 = _predicate;
-        final $15 = _silence;
-        final $16 = $1;
+        final $15 = $1;
         _predicate = true;
         $1 = false;
-        _silence = true;
         if (_c == 93) {
           _success = true;
           _c = _input[++_pos];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
-        _silence = $15;
         _c = $11;
         _pos = $12;
         _predicate = $14;
-        _silence = $15;
-        $1 = $16;
+        $1 = $15;
         _success = !_success;
         if (_success) {
           $10 = _parse$$RANGE(249, $1);
@@ -2068,8 +1875,8 @@ class Peg2Parser {
           _c = _input[++_pos];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
         if (_success) {
@@ -2086,121 +1893,113 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'character class\''];
-        _report = _error;
-        _reporter = -1;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'character class\'');
       }
     }
     return $2;
   }
 
   String _parse_$RightParenthesis(int $0, bool $1) {
-    if (_memoized(252, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 41) {
       _success = true;
-      $3 = ')';
+      $2 = ')';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(255, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\')\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\')\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(252, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$Period(int $0, bool $1) {
-    if (_memoized(256, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 46) {
       _success = true;
-      $3 = '.';
+      $2 = '.';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(259, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'.\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'.\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(256, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   dynamic _parse_end_of_file(int $0, bool $1) {
     dynamic $2;
-    _error = -1;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
     final $7 = _predicate;
-    final $8 = _silence;
-    final $9 = $1;
+    final $8 = $1;
     _predicate = true;
     $1 = false;
-    _silence = true;
     if (_c < _eof) {
       _success = true;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
-    _silence = $8;
     _c = $4;
     _pos = $5;
     _predicate = $7;
-    _silence = $8;
-    $1 = $9;
+    $1 = $8;
     _success = !_success;
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'end of file\''];
-        _report = _error;
-        _reporter = -1;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'end of file\'');
       }
     }
     return $2;
@@ -2208,7 +2007,7 @@ class Peg2Parser {
 
   String _parse_globals(int $0, bool $1) {
     String $2;
-    _error = -1;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
     if (_c == 37) {
@@ -2216,8 +2015,8 @@ class Peg2Parser {
       _matchString('%{');
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
@@ -2225,8 +2024,6 @@ class Peg2Parser {
       final $10 = _pos;
       $1 = false;
       final $12 = _c;
-      final $15 = _silence;
-      _silence = true;
       for (;;) {
         _parse$$GLOBALS_BODY(271, false);
         if (!_success) {
@@ -2234,7 +2031,6 @@ class Peg2Parser {
         }
       }
       _success = true;
-      _silence = $15;
       if (!_success) {
         _c = $12;
         _pos = $10;
@@ -2247,8 +2043,8 @@ class Peg2Parser {
         _matchString('}%');
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -2258,10 +2054,12 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'globals\''];
-        _report = _error;
-        _reporter = -1;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'globals\'');
       }
     }
     return $2;
@@ -2269,61 +2067,59 @@ class Peg2Parser {
 
   List _parse_leading_spaces(int $0, bool $1) {
     List $2;
-    _error = -1;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
     $2 = _parse$$SPACING(276, false);
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'leading spaces\''];
-        _report = _error;
-        _reporter = -1;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'leading spaces\'');
       }
     }
     return $2;
   }
 
   String _parse_$EqualSign(int $0, bool $1) {
-    if (_memoized(277, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 61) {
       _success = true;
-      $3 = '=';
+      $2 = '=';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(280, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'=\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'=\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(277, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   Expression _parse_literal(int $0, bool $1) {
     Expression $2;
-    _error = -1;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
     if (_c == 34) {
@@ -2331,64 +2127,57 @@ class Peg2Parser {
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       List<int> $8;
-      final $9 = _silence;
-      _silence = true;
       if ($1) {
         $8 = [];
       }
       for (;;) {
-        int $10;
-        final $11 = _c;
-        final $12 = _pos;
-        final $14 = _predicate;
-        final $15 = _silence;
-        final $16 = $1;
+        int $9;
+        final $10 = _c;
+        final $11 = _pos;
+        final $13 = _predicate;
+        final $14 = $1;
         _predicate = true;
         $1 = false;
-        _silence = true;
         if (_c == 34) {
           _success = true;
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
-        _silence = $15;
-        _c = $11;
-        _pos = $12;
-        _predicate = $14;
-        _silence = $15;
-        $1 = $16;
+        _c = $10;
+        _pos = $11;
+        _predicate = $13;
+        $1 = $14;
         _success = !_success;
         if (_success) {
-          $10 = _parse$$LITERAL_CHAR(289, $1);
+          $9 = _parse$$LITERAL_CHAR(289, $1);
         }
         if (!_success) {
-          _c = $11;
-          _pos = $12;
+          _c = $10;
+          _pos = $11;
           break;
         }
         if ($1) {
-          $8.add($10);
+          $8.add($9);
         }
       }
       _success = true;
-      _silence = $9;
       if (_c == 34) {
         _success = true;
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -2404,10 +2193,12 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'literal\''];
-        _report = _error;
-        _reporter = -1;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'literal\'');
       }
     }
     return $2;
@@ -2415,7 +2206,7 @@ class Peg2Parser {
 
   String _parse_members(int $0, bool $1) {
     String $2;
-    _error = -1;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
     if (_c == 123) {
@@ -2423,8 +2214,8 @@ class Peg2Parser {
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
@@ -2432,8 +2223,6 @@ class Peg2Parser {
       final $10 = _pos;
       $1 = false;
       final $12 = _c;
-      final $15 = _silence;
-      _silence = true;
       for (;;) {
         _parse$$ACTION_BODY(299, false);
         if (!_success) {
@@ -2441,7 +2230,6 @@ class Peg2Parser {
         }
       }
       _success = true;
-      _silence = $15;
       if (!_success) {
         _c = $12;
         _pos = $10;
@@ -2454,8 +2242,8 @@ class Peg2Parser {
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -2465,126 +2253,116 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'members\''];
-        _report = _error;
-        _reporter = -1;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'members\'');
       }
     }
     return $2;
   }
 
   String _parse_$ExclamationMark(int $0, bool $1) {
-    if (_memoized(302, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 33) {
       _success = true;
-      $3 = '!';
+      $2 = '!';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(305, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'!\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'!\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(302, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$LeftParenthesis(int $0, bool $1) {
-    if (_memoized(306, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 40) {
       _success = true;
-      $3 = '(';
+      $2 = '(';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(309, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'(\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'(\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(306, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$PlusSign(int $0, bool $1) {
-    if (_memoized(310, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 43) {
       _success = true;
-      $3 = '+';
+      $2 = '+';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(313, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'+\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'+\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(310, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$Comma(int $0, bool $1) {
     String $2;
-    _error = -1;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
     if (_c == 44) {
@@ -2593,8 +2371,8 @@ class Peg2Parser {
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
@@ -2603,216 +2381,193 @@ class Peg2Parser {
     if (!_success) {
       _c = $4;
       _pos = $5;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\',\''];
-        _report = _error;
-        _reporter = -1;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\',\'');
       }
     }
     return $2;
   }
 
   String _parse_$QuestionMark(int $0, bool $1) {
-    if (_memoized(318, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 63) {
       _success = true;
-      $3 = '?';
+      $2 = '?';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(321, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'?\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'?\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(318, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$Slash(int $0, bool $1) {
-    if (_memoized(322, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 47) {
       _success = true;
-      $3 = '/';
+      $2 = '/';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(325, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'/\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'/\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(322, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$Asterisk(int $0, bool $1) {
-    if (_memoized(326, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 42) {
       _success = true;
-      $3 = '*';
+      $2 = '*';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(329, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'*\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'*\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(326, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$LessThanSign(int $0, bool $1) {
-    if (_memoized(330, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 60) {
       _success = true;
-      $3 = '<';
+      $2 = '<';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(333, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'<\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'<\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(330, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse_$GreaterThanSign(int $0, bool $1) {
-    if (_memoized(334, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    _error = -1;
-    final $5 = _c;
+    String $2;
+    _failure = -1;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 62) {
       _success = true;
-      $3 = '>';
+      $2 = '>';
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
       _parse$$SPACING(337, false);
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
-      if (!_silence && _error > _pos) {
-        _expected = const ['\'>\''];
-        _report = _error;
-        _reporter = -1;
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'>\'');
       }
     }
-    if (_memoizable[$0] == true) {
-      _memoize(334, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   dynamic _parse$$ACTION_BODY(int $0, bool $1) {
-    if (_memoized(338, $0)) {
-      return _mresult as dynamic;
-    }
-    final $2 = _pos;
-    dynamic $3;
-    final $5 = _c;
+    dynamic $2;
+    final $4 = _c;
+    final $5 = _pos;
     for (;;) {
       if (_c == 123) {
         _success = true;
-        $3 = '{';
+        $2 = '{';
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
-        final $9 = _silence;
-        _silence = true;
         for (;;) {
           _parse$$ACTION_BODY(342, false);
           if (!_success) {
@@ -2820,44 +2575,39 @@ class Peg2Parser {
           }
         }
         _success = true;
-        _silence = $9;
         if (_c == 125) {
           _success = true;
           _c = _input[++_pos];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
       }
       if (_success) {
         break;
       } else {
-        _c = $5;
-        _pos = $2;
+        _c = $4;
+        _pos = $5;
       }
-      final $13 = _predicate;
-      final $14 = _silence;
-      final $15 = $1;
+      final $12 = _predicate;
+      final $13 = $1;
       _predicate = true;
       $1 = false;
-      _silence = true;
       if (_c == 125) {
         _success = true;
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
-      _silence = $14;
-      _c = $5;
-      _pos = $2;
-      _predicate = $13;
-      _silence = $14;
-      $1 = $15;
+      _c = $4;
+      _pos = $5;
+      _predicate = $12;
+      $1 = $13;
       _success = !_success;
       if (_success) {
         if (_c < _eof) {
@@ -2865,22 +2615,19 @@ class Peg2Parser {
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
       }
       if (_success) {
       } else {
-        _c = $5;
-        _pos = $2;
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    if (_memoizable[$0] == true) {
-      _memoize(338, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse$$COMMENT(int $0, bool $1) {
@@ -2893,29 +2640,23 @@ class Peg2Parser {
       _c = _input[++_pos];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
-      final $9 = _silence;
-      _silence = true;
       for (;;) {
-        final $11 = _c;
-        final $12 = _pos;
-        final $14 = _predicate;
-        final $15 = _silence;
-        final $16 = $1;
+        final $10 = _c;
+        final $11 = _pos;
+        final $13 = _predicate;
+        final $14 = $1;
         _predicate = true;
         $1 = false;
-        _silence = true;
         _parse$$EOL(355, false);
-        _silence = $15;
-        _c = $11;
-        _pos = $12;
-        _predicate = $14;
-        _silence = $15;
-        $1 = $16;
+        _c = $10;
+        _pos = $11;
+        _predicate = $13;
+        $1 = $14;
         _success = !_success;
         if (_success) {
           if (_c < _eof) {
@@ -2923,24 +2664,20 @@ class Peg2Parser {
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
-            if (!_silence && _error < _pos) {
-              _error = _pos;
+            if (_failure < _pos) {
+              _failure = _pos;
             }
           }
         }
         if (!_success) {
-          _c = $11;
-          _pos = $12;
+          _c = $10;
+          _pos = $11;
           break;
         }
       }
       _success = true;
-      _silence = $9;
-      final $20 = _silence;
-      _silence = true;
       _parse$$EOL(358, false);
       _success = true;
-      _silence = $20;
     }
     if (!_success) {
       _c = $4;
@@ -2950,49 +2687,43 @@ class Peg2Parser {
   }
 
   dynamic _parse$$EOL(int $0, bool $1) {
-    if (_memoized(359, $0)) {
-      return _mresult as dynamic;
-    }
-    final $2 = _pos;
-    dynamic $3;
-    final $5 = _c;
+    dynamic $2;
+    final $4 = _c;
+    final $5 = _pos;
     for (;;) {
       if (_c == 13) {
         _success = true;
-        $3 = _matchString('\r\n');
+        $2 = _matchString('\r\n');
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
         break;
       } else {
-        _c = $5;
-        _pos = $2;
+        _c = $4;
+        _pos = $5;
       }
       if (_c == 10 || _c == 13) {
         _success = true;
-        $3 = _c;
+        $2 = _c;
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
       } else {
-        _c = $5;
-        _pos = $2;
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    if (_memoizable[$0] == true) {
-      _memoize(359, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   dynamic _parse$$GLOBALS_BODY(int $0, bool $1) {
@@ -3000,26 +2731,22 @@ class Peg2Parser {
     final $4 = _c;
     final $5 = _pos;
     final $7 = _predicate;
-    final $8 = _silence;
-    final $9 = $1;
+    final $8 = $1;
     _predicate = true;
     $1 = false;
-    _silence = true;
     if (_c == 125) {
       _success = true;
       _matchString('}%');
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
-    _silence = $8;
     _c = $4;
     _pos = $5;
     _predicate = $7;
-    _silence = $8;
-    $1 = $9;
+    $1 = $8;
     _success = !_success;
     if (_success) {
       if (_c < _eof) {
@@ -3027,8 +2754,8 @@ class Peg2Parser {
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
     }
@@ -3040,19 +2767,16 @@ class Peg2Parser {
   }
 
   int _parse$$HEX_NUMBER(int $0, bool $1) {
-    if (_memoized(369, $0)) {
-      return _mresult as int;
-    }
-    final $2 = _pos;
-    int $3;
-    final $5 = _c;
+    int $2;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c == 92) {
       _success = true;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (_success) {
@@ -3061,8 +2785,8 @@ class Peg2Parser {
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -3080,8 +2804,8 @@ class Peg2Parser {
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
-            if (!_silence && _error < _pos) {
-              _error = _pos;
+            if (_failure < _pos) {
+              _failure = _pos;
             }
           }
           if (!_success) {
@@ -3101,33 +2825,25 @@ class Peg2Parser {
           final d = $9;
           int $$;
           $$ = int.parse(d, radix: 16);
-          $3 = $$;
+          $2 = $$;
         }
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
+      _c = $4;
+      _pos = $5;
     }
-    if (_memoizable[$0] == true) {
-      _memoize(369, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   String _parse$$IDENTIFIER(int $0, bool $1) {
-    if (_memoized(378, $0)) {
-      return _mresult as String;
-    }
-    final $2 = _pos;
-    String $3;
-    final $5 = _c;
+    String $2;
+    final $4 = _c;
+    final $5 = _pos;
     final $8 = $1;
     $1 = false;
     _parse$$IDENT_START(383, false);
     if (_success) {
-      final $13 = _silence;
-      _silence = true;
       for (;;) {
         _parse$$IDENT_CONT(385, false);
         if (!_success) {
@@ -3135,23 +2851,19 @@ class Peg2Parser {
         }
       }
       _success = true;
-      _silence = $13;
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
+      _c = $4;
+      _pos = $5;
     } else {
-      $3 = _text.substring($2, _pos);
+      $2 = _text.substring($5, _pos);
     }
     $1 = $8;
     if (!_success) {
-      _c = $5;
-      _pos = $2;
+      _c = $4;
+      _pos = $5;
     }
-    if (_memoizable[$0] == true) {
-      _memoize(378, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   int _parse$$IDENT_CONT(int $0, bool $1) {
@@ -3172,8 +2884,8 @@ class Peg2Parser {
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -3187,30 +2899,24 @@ class Peg2Parser {
   }
 
   int _parse$$IDENT_START(int $0, bool $1) {
-    if (_memoized(391, $0)) {
-      return _mresult as int;
-    }
-    final $2 = _pos;
-    int $3;
-    final $5 = _c;
+    int $2;
+    final $4 = _c;
+    final $5 = _pos;
     if (_c >= 65 && _c <= 90 || _c >= 97 && _c <= 122) {
       _success = true;
-      $3 = _c;
+      $2 = _c;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
       _success = false;
-      if (!_silence && _error < _pos) {
-        _error = _pos;
+      if (_failure < _pos) {
+        _failure = _pos;
       }
     }
     if (!_success) {
-      _c = $5;
-      _pos = $2;
+      _c = $4;
+      _pos = $5;
     }
-    if (_memoizable[$0] == true) {
-      _memoize(391, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   int _parse$$LITERAL_CHAR(int $0, bool $1) {
@@ -3223,8 +2929,8 @@ class Peg2Parser {
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -3235,8 +2941,8 @@ class Peg2Parser {
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
         if (_success) {
@@ -3260,43 +2966,35 @@ class Peg2Parser {
         _pos = $5;
       }
       final $12 = _predicate;
-      final $13 = _silence;
-      final $14 = $1;
+      final $13 = $1;
       _predicate = true;
       $1 = false;
-      _silence = true;
       if (_c == 92) {
         _success = true;
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
-      _silence = $13;
       _c = $4;
       _pos = $5;
       _predicate = $12;
-      _silence = $13;
-      $1 = $14;
+      $1 = $13;
       _success = !_success;
       if (_success) {
-        final $17 = _c;
-        final $18 = _pos;
-        final $19 = _predicate;
-        final $20 = _silence;
-        final $21 = $1;
+        final $16 = _c;
+        final $17 = _pos;
+        final $18 = _predicate;
+        final $19 = $1;
         _predicate = true;
         $1 = false;
-        _silence = true;
         _parse$$EOL(404, false);
-        _silence = $20;
-        _c = $17;
-        _pos = $18;
-        _predicate = $19;
-        _silence = $20;
-        $1 = $21;
+        _c = $16;
+        _pos = $17;
+        _predicate = $18;
+        $1 = $19;
         _success = !_success;
         if (_success) {
           if (_c < _eof) {
@@ -3305,8 +3003,8 @@ class Peg2Parser {
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
-            if (!_silence && _error < _pos) {
-              _error = _pos;
+            if (_failure < _pos) {
+              _failure = _pos;
             }
           }
         }
@@ -3333,8 +3031,8 @@ class Peg2Parser {
           _c = _input[++_pos];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
         if (_success) {
@@ -3372,20 +3070,17 @@ class Peg2Parser {
   }
 
   int _parse$$RANGE_CHAR(int $0, bool $1) {
-    if (_memoized(413, $0)) {
-      return _mresult as int;
-    }
-    final $2 = _pos;
-    int $3;
-    final $5 = _c;
+    int $2;
+    final $4 = _c;
+    final $5 = _pos;
     for (;;) {
       if (_c == 92) {
         _success = true;
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -3400,93 +3095,82 @@ class Peg2Parser {
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
         if (_success) {
           final c = $8;
           int $$;
           $$ = _escape(c);
-          $3 = $$;
+          $2 = $$;
         }
       }
       if (_success) {
         break;
       } else {
-        _c = $5;
-        _pos = $2;
+        _c = $4;
+        _pos = $5;
       }
-      $3 = _parse$$HEX_NUMBER(418, $1);
+      $2 = _parse$$HEX_NUMBER(418, $1);
       if (_success) {
         break;
       } else {
-        _c = $5;
-        _pos = $2;
+        _c = $4;
+        _pos = $5;
       }
       final $12 = _predicate;
-      final $13 = _silence;
-      final $14 = $1;
+      final $13 = $1;
       _predicate = true;
       $1 = false;
-      _silence = true;
       if (_c == 92) {
         _success = true;
         _c = _input[++_pos];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
-      _silence = $13;
-      _c = $5;
-      _pos = $2;
+      _c = $4;
+      _pos = $5;
       _predicate = $12;
-      _silence = $13;
-      $1 = $14;
+      $1 = $13;
       _success = !_success;
       if (_success) {
-        final $17 = _c;
-        final $18 = _pos;
-        final $19 = _predicate;
-        final $20 = _silence;
-        final $21 = $1;
+        final $16 = _c;
+        final $17 = _pos;
+        final $18 = _predicate;
+        final $19 = $1;
         _predicate = true;
         $1 = false;
-        _silence = true;
         _parse$$EOL(423, false);
-        _silence = $20;
-        _c = $17;
-        _pos = $18;
-        _predicate = $19;
-        _silence = $20;
-        $1 = $21;
+        _c = $16;
+        _pos = $17;
+        _predicate = $18;
+        $1 = $19;
         _success = !_success;
         if (_success) {
           if (_c < _eof) {
             _success = true;
-            $3 = _c;
+            $2 = _c;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
-            if (!_silence && _error < _pos) {
-              _error = _pos;
+            if (_failure < _pos) {
+              _failure = _pos;
             }
           }
         }
       }
       if (_success) {
       } else {
-        _c = $5;
-        _pos = $2;
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    if (_memoizable[$0] == true) {
-      _memoize(413, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   dynamic _parse$$SPACE(int $0, bool $1) {
@@ -3500,8 +3184,8 @@ class Peg2Parser {
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -3522,30 +3206,25 @@ class Peg2Parser {
   }
 
   List _parse$$SPACING(int $0, bool $1) {
-    if (_memoized(430, $0)) {
-      return _mresult as List;
-    }
-    final $2 = _pos;
-    List $3;
-    final $5 = _c;
-    final $8 = _silence;
-    _silence = true;
+    List $2;
+    final $4 = _c;
+    final $5 = _pos;
     for (;;) {
-      final $10 = _c;
-      final $11 = _pos;
+      final $9 = _c;
+      final $10 = _pos;
       for (;;) {
         _parse$$SPACE(435, false);
         if (_success) {
           break;
         } else {
-          _c = $10;
-          _pos = $11;
+          _c = $9;
+          _pos = $10;
         }
         _parse$$COMMENT(437, false);
         if (_success) {
         } else {
-          _c = $10;
-          _pos = $11;
+          _c = $9;
+          _pos = $10;
         }
         break;
       }
@@ -3554,15 +3233,11 @@ class Peg2Parser {
       }
     }
     _success = true;
-    _silence = $8;
     if (!_success) {
-      _c = $5;
-      _pos = $2;
+      _c = $4;
+      _pos = $5;
     }
-    if (_memoizable[$0] == true) {
-      _memoize(430, $2, $3);
-    }
-    return $3;
+    return $2;
   }
 
   int _parse$$TERMINAL_CHAR(int $0, bool $1) {
@@ -3575,8 +3250,8 @@ class Peg2Parser {
         _matchString('//');
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {
@@ -3586,8 +3261,8 @@ class Peg2Parser {
           _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
           _success = false;
-          if (!_silence && _error < _pos) {
-            _error = _pos;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
         }
       }
@@ -3603,8 +3278,8 @@ class Peg2Parser {
         _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
         _success = false;
-        if (!_silence && _error < _pos) {
-          _error = _pos;
+        if (_failure < _pos) {
+          _failure = _pos;
         }
       }
       if (_success) {

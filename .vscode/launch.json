@@ -7,7 +7,7 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "--memoize",
+                //"--memoize",
                 "bin/peg2.peg"
             ]
         },
