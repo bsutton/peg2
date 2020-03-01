@@ -88,8 +88,18 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
     final rule = node.rule;
     final isTerminal =
         node.parent == null && rule.kind == ProductionRuleKind.terminal;
+    final isNonterminal =
+        node.parent == null && rule.kind == ProductionRuleKind.nonterminal;
     if (isTerminal) {
       addAssign(b, varOp(m.fposEnd), constOp(-1));
+    }
+
+    if (isNonterminal) {
+      final test = ltOp(varOp(m.report), varOp(m.pos));
+      addIf(b, test, (b) {
+        addAssign(b, varOp(m.report), varOp(m.pos));
+        addAssign(b, varOp(m.reporter), constOp(node.id));
+      });
     }
 
     final ifNotSuccess = BlockOperation();
@@ -130,6 +140,14 @@ class RulesToOperationsGenerator extends ExpressionToOperationGenerator
         final params = [varOp(savedVars[m.pos]), constOp(rule.name)];
         final fail = callOp(varOp(m.fail), params);
         addOp(b, fail);
+      });
+    }
+
+    if (isNonterminal) {
+      final startTerminals = node.startTerminals;
+      final test = equalOp(varOp(m.reporter), constOp(node.id));
+      addIf(ifNotSuccess, test, (b) {
+        addOp(b, NopOperation('${startTerminals.join(', ')}'));
       });
     }
 

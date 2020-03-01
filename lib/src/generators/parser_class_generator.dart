@@ -32,6 +32,8 @@ class ParserClassGenerator {
       'var _mresult',
       'int _pos',
       'bool _predicate',
+      'int _report',
+      'int _reporter',
       'dynamic _result',
       'bool _silence',
       'bool _success',
@@ -360,7 +362,9 @@ void _reset() {
   _memos = [];
   _memos.length = _input.length + 1;
   _pos = 0;
-  _predicate = false;  
+  _predicate = false;
+  _report = -1;
+  _reporter = 0;
   _silence = false;
   _trackCid = [];
   _trackCid.length = {{EXPR_COUNT}};

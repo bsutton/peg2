@@ -26,20 +26,20 @@ class OperationUtils {
     return op;
   }
 
-  ConditionalOperation addIf(
-      BlockOperation block, Operation test, void Function(BlockOperation) fTrue,
-      [void Function(BlockOperation) fFalse]) {
+  ConditionalOperation addIf(BlockOperation block, Operation test,
+      void Function(BlockOperation) ifTrue,
+      [void Function(BlockOperation) ifFalse]) {
     final bTrue = BlockOperation();
     BlockOperation bFalse;
-    if (fFalse != null) {
+    if (ifFalse != null) {
       bFalse = BlockOperation();
     }
 
     final op = ConditionalOperation(test, bTrue, bFalse);
     addOp(block, op);
-    fTrue(bTrue);
-    if (fFalse != null) {
-      fFalse(bFalse);
+    ifTrue(bTrue);
+    if (ifFalse != null) {
+      ifFalse(bFalse);
     }
 
     return op;

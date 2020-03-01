@@ -8,5 +8,6 @@ part 'src/expression_analyzers/expression_intializer1.dart';
 part 'src/expression_analyzers/expression_productiveness_resolver.dart';
 part 'src/expression_analyzers/expression_return_type_resolver.dart';
 part 'src/expression_analyzers/expression_start_characters_resolver.dart';
+part 'src/expression_analyzers/expression_start_terminals_resolver.dart';
 part 'src/expression_analyzers/expression_successfulness_resolver.dart';
 part 'src/expression_analyzers/optional_expression_resolver.dart';

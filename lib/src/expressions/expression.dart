@@ -25,6 +25,8 @@ abstract class Expression {
 
   final SparseBoolList startCharacters = SparseBoolList();
 
+  final Set<ProductionRule> startTerminals = {};
+
   String variable;
 
   bool used;

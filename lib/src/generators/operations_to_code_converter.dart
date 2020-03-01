@@ -225,7 +225,7 @@ class OperationsToCodeConverter extends OperationVisitor {
       _result = '// NOP';
     }
 
-    _result = '';
+    //_result = '';
   }
 
   @override

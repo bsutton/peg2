@@ -13,6 +13,9 @@ class ExpressionInitializer1 {
         ExpressionStartCharactersResolver();
     expressionStartCharactersResolver.resolve(rules);
 
+    final expressionStartTerminalsResolver = ExpressionStartTerminalsResolver();
+    expressionStartTerminalsResolver.resolve(rules);
+
     final expressionSuccessfulnessResolver = ExpressionSuccessfulnessResolver();
     expressionSuccessfulnessResolver.resolve(grammar);
 

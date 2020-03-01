@@ -27,19 +27,17 @@ class ParserClassMembers {
 
   final mresult = Variable('_mresult', true);
 
-  final popState = Variable('_popState', true);
-
   final pos = Variable('_pos', true);
 
   final predicate = Variable('_predicate', true);
 
-  final pushState = Variable('_pushState', true);
+  final report = Variable('_report', true);
+
+  final reporter = Variable('_reporter', true);
 
   final silence = Variable('_silence', true);
 
   final startCapture = Variable('_startCapture', true);
-
-  final stopCapture = Variable('_stopCapture', true);
 
   final success = Variable('_success', true);
 
