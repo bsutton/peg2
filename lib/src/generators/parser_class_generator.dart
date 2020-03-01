@@ -120,7 +120,9 @@ void _buildError() {
     if (start == null) {
       sb.writeln('.');
     } else if (line == 0 || start == source.length) {
-      sb.writeln(' (at end of file):');
+      sb.write(' (at offset ');
+      sb.write(start);
+      sb.writeln('):');
     } else {
       sb.write(' (at line ');
       sb.write(line);
