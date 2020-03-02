@@ -1,6 +1,6 @@
-part of '../../operation_generators.dart';
+part of '../../parser_generator.dart';
 
-class ParserClassMembers {
+abstract class ParserClassMembers {
   final c = Variable('_c', true);
 
   final eof = Variable('_eof', true);
@@ -29,9 +29,7 @@ class ParserClassMembers {
 
   final mresult = Variable('_mresult', true);
 
-  final pos = Variable('_pos', true);
-
-  final predicate = Variable('_predicate', true);
+  final pos = Variable('_pos', true);  
 
   final success = Variable('_success', true);
 

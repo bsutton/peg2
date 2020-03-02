@@ -1,4 +1,4 @@
-part of '../../generators.dart';
+part of '../../parser_generator.dart';
 
 class ParserGeneratorOptions {
   bool inlineNonterminals = false;

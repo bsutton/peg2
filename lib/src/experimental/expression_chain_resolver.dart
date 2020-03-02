@@ -1,5 +1,7 @@
 part of '../../experimental.dart';
 
+/*
+
 class ExpressionChainResolver extends ExpressionVisitor {
   ExpressionNode _parent;
 
@@ -139,3 +141,4 @@ class ExpressionChainResolver extends ExpressionVisitor {
     _parent = parent;
   }
 }
+*/

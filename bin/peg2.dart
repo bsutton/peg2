@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:path/path.dart' as _path;
-import 'package:peg2/generators.dart';
+import 'package:peg2/parser_generator.dart';
+import 'package:peg2/general_parser_generator.dart';
 import 'package:peg2/grammar.dart';
 import 'package:strings/strings.dart';
 
@@ -105,7 +106,14 @@ void main(List<String> args) {
   }
 
   options.name = camelize(name);
-  final parserGenerator = ParserGenerator(grammar, options);
+  ParserGenerator parserGenerator;
+  if (options.isPostfix()) {
+    print('Not implemented yet');
+    exit(-1);
+  } else {
+    parserGenerator = GeneralParserGenerator(grammar, options);
+  }
+  
   final parserCode = parserGenerator.generate();
   if (parserCode == null) {
     print('Parser generation error');

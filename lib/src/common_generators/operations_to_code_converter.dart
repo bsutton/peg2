@@ -1,4 +1,4 @@
-part of '../../generators.dart';
+part of '../../common_generators.dart';
 
 class OperationsToCodeConverter extends OperationVisitor {
   dynamic _result;
