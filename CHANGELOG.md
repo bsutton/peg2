@@ -1,3 +1,10 @@
+## 0.1.21
+
+- Redesigned the architecture and structure of generators
+- Reworked the production rule methods generator, improved reuse of initial variables in expressions
+- Minor improvements of code generators, now generated code is even cleaner ans shorter
+- Small changes in the algorithm of the generated expressions
+
 ## 0.1.20
 
 - Fixed bugs in analyzer `InvocationsResolver`, the analyzer has been reworked

@@ -24,9 +24,30 @@ class ProductionRulesGeneratorContext {
     return variable;
   }
 
-  ProductionRulesGeneratorContext copy(BlockOperation parentBlock) {
-    final result = ProductionRulesGeneratorContext(parentBlock);
-    result.variables.addAll(savedVariables);
+  Variable addVariable(
+      BlockOperation block, VariableAllocator va, Variable variable) {
+    var result = variables[variable];
+    if (result != null) {
+      return result;
+    }
+
+    result = va.newVar(block, 'final', _utils.varOp(variable));
+    variables[variable] = result;
+    return result;
+  }
+
+  ProductionRulesGeneratorContext copy(BlockOperation block,
+      [Iterable<Variable> variables]) {
+    final result = ProductionRulesGeneratorContext(block);
+    if (variables != null) {
+      for (final variable in variables) {
+        final value = this.variables[variable];
+        if (value != null) {
+          result.variables[variable] = value;
+        }
+      }
+    }
+
     result.arguments = arguments;
     return result;
   }

@@ -222,6 +222,16 @@ void _buildError() {
   }
 }
 
+void _fail(List<String> expected) {
+  if (_error < _failure) {
+    _error = _failure;
+    _expected = [];
+  }
+  if (_error == _failure) {
+    _expected.addAll(expected);
+  }
+}
+
 int _matchRanges(List<int> ranges) {
   int result;
   _success = false;
@@ -333,6 +343,7 @@ void _reset() {
   _memos.length = _input.length + 1;
   _pos = 0;
   _predicate = false;
+  _success = false;
   _trackCid = [];
   _trackCid.length = {{EXPR_COUNT}};
   _trackPos = [];

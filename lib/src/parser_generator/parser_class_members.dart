@@ -9,6 +9,8 @@ abstract class ParserClassMembers {
 
   final expected = Variable('_expected', true);
 
+  final fail = Variable('_fail', true);
+
   final failure = Variable('_failure', true);
 
   final matchAny = Variable('_matchAny', true);

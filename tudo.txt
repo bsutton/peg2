@@ -1,8 +1,6 @@
-optimize caller id assignment?
 check duplicare semantic variables
 add binary search for (long) ranges
 add more grammar analyzers
-implement optimizer to remove "_succes = true" before calls to [_parseXXX, _matchXXX]
 implement lookup tables (using starting characters of expressions) for the ordered choice expressions to improve the performance by skip unnecessary (heavy) operations
 remove loop in postfix choice with single expression
 exmaple postfix _e185 does not has return statement
@@ -11,7 +9,6 @@ implement analyzer warning when repetition child isSucessful (infinite loop)
 does not generate unused rules in postfix generator
 improve error message formatter (for Unicode)
 find bug with "break"
-use silence in postfix generator
 does not generate unused global parser methods
 make some classes private?
 add command line option "optimize-size"
@@ -19,4 +16,7 @@ add resolver of unused rules
 use bit masks in fast check in predict?
 optimize internal check if repetitions cannot be non productive (ro reduce generated code)
 inplement malformed terminals reporting
-
+add support of memoization of inlining rules
+rework isProductive from `bool` to { always, never, sometimes }
+add parenthesis to unary operator printer
+code optimization fails in `parse_semantic_value`

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:path/path.dart';
+
 import 'expressions.dart';
 import 'grammar.dart';
 import 'operation_utils.dart';
