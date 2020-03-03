@@ -256,16 +256,6 @@ class Peg2Parser {
     }
   }
 
-  void _fail(List<String> expected) {
-    if (_error < _failure) {
-      _error = _failure;
-      _expected = [];
-    }
-    if (_error == _failure) {
-      _expected.addAll(expected);
-    }
-  }
-
   int _matchRanges(List<int> ranges) {
     int result;
     _success = false;
@@ -282,7 +272,7 @@ class Peg2Parser {
       }
     }
 
-    if (!_success) {
+    if (!_success && _error < _pos) {
       _failure = _pos;
     }
 
@@ -302,11 +292,15 @@ class Peg2Parser {
       }
     }
 
-    if (_success = i == length) {
+    if (i == length) {
       _c = _input[_pos += length];
+      _success = true;
       result = text;
     } else {
-      _failure = _pos + i;
+      _success = false;
+      if (_failure < _pos + i) {
+        _failure = _pos + i;
+      }
     }
 
     return result;
@@ -377,7 +371,6 @@ class Peg2Parser {
     _memos.length = _input.length + 1;
     _pos = 0;
     _predicate = false;
-    _success = false;
     _trackCid = [];
     _trackCid.length = 444;
     _trackPos = [];
@@ -412,13 +405,14 @@ class Peg2Parser {
 
   Grammar _parseGrammar(int $0, bool $1) {
     Grammar $2;
-    Grammar $3;
     final $4 = _c;
     final $5 = _pos;
-    Grammar $6;
-    final $7 = _parse_leading_spaces(3, false);
+    _parse_leading_spaces(3, false);
+    _success = true;
     final $8 = _parse_globals(5, $1);
+    _success = true;
     final $9 = _parse_members(7, $1);
+    _success = true;
     List<ProductionRule> $10;
     if ($1) {
       $10 = [];
@@ -439,161 +433,145 @@ class Peg2Parser {
       $11 = true;
     }
     if (_success) {
-      final $13 = _parse_end_of_file(10, false);
+      _parse_end_of_file(10, false);
       if (_success) {
         final g = $8;
         final m = $9;
         final d = $10;
         Grammar $$;
         $$ = Grammar(d, g, m);
-        $6 = $$;
+        $2 = $$;
       }
     }
     if (!_success) {
       _c = $4;
       _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const [
+          '\'non terminal name\'',
+          '\'terminal name\'',
+          '\'sub terminal name\'',
+          '\'library prefix\'',
+          '\'type name\''
+        ]);
+      }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'non terminal name\'',
-        '\'terminal name\'',
-        '\'sub terminal name\'',
-        '\'library prefix\'',
-        '\'type name\''
-      ]);
-    }
-    $2 = $3;
     return $2;
   }
 
   ProductionRule _parseDefinition(int $0, bool $1) {
     ProductionRule $2;
-    ProductionRule $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      ProductionRule $6;
-      final $7 = _parseNonterminalDefinition(13, $1);
-      $6 = $7;
+      $2 = _parseNonterminalDefinition(13, $1);
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      ProductionRule $8;
-      final $9 = _parseTerminalDefinition(15, $1);
-      $8 = $9;
+      $2 = _parseTerminalDefinition(15, $1);
       if (_success) {
-        $3 = $8;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      ProductionRule $10;
-      final $11 = _parseSubterminalDefinition(17, $1);
-      $10 = $11;
+      $2 = _parseSubterminalDefinition(17, $1);
       if (_success) {
-        $3 = $10;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'non terminal name\'',
-        '\'terminal name\'',
-        '\'sub terminal name\'',
-        '\'library prefix\'',
-        '\'type name\''
-      ]);
+    if (!_success) {
+      if ($5 == _error) {
+        _expected.addAll(const [
+          '\'non terminal name\'',
+          '\'terminal name\'',
+          '\'sub terminal name\'',
+          '\'library prefix\'',
+          '\'type name\''
+        ]);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   ProductionRule _parseNonterminalDefinition(int $0, bool $1) {
     ProductionRule $2;
-    ProductionRule $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      ProductionRule $6;
       final $7 = _parseType(20, $1);
       if (_success) {
         final $8 = _parse_non_terminal_name(21, $1);
         if (_success) {
-          final $9 = _parse_$EqualSign(22, false);
+          _parse_$EqualSign(22, false);
           if (_success) {
             final $10 = _parseNonterminalExpression(23, $1);
             if (_success) {
-              final $11 = _parse_$Semicolon(24, false);
+              _parse_$Semicolon(24, false);
               if (_success) {
                 final t = $7;
                 final n = $8;
                 final e = $10;
                 ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, t);
-                $6 = $$;
+                $2 = $$;
               }
             }
           }
         }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
-        }
       }
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
-      ProductionRule $12;
       final $13 = _parse_non_terminal_name(26, $1);
       if (_success) {
-        final $14 = _parse_$EqualSign(27, false);
+        _parse_$EqualSign(27, false);
         if (_success) {
           final $15 = _parseNonterminalExpression(28, $1);
           if (_success) {
-            final $16 = _parse_$Semicolon(29, false);
+            _parse_$Semicolon(29, false);
             if (_success) {
               final n = $13;
               final e = $15;
               ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, null);
-              $12 = $$;
+              $2 = $$;
             }
           }
         }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
-        }
       }
       if (_success) {
-        $3 = $12;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
       break;
     }
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'non terminal name\'',
-        '\'library prefix\'',
-        '\'type name\''
-      ]);
+    if (!_success) {
+      if ($5 == _error) {
+        _expected.addAll(const [
+          '\'non terminal name\'',
+          '\'library prefix\'',
+          '\'type name\''
+        ]);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   OrderedChoiceExpression _parseNonterminalExpression(int $0, bool $1) {
     OrderedChoiceExpression $2;
-    OrderedChoiceExpression $3;
     final $4 = _c;
     final $5 = _pos;
-    OrderedChoiceExpression $6;
     final $7 = _parseNonterminalSequence(32, $1);
     if (_success) {
       List<SequenceExpression> $8;
@@ -604,46 +582,48 @@ class Peg2Parser {
         SequenceExpression $9;
         final $10 = _c;
         final $11 = _pos;
-        SequenceExpression $12;
-        final $13 = _parse_$Slash(36, false);
+        _parse_$Slash(36, false);
         if (_success) {
-          final $14 = _parseNonterminalSequence(37, $1);
-          $12 = $14;
-        }
-        $9 = $12;
-        if (!_success && _error == $11) {
-          _fail(const ['\'/\'']);
+          $9 = _parseNonterminalSequence(37, $1);
         }
         if (!_success) {
-          _success = true;
+          _c = $10;
+          _pos = $11;
+          if ($11 == _error) {
+            _expected.addAll(const ['\'/\'']);
+          }
+        }
+        if (!_success) {
           break;
         }
         if ($1) {
           $8.add($9);
         }
       }
-      if (_success) {
+      _success = true;
+      {
         final e = $7;
         final n = $8;
         OrderedChoiceExpression $$;
         $$ = OrderedChoiceExpression([e, ...n]);
-        $6 = $$;
+        $2 = $$;
       }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   SequenceExpression _parseNonterminalSequence(int $0, bool $1) {
     SequenceExpression $2;
-    SequenceExpression $3;
     final $4 = _c;
     final $5 = _pos;
-    SequenceExpression $6;
     List<Expression> $7;
     if ($1) {
       $7 = [];
@@ -666,267 +646,258 @@ class Peg2Parser {
     if (_success) {
       final $10 = _parse_action(43, $1);
       _success = true;
-      if (_success) {
+      {
         final e = $7;
         final a = $10;
         SequenceExpression $$;
         $$ = SequenceExpression(e, a);
-        $6 = $$;
+        $2 = $$;
       }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   Expression _parseNonterminalPrefix(int $0, bool $1) {
     Expression $2;
-    Expression $3;
     final $4 = _c;
     final $5 = _pos;
-    Expression $6;
     final $7 = _parse_semantic_value(47, $1);
+    _success = true;
     String $8;
     final $9 = _c;
     final $10 = _pos;
+    final $11 = _pos;
     for (;;) {
-      String $11;
-      final $12 = _parse_$Ampersand(51, $1);
-      $11 = $12;
+      $8 = _parse_$Ampersand(51, $1);
       if (_success) {
-        $8 = $11;
         break;
+      } else {
+        _c = $9;
+        _pos = $10;
       }
-      String $13;
-      final $14 = _parse_$ExclamationMark(53, $1);
-      $13 = $14;
+      $8 = _parse_$ExclamationMark(53, $1);
       if (_success) {
-        $8 = $13;
-        break;
+      } else {
+        _c = $9;
+        _pos = $10;
       }
       break;
     }
-    if (!_success && _error == $10) {
-      _fail(const ['\'&\'', '\'!\'']);
+    if (!_success) {
+      if ($11 == _error) {
+        _expected.addAll(const ['\'&\'', '\'!\'']);
+      }
     }
-    final $15 = _parseNonterminalSuffix(54, $1);
+    _success = true;
+    final $16 = _parseNonterminalSuffix(54, $1);
     if (_success) {
       final s = $7;
       final p = $8;
-      final e = $15;
+      final e = $16;
       Expression $$;
       $$ = _prefix(p, e, s);
-      $6 = $$;
+      $2 = $$;
     }
     if (!_success) {
       _c = $4;
       _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
+      }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
-    }
-    $2 = $3;
     return $2;
   }
 
   Expression _parseNonterminalSuffix(int $0, bool $1) {
     Expression $2;
-    Expression $3;
     final $4 = _c;
     final $5 = _pos;
-    Expression $6;
     final $7 = _parseNonterminalPrimary(57, $1);
     if (_success) {
       String $8;
       final $9 = _c;
       final $10 = _pos;
+      final $11 = _pos;
       for (;;) {
-        String $11;
-        final $12 = _parse_$QuestionMark(61, $1);
-        $11 = $12;
+        $8 = _parse_$QuestionMark(61, $1);
         if (_success) {
-          $8 = $11;
           break;
+        } else {
+          _c = $9;
+          _pos = $10;
         }
-        String $13;
-        final $14 = _parse_$Asterisk(63, $1);
-        $13 = $14;
+        $8 = _parse_$Asterisk(63, $1);
         if (_success) {
-          $8 = $13;
           break;
+        } else {
+          _c = $9;
+          _pos = $10;
         }
-        String $15;
-        final $16 = _parse_$PlusSign(65, $1);
-        $15 = $16;
+        $8 = _parse_$PlusSign(65, $1);
         if (_success) {
-          $8 = $15;
-          break;
+        } else {
+          _c = $9;
+          _pos = $10;
         }
         break;
       }
-      if (!_success && _error == $10) {
-        _fail(const ['\'?\'', '\'*\'', '\'+\'']);
+      if (!_success) {
+        if ($11 == _error) {
+          _expected.addAll(const ['\'?\'', '\'*\'', '\'+\'']);
+        }
       }
       _success = true;
-      if (_success) {
+      {
         final e = $7;
         final s = $8;
         Expression $$;
         $$ = _suffix(s, e);
-        $6 = $$;
+        $2 = $$;
       }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   Expression _parseNonterminalPrimary(int $0, bool $1) {
     Expression $2;
-    Expression $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      Expression $6;
       final $7 = _parse_non_terminal_name(68, $1);
       if (_success) {
         final n = $7;
         Expression $$;
         $$ = NonterminalExpression(n);
-        $6 = $$;
+        $2 = $$;
       }
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      Expression $8;
       final $9 = _parse_terminal_name(70, $1);
       if (_success) {
         final n = $9;
         Expression $$;
         $$ = TerminalExpression(n);
-        $8 = $$;
+        $2 = $$;
       }
       if (_success) {
-        $3 = $8;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      Expression $10;
-      final $11 = _parse_$LeftParenthesis(72, false);
+      _parse_$LeftParenthesis(72, false);
       if (_success) {
-        final $12 = _parseNonterminalExpression(73, $1);
+        $2 = _parseNonterminalExpression(73, $1);
         if (_success) {
-          final $13 = _parse_$RightParenthesis(74, false);
-          $10 = $12;
-        }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
+          _parse_$RightParenthesis(74, false);
         }
       }
       if (_success) {
-        $3 = $10;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
       break;
     }
-    if (!_success && _error == $5) {
-      _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
+    if (!_success) {
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   ProductionRule _parseTerminalDefinition(int $0, bool $1) {
     ProductionRule $2;
-    ProductionRule $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      ProductionRule $6;
       final $7 = _parseType(77, $1);
       if (_success) {
         final $8 = _parse_terminal_name(78, $1);
         if (_success) {
-          final $9 = _parse_$EqualSign(79, false);
+          _parse_$EqualSign(79, false);
           if (_success) {
             final $10 = _parseExpression(80, $1);
             if (_success) {
-              final $11 = _parse_$Semicolon(81, false);
+              _parse_$Semicolon(81, false);
               if (_success) {
                 final t = $7;
                 final n = $8;
                 final e = $10;
                 ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.terminal, e, t);
-                $6 = $$;
+                $2 = $$;
               }
             }
           }
         }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
-        }
       }
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
-      ProductionRule $12;
       final $13 = _parse_terminal_name(83, $1);
       if (_success) {
-        final $14 = _parse_$EqualSign(84, false);
+        _parse_$EqualSign(84, false);
         if (_success) {
           final $15 = _parseExpression(85, $1);
           if (_success) {
-            final $16 = _parse_$Semicolon(86, false);
+            _parse_$Semicolon(86, false);
             if (_success) {
               final n = $13;
               final e = $15;
               ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.terminal, e, null);
-              $12 = $$;
+              $2 = $$;
             }
           }
         }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
-        }
       }
       if (_success) {
-        $3 = $12;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
       break;
     }
-    if (!_success && _error == $5) {
-      _fail(const ['\'terminal name\'', '\'library prefix\'', '\'type name\'']);
+    if (!_success) {
+      if ($5 == _error) {
+        _expected.addAll(
+            const ['\'terminal name\'', '\'library prefix\'', '\'type name\'']);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   OrderedChoiceExpression _parseExpression(int $0, bool $1) {
     OrderedChoiceExpression $2;
-    OrderedChoiceExpression $3;
     final $4 = _c;
     final $5 = _pos;
-    OrderedChoiceExpression $6;
     final $7 = _parseSequence(89, $1);
     if (_success) {
       List<SequenceExpression> $8;
@@ -937,53 +908,54 @@ class Peg2Parser {
         SequenceExpression $9;
         final $10 = _c;
         final $11 = _pos;
-        SequenceExpression $12;
-        final $13 = _parse_$Slash(93, false);
+        _parse_$Slash(93, false);
         if (_success) {
-          final $14 = _parseSequence(94, $1);
-          $12 = $14;
-        }
-        $9 = $12;
-        if (!_success && _error == $11) {
-          _fail(const ['\'/\'']);
+          $9 = _parseSequence(94, $1);
         }
         if (!_success) {
-          _success = true;
+          _c = $10;
+          _pos = $11;
+          if ($11 == _error) {
+            _expected.addAll(const ['\'/\'']);
+          }
+        }
+        if (!_success) {
           break;
         }
         if ($1) {
           $8.add($9);
         }
       }
-      if (_success) {
+      _success = true;
+      {
         final e = $7;
         final n = $8;
         OrderedChoiceExpression $$;
         $$ = OrderedChoiceExpression([e, ...n]);
-        $6 = $$;
+        $2 = $$;
       }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'sub terminal name\'',
-        '\'(\'',
-        '\'literal\'',
-        '\'character class\'',
-        '\'.\'',
-        '\'<\''
-      ]);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const [
+          '\'sub terminal name\'',
+          '\'(\'',
+          '\'literal\'',
+          '\'character class\'',
+          '\'.\'',
+          '\'<\''
+        ]);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   SequenceExpression _parseSequence(int $0, bool $1) {
     SequenceExpression $2;
-    SequenceExpression $3;
     final $4 = _c;
     final $5 = _pos;
-    SequenceExpression $6;
     List<Expression> $7;
     if ($1) {
       $7 = [];
@@ -1006,385 +978,364 @@ class Peg2Parser {
     if (_success) {
       final $10 = _parse_action(100, $1);
       _success = true;
-      if (_success) {
+      {
         final e = $7;
         final a = $10;
         SequenceExpression $$;
         $$ = SequenceExpression(e, a);
-        $6 = $$;
+        $2 = $$;
       }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'sub terminal name\'',
-        '\'(\'',
-        '\'literal\'',
-        '\'character class\'',
-        '\'.\'',
-        '\'<\''
-      ]);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const [
+          '\'sub terminal name\'',
+          '\'(\'',
+          '\'literal\'',
+          '\'character class\'',
+          '\'.\'',
+          '\'<\''
+        ]);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   Expression _parsePrefix(int $0, bool $1) {
     Expression $2;
-    Expression $3;
     final $4 = _c;
     final $5 = _pos;
-    Expression $6;
     final $7 = _parse_semantic_value(104, $1);
+    _success = true;
     String $8;
     final $9 = _c;
     final $10 = _pos;
+    final $11 = _pos;
     for (;;) {
-      String $11;
-      final $12 = _parse_$Ampersand(108, $1);
-      $11 = $12;
+      $8 = _parse_$Ampersand(108, $1);
       if (_success) {
-        $8 = $11;
         break;
+      } else {
+        _c = $9;
+        _pos = $10;
       }
-      String $13;
-      final $14 = _parse_$ExclamationMark(110, $1);
-      $13 = $14;
+      $8 = _parse_$ExclamationMark(110, $1);
       if (_success) {
-        $8 = $13;
-        break;
+      } else {
+        _c = $9;
+        _pos = $10;
       }
       break;
     }
-    if (!_success && _error == $10) {
-      _fail(const ['\'&\'', '\'!\'']);
+    if (!_success) {
+      if ($11 == _error) {
+        _expected.addAll(const ['\'&\'', '\'!\'']);
+      }
     }
-    final $15 = _parseSuffix(111, $1);
+    _success = true;
+    final $16 = _parseSuffix(111, $1);
     if (_success) {
       final s = $7;
       final p = $8;
-      final e = $15;
+      final e = $16;
       Expression $$;
       $$ = _prefix(p, e, s);
-      $6 = $$;
+      $2 = $$;
     }
     if (!_success) {
       _c = $4;
       _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const [
+          '\'sub terminal name\'',
+          '\'(\'',
+          '\'literal\'',
+          '\'character class\'',
+          '\'.\'',
+          '\'<\''
+        ]);
+      }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'sub terminal name\'',
-        '\'(\'',
-        '\'literal\'',
-        '\'character class\'',
-        '\'.\'',
-        '\'<\''
-      ]);
-    }
-    $2 = $3;
     return $2;
   }
 
   Expression _parseSuffix(int $0, bool $1) {
     Expression $2;
-    Expression $3;
     final $4 = _c;
     final $5 = _pos;
-    Expression $6;
     final $7 = _parsePrimary(114, $1);
     if (_success) {
       String $8;
       final $9 = _c;
       final $10 = _pos;
+      final $11 = _pos;
       for (;;) {
-        String $11;
-        final $12 = _parse_$QuestionMark(118, $1);
-        $11 = $12;
+        $8 = _parse_$QuestionMark(118, $1);
         if (_success) {
-          $8 = $11;
           break;
+        } else {
+          _c = $9;
+          _pos = $10;
         }
-        String $13;
-        final $14 = _parse_$Asterisk(120, $1);
-        $13 = $14;
+        $8 = _parse_$Asterisk(120, $1);
         if (_success) {
-          $8 = $13;
           break;
+        } else {
+          _c = $9;
+          _pos = $10;
         }
-        String $15;
-        final $16 = _parse_$PlusSign(122, $1);
-        $15 = $16;
+        $8 = _parse_$PlusSign(122, $1);
         if (_success) {
-          $8 = $15;
-          break;
+        } else {
+          _c = $9;
+          _pos = $10;
         }
         break;
       }
-      if (!_success && _error == $10) {
-        _fail(const ['\'?\'', '\'*\'', '\'+\'']);
+      if (!_success) {
+        if ($11 == _error) {
+          _expected.addAll(const ['\'?\'', '\'*\'', '\'+\'']);
+        }
       }
       _success = true;
-      if (_success) {
+      {
         final e = $7;
         final s = $8;
         Expression $$;
         $$ = _suffix(s, e);
-        $6 = $$;
+        $2 = $$;
       }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'sub terminal name\'',
-        '\'(\'',
-        '\'literal\'',
-        '\'character class\'',
-        '\'.\'',
-        '\'<\''
-      ]);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const [
+          '\'sub terminal name\'',
+          '\'(\'',
+          '\'literal\'',
+          '\'character class\'',
+          '\'.\'',
+          '\'<\''
+        ]);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   Expression _parsePrimary(int $0, bool $1) {
     Expression $2;
-    Expression $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      Expression $6;
       final $7 = _parse_sub_terminal_name(125, $1);
       if (_success) {
         final n = $7;
         Expression $$;
         $$ = SubterminalExpression(n);
-        $6 = $$;
+        $2 = $$;
       }
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      Expression $8;
-      final $9 = _parse_$LeftParenthesis(127, false);
+      _parse_$LeftParenthesis(127, false);
       if (_success) {
-        final $10 = _parseExpression(128, $1);
+        $2 = _parseExpression(128, $1);
         if (_success) {
-          final $11 = _parse_$RightParenthesis(129, false);
-          $8 = $10;
-        }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
+          _parse_$RightParenthesis(129, false);
         }
       }
       if (_success) {
-        $3 = $8;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
-      Expression $12;
-      final $13 = _parse_literal(131, $1);
-      $12 = $13;
+      $2 = _parse_literal(131, $1);
       if (_success) {
-        $3 = $12;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      Expression $14;
-      final $15 = _parse_character_class(133, $1);
-      $14 = $15;
+      $2 = _parse_character_class(133, $1);
       if (_success) {
-        $3 = $14;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      Expression $16;
-      final $17 = _parse_$Period(135, $1);
+      _parse_$Period(135, $1);
       if (_success) {
         Expression $$;
         $$ = AnyCharacterExpression();
-        $16 = $$;
+        $2 = $$;
       }
       if (_success) {
-        $3 = $16;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      Expression $18;
-      final $19 = _parse_$LessThanSign(137, false);
+      _parse_$LessThanSign(137, false);
       if (_success) {
         final $20 = _parseExpression(138, $1);
         if (_success) {
-          final $21 = _parse_$GreaterThanSign(139, false);
+          _parse_$GreaterThanSign(139, false);
           if (_success) {
             final e = $20;
             Expression $$;
             $$ = CaptureExpression(e);
-            $18 = $$;
+            $2 = $$;
           }
-        }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
         }
       }
       if (_success) {
-        $3 = $18;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
       break;
     }
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'sub terminal name\'',
-        '\'(\'',
-        '\'literal\'',
-        '\'character class\'',
-        '\'.\'',
-        '\'<\''
-      ]);
+    if (!_success) {
+      if ($5 == _error) {
+        _expected.addAll(const [
+          '\'sub terminal name\'',
+          '\'(\'',
+          '\'literal\'',
+          '\'character class\'',
+          '\'.\'',
+          '\'<\''
+        ]);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   ProductionRule _parseSubterminalDefinition(int $0, bool $1) {
     ProductionRule $2;
-    ProductionRule $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      ProductionRule $6;
       final $7 = _parseType(142, $1);
       if (_success) {
         final $8 = _parse_sub_terminal_name(143, $1);
         if (_success) {
-          final $9 = _parse_$EqualSign(144, false);
+          _parse_$EqualSign(144, false);
           if (_success) {
             final $10 = _parseExpression(145, $1);
             if (_success) {
-              final $11 = _parse_$Semicolon(146, false);
+              _parse_$Semicolon(146, false);
               if (_success) {
                 final t = $7;
                 final n = $8;
                 final e = $10;
                 ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, t);
-                $6 = $$;
+                $2 = $$;
               }
             }
           }
         }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
-        }
       }
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
-      ProductionRule $12;
       final $13 = _parse_sub_terminal_name(148, $1);
       if (_success) {
-        final $14 = _parse_$EqualSign(149, false);
+        _parse_$EqualSign(149, false);
         if (_success) {
           final $15 = _parseExpression(150, $1);
           if (_success) {
-            final $16 = _parse_$Semicolon(151, false);
+            _parse_$Semicolon(151, false);
             if (_success) {
               final n = $13;
               final e = $15;
               ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, null);
-              $12 = $$;
+              $2 = $$;
             }
           }
         }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
-        }
       }
       if (_success) {
-        $3 = $12;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
       break;
     }
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'sub terminal name\'',
-        '\'library prefix\'',
-        '\'type name\''
-      ]);
+    if (!_success) {
+      if ($5 == _error) {
+        _expected.addAll(const [
+          '\'sub terminal name\'',
+          '\'library prefix\'',
+          '\'type name\''
+        ]);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parseType(int $0, bool $1) {
     String $2;
-    String $3;
     final $4 = _c;
     final $5 = _pos;
-    String $6;
     final $7 = _parseTypeName(154, $1);
     if (_success) {
       List<String> $8;
       final $9 = _c;
       final $10 = _pos;
-      List<String> $11;
-      final $12 = _parse_$LessThanSign(158, false);
+      final $11 = _pos;
+      _parse_$LessThanSign(158, false);
       if (_success) {
-        final $13 = _parseTypeArguments(159, $1);
+        $8 = _parseTypeArguments(159, $1);
         if (_success) {
-          final $14 = _parse_$GreaterThanSign(160, false);
-          $11 = $13;
-        }
-        if (!_success) {
-          _c = $9;
-          _pos = $10;
+          _parse_$GreaterThanSign(160, false);
         }
       }
-      $8 = $11;
-      if (!_success && _error == $10) {
-        _fail(const ['\'<\'']);
+      if (!_success) {
+        _c = $9;
+        _pos = $10;
+        if ($11 == _error) {
+          _expected.addAll(const ['\'<\'']);
+        }
       }
       _success = true;
-      if (_success) {
+      {
         final n = $7;
         final a = $8;
         String $$;
         $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
-        $6 = $$;
+        $2 = $$;
       }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const ['\'library prefix\'', '\'type name\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const ['\'library prefix\'', '\'type name\'']);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parseTypeName(int $0, bool $1) {
     String $2;
-    String $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      String $6;
       final $7 = _parse_library_prefix(163, $1);
       if (_success) {
-        final $8 = _parse_$Period(164, false);
+        _parse_$Period(164, false);
         if (_success) {
           final $9 = _parse_type_name(165, $1);
           if (_success) {
@@ -1392,42 +1343,36 @@ class Peg2Parser {
             final n = $9;
             String $$;
             $$ = '$p.$n';
-            $6 = $$;
+            $2 = $$;
           }
         }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
-        }
       }
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
-      String $10;
-      final $11 = _parse_type_name(167, $1);
-      $10 = $11;
+      $2 = _parse_type_name(167, $1);
       if (_success) {
-        $3 = $10;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    if (!_success && _error == $5) {
-      _fail(const ['\'library prefix\'', '\'type name\'']);
+    if (!_success) {
+      if ($5 == _error) {
+        _expected.addAll(const ['\'library prefix\'', '\'type name\'']);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   List<String> _parseTypeArguments(int $0, bool $1) {
     List<String> $2;
-    List<String> $3;
     final $4 = _c;
     final $5 = _pos;
-    List<String> $6;
     final $7 = _parseType(170, $1);
     if (_success) {
       List<String> $8;
@@ -1438,1545 +1383,1657 @@ class Peg2Parser {
         String $9;
         final $10 = _c;
         final $11 = _pos;
-        String $12;
-        final $13 = _parse_$Comma(174, false);
+        _parse_$Comma(174, false);
         if (_success) {
-          final $14 = _parseType(175, $1);
-          $12 = $14;
-        }
-        $9 = $12;
-        if (!_success && _error == $11) {
-          _fail(const ['\',\'']);
+          $9 = _parseType(175, $1);
         }
         if (!_success) {
-          _success = true;
+          _c = $10;
+          _pos = $11;
+          if ($11 == _error) {
+            _expected.addAll(const ['\',\'']);
+          }
+        }
+        if (!_success) {
           break;
         }
         if ($1) {
           $8.add($9);
         }
       }
-      if (_success) {
+      _success = true;
+      {
         final t = $7;
         final n = $8;
         List<String> $$;
         $$ = [t, ...n];
-        $6 = $$;
+        $2 = $$;
       }
     }
-    $3 = $6;
-    if (!_success && _error == $5) {
-      _fail(const ['\'library prefix\'', '\'type name\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if ($5 == _error) {
+        _expected.addAll(const ['\'library prefix\'', '\'type name\'']);
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_non_terminal_name(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    final $8 = _parse$$IDENTIFIER(178, $1);
+    $2 = _parse$$IDENTIFIER(178, $1);
     if (_success) {
-      final $9 = _parse$$SPACING(179, false);
-      $7 = $8;
+      _parse$$SPACING(179, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'non terminal name\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'non terminal name\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_terminal_name(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    final $9 = $1;
+    final $8 = $1;
     $1 = false;
-    int $10;
-    final $11 = _c;
-    final $12 = _pos;
-    var $13 = _pos;
-    int $14;
-    int $15;
-    if (_success = _c == 39) {
-      $15 = _c;
-      _c = _input[++_pos];
+    if (_c == 39) {
+      _success = true;
+      _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      List $16;
-      var $17 = false;
+      var $13 = false;
       for (;;) {
-        dynamic $18;
-        final $19 = _c;
-        final $20 = _pos;
-        var $21 = _pos;
-        dynamic $22;
-        final $23 = $1;
+        final $15 = _c;
+        final $16 = _pos;
+        final $18 = _predicate;
+        final $19 = $1;
+        _predicate = true;
         $1 = false;
-        int $24;
-        if (_success = _c == 39) {
-          $24 = _c;
-          _c = _input[++_pos];
+        if (_c == 39) {
+          _success = true;
+          _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
-          _failure = _pos;
-        }
-        _success = !_success;
-        _c = $19;
-        _pos = $20;
-        $1 = $23;
-        var $25;
-        if (_success) {
-          final $26 = _parse$$TERMINAL_CHAR(191, false);
-          $22 = $25;
-        }
-        $18 = $22;
-        if (!_success) {
-          _success = $17;
-          if (!_success) {
-            $16 = null;
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
           }
+        }
+        _c = $15;
+        _pos = $16;
+        _predicate = $18;
+        $1 = $19;
+        _success = !_success;
+        if (_success) {
+          _parse$$TERMINAL_CHAR(191, false);
+        }
+        if (!_success) {
+          _c = $15;
+          _pos = $16;
+          _success = $13;
           break;
         }
-        $17 = true;
+        $13 = true;
       }
       if (_success) {
-        int $27;
-        if (_success = _c == 39) {
-          $27 = _c;
-          _c = _input[++_pos];
+        if (_c == 39) {
+          _success = true;
+          _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
-          _failure = _pos;
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
         }
-        $14 = $15;
-      }
-      if (!_success) {
-        _c = $11;
-        _pos = $12;
       }
     }
-    $10 = $14;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    } else {
+      $2 = _text.substring($5, _pos);
+    }
+    $1 = $8;
     if (_success) {
-      $8 = _text.substring($5, _pos);
+      _parse$$SPACING(193, false);
     }
-    $1 = $9;
-    if (_success) {
-      final $28 = _parse$$SPACING(193, false);
-      $7 = $8;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'terminal name\'');
+      }
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'terminal name\'']);
-    }
-    $2 = $3;
     return $2;
   }
 
   String _parse_sub_terminal_name(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    final $9 = $1;
+    final $8 = $1;
     $1 = false;
-    int $10;
-    final $11 = _c;
-    final $12 = _pos;
-    var $13 = _pos;
-    int $14;
-    int $15;
-    if (_success = _c == 64) {
-      $15 = _c;
-      _c = _input[++_pos];
+    if (_c == 64) {
+      _success = true;
+      _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $16 = _parse$$IDENTIFIER(200, false);
-      $14 = $15;
+      _parse$$IDENTIFIER(200, false);
     }
-    $10 = $14;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    } else {
+      $2 = _text.substring($5, _pos);
+    }
+    $1 = $8;
     if (_success) {
-      $8 = _text.substring($5, _pos);
+      _parse$$SPACING(201, false);
     }
-    $1 = $9;
-    if (_success) {
-      final $17 = _parse$$SPACING(201, false);
-      $7 = $8;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'sub terminal name\'');
+      }
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'sub terminal name\'']);
-    }
-    $2 = $3;
     return $2;
   }
 
   String _parse_semantic_value(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    final $8 = _parse$$IDENTIFIER(204, $1);
+    $2 = _parse$$IDENTIFIER(204, $1);
     if (_success) {
-      String $9;
-      if (_success = _c == 58) {
-        $9 = ':';
+      if (_c == 58) {
+        _success = true;
         _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
-      $7 = $8;
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'semantic value\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'semantic value\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_type_name(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    final $9 = $1;
+    final $8 = $1;
     $1 = false;
-    String $10;
-    final $11 = _c;
-    final $12 = _pos;
-    var $13 = _pos;
-    String $14;
-    final $15 = _parse$$IDENTIFIER(211, false);
+    _parse$$IDENTIFIER(211, false);
     if (_success) {
-      int $16;
-      if (_success = _c == 63) {
-        $16 = _c;
-        _c = _input[++_pos];
+      if (_c == 63) {
+        _success = true;
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
       _success = true;
-      $14 = $15;
     }
-    $10 = $14;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    } else {
+      $2 = _text.substring($5, _pos);
+    }
+    $1 = $8;
     if (_success) {
-      $8 = _text.substring($5, _pos);
+      _parse$$SPACING(214, false);
     }
-    $1 = $9;
-    if (_success) {
-      final $17 = _parse$$SPACING(214, false);
-      $7 = $8;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'type name\'');
+      }
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'type name\'']);
-    }
-    $2 = $3;
     return $2;
   }
 
   String _parse_library_prefix(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    final $9 = $1;
+    final $8 = $1;
     $1 = false;
-    int $10;
-    final $11 = _c;
-    final $12 = _pos;
-    var $13 = _pos;
-    int $14;
-    int $15;
-    if (_success = _c == 95) {
-      $15 = _c;
-      _c = _input[++_pos];
+    if (_c == 95) {
+      _success = true;
+      _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
-    final $16 = _parse$$IDENTIFIER(222, false);
-    $14 = $15;
-    $10 = $14;
-    if (_success) {
-      $8 = _text.substring($5, _pos);
+    _success = true;
+    _parse$$IDENTIFIER(222, false);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    } else {
+      $2 = _text.substring($5, _pos);
     }
-    $1 = $9;
-    $7 = $8;
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'library prefix\'']);
+    $1 = $8;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'library prefix\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$Semicolon(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 59) {
-      $8 = ';';
+    if (_c == 59) {
+      _success = true;
+      $2 = ';';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(226, false);
-      $7 = $8;
+      _parse$$SPACING(226, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\';\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\';\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_action(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 123) {
-      $8 = '{';
+    if (_c == 123) {
+      _success = true;
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      String $9;
+      final $9 = $1;
       final $10 = _pos;
-      final $11 = $1;
       $1 = false;
-      List $12;
-      final $13 = _c;
-      final $14 = _pos;
-      var $15 = _pos;
-      List $16;
-      List $17;
+      final $12 = _c;
       for (;;) {
-        final $18 = _parse$$ACTION_BODY(234, false);
+        _parse$$ACTION_BODY(234, false);
         if (!_success) {
-          _success = true;
           break;
         }
       }
-      $16 = $17;
-      $12 = $16;
-      if (_success) {
-        $9 = _text.substring($10, _pos);
+      _success = true;
+      if (!_success) {
+        _c = $12;
+        _pos = $10;
+      } else {
+        $2 = _text.substring($10, _pos);
       }
-      $1 = $11;
-      String $19;
-      if (_success = _c == 125) {
-        $19 = '}';
+      $1 = $9;
+      if (_c == 125) {
+        _success = true;
         _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
       if (_success) {
-        final $20 = _parse$$SPACING(236, false);
-        $7 = $9;
-      }
-      if (!_success) {
-        _c = $4;
-        _pos = $5;
+        _parse$$SPACING(236, false);
       }
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'action\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'action\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$Ampersand(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 38) {
-      $8 = '&';
+    if (_c == 38) {
+      _success = true;
+      $2 = '&';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(240, false);
-      $7 = $8;
+      _parse$$SPACING(240, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'&\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'&\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   Expression _parse_character_class(int $0, bool $1) {
     Expression $2;
-    Expression $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    Expression $7;
-    String $8;
-    if (_success = _c == 91) {
-      $8 = '[';
+    if (_c == 91) {
+      _success = true;
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      List<List<int>> $9;
+      List<List<int>> $8;
       if ($1) {
-        $9 = [];
+        $8 = [];
       }
-      var $10 = false;
+      var $9 = false;
       for (;;) {
-        List<int> $11;
-        final $12 = _c;
-        final $13 = _pos;
-        var $14 = _pos;
-        List<int> $15;
-        final $16 = $1;
+        List<int> $10;
+        final $11 = _c;
+        final $12 = _pos;
+        final $14 = _predicate;
+        final $15 = $1;
+        _predicate = true;
         $1 = false;
-        String $17;
-        if (_success = _c == 93) {
-          $17 = ']';
+        if (_c == 93) {
+          _success = true;
           _c = _input[++_pos];
         } else {
-          _failure = _pos;
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
         }
+        _c = $11;
+        _pos = $12;
+        _predicate = $14;
+        $1 = $15;
         _success = !_success;
-        _c = $12;
-        _pos = $13;
-        $1 = $16;
-        var $18;
         if (_success) {
-          final $19 = _parse$$RANGE(249, $1);
-          $15 = $19;
+          $10 = _parse$$RANGE(249, $1);
         }
-        $11 = $15;
         if (!_success) {
-          _success = $10;
+          _c = $11;
+          _pos = $12;
+          _success = $9;
           if (!_success) {
-            $9 = null;
+            $8 = null;
           }
           break;
         }
         if ($1) {
-          $9.add($11);
+          $8.add($10);
         }
-        $10 = true;
+        $9 = true;
       }
       if (_success) {
-        String $20;
-        if (_success = _c == 93) {
-          $20 = ']';
+        if (_c == 93) {
+          _success = true;
           _c = _input[++_pos];
         } else {
-          _failure = _pos;
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
         }
         if (_success) {
-          final $21 = _parse$$SPACING(251, false);
+          _parse$$SPACING(251, false);
           if (_success) {
-            final r = $9;
+            final r = $8;
             Expression $$;
             $$ = CharacterClassExpression(r);
-            $7 = $$;
+            $2 = $$;
           }
         }
       }
-      if (!_success) {
-        _c = $4;
-        _pos = $5;
+    }
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'character class\'');
       }
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'character class\'']);
-    }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$RightParenthesis(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 41) {
-      $8 = ')';
+    if (_c == 41) {
+      _success = true;
+      $2 = ')';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(255, false);
-      $7 = $8;
+      _parse$$SPACING(255, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\')\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\')\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$Period(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 46) {
-      $8 = '.';
+    if (_c == 46) {
+      _success = true;
+      $2 = '.';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(259, false);
-      $7 = $8;
+      _parse$$SPACING(259, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'.\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'.\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   dynamic _parse_end_of_file(int $0, bool $1) {
     dynamic $2;
-    dynamic $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    dynamic $7;
+    final $7 = _predicate;
     final $8 = $1;
+    _predicate = true;
     $1 = false;
-    int $9;
-    if (_success = _c < _eof) {
-      $9 = _c;
+    if (_c < _eof) {
+      _success = true;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
-    _success = !_success;
     _c = $4;
     _pos = $5;
+    _predicate = $7;
     $1 = $8;
-    var $10;
-    $7 = $10;
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'end of file\'']);
+    _success = !_success;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'end of file\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_globals(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 37) {
-      $8 = _matchString('%{');
+    if (_c == 37) {
+      _success = true;
+      _matchString('%{');
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      String $9;
+      final $9 = $1;
       final $10 = _pos;
-      final $11 = $1;
       $1 = false;
-      List $12;
-      final $13 = _c;
-      final $14 = _pos;
-      var $15 = _pos;
-      List $16;
-      List $17;
+      final $12 = _c;
       for (;;) {
-        final $18 = _parse$$GLOBALS_BODY(271, false);
+        _parse$$GLOBALS_BODY(271, false);
         if (!_success) {
-          _success = true;
           break;
         }
       }
-      $16 = $17;
-      $12 = $16;
-      if (_success) {
-        $9 = _text.substring($10, _pos);
-      }
-      $1 = $11;
-      String $19;
-      if (_success = _c == 125) {
-        $19 = _matchString('}%');
-      } else {
-        _failure = _pos;
-      }
-      if (_success) {
-        final $20 = _parse$$SPACING(273, false);
-        $7 = $9;
-      }
+      _success = true;
       if (!_success) {
-        _c = $4;
-        _pos = $5;
+        _c = $12;
+        _pos = $10;
+      } else {
+        $2 = _text.substring($10, _pos);
+      }
+      $1 = $9;
+      if (_c == 125) {
+        _success = true;
+        _matchString('}%');
+      } else {
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
+      }
+      if (_success) {
+        _parse$$SPACING(273, false);
       }
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'globals\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'globals\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   List _parse_leading_spaces(int $0, bool $1) {
     List $2;
-    List $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    List $7;
-    final $8 = _parse$$SPACING(276, false);
-    $7 = $8;
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'leading spaces\'']);
+    $2 = _parse$$SPACING(276, false);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'leading spaces\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$EqualSign(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 61) {
-      $8 = '=';
+    if (_c == 61) {
+      _success = true;
+      $2 = '=';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(280, false);
-      $7 = $8;
+      _parse$$SPACING(280, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'=\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'=\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   Expression _parse_literal(int $0, bool $1) {
     Expression $2;
-    Expression $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    Expression $7;
-    int $8;
-    if (_success = _c == 34) {
-      $8 = _c;
-      _c = _input[++_pos];
+    if (_c == 34) {
+      _success = true;
+      _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      List<int> $9;
+      List<int> $8;
       if ($1) {
-        $9 = [];
+        $8 = [];
       }
       for (;;) {
-        int $10;
-        final $11 = _c;
-        final $12 = _pos;
-        var $13 = _pos;
-        int $14;
-        final $15 = $1;
+        int $9;
+        final $10 = _c;
+        final $11 = _pos;
+        final $13 = _predicate;
+        final $14 = $1;
+        _predicate = true;
         $1 = false;
-        int $16;
-        if (_success = _c == 34) {
-          $16 = _c;
-          _c = _input[++_pos];
-        } else {
-          _failure = _pos;
-        }
-        _success = !_success;
-        _c = $11;
-        _pos = $12;
-        $1 = $15;
-        var $17;
-        if (_success) {
-          final $18 = _parse$$LITERAL_CHAR(289, $1);
-          $14 = $18;
-        }
-        $10 = $14;
-        if (!_success) {
+        if (_c == 34) {
           _success = true;
+          _c = _input[_pos += _c <= 65535 ? 1 : 2];
+        } else {
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
+        }
+        _c = $10;
+        _pos = $11;
+        _predicate = $13;
+        $1 = $14;
+        _success = !_success;
+        if (_success) {
+          $9 = _parse$$LITERAL_CHAR(289, $1);
+        }
+        if (!_success) {
+          _c = $10;
+          _pos = $11;
           break;
         }
         if ($1) {
-          $9.add($10);
+          $8.add($9);
         }
       }
-      int $19;
-      if (_success = _c == 34) {
-        $19 = _c;
-        _c = _input[++_pos];
+      _success = true;
+      if (_c == 34) {
+        _success = true;
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
       if (_success) {
-        final $20 = _parse$$SPACING(291, false);
+        _parse$$SPACING(291, false);
         if (_success) {
-          final c = $9;
+          final c = $8;
           Expression $$;
           $$ = LiteralExpression(String.fromCharCodes(c));
-          $7 = $$;
+          $2 = $$;
         }
       }
-      if (!_success) {
-        _c = $4;
-        _pos = $5;
+    }
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'literal\'');
       }
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'literal\'']);
-    }
-    $2 = $3;
     return $2;
   }
 
   String _parse_members(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 123) {
-      $8 = '{';
+    if (_c == 123) {
+      _success = true;
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      String $9;
+      final $9 = $1;
       final $10 = _pos;
-      final $11 = $1;
       $1 = false;
-      List $12;
-      final $13 = _c;
-      final $14 = _pos;
-      var $15 = _pos;
-      List $16;
-      List $17;
+      final $12 = _c;
       for (;;) {
-        final $18 = _parse$$ACTION_BODY(299, false);
+        _parse$$ACTION_BODY(299, false);
         if (!_success) {
-          _success = true;
           break;
         }
       }
-      $16 = $17;
-      $12 = $16;
-      if (_success) {
-        $9 = _text.substring($10, _pos);
+      _success = true;
+      if (!_success) {
+        _c = $12;
+        _pos = $10;
+      } else {
+        $2 = _text.substring($10, _pos);
       }
-      $1 = $11;
-      String $19;
-      if (_success = _c == 125) {
-        $19 = '}';
+      $1 = $9;
+      if (_c == 125) {
+        _success = true;
         _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
       if (_success) {
-        final $20 = _parse$$SPACING(301, false);
-        $7 = $9;
-      }
-      if (!_success) {
-        _c = $4;
-        _pos = $5;
+        _parse$$SPACING(301, false);
       }
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'members\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'members\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$ExclamationMark(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 33) {
-      $8 = '!';
+    if (_c == 33) {
+      _success = true;
+      $2 = '!';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(305, false);
-      $7 = $8;
+      _parse$$SPACING(305, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'!\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'!\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$LeftParenthesis(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 40) {
-      $8 = '(';
+    if (_c == 40) {
+      _success = true;
+      $2 = '(';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(309, false);
-      $7 = $8;
+      _parse$$SPACING(309, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'(\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'(\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$PlusSign(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 43) {
-      $8 = '+';
+    if (_c == 43) {
+      _success = true;
+      $2 = '+';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(313, false);
-      $7 = $8;
+      _parse$$SPACING(313, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'+\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'+\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$Comma(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 44) {
-      $8 = ',';
+    if (_c == 44) {
+      _success = true;
+      $2 = ',';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(317, false);
-      $7 = $8;
+      _parse$$SPACING(317, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\',\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\',\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$QuestionMark(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 63) {
-      $8 = '?';
+    if (_c == 63) {
+      _success = true;
+      $2 = '?';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(321, false);
-      $7 = $8;
+      _parse$$SPACING(321, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'?\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'?\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$Slash(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 47) {
-      $8 = '/';
+    if (_c == 47) {
+      _success = true;
+      $2 = '/';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(325, false);
-      $7 = $8;
+      _parse$$SPACING(325, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'/\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'/\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$Asterisk(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 42) {
-      $8 = '*';
+    if (_c == 42) {
+      _success = true;
+      $2 = '*';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(329, false);
-      $7 = $8;
+      _parse$$SPACING(329, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'*\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'*\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$LessThanSign(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 60) {
-      $8 = '<';
+    if (_c == 60) {
+      _success = true;
+      $2 = '<';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(333, false);
-      $7 = $8;
+      _parse$$SPACING(333, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'<\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'<\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse_$GreaterThanSign(int $0, bool $1) {
     String $2;
-    String $3;
+    _failure = -1;
     final $4 = _c;
     final $5 = _pos;
-    var $6 = _pos;
-    String $7;
-    String $8;
-    if (_success = _c == 62) {
-      $8 = '>';
+    if (_c == 62) {
+      _success = true;
+      $2 = '>';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      final $9 = _parse$$SPACING(337, false);
-      $7 = $8;
+      _parse$$SPACING(337, false);
     }
-    $3 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'>\'']);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+      if (_failure >= _error) {
+        if (_failure > _error) {
+          _error = _failure;
+          _expected = [];
+        }
+        _expected.add('\'>\'');
+      }
     }
-    $2 = $3;
     return $2;
   }
 
   dynamic _parse$$ACTION_BODY(int $0, bool $1) {
     dynamic $2;
-    dynamic $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      String $6;
-      String $7;
-      if (_success = _c == 123) {
-        $7 = '{';
+      if (_c == 123) {
+        _success = true;
+        $2 = '{';
         _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
       if (_success) {
-        List $8;
         for (;;) {
-          final $9 = _parse$$ACTION_BODY(342, false);
+          _parse$$ACTION_BODY(342, false);
           if (!_success) {
-            _success = true;
             break;
           }
         }
-        String $10;
-        if (_success = _c == 125) {
-          $10 = '}';
+        _success = true;
+        if (_c == 125) {
+          _success = true;
           _c = _input[++_pos];
         } else {
-          _failure = _pos;
-        }
-        $6 = $7;
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
         }
       }
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
-      dynamic $11;
-      final $12 = $1;
+      final $12 = _predicate;
+      final $13 = $1;
+      _predicate = true;
       $1 = false;
-      String $13;
-      if (_success = _c == 125) {
-        $13 = '}';
+      if (_c == 125) {
+        _success = true;
         _c = _input[++_pos];
       } else {
-        _failure = _pos;
-      }
-      _success = !_success;
-      _c = $4;
-      _pos = $5;
-      $1 = $12;
-      var $14;
-      if (_success) {
-        int $15;
-        if (_success = _c < _eof) {
-          $15 = _c;
-          _c = _input[_pos += _c <= 65535 ? 1 : 2];
-        } else {
+        _success = false;
+        if (_failure < _pos) {
           _failure = _pos;
         }
-        $11 = $14;
-      }
-      if (_success) {
-        $3 = $11;
-        break;
       }
       _c = $4;
       _pos = $5;
+      _predicate = $12;
+      $1 = $13;
+      _success = !_success;
+      if (_success) {
+        if (_c < _eof) {
+          _success = true;
+          _c = _input[_pos += _c <= 65535 ? 1 : 2];
+        } else {
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
+        }
+      }
+      if (_success) {
+      } else {
+        _c = $4;
+        _pos = $5;
+      }
       break;
     }
-    $2 = $3;
     return $2;
   }
 
   String _parse$$COMMENT(int $0, bool $1) {
     String $2;
-    String $3;
     final $4 = _c;
     final $5 = _pos;
-    String $6;
-    String $7;
-    if (_success = _c == 35) {
-      $7 = '#';
+    if (_c == 35) {
+      _success = true;
+      $2 = '#';
       _c = _input[++_pos];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      List $8;
       for (;;) {
-        dynamic $9;
         final $10 = _c;
         final $11 = _pos;
-        dynamic $12;
-        final $13 = $1;
+        final $13 = _predicate;
+        final $14 = $1;
+        _predicate = true;
         $1 = false;
-        final $14 = _parse$$EOL(355, false);
-        _success = !_success;
+        _parse$$EOL(355, false);
         _c = $10;
         _pos = $11;
-        $1 = $13;
-        var $15;
+        _predicate = $13;
+        $1 = $14;
+        _success = !_success;
         if (_success) {
-          int $16;
-          if (_success = _c < _eof) {
-            $16 = _c;
+          if (_c < _eof) {
+            _success = true;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
-            _failure = _pos;
+            _success = false;
+            if (_failure < _pos) {
+              _failure = _pos;
+            }
           }
-          $12 = $15;
         }
-        $9 = $12;
         if (!_success) {
-          _success = true;
+          _c = $10;
+          _pos = $11;
           break;
         }
       }
-      final $17 = _parse$$EOL(358, false);
       _success = true;
-      $6 = $7;
-      if (!_success) {
-        _c = $4;
-        _pos = $5;
-      }
+      _parse$$EOL(358, false);
+      _success = true;
     }
-    $3 = $6;
-    $2 = $3;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    }
     return $2;
   }
 
   dynamic _parse$$EOL(int $0, bool $1) {
     dynamic $2;
-    dynamic $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      String $6;
-      String $7;
-      if (_success = _c == 13) {
-        $7 = _matchString('\r\n');
+      if (_c == 13) {
+        _success = true;
+        $2 = _matchString('\r\n');
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
-      $6 = $7;
       if (_success) {
-        $3 = $6;
         break;
-      }
-      int $8;
-      int $9;
-      if (_success = _c == 10 || _c == 13) {
-        $9 = _c;
-        _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _c = $4;
+        _pos = $5;
       }
-      $8 = $9;
+      if (_c == 10 || _c == 13) {
+        _success = true;
+        $2 = _c;
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
+      } else {
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
+      }
       if (_success) {
-        $3 = $8;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    $2 = $3;
     return $2;
   }
 
   dynamic _parse$$GLOBALS_BODY(int $0, bool $1) {
     dynamic $2;
-    dynamic $3;
     final $4 = _c;
     final $5 = _pos;
-    dynamic $6;
-    final $7 = $1;
+    final $7 = _predicate;
+    final $8 = $1;
+    _predicate = true;
     $1 = false;
-    String $8;
-    if (_success = _c == 125) {
-      $8 = _matchString('}%');
+    if (_c == 125) {
+      _success = true;
+      _matchString('}%');
     } else {
-      _failure = _pos;
-    }
-    _success = !_success;
-    _c = $4;
-    _pos = $5;
-    $1 = $7;
-    var $9;
-    if (_success) {
-      int $10;
-      if (_success = _c < _eof) {
-        $10 = _c;
-        _c = _input[_pos += _c <= 65535 ? 1 : 2];
-      } else {
+      _success = false;
+      if (_failure < _pos) {
         _failure = _pos;
       }
-      $6 = $9;
     }
-    $3 = $6;
-    $2 = $3;
+    _c = $4;
+    _pos = $5;
+    _predicate = $7;
+    $1 = $8;
+    _success = !_success;
+    if (_success) {
+      if (_c < _eof) {
+        _success = true;
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
+      } else {
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
+      }
+    }
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    }
     return $2;
   }
 
   int _parse$$HEX_NUMBER(int $0, bool $1) {
     int $2;
-    int $3;
     final $4 = _c;
     final $5 = _pos;
-    int $6;
-    int $7;
-    if (_success = _c == 92) {
-      $7 = _c;
-      _c = _input[++_pos];
+    if (_c == 92) {
+      _success = true;
+      _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
     if (_success) {
-      String $8;
-      if (_success = _c == 117) {
-        $8 = 'u';
+      if (_c == 117) {
+        _success = true;
         _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
       if (_success) {
         String $9;
-        final $10 = _pos;
-        final $11 = $1;
+        final $10 = $1;
+        final $11 = _pos;
         $1 = false;
-        List<int> $12;
         final $13 = _c;
-        final $14 = _pos;
-        List<int> $15;
-        List<int> $16;
-        var $17 = false;
+        var $16 = false;
         for (;;) {
-          int $18;
-          if (_success = _c >= 48 && _c <= 57 ||
+          if (_c >= 48 && _c <= 57 ||
               _c >= 65 && _c <= 70 ||
               _c >= 97 && _c <= 102) {
-            $18 = _c;
-            _c = _input[++_pos];
+            _success = true;
+            _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
-            _failure = _pos;
+            _success = false;
+            if (_failure < _pos) {
+              _failure = _pos;
+            }
           }
           if (!_success) {
-            _success = $17;
-            if (!_success) {
-              $16 = null;
-            }
+            _success = $16;
             break;
           }
-          $17 = true;
+          $16 = true;
         }
-        $15 = $16;
-        $12 = $15;
-        if (_success) {
-          $9 = _text.substring($10, _pos);
+        if (!_success) {
+          _c = $13;
+          _pos = $11;
+        } else {
+          $9 = _text.substring($11, _pos);
         }
-        $1 = $11;
+        $1 = $10;
         if (_success) {
           final d = $9;
           int $$;
           $$ = int.parse(d, radix: 16);
-          $6 = $$;
+          $2 = $$;
         }
       }
-      if (!_success) {
-        _c = $4;
-        _pos = $5;
-      }
     }
-    $3 = $6;
-    $2 = $3;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    }
     return $2;
   }
 
   String _parse$$IDENTIFIER(int $0, bool $1) {
     String $2;
-    String $3;
     final $4 = _c;
     final $5 = _pos;
-    String $6;
-    String $7;
     final $8 = $1;
     $1 = false;
-    int $9;
-    final $10 = _c;
-    final $11 = _pos;
-    int $12;
-    final $13 = _parse$$IDENT_START(383, false);
+    _parse$$IDENT_START(383, false);
     if (_success) {
-      List<int> $14;
       for (;;) {
-        final $15 = _parse$$IDENT_CONT(385, false);
+        _parse$$IDENT_CONT(385, false);
         if (!_success) {
-          _success = true;
           break;
         }
       }
-      $12 = $13;
+      _success = true;
     }
-    $9 = $12;
-    if (_success) {
-      $7 = _text.substring($5, _pos);
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    } else {
+      $2 = _text.substring($5, _pos);
     }
     $1 = $8;
-    $6 = $7;
-    $3 = $6;
-    $2 = $3;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    }
     return $2;
   }
 
   int _parse$$IDENT_CONT(int $0, bool $1) {
     int $2;
-    int $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      int $6;
-      final $7 = _parse$$IDENT_START(388, false);
-      $6 = $7;
+      $2 = _parse$$IDENT_START(388, false);
       if (_success) {
-        $3 = $6;
         break;
-      }
-      int $8;
-      int $9;
-      if (_success = _c >= 48 && _c <= 57 || _c == 95) {
-        $9 = _c;
-        _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _c = $4;
+        _pos = $5;
       }
-      $8 = $9;
+      if (_c >= 48 && _c <= 57 || _c == 95) {
+        _success = true;
+        $2 = _c;
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
+      } else {
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
+      }
       if (_success) {
-        $3 = $8;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    $2 = $3;
     return $2;
   }
 
   int _parse$$IDENT_START(int $0, bool $1) {
     int $2;
-    int $3;
     final $4 = _c;
     final $5 = _pos;
-    int $6;
-    int $7;
-    if (_success = _c >= 65 && _c <= 90 || _c >= 97 && _c <= 122) {
-      $7 = _c;
-      _c = _input[++_pos];
+    if (_c >= 65 && _c <= 90 || _c >= 97 && _c <= 122) {
+      _success = true;
+      $2 = _c;
+      _c = _input[_pos += _c <= 65535 ? 1 : 2];
     } else {
-      _failure = _pos;
+      _success = false;
+      if (_failure < _pos) {
+        _failure = _pos;
+      }
     }
-    $6 = $7;
-    $3 = $6;
-    $2 = $3;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    }
     return $2;
   }
 
   int _parse$$LITERAL_CHAR(int $0, bool $1) {
     int $2;
-    int $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      int $6;
-      String $7;
-      if (_success = _c == 92) {
-        $7 = '\\';
+      if (_c == 92) {
+        _success = true;
         _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
       if (_success) {
         int $8;
-        if (_success =
-            _c == 34 || _c == 92 || _c == 110 || _c == 114 || _c == 116) {
+        if (_c == 34 || _c == 92 || _c == 110 || _c == 114 || _c == 116) {
+          _success = true;
           $8 = _c;
-          _c = _input[++_pos];
+          _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
-          _failure = _pos;
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
         }
         if (_success) {
           final c = $8;
           int $$;
           $$ = _escape(c);
-          $6 = $$;
+          $2 = $$;
         }
       }
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
-      int $9;
-      final $10 = _parse$$HEX_NUMBER(399, $1);
-      $9 = $10;
+      $2 = _parse$$HEX_NUMBER(399, $1);
       if (_success) {
-        $3 = $9;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      int $11;
-      final $12 = $1;
+      final $12 = _predicate;
+      final $13 = $1;
+      _predicate = true;
       $1 = false;
-      String $13;
-      if (_success = _c == 92) {
-        $13 = '\\';
+      if (_c == 92) {
+        _success = true;
         _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
-      _success = !_success;
       _c = $4;
       _pos = $5;
-      $1 = $12;
-      var $14;
+      _predicate = $12;
+      $1 = $13;
+      _success = !_success;
       if (_success) {
-        final $15 = _c;
-        final $16 = _pos;
-        final $17 = $1;
+        final $16 = _c;
+        final $17 = _pos;
+        final $18 = _predicate;
+        final $19 = $1;
+        _predicate = true;
         $1 = false;
-        final $18 = _parse$$EOL(404, false);
+        _parse$$EOL(404, false);
+        _c = $16;
+        _pos = $17;
+        _predicate = $18;
+        $1 = $19;
         _success = !_success;
-        _c = $15;
-        _pos = $16;
-        $1 = $17;
-        var $19;
         if (_success) {
-          int $20;
-          if (_success = _c < _eof) {
-            $20 = _c;
+          if (_c < _eof) {
+            _success = true;
+            $2 = _c;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
-            _failure = _pos;
+            _success = false;
+            if (_failure < _pos) {
+              _failure = _pos;
+            }
           }
-          $11 = $20;
-        }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
         }
       }
       if (_success) {
-        $3 = $11;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
       break;
     }
-    $2 = $3;
     return $2;
   }
 
   List<int> _parse$$RANGE(int $0, bool $1) {
     List<int> $2;
-    List<int> $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      List<int> $6;
       final $7 = _parse$$RANGE_CHAR(408, $1);
       if (_success) {
-        String $8;
-        if (_success = _c == 45) {
-          $8 = '-';
+        if (_c == 45) {
+          _success = true;
           _c = _input[++_pos];
         } else {
-          _failure = _pos;
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
         }
         if (_success) {
           final $9 = _parse$$RANGE_CHAR(410, $1);
@@ -2985,250 +3042,249 @@ class Peg2Parser {
             final e = $9;
             List<int> $$;
             $$ = [s, e];
-            $6 = $$;
+            $2 = $$;
           }
-        }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
         }
       }
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
-      List<int> $10;
       final $11 = _parse$$RANGE_CHAR(412, $1);
       if (_success) {
         final c = $11;
         List<int> $$;
         $$ = [c, c];
-        $10 = $$;
+        $2 = $$;
       }
       if (_success) {
-        $3 = $10;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    $2 = $3;
     return $2;
   }
 
   int _parse$$RANGE_CHAR(int $0, bool $1) {
     int $2;
-    int $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      int $6;
-      String $7;
-      if (_success = _c == 92) {
-        $7 = '\\';
+      if (_c == 92) {
+        _success = true;
         _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
       if (_success) {
         int $8;
-        if (_success =
-            _c >= 92 && _c <= 93 || _c == 110 || _c == 114 || _c == 116) {
+        if (_c >= 92 && _c <= 93 || _c == 110 || _c == 114 || _c == 116) {
+          _success = true;
           $8 = _c;
-          _c = _input[++_pos];
+          _c = _input[_pos += _c <= 65535 ? 1 : 2];
         } else {
-          _failure = _pos;
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
         }
         if (_success) {
           final c = $8;
           int $$;
           $$ = _escape(c);
-          $6 = $$;
+          $2 = $$;
         }
       }
       if (_success) {
-        $3 = $6;
         break;
-      }
-      _c = $4;
-      _pos = $5;
-      int $9;
-      final $10 = _parse$$HEX_NUMBER(418, $1);
-      $9 = $10;
-      if (_success) {
-        $3 = $9;
-        break;
-      }
-      int $11;
-      final $12 = $1;
-      $1 = false;
-      int $13;
-      if (_success = _c >= 92 && _c <= 93) {
-        $13 = _c;
-        _c = _input[++_pos];
       } else {
-        _failure = _pos;
+        _c = $4;
+        _pos = $5;
       }
-      _success = !_success;
+      $2 = _parse$$HEX_NUMBER(418, $1);
+      if (_success) {
+        break;
+      } else {
+        _c = $4;
+        _pos = $5;
+      }
+      final $12 = _predicate;
+      final $13 = $1;
+      _predicate = true;
+      $1 = false;
+      if (_c >= 92 && _c <= 93) {
+        _success = true;
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
+      } else {
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
+      }
       _c = $4;
       _pos = $5;
-      $1 = $12;
-      var $14;
+      _predicate = $12;
+      $1 = $13;
+      _success = !_success;
       if (_success) {
-        final $15 = _c;
-        final $16 = _pos;
-        final $17 = $1;
+        final $16 = _c;
+        final $17 = _pos;
+        final $18 = _predicate;
+        final $19 = $1;
+        _predicate = true;
         $1 = false;
-        final $18 = _parse$$EOL(423, false);
+        _parse$$EOL(423, false);
+        _c = $16;
+        _pos = $17;
+        _predicate = $18;
+        $1 = $19;
         _success = !_success;
-        _c = $15;
-        _pos = $16;
-        $1 = $17;
-        var $19;
         if (_success) {
-          int $20;
-          if (_success = _c < _eof) {
-            $20 = _c;
+          if (_c < _eof) {
+            _success = true;
+            $2 = _c;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
-            _failure = _pos;
+            _success = false;
+            if (_failure < _pos) {
+              _failure = _pos;
+            }
           }
-          $11 = $20;
-        }
-        if (!_success) {
-          _c = $4;
-          _pos = $5;
         }
       }
       if (_success) {
-        $3 = $11;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      _c = $4;
-      _pos = $5;
       break;
     }
-    $2 = $3;
     return $2;
   }
 
   dynamic _parse$$SPACE(int $0, bool $1) {
     dynamic $2;
-    dynamic $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      int $6;
-      int $7;
-      if (_success = _c == 9 || _c == 32) {
-        $7 = _c;
-        _c = _input[++_pos];
+      if (_c == 9 || _c == 32) {
+        _success = true;
+        $2 = _c;
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
       } else {
-        _failure = _pos;
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
       }
-      $6 = $7;
       if (_success) {
-        $3 = $6;
         break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
-      dynamic $8;
-      final $9 = _parse$$EOL(429, false);
-      $8 = $9;
+      $2 = _parse$$EOL(429, false);
       if (_success) {
-        $3 = $8;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    $2 = $3;
     return $2;
   }
 
   List _parse$$SPACING(int $0, bool $1) {
     List $2;
-    List $3;
     final $4 = _c;
     final $5 = _pos;
-    List $6;
-    List $7;
     for (;;) {
-      dynamic $8;
       final $9 = _c;
       final $10 = _pos;
       for (;;) {
-        dynamic $11;
-        final $12 = _parse$$SPACE(435, false);
-        $11 = $12;
+        _parse$$SPACE(435, false);
         if (_success) {
-          $8 = $11;
           break;
+        } else {
+          _c = $9;
+          _pos = $10;
         }
-        String $13;
-        final $14 = _parse$$COMMENT(437, false);
-        $13 = $14;
+        _parse$$COMMENT(437, false);
         if (_success) {
-          $8 = $13;
-          break;
+        } else {
+          _c = $9;
+          _pos = $10;
         }
         break;
       }
       if (!_success) {
-        _success = true;
         break;
       }
     }
-    $6 = $7;
-    $3 = $6;
-    $2 = $3;
+    _success = true;
+    if (!_success) {
+      _c = $4;
+      _pos = $5;
+    }
     return $2;
   }
 
   int _parse$$TERMINAL_CHAR(int $0, bool $1) {
     int $2;
-    int $3;
     final $4 = _c;
     final $5 = _pos;
     for (;;) {
-      int $6;
-      String $7;
-      if (_success = _c == 47) {
-        $7 = _matchString('//');
+      if (_c == 47) {
+        _success = true;
+        _matchString('//');
       } else {
-        _failure = _pos;
-      }
-      if (_success) {
-        int $8;
-        if (_success = _c == 39) {
-          $8 = _c;
-          _c = _input[++_pos];
-        } else {
+        _success = false;
+        if (_failure < _pos) {
           _failure = _pos;
         }
-        $6 = $8;
       }
       if (_success) {
-        $3 = $6;
-        break;
+        if (_c == 39) {
+          _success = true;
+          $2 = _c;
+          _c = _input[_pos += _c <= 65535 ? 1 : 2];
+        } else {
+          _success = false;
+          if (_failure < _pos) {
+            _failure = _pos;
+          }
+        }
       }
-      _c = $4;
-      _pos = $5;
-      int $9;
-      int $10;
-      if (_success = _c >= 32 && _c <= 38 || _c >= 40 && _c <= 126) {
-        $10 = _c;
-        _c = _input[++_pos];
+      if (_success) {
+        break;
       } else {
-        _failure = _pos;
+        _c = $4;
+        _pos = $5;
       }
-      $9 = $10;
+      if (_c >= 32 && _c <= 38 || _c >= 40 && _c <= 126) {
+        _success = true;
+        $2 = _c;
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
+      } else {
+        _success = false;
+        if (_failure < _pos) {
+          _failure = _pos;
+        }
+      }
       if (_success) {
-        $3 = $9;
-        break;
+      } else {
+        _c = $4;
+        _pos = $5;
       }
       break;
     }
-    $2 = $3;
     return $2;
   }
 }

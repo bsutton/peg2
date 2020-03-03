@@ -9,7 +9,7 @@
             "args": [
                 //"--inline-all",
                 //"--memoize",
-                "--no-optimize-code",
+                //"--no-optimize-code",
                 "bin/peg2.peg"
             ]
         },

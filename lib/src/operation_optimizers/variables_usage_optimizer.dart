@@ -58,9 +58,83 @@ class VariableUsageOptimizer with OperationUtils {
         continue;
       }
 
+      print(right.getMethod().name);
+      if (leftVariable.name == '\$7' &&
+          right.getMethod().name == '_parse_semantic_value') {
+        var x = 0;
+      }
+
       final rightDeclaration = rightVariable.declaration;
       final rightDeclarationParent = rightDeclaration.parent;
-      if (_isVariableUsedInOperation(rightDeclarationParent, leftVariable)) {
+      final variableUsageCollector = _VariableUsageCollector();
+      final leftUsage =
+          variableUsageCollector.collect(rightDeclarationParent, leftVariable);
+      if (leftUsage.isNotEmpty && leftUsage.first != current) {
+        usedBelow.add(rightVariable);
+        continue;
+      }
+
+      var leftVariableHasFoo = false;
+      for (final operation in leftUsage) {
+        if (leftVariableHasFoo) {
+          break;
+        }
+
+        var parent = operation.parent;
+        while (true) {
+          if (parent == null) {
+            break;
+          }
+
+          if (parent == rightDeclarationParent) {
+            break;
+          }
+
+          if (parent is ConditionalOperation || parent is LoopOperation) {
+            final stat = _stats.getStat(parent);
+            final writeCount = stat.getWriteCount(rightVariable);
+            if (writeCount != 0) {
+              leftVariableHasFoo = true;
+              break;
+            }
+          }
+
+          parent = parent.parent;
+        }
+      }
+
+      final rightUsage =
+          variableUsageCollector.collect(rightDeclarationParent, rightVariable);
+      var rightVariableHasManyValues = false;
+      for (final operation in rightUsage) {
+        if (rightVariableHasManyValues) {
+          break;
+        }
+
+        var parent = operation.parent;
+        while (true) {
+          if (parent == null) {
+            break;
+          }
+
+          if (parent == rightDeclarationParent) {
+            break;
+          }
+
+          if (parent is ConditionalOperation || parent is LoopOperation) {
+            final stat = _stats.getStat(parent);
+            final writeCount = stat.getWriteCount(rightVariable);
+            if (writeCount != 0) {
+              rightVariableHasManyValues = true;
+              break;
+            }
+          }
+
+          parent = parent.parent;
+        }
+      }
+
+      if (rightVariableHasManyValues) {
         usedBelow.add(rightVariable);
         continue;
       }
@@ -76,11 +150,20 @@ class VariableUsageOptimizer with OperationUtils {
     }
   }
 
-  bool _isVariableUsedInOperation(Operation operation, Variable variable) {
+  bool _isVariableUsedInOperation(
+      Operation operation, Variable variable, bool read, bool write) {
     final stat = _stats.getStat(operation);
     final readCount = stat.getReadCount(variable);
     final writeCount = stat.getWriteCount(variable);
-    return readCount != 0 && writeCount != 0;
+    if (read && readCount != 0) {
+      return true;
+    }
+
+    if (write && writeCount != 0) {
+      return true;
+    }
+
+    return false;
   }
 
   void _replaceParameter(ParameterOperation parameter, Variable variable) {
@@ -119,6 +202,26 @@ class _VariableReplacer extends SimpleOperationVisitor {
   void visitVariable(VariableOperation node) {
     if (node.variable == _from) {
       node.variable = _to;
+    }
+  }
+}
+
+class _VariableUsageCollector extends SimpleOperationVisitor {
+  List<Operation> _result;
+
+  Variable _variable;
+
+  List<Operation> collect(Operation operation, Variable variable) {
+    _result = [];
+    _variable = variable;
+    operation.accept(this);
+    return _result;
+  }
+
+  @override
+  void visitVariable(VariableOperation node) {
+    if (node.variable == _variable) {
+      _result.add(node.parent);
     }
   }
 }

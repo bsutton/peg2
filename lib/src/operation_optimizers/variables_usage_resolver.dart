@@ -21,6 +21,7 @@ class VariablesUsageResolver extends SimpleOperationVisitor
           final variable = left.variable;
           final stat = _stats.getStat(node);
           stat.addReadCount(variable, -1);
+          stat.addWriteCount(variable, 1);
         }
 
         break;
