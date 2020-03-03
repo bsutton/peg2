@@ -12,11 +12,10 @@ find bug with "break"
 does not generate unused global parser methods
 make some classes private?
 add command line option "optimize-size"
-add resolver of unused rules
 use bit masks in fast check in predict?
 optimize internal check if repetitions cannot be non productive (ro reduce generated code)
 inplement malformed terminals reporting
 add support of memoization of inlining rules
 rework isProductive from `bool` to { always, never, sometimes }
 add parenthesis to unary operator printer
-code optimization fails in `parse_semantic_value`
+improve variable usage optimizer

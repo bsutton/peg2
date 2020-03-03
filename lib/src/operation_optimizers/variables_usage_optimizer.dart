@@ -5,14 +5,15 @@ class VariableUsageOptimizer with OperationUtils {
 
   void optimize(BlockOperation operation, VariablesStats stats) {
     _stats = stats;
-    final usedBelow = <Variable>{};
+    final used = <Variable>{};
     final operations = operation.operations;
     for (var i = operations.length - 1; i >= 0; i--) {
       final current = operations[i];
       final binary = getOp<BinaryOperation>(current);
-      if (binary == null || binary.kind != OperationKind.assign) {
+      if (binary == null ||
+          !(binary.kind == OperationKind.assign ||
+              binary.kind == OperationKind.addAssign)) {
         final stat = _stats.getStat(current);
-        usedBelow.addAll(stat.readings.keys);
         switch (current.kind) {
           case OperationKind.block:
             final op = getOp<BlockOperation>(current);
@@ -31,6 +32,7 @@ class VariableUsageOptimizer with OperationUtils {
             optimize(op.body, _stats);
             break;
           default:
+            used.addAll(stat.readings.keys);
         }
 
         continue;
@@ -38,45 +40,59 @@ class VariableUsageOptimizer with OperationUtils {
 
       final left = getOp<VariableOperation>(binary.left);
       final right = getOp<VariableOperation>(binary.right);
-      if (left == null || right == null) {
-        final stat = _stats.getStat(current);
-        usedBelow.addAll(stat.readings.keys);
+      final stat = _stats.getStat(current);
+      if (!_canOptimize(left, right, used)) {
+        used.addAll(stat.readings.keys);
         continue;
       }
 
       final leftVariable = left.variable;
       final rightVariable = right.variable;
-      if (usedBelow.contains(rightVariable)) {
-        continue;
-      }
 
-      if (rightVariable.frozen) {
+      final leftDeclaration = leftVariable.declaration;
+      final leftDeclarationParent = leftDeclaration.parent;
+      if (leftDeclarationParent != current.parent) {
+        used.addAll(stat.readings.keys);
         continue;
-      }
-
-      if (leftVariable.frozen) {
-        continue;
-      }
-
-      print(right.getMethod().name);
-      if (leftVariable.name == '\$7' &&
-          right.getMethod().name == '_parse_semantic_value') {
-        var x = 0;
       }
 
       final rightDeclaration = rightVariable.declaration;
       final rightDeclarationParent = rightDeclaration.parent;
-      final variableUsageCollector = _VariableUsageCollector();
-      final leftUsage =
-          variableUsageCollector.collect(rightDeclarationParent, leftVariable);
-      if (leftUsage.isNotEmpty && leftUsage.first != current) {
-        usedBelow.add(rightVariable);
+      final operationInsideOperationFinder = _OperationInsideOperationFinder();
+      Operation lowerDeclarationParent;
+      if (leftDeclarationParent == rightDeclarationParent) {
+        lowerDeclarationParent = rightDeclarationParent;
+      } else {
+        while (true) {
+          var found = operationInsideOperationFinder.find(
+              leftDeclarationParent, rightDeclarationParent);
+          if (found) {
+            lowerDeclarationParent = rightDeclarationParent;
+            break;
+          }
+
+          found = operationInsideOperationFinder.find(
+              rightDeclarationParent, leftDeclarationParent);
+          if (found) {
+            lowerDeclarationParent = leftDeclarationParent;
+          }
+
+          break;
+        }
+      }
+
+      if (lowerDeclarationParent == null ||
+          lowerDeclarationParent != rightDeclarationParent) {
+        used.addAll(stat.readings.keys);
         continue;
       }
 
-      var leftVariableHasFoo = false;
-      for (final operation in leftUsage) {
-        if (leftVariableHasFoo) {
+      final variableUsageCollector = _VariableUsageCollector();
+      final rightOperationsUsage =
+          variableUsageCollector.collect(lowerDeclarationParent, rightVariable);
+      var rightVariableAssignedInConditionals = false;
+      for (final operation in rightOperationsUsage) {
+        if (rightVariableAssignedInConditionals) {
           break;
         }
 
@@ -94,7 +110,7 @@ class VariableUsageOptimizer with OperationUtils {
             final stat = _stats.getStat(parent);
             final writeCount = stat.getWriteCount(rightVariable);
             if (writeCount != 0) {
-              leftVariableHasFoo = true;
+              rightVariableAssignedInConditionals = true;
               break;
             }
           }
@@ -103,87 +119,91 @@ class VariableUsageOptimizer with OperationUtils {
         }
       }
 
-      final rightUsage =
-          variableUsageCollector.collect(rightDeclarationParent, rightVariable);
-      var rightVariableHasManyValues = false;
-      for (final operation in rightUsage) {
-        if (rightVariableHasManyValues) {
-          break;
-        }
-
-        var parent = operation.parent;
-        while (true) {
-          if (parent == null) {
-            break;
-          }
-
-          if (parent == rightDeclarationParent) {
-            break;
-          }
-
-          if (parent is ConditionalOperation || parent is LoopOperation) {
-            final stat = _stats.getStat(parent);
-            final writeCount = stat.getWriteCount(rightVariable);
-            if (writeCount != 0) {
-              rightVariableHasManyValues = true;
-              break;
-            }
-          }
-
-          parent = parent.parent;
-        }
-      }
-
-      if (rightVariableHasManyValues) {
-        usedBelow.add(rightVariable);
+      if (rightVariableAssignedInConditionals) {
+        used.add(rightVariable);
         continue;
       }
 
       final variableReplacer = _VariableReplacer();
       variableReplacer.replace(
-          rightDeclarationParent, rightVariable, leftVariable);
-      _replaceParameter(rightDeclaration, leftVariable);
+          lowerDeclarationParent, rightVariable, leftVariable);
+      _replaceParameter(rightDeclaration, leftVariable, stats);
       _replaceAssign(
-          binary, NopOperation('${leftVariable} = ${rightVariable}'));
-      final variableUsageResolver = VariablesUsageResolver();
-      variableUsageResolver.resolve(rightDeclarationParent, _stats);
+          binary, NopOperation('${leftVariable} = ${rightVariable}'), stats);
+      _analizeUsage(lowerDeclarationParent, stats);
     }
   }
 
-  bool _isVariableUsedInOperation(
-      Operation operation, Variable variable, bool read, bool write) {
-    final stat = _stats.getStat(operation);
-    final readCount = stat.getReadCount(variable);
-    final writeCount = stat.getWriteCount(variable);
-    if (read && readCount != 0) {
-      return true;
-    }
-
-    if (write && writeCount != 0) {
-      return true;
-    }
-
-    return false;
+  void _analizeUsage(Operation operation, VariablesStats stats) {
+    final variablesUsageResolver = VariablesUsageResolver();
+    variablesUsageResolver.resolve(operation, stats);
   }
 
-  void _replaceParameter(ParameterOperation parameter, Variable variable) {
+  bool _canOptimize(
+      VariableOperation left, VariableOperation right, Set<Variable> used) {
+    if (left == null || right == null) {
+      return false;
+    }
+
+    final leftVariable = left.variable;
+    final rightVariable = right.variable;
+    if (used.contains(rightVariable)) {
+      return false;
+    }
+
+    if (rightVariable.frozen) {
+      return false;
+    }
+
+    if (leftVariable.frozen) {
+      return false;
+    }
+
+    return true;
+  }
+
+  void _replaceAssign(
+      BinaryOperation from, Operation to, VariablesStats stats) {
+    _replaceOperation(from, to, stats);
+  }
+
+  void _replaceOperation(Operation from, Operation to, VariablesStats stats) {
+    final operationReplacer = OperationReplacer();
+    operationReplacer.replace(from, to, stats);
+  }
+
+  void _replaceParameter(
+      ParameterOperation parameter, Variable variable, VariablesStats stats) {
     final operation = parameter.operation;
     if (operation == null) {
-      _replaceOperation(
-          parameter, NopOperation('${parameter.type} ${parameter.variable}'));
+      _replaceOperation(parameter,
+          NopOperation('${parameter.type} ${parameter.variable}'), stats);
     } else {
       final assign = binOp(OperationKind.assign, varOp(variable), operation);
-      _replaceOperation(parameter, assign);
+      _replaceOperation(parameter, assign, stats);
     }
   }
+}
 
-  void _replaceAssign(BinaryOperation from, Operation to) {
-    _replaceOperation(from, to);
+class _OperationInsideOperationFinder extends SimpleOperationVisitor {
+  bool _found;
+
+  Operation _what;
+
+  bool find(Operation where, Operation what) {
+    _found = false;
+    _what = what;
+    where.accept(this);
+    return _found;
   }
 
-  void _replaceOperation(Operation from, Operation to) {
-    final operationReplacer = OperationReplacer();
-    operationReplacer.replace(from, to);
+  @override
+  void visit(Operation node) {
+    if (node == _what) {
+      _found = true;
+    } else {
+      super.visit(node);
+    }
   }
 }
 

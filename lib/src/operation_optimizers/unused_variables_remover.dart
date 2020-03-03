@@ -2,22 +2,29 @@ part of '../../operation_optimizers.dart';
 
 class UnusedVariablesRemover extends SimpleOperationVisitor
     with OperationUtils {
+  bool _hasModifications;
+
   List<ParameterOperation> _paramaters;
 
   VariablesStats _stats;
 
   void remove(Operation operation, VariablesStats stats) {
-    _paramaters = [];
     _stats = stats;
-    operation.accept(this);
-    for (final paramater in _paramaters) {
-      _replaceParameter(paramater);
+    _hasModifications = true;
+    while (_hasModifications) {
+      _hasModifications = false;
+      _paramaters = [];
+      operation.accept(this);
+      for (final paramater in _paramaters) {
+        _replaceParameter(paramater, stats);
+      }
     }
   }
 
   @override
   void visitBinary(BinaryOperation node) {
-    if (node.kind != OperationKind.assign) {
+    if (!(node.kind == OperationKind.assign ||
+        node.kind == OperationKind.addAssign)) {
       return;
     }
 
@@ -46,30 +53,11 @@ class UnusedVariablesRemover extends SimpleOperationVisitor
       case OperationKind.constant:
       case OperationKind.list:
       case OperationKind.variable:
-        _replaceOperation(node, NopOperation());
+        _replaceOperation(node, NopOperation(), _stats);
         break;
       default:
-        _replaceOperation(node, right);
+        _replaceOperation(node, right, _stats);
         break;
-    }
-  }
-
-  void _replaceParameter(ParameterOperation node) {
-    final operationReplacer = OperationReplacer();
-    final operation = node.operation;
-    if (operation == null) {
-      operationReplacer.replace(node, NopOperation());
-    } else {
-      switch (operation.kind) {
-        case OperationKind.constant:
-        case OperationKind.list:
-        case OperationKind.variable:
-          _replaceOperation(node, NopOperation());
-          break;
-        default:
-          operationReplacer.replace(node, node.operation);
-          break;
-      }
     }
   }
 
@@ -91,8 +79,29 @@ class UnusedVariablesRemover extends SimpleOperationVisitor
     }
   }
 
-  void _replaceOperation(Operation from, Operation to) {
+  void _replaceOperation(Operation from, Operation to, VariablesStats stats) {
+    _hasModifications = true;
     final operationReplacer = OperationReplacer();
-    operationReplacer.replace(from, to);
+    operationReplacer.replace(from, to, stats);
+  }
+
+  void _replaceParameter(ParameterOperation node, VariablesStats stats) {
+    _hasModifications = true;
+    final operationReplacer = OperationReplacer();
+    final operation = node.operation;
+    if (operation == null) {
+      operationReplacer.replace(node, NopOperation(), stats);
+    } else {
+      switch (operation.kind) {
+        case OperationKind.constant:
+        case OperationKind.list:
+        case OperationKind.variable:
+          _replaceOperation(node, NopOperation(), _stats);
+          break;
+        default:
+          operationReplacer.replace(node, node.operation, stats);
+          break;
+      }
+    }
   }
 }

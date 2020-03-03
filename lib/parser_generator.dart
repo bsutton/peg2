@@ -16,4 +16,3 @@ part 'src/parser_generator/parser_generator_options.dart';
 part 'src/parser_generator/parser_library_generator.dart';
 part 'src/parser_generator/production_rules_generator.dart';
 part 'src/parser_generator/production_rules_generator_context.dart';
-

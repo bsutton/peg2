@@ -5,72 +5,39 @@ class OperationReplacer extends SimpleOperationVisitor {
 
   Operation _to;
 
-  void replace(Operation from, Operation to) {
+  void replace(Operation from, Operation to, VariablesStats stats) {
     _from = from;
     _to = to;
+    VariablesStat stat;
+    if (stats != null) {
+      stat = stats.getStat(from);
+    }
+
     final parent = from.parent;
     parent.accept(this);
     final operationInitializer = OperationInitializer();
     operationInitializer.initialize(to);
+    if (stats != null) {
+      final parentStat = stats.getStat(parent);
+      final readings = stat.readings;
+      for (final key in readings.keys) {
+        final count = readings[key];
+        parentStat.addReadCount(key, -count);
+      }
+
+      final writings = stat.writings;
+      for (final key in writings.keys) {
+        final count = writings[key];
+        parentStat.addWriteCount(key, -count);
+      }
+
+      final variablesUsageResolver = VariablesUsageResolver();
+      variablesUsageResolver.resolve(to, stats);
+    }
   }
 
   @override
   void visit(Operation node) {
-    throw StateError('Replacement not supported');
-  }
-
-  @override
-  void visitAction(ActionOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitBinary(BinaryOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitBlock(BlockOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitCall(CallOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitList(ListOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitListAccess(ListAccessOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitMemberAccess(MemberAccessOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitParameter(ParameterOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitReturn(ReturnOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitTernary(TernaryOperation node) {
-    _replace(node);
-  }
-
-  @override
-  void visitUnary(UnaryOperation node) {
     _replace(node);
   }
 

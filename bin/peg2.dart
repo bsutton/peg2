@@ -113,7 +113,7 @@ void main(List<String> args) {
   } else {
     parserGenerator = GeneralParserGenerator(grammar, options);
   }
-  
+
   final parserCode = parserGenerator.generate();
   if (parserCode == null) {
     print('Parser generation error');

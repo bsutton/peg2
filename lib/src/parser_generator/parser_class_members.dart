@@ -31,7 +31,7 @@ abstract class ParserClassMembers {
 
   final mresult = Variable('_mresult', true);
 
-  final pos = Variable('_pos', true);  
+  final pos = Variable('_pos', true);
 
   final success = Variable('_success', true);
 

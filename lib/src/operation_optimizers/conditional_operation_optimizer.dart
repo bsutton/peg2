@@ -148,7 +148,7 @@ class ConditionalOperationOptimizer with OperationUtils {
 
   bool _isEqualVariables(Operation op1, Operation op2) {
     final variable1 = getOp<VariableOperation>(op1);
-    final variable2 = getOp<VariableOperation>(op1);
+    final variable2 = getOp<VariableOperation>(op2);
     if (variable1 != null && variable2 != null) {
       return variable1.variable == variable2.variable;
     }

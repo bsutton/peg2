@@ -4,6 +4,9 @@
 - Reworked the production rule methods generator, improved reuse of initial variables in expressions
 - Minor improvements of code generators, now generated code is even cleaner ans shorter
 - Small changes in the algorithm of the generated expressions
+- Fixed bugs in `VariableUsageOptimizer`
+- Improved `UnusedVariablesRemover`
+- Fixed bugs in `GeneralProductionRulesGenerator.visitSequence()`
 
 ## 0.1.20
 

@@ -435,6 +435,7 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
     context.result = result;
     void Function(BlockOperation) onSuccess;
     final results = <Expression, Variable>{};
+    final isLastChildOptional = expressions.last.isOptional;
     void plunge(BlockOperation b, int index) {
       if (index > expressions.length - 1) {
         return;
@@ -463,15 +464,6 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
             plunge(b, index + 1);
           });
         }
-
-        if (index == 1) {
-          addIfNotVar(b, _m.success, (b) {
-            final c = context.getVariable(_m.c);
-            final pos = context.getVariable(_m.pos);
-            addAssign(b, varOp(_m.c), varOp(c));
-            addAssign(b, varOp(_m.pos), varOp(pos));
-          });
-        }
       } else {
         if (hasAction) {
           addIfVar(b, _m.success, (b) {
@@ -479,18 +471,25 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
           });
         } else {
           if (variables.isEmpty) {
-            final variable = results.values.first;
-            addAssign(b, varOp(result), varOp(variable));
+            onSuccess = (b) {
+              final variable = results.values.first;
+              addAssign(b, varOp(result), varOp(variable));
+            };
           } else if (variables.length == 1) {
-            final expression = variables.keys.first;
-            final variable = results[expression];
-            addAssign(b, varOp(result), varOp(variable));
+            onSuccess = (b) {
+              final expression = variables.keys.first;
+              final variable = results[expression];
+              addAssign(b, varOp(result), varOp(variable));
+            };
           } else {
             if (node.isProductive) {
-              addIfVar(b, _m.success, (b) {
-                final list = listOp(null, variables.values.map(varOp).toList());
-                addAssign(b, varOp(result), list);
-              });
+              onSuccess = (b) {
+                addIfVar(b, _m.success, (b) {
+                  final list =
+                      listOp(null, variables.values.map(varOp).toList());
+                  addAssign(b, varOp(result), list);
+                });
+              };
             } else {
               //addAssign(b, varOp(result), null);
             }
@@ -498,8 +497,21 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
         }
 
         if (onSuccess != null) {
-          addIfVar(b, _m.success, onSuccess);
+          if (isLastChildOptional) {
+            onSuccess(b);
+          } else {
+            addIfVar(b, _m.success, onSuccess);
+          }
         }
+      }
+
+      if (index == 1) {
+        addIfNotVar(b, _m.success, (b) {
+          final c = context.getVariable(_m.c);
+          final pos = context.getVariable(_m.pos);
+          addAssign(b, varOp(_m.c), varOp(c));
+          addAssign(b, varOp(_m.pos), varOp(pos));
+        });
       }
     }
 
