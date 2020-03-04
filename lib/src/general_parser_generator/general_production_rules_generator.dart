@@ -22,7 +22,8 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
     final rules = grammar.rules;
     for (final rule in rules) {
       var skip = false;
-      if (rule.directCallers.length == 1) {
+      final inline = _canInline(rule);
+      if (inline) {
         switch (rule.kind) {
           case ProductionRuleKind.nonterminal:
             if (options.inlineNonterminals) {
@@ -217,7 +218,7 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
   @override
   void visitNonterminal(NonterminalExpression node) {
     final rule = node.expression.rule;
-    final inline = options.inlineNonterminals && rule.directCallers.length == 1;
+    final inline = options.inlineNonterminals && _canInline(rule);
     _visitSymbol(node, inline);
   }
 
@@ -521,14 +522,14 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
   @override
   void visitSubterminal(SubterminalExpression node) {
     final rule = node.expression.rule;
-    final inline = options.inlineSubterminals && rule.directCallers.length == 1;
+    final inline = options.inlineSubterminals && _canInline(rule);
     _visitSymbol(node, inline);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
     final rule = node.expression.rule;
-    final inline = options.inlineNonterminals && rule.directCallers.length == 1;
+    final inline = options.inlineNonterminals && _canInline(rule);
     _visitSymbol(node, inline);
   }
 
@@ -622,6 +623,18 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
     final action = ActionOperation(variables.values.map(varOp).toList(), code);
     b.operations.add(action);
     addAssign(b, varOp(result), varOp($$));
+  }
+
+  bool _canInline(ProductionRule rule) {
+    return rule.directCallers.length == 1;
+    /*
+    // Max inline
+    final callers = rule.allCallers.map((e) => e.rule.expression).toList();
+      var inline = !callers.contains(rule.expression);
+      if (!inline) {
+        var x = 0;
+      }
+    */
   }
 
   MethodOperation _generateRule(ProductionRule rule) {
