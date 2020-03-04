@@ -21,7 +21,8 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
   void visitAndPredicate(AndPredicateExpression node) {
     final child = node.expression;
     child.accept(this);
-    _addAllCharacters(node);
+    _addCharacters(node, child.startCharacters);
+    _setCanMatchEof(node, child.canMacthEof);
   }
 
   @override
@@ -34,17 +35,12 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final child = node.expression;
     child.accept(this);
     _addCharacters(node, child.startCharacters);
+    _setCanMatchEof(node, child.canMacthEof);
   }
 
   @override
   void visitCharacterClass(CharacterClassExpression node) {
-    final characters = SparseBoolList();
-    for (final range in node.ranges) {
-      final group = GroupedRangeList<bool>(range[0], range[1], true);
-      characters.addGroup(group);
-    }
-
-    _addCharacters(node, characters);
+    _addCharacters(node, node.ranges);
   }
 
   @override
@@ -78,6 +74,7 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final rule = node.expression.rule;
     final child = rule.expression;
     _addCharacters(node, child.startCharacters);
+    _setCanMatchEof(node, child.canMacthEof);
   }
 
   @override
@@ -85,6 +82,7 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final child = node.expression;
     child.accept(this);
     _addAllCharacters(node);
+    _setCanMatchEof(node, true);
   }
 
   @override
@@ -92,13 +90,15 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final child = node.expression;
     child.accept(this);
     _addCharacters(node, child.startCharacters);
+    _setCanMatchEof(node, child.canMacthEof);
   }
 
   @override
   void visitOptional(OptionalExpression node) {
     final child = node.expression;
     child.accept(this);
-    _addCharacters(node, child.startCharacters);
+    _addAllCharacters(node);
+    _setCanMatchEof(node, true);
   }
 
   @override
@@ -109,6 +109,7 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
       final child = expressions[i];
       child.accept(this);
       _addCharacters(node, child.startCharacters);
+      _setCanMatchEof(node, child.canMacthEof);
     }
   }
 
@@ -116,17 +117,21 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
   void visitSequence(SequenceExpression node) {
     final expressions = node.expressions;
     final length = expressions.length;
-    var skip = false;
+    Expression firstNotOptional;
     for (var i = 0; i < length; i++) {
       final child = expressions[i];
       child.accept(this);
-      if (!skip) {
-        _addCharacters(node, child.startCharacters);
+      if (!child.isOptional && firstNotOptional == null) {
+        firstNotOptional = child;
       }
+    }
 
-      if (!child.isOptional) {
-        skip = true;
-      }
+    if (firstNotOptional != null) {
+      _addCharacters(node, firstNotOptional.startCharacters);
+      _setCanMatchEof(node, firstNotOptional.canMacthEof);
+    } else {
+      _addAllCharacters(node);
+      _setCanMatchEof(node, true);
     }
   }
 
@@ -135,6 +140,7 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final rule = node.expression.rule;
     final child = rule.expression;
     _addCharacters(node, child.startCharacters);
+    _setCanMatchEof(node, child.canMacthEof);
   }
 
   @override
@@ -142,13 +148,15 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final rule = node.expression.rule;
     final child = rule.expression;
     _addCharacters(node, child.startCharacters);
+    _setCanMatchEof(node, child.canMacthEof);
   }
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
     final child = node.expression;
     child.accept(this);
-    _addCharacters(node, child.startCharacters);
+    _addAllCharacters(node);
+    _setCanMatchEof(node, true);
   }
 
   void _addAllCharacters(Expression node) {
@@ -176,6 +184,15 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
       }
 
       _hasModifications = true;
+    }
+  }
+
+  void _setCanMatchEof(Expression node, bool canMatchEof) {
+    if (canMatchEof) {
+      if (node.canMacthEof != canMatchEof) {
+        node.canMacthEof = canMatchEof;
+        _hasModifications = true;
+      }
     }
   }
 }

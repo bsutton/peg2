@@ -1,6 +1,8 @@
 part of '../../expressions.dart';
 
 abstract class Expression {
+  bool canMacthEof = false;
+
   int id;
 
   int index;

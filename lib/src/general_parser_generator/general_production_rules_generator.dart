@@ -1,20 +1,16 @@
 part of '../../general_parser_generator.dart';
 
-class GeneralProductionRulesGenerator extends ProductionRulesGenerator
-    with ExpressionVisitor, OperationUtils {
-  static const _paramCallerId = 'param_callerId';
+class GeneralProductionRulesGenerator
+    extends ExpressionsToOperationsGenerator<GeneralParserClassMembers>
+    with ExpressionVisitor, OperationUtils, ProductionRulesGenerator {
+  final Grammar grammar;
 
-  static const _paramProductive = 'param_productive';
-
-  final _m = GeneralParserClassMembers();
+  final ParserGeneratorOptions options;
 
   bool _isProductive;
 
-  VariableAllocator _va;
-
-  GeneralProductionRulesGenerator(
-      Grammar grammar, ParserGeneratorOptions options)
-      : super(grammar, options);
+  GeneralProductionRulesGenerator(this.grammar, this.options)
+      : super(GeneralParserClassMembers());
 
   @override
   void generate(
@@ -54,247 +50,11 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
     }
   }
 
-  VariableAllocator newVarAlloc() {
-    var lastVariableId = 0;
-    final result = VariableAllocator(() {
-      final name = '\$${lastVariableId++}';
-      return name;
-    });
-
-    return result;
-  }
-
-  @override
-  void visitAndPredicate(AndPredicateExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final productive = context.getArgument(_paramProductive);
-    context.saveVariable(b, _va, _m.c);
-    context.saveVariable(b, _va, _m.pos);
-    context.saveVariable(b, _va, productive);
-    addAssign(b, varOp(productive), constOp(false));
-    final child = node.expression;
-    _visitChild(child, b, context, [_m.c, _m.pos]);
-    context.restoreVariables(b);
-    context.result = _va.newVar(b, 'final', null);
-  }
-
-  @override
-  void visitAnyCharacter(AnyCharacterExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final result = _va.newVar(b, 'int', null);
-    context.result = result;
-    final test = ltOp(varOp(_m.c), varOp(_m.eof));
-    void generate(BlockOperation b) {
-      addAssign(b, varOp(result), varOp(_m.c));
-      final testC = lteOp(varOp(_m.c), constOp(0xffff));
-      final ternary = ternaryOp(testC, constOp(1), constOp(2));
-      final assignPos = addAssignOp(varOp(_m.pos), ternary);
-      final listAcc = listAccOp(varOp(_m.input), assignPos);
-      addAssign(b, varOp(_m.c), listAcc);
-    }
-
-    _generateTestRangesByTest(b, test, generate);
-  }
-
-  @override
-  void visitCapture(CaptureExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final result = _va.newVar(b, 'String', null);
-    context.result = result;
-    final start = context.addVariable(b, _va, _m.pos);
-    final productive = context.getArgument(_paramProductive);
-    context.saveVariable(b, _va, productive);
-    addAssign(b, varOp(productive), constOp(false));
-    final child = node.expression;
-    _visitChild(child, b, context);
-    addIfVar(b, _m.success, (b) {
-      final substring = Variable('substring');
-      final callSubstring = mbrCallOp(
-          varOp(_m.text), varOp(substring), [varOp(start), varOp(_m.pos)]);
-      addAssign(b, varOp(result), callSubstring);
-    });
-
-    context.restoreVariables(b);
-  }
-
-  @override
-  void visitCharacterClass(CharacterClassExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final ranges = <int>[];
-    for (final range in node.ranges) {
-      ranges.addAll(range);
-    }
-
-    Variable result;
-    if (ranges.length <= 20) {
-      var hasLongChars = false;
-      for (var i = 0; i < ranges.length; i += 2) {
-        if (ranges[i] > 0xffff || ranges[i + 1] > 0xffff) {
-          hasLongChars = true;
-        }
-      }
-
-      result = _va.newVar(b, 'int', null);
-
-      void generate(BlockOperation b) {
-        addAssign(b, varOp(result), varOp(_m.c));
-        Operation assignPos;
-        if (hasLongChars) {
-          final testC = lteOp(varOp(_m.c), constOp(0xffff));
-          final ternary = ternaryOp(testC, constOp(1), constOp(2));
-          assignPos = addAssignOp(varOp(_m.pos), ternary);
-        } else {
-          assignPos = preIncOp(varOp(_m.pos));
-        }
-
-        final listAcc = listAccOp(varOp(_m.input), assignPos);
-        addAssign(b, varOp(_m.c), listAcc);
-      }
-
-      _generateTestRangesByRanges(b, ranges, generate);
-    } else {
-      final elements = <ConstantOperation>[];
-      for (var i = 0; i < ranges.length; i += 2) {
-        elements.add(constOp(ranges[i]));
-        elements.add(constOp(ranges[i + 1]));
-      }
-
-      final list = listOp(null, elements);
-      final chars = _va.newVar(b, 'const', list);
-      final matchRanges = callOp(varOp(_m.matchRanges), [varOp(chars)]);
-      result = _va.newVar(b, 'final', matchRanges);
-    }
-
-    context.result = result;
-  }
-
-  @override
-  void visitLiteral(LiteralExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final text = node.text;
-    final runes = text.runes;
-    Variable result;
-    if (runes.length == 1) {
-      final rune = runes.first;
-      result = _va.newVar(b, 'String', null);
-
-      void generate(BlockOperation b) {
-        addAssign(b, varOp(result), constOp(text));
-        Operation posAssign;
-        if (rune <= 0xffff) {
-          posAssign = preIncOp(varOp(_m.pos));
-        } else {
-          posAssign = addAssignOp(varOp(_m.pos), constOp(2));
-        }
-
-        final listAcc = listAccOp(varOp(_m.input), posAssign);
-        addAssign(b, varOp(_m.c), listAcc);
-      }
-
-      _generateTestRangesByRanges(b, [rune, rune], generate);
-    } else if (runes.length > 1) {
-      final rune = runes.first;
-      result = _va.newVar(b, 'String', null);
-
-      void generate(BlockOperation b) {
-        final matchString = callOp(varOp(_m.matchString), [constOp(text)]);
-        addAssign(b, varOp(result), matchString);
-      }
-
-      _generateTestRangesByRanges(b, [rune, rune], generate);
-    } else {
-      result = _va.newVar(b, 'final', constOp(''));
-      addAssign(b, varOp(_m.success), constOp(true));
-    }
-
-    context.result = result;
-  }
-
   @override
   void visitNonterminal(NonterminalExpression node) {
     final rule = node.expression.rule;
     final inline = options.inlineNonterminals && _canInline(rule);
     _visitSymbol(node, inline);
-  }
-
-  @override
-  void visitNotPredicate(NotPredicateExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final productive = context.getArgument(_paramProductive);
-    context.saveVariable(b, _va, _m.c);
-    context.saveVariable(b, _va, _m.pos);
-    context.saveVariable(b, _va, productive);
-    addAssign(b, varOp(productive), constOp(false));
-    final child = node.expression;
-    _visitChild(child, b, context, [_m.c, _m.pos]);
-    addAssign(b, varOp(_m.success), notOp(varOp(_m.success)));
-    context.restoreVariables(b);
-    context.result = _va.newVar(b, 'var', null);
-  }
-
-  @override
-  void visitOneOrMore(OneOrMoreExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final productive = context.getArgument(_paramProductive);
-    final returnType = node.returnType;
-    final result = _va.newVar(b, returnType, null);
-    context.result = result;
-    if (node.isProductive) {
-      addIfElse(b, varOp(productive), (b) {
-        addAssign(b, varOp(result), listOp(null, []));
-      });
-    } else {
-      // Do nothing
-    }
-
-    final passed = _va.newVar(b, 'var', constOp(false));
-    addLoop(b, (b) {
-      final child = node.expression;
-      final next = _visitChild(child, b, context);
-      addIfNotVar(b, _m.success, (b) {
-        addAssign(b, varOp(_m.success), varOp(passed));
-        addIfNotVar(b, _m.success, (b) {
-          addAssign(b, varOp(result), constOp(null));
-        });
-
-        addBreak(b);
-      });
-
-      if (node.isProductive) {
-        addIfElse(b, varOp(productive), (b) {
-          final add = Variable('add');
-          addMbrCall(b, varOp(result), varOp(add), [varOp(next.result)]);
-        });
-      } else {
-        // Do nothing
-      }
-
-      addAssign(b, varOp(passed), constOp(true));
-    });
-  }
-
-  @override
-  void visitOptional(OptionalExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final child = node.expression;
-    final next = _visitChild(child, b, context);
-    context.result = next.result;
-    var cannotOptimize = true;
-    if (!node.isLast || child.isOptional) {
-      cannotOptimize = false;
-    }
-
-    if (cannotOptimize) {
-      addAssign(b, varOp(_m.success), constOp(true));
-    }
   }
 
   @override
@@ -308,13 +68,13 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
         node.parent == null && rule.kind == ProductionRuleKind.terminal;
     final isTerminal = rule.kind == ProductionRuleKind.terminal;
     final isNonterminal = rule.kind == ProductionRuleKind.nonterminal;
-    final result = _va.newVar(b, returnType, null);
+    final result = va.newVar(b, returnType, null);
     context.result = result;
-    final c = context.addVariable(b, _va, _m.c);
-    final start = context.addVariable(b, _va, _m.pos);
+    final c = context.addVariable(b, va, m.c);
+    final start = context.addVariable(b, va, m.pos);
     Variable failure;
     if (isTerminal) {
-      failure = _va.newVar(b, 'var', varOp(_m.pos));
+      failure = va.newVar(b, 'var', varOp(m.pos));
     }
 
     //final ifNotSuccess = BlockOperation();
@@ -322,29 +82,29 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
       addLoop(b, (b) {
         for (var i = 0; i < expressions.length; i++) {
           final child = expressions[i];
-          final next = _visitChild(child, b, context, [_m.c, _m.pos]);
+          final next = _visitChild(child, b, context, [m.c, m.pos]);
           if (isTerminal) {
-            final test = ltOp(varOp(failure), varOp(_m.failure));
+            final test = ltOp(varOp(failure), varOp(m.failure));
             addIf(b, test, (b) {
-              addAssign(b, varOp(failure), varOp(_m.failure));
+              addAssign(b, varOp(failure), varOp(m.failure));
             });
           }
 
-          addIfVar(b, _m.success, (b) {
+          addIfVar(b, m.success, (b) {
             addAssign(b, varOp(result), varOp(next.result));
             addBreak(b);
           });
 
           if (child.expressions.length > 1) {
-            addAssign(b, varOp(_m.c), varOp(c));
-            addAssign(b, varOp(_m.pos), varOp(start));
+            addAssign(b, varOp(m.c), varOp(c));
+            addAssign(b, varOp(m.pos), varOp(start));
           }
 
           if (i < expressions.length - 1) {
             //
           } else {
             if (isTerminal) {
-              addAssign(b, varOp(_m.failure), varOp(failure));
+              addAssign(b, varOp(m.failure), varOp(failure));
             }
 
             addBreak(b);
@@ -353,7 +113,7 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
       });
     } else {
       final child = expressions[0];
-      final next = _visitChild(child, b, context, [_m.c, _m.pos]);
+      final next = _visitChild(child, b, context, [m.c, m.pos]);
       addAssign(b, varOp(result), varOp(next.result));
     }
 
@@ -362,17 +122,17 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
       final terminals = startTerminals.map((e) => e.name);
       final elements = terminals.map(constOp).toList();
       final list = listOp('const', elements);
-      addCall(b, varOp(_m.fail), [list]);
+      addCall(b, varOp(m.fail), [list]);
     }
 
     if (isTopTerminal) {
-      final testSuccess = notOp(varOp(_m.success));
-      final testError = lteOp(varOp(_m.error), varOp(_m.failure));
+      final testSuccess = notOp(varOp(m.success));
+      final testError = lteOp(varOp(m.error), varOp(m.failure));
       final test = landOp(testSuccess, testError);
       addIf(b, test, fail);
     } else if (isNonterminal) {
-      final testSuccess = notOp(varOp(_m.success));
-      final testError = eqOp(varOp(_m.error), varOp(start));
+      final testSuccess = notOp(varOp(m.success));
+      final testError = eqOp(varOp(m.error), varOp(start));
       final test = landOp(testSuccess, testError);
       addIf(b, test, fail);
     }
@@ -422,17 +182,13 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
 
   @override
   void visitSequence(SequenceExpression node) {
-    if (node.rule.name == "'semantic value'") {
-      var x = 0;
-    }
-
     final context = contexts.last;
     final b = context.block;
     final expressions = node.expressions;
     final hasAction = node.actionIndex != null;
     final variables = <Expression, Variable>{};
     final returnType = node.returnType;
-    final result = _va.newVar(b, returnType, null);
+    final result = va.newVar(b, returnType, null);
     context.result = result;
     void Function(BlockOperation) onSuccess;
     final results = <Expression, Variable>{};
@@ -446,7 +202,7 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
       _isProductive = child.isProductive;
       ProductionRulesGeneratorContext next;
       if (index == 0) {
-        next = _visitChild(child, b, context, [_m.c, _m.pos]);
+        next = _visitChild(child, b, context, [m.c, m.pos]);
       } else {
         next = _visitChild(child, b, context);
       }
@@ -461,13 +217,13 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
         if (child.isOptional) {
           plunge(b, index + 1);
         } else {
-          addIfVar(b, _m.success, (b) {
+          addIfVar(b, m.success, (b) {
             plunge(b, index + 1);
           });
         }
       } else {
         if (hasAction) {
-          addIfVar(b, _m.success, (b) {
+          addIfVar(b, m.success, (b) {
             _buildAction(b, node, result, variables);
           });
         } else {
@@ -485,7 +241,7 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
           } else {
             if (node.isProductive) {
               onSuccess = (b) {
-                addIfVar(b, _m.success, (b) {
+                addIfVar(b, m.success, (b) {
                   final list =
                       listOp(null, variables.values.map(varOp).toList());
                   addAssign(b, varOp(result), list);
@@ -501,17 +257,17 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
           if (isLastChildOptional) {
             onSuccess(b);
           } else {
-            addIfVar(b, _m.success, onSuccess);
+            addIfVar(b, m.success, onSuccess);
           }
         }
       }
 
       if (index == 1) {
-        addIfNotVar(b, _m.success, (b) {
-          final c = context.getVariable(_m.c);
-          final pos = context.getVariable(_m.pos);
-          addAssign(b, varOp(_m.c), varOp(c));
-          addAssign(b, varOp(_m.pos), varOp(pos));
+        addIfNotVar(b, m.success, (b) {
+          final c = context.getVariable(m.c);
+          final pos = context.getVariable(m.pos);
+          addAssign(b, varOp(m.c), varOp(c));
+          addAssign(b, varOp(m.pos), varOp(pos));
         });
       }
     }
@@ -537,9 +293,9 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
   void visitZeroOrMore(ZeroOrMoreExpression node) {
     final context = contexts.last;
     final b = context.block;
-    final productive = context.getArgument(_paramProductive);
+    final productive = context.getArgument(parameterProductive);
     final returnType = node.returnType;
-    final result = _va.newVar(b, returnType, null);
+    final result = va.newVar(b, returnType, null);
     context.result = result;
     if (node.isProductive) {
       addIfElse(b, varOp(productive), (b) {
@@ -552,8 +308,8 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
     addLoop(b, (b) {
       final child = node.expression;
       final next = _visitChild(child, b, context);
-      addIfNotVar(b, _m.success, (b) {
-        addAssign(b, varOp(_m.success), constOp(true));
+      addIfNotVar(b, m.success, (b) {
+        addAssign(b, varOp(m.success), constOp(true));
         addBreak(b);
       });
       if (node.isProductive) {
@@ -638,12 +394,12 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
   }
 
   MethodOperation _generateRule(ProductionRule rule) {
-    _va = newVarAlloc();
+    va = newVarAlloc();
     final body = BlockOperation();
     final context = ProductionRulesGeneratorContext(body);
     final expression = rule.expression;
-    final callerId = context.addArgument(_paramCallerId, _va.alloc(true));
-    final productive = context.addArgument(_paramProductive, _va.alloc(true));
+    final callerId = context.addArgument(parameterCallerId, va.alloc(true));
+    final productive = context.addArgument(parameterProductive, va.alloc(true));
     final id = expression.id;
     final name = _getRuleMethodName(rule);
     final params = <ParameterOperation>[];
@@ -656,27 +412,27 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
     void generate() {
       final b = context.block;
       if (_needMemoize(rule)) {
-        final callerId = context.getArgument(_paramCallerId);
+        final callerId = context.getArgument(parameterCallerId);
         final memoized =
-            callOp(varOp(_m.memoized), [constOp(id), varOp(callerId)]);
+            callOp(varOp(m.memoized), [constOp(id), varOp(callerId)]);
         addIf(b, memoized, (b) {
-          final convert = convertOp(varOp(_m.mresult), returnType);
+          final convert = convertOp(varOp(m.mresult), returnType);
           addReturn(b, convert);
         });
       }
 
-      final result = _va.newVar(b, returnType, null);
+      final result = va.newVar(b, returnType, null);
       context.result = result;
       final next = _visitChild(expression, b, context);
       addAssign(b, varOp(result), varOp(next.result));
       if (options.memoize && rule.directCallers.length > 1) {
         final listAccess =
-            ListAccessOperation(varOp(_m.memoizable), varOp(callerId));
+            ListAccessOperation(varOp(m.memoizable), varOp(callerId));
         final test =
             BinaryOperation(listAccess, OperationKind.equal, constOp(true));
         addIf(b, test, (b) {
           final memoize = callOp(
-              varOp(_m.memoize), [constOp(id), varOp(start), varOp(result)]);
+              varOp(m.memoize), [constOp(id), varOp(start), varOp(result)]);
           addOp(b, memoize);
         });
       }
@@ -687,24 +443,7 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
     generate();
     //final result = addMethod(returnType, name, params, (b) {});
     final result = MethodOperation(returnType, name, params, body);
-
     return result;
-  }
-
-  void _generateTestRangesByRanges(BlockOperation b, List<int> ranges,
-      void Function(BlockOperation b) ifTrue) {
-    final test = _testRanges(ranges);
-    _generateTestRangesByTest(b, test, ifTrue);
-  }
-
-  void _generateTestRangesByTest(BlockOperation b, Operation test,
-      void Function(BlockOperation b) ifTrue) {
-    final testSuccess = binOp(OperationKind.assign, varOp(_m.success), test);
-    addIfElse(b, testSuccess, (b) {
-      ifTrue(b);
-    }, (b) {
-      addAssign(b, varOp(_m.failure), varOp(_m.pos));
-    });
   }
 
   String _getRuleMethodName(ProductionRule rule) {
@@ -863,31 +602,6 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
     return true;
   }
 
-  Operation _testRanges(List<int> ranges) {
-    Operation op(int start, int end) {
-      if (start == end) {
-        return eqOp(varOp(_m.c), constOp(start));
-      } else {
-        final left = gteOp(varOp(_m.c), constOp(start));
-        final right = lteOp(varOp(_m.c), constOp(end));
-        return landOp(left, right);
-      }
-    }
-
-    if (ranges[0] == 0 && ranges[1] == 0x10ffff) {
-      // Allows match EOF
-      ranges[1] = 0x10ffff + 1;
-    }
-
-    var result = op(ranges[0], ranges[1]);
-    for (var i = 2; i < ranges.length; i += 2) {
-      final right = op(ranges[i], ranges[i + 1]);
-      result = lorOp(result, right);
-    }
-
-    return result;
-  }
-
   ProductionRulesGeneratorContext _visitChild(Expression expression,
       BlockOperation block, ProductionRulesGeneratorContext context,
       [Iterable<Variable> variables]) {
@@ -909,12 +623,11 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
     final name = Variable(_getRuleMethodName(rule));
     final cid = node.id;
     final startCharacters = node.startCharacters;
-    final charGroups = startCharacters.groups;
     var predict = false;
     if (options.predict) {
       if (rule.kind == ProductionRuleKind.subterminal ||
           rule.kind == ProductionRuleKind.terminal) {
-        if (charGroups.length < 10) {
+        if (startCharacters.groups.length < 10) {
           predict = true;
         }
       }
@@ -929,37 +642,34 @@ class GeneralProductionRulesGenerator extends ProductionRulesGenerator
       } else {
         Operation _productive;
         if (node.isProductive) {
-          final productive = context.getArgument(_paramProductive);
+          final productive = context.getArgument(parameterProductive);
           _productive = _isProductive ? varOp(productive) : constOp(false);
         } else {
           _productive = constOp(false);
         }
 
         final methodCall = callOp(varOp(name), [constOp(cid), _productive]);
-        result = _va.newVar(b, 'final', methodCall);
+        result = va.newVar(b, 'final', methodCall);
       }
 
       return result;
     }
 
     if (predict) {
-      final ranges = <int>[];
-      for (final group in charGroups) {
-        ranges.add(group.start);
-        ranges.add(group.end);
-      }
-
-      final test = _testRanges(ranges);
+      var c = context.tryGetVariable(m.c);
+      c ??= m.c;
+      final test =
+          createTestOperationForRanges(c, startCharacters, node.canMacthEof);
       final returnType = node.returnType;
-      final result = _va.newVar(b, returnType, null);
+      final result = va.newVar(b, returnType, null);
       addIfElse(b, test, (b) {
         final result = generate(b);
         addAssign(b, varOp(result), varOp(result));
       }, (b) {
         if (rule.expression.isSuccessful) {
-          addAssign(b, varOp(_m.success), constOp(true));
+          addAssign(b, varOp(m.success), constOp(true));
         } else {
-          addAssign(b, varOp(_m.success), constOp(false));
+          addAssign(b, varOp(m.success), constOp(false));
           //if (rule.kind == ProductionRuleKind.terminal) {
           //  final test = notOp(varOp(m.silence));
           //  addIf(b, test, (b) {

@@ -89,4 +89,8 @@ class ProductionRulesGeneratorContext {
     savedVariables[variable] = result;
     return result;
   }
+
+  Variable tryGetVariable(Variable variable) {
+    return variables[variable];
+  }
 }

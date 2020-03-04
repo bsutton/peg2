@@ -1,3 +1,7 @@
+## 0.1.22
+
+- Fixed bugs in `ExpressionStartCharactersResolver`
+
 ## 0.1.21
 
 - Redesigned the architecture and structure of generators

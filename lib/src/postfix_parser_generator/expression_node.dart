@@ -1,6 +1,4 @@
-part of '../../experimental.dart';
-
-/*
+part of '../../postfix_parser_generator.dart';
 
 class ExpressionNode {
   final Expression expression;
@@ -13,4 +11,3 @@ class ExpressionNode {
     children.add(child);
   }
 }
-*/

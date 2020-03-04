@@ -1,7 +1,7 @@
 part of '../../expressions.dart';
 
 class CharacterClassExpression extends Expression {
-  List<List<int>> ranges;
+  SparseBoolList ranges;
 
   CharacterClassExpression(List<List<int>> ranges) {
     if (ranges == null) {
@@ -12,14 +12,8 @@ class CharacterClassExpression extends Expression {
       throw ArgumentError('List of ranges should not be empty');
     }
 
-    int max(int x, int y) => x > y ? x : y;
-    int min(int x, int y) => x < y ? x : y;
-    final data = <List<int>>[];
-    for (var range in ranges) {
-      if (range.length != 2) {
-        throw ArgumentError('ranges');
-      }
-
+    final list = SparseBoolList();
+    for (final range in ranges) {
       final start = range[0];
       final end = range[1];
       if (start is! int) {
@@ -42,27 +36,12 @@ class CharacterClassExpression extends Expression {
         throw RangeError.value(start, 'end');
       }
 
-      data.add([start, end]);
+      final group = GroupedRangeList<bool>(start, end, true);
+      list.addGroup(group);
     }
 
-    data.sort((a, b) => a[0].compareTo(b[0]));
-    for (var i = 0; i < data.length; i++) {
-      if (i < data.length - 1) {
-        final prev = data[i];
-        final next = data[i + 1];
-        final p0 = prev[0];
-        final p1 = prev[1];
-        final n0 = next[0];
-        final n1 = next[1];
-        if (p1 >= n0 || p1 + 1 == n0) {
-          data[i] = [min(p0, n0), max(p1, n1)];
-          data.removeAt(i + 1);
-          i--;
-        }
-      }
-    }
-
-    this.ranges = data;
+    list.freeze();
+    this.ranges = list;
   }
 
   @override
@@ -74,13 +53,13 @@ class CharacterClassExpression extends Expression {
   String toString() {
     final sb = StringBuffer();
     sb.write('[');
-    for (var range in ranges) {
-      if (range[0] == range[1]) {
-        sb.write(_escape(range[0]));
+    for (var group in ranges.groups) {
+      if (group.start == group.end) {
+        sb.write(_escape(group.start));
       } else {
-        sb.write(_escape(range[0]));
+        sb.write(_escape(group.start));
         sb.write('-');
-        sb.write(_escape(range[1]));
+        sb.write(_escape(group.end));
       }
     }
 
@@ -105,8 +84,6 @@ class CharacterClassExpression extends Expression {
     switch (character) {
       case 45:
         return '\\-';
-      case 91:
-        return '\\[';
       case 92:
         return '\\\\';
       case 93:

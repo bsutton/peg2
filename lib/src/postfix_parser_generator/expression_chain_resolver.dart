@@ -1,6 +1,4 @@
-part of '../../experimental.dart';
-
-/*
+part of '../../postfix_parser_generator.dart';
 
 class ExpressionChainResolver extends ExpressionVisitor {
   ExpressionNode _parent;
@@ -141,4 +139,3 @@ class ExpressionChainResolver extends ExpressionVisitor {
     _parent = parent;
   }
 }
-*/
