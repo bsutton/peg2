@@ -7,7 +7,9 @@ class PostfixProductionRulesGenerator
 
   ParserGeneratorOptions options;
 
-  Variable _result;
+  Variable _prevResult;
+
+  Variable _startPos;
 
   PostfixProductionRulesGenerator(this.grammar, this.options)
       : super(PostfixParseClassMembers());
@@ -25,8 +27,10 @@ class PostfixProductionRulesGenerator
   void visitAndPredicate(AndPredicateExpression node) {
     final context = contexts.last;
     final b = context.block;
-    if (_result != null) {
-      context.result = va.newVar(b, 'final', null);
+    if (_startPos != null) {
+      final result = va.newVar(b, 'final', null);
+      context.result = result;
+      _prevResult = result;
     } else {
       super.visitAndPredicate(node);
     }
@@ -36,15 +40,14 @@ class PostfixProductionRulesGenerator
   void visitAnyCharacter(AnyCharacterExpression node) {
     final context = contexts.last;
     final b = context.block;
-    if (_mode == _Mode.start) {
+    if (_startPos != null) {
       var c = context.tryGetVariable(m.c);
       c ??= m.c;
       final result = va.newVar(b, 'final', varOp(c));
       context.result = result;
-    } else if (_mode == null) {
-      super.visitAnyCharacter(node);
+      _prevResult = result;
     } else {
-      _errorInvalidMode(_mode);
+      super.visitAnyCharacter(node);
     }
   }
 
@@ -52,26 +55,25 @@ class PostfixProductionRulesGenerator
   void visitCharacterClass(CharacterClassExpression node) {
     final context = contexts.last;
     final b = context.block;
-    if (_mode == _Mode.start) {
+    if (_startPos != null) {
       var c = context.tryGetVariable(m.c);
       c ??= m.c;
       final result = va.newVar(b, 'final', varOp(c));
       context.result = result;
-    } else if (_mode == null) {
-      super.visitCharacterClass(node);
+      _prevResult = result;
     } else {
-      _errorInvalidMode(_mode);
+      super.visitCharacterClass(node);
     }
   }
 
   @override
   void visitLiteral(LiteralExpression node) {
-    if (_mode == _Mode.start) {
+    if (_startPos != null) {
+      final context = contexts.last;
       super.visitLiteral(node);
-    } else if (_mode == null) {
-      super.visitLiteral(node);
+      _prevResult = context.result;
     } else {
-      _errorInvalidMode(_mode);
+      super.visitLiteral(node);
     }
   }
 
@@ -84,9 +86,11 @@ class PostfixProductionRulesGenerator
   void visitNotPredicate(NotPredicateExpression node) {
     final context = contexts.last;
     final b = context.block;
-    if (_result != null) {
+    if (_startPos != null) {
       addAssign(b, varOp(m.success), constOp(false));
-      context.result = va.newVar(b, 'final', null);
+      final result = va.newVar(b, 'final', null);
+      context.result = result;
+      _prevResult = result;
     } else {
       super.visitNotPredicate(node);
     }
@@ -96,14 +100,17 @@ class PostfixProductionRulesGenerator
   void visitOneOrMore(OneOrMoreExpression node) {
     final context = contexts.last;
     final b = context.block;
-    if (_isPrologue) {
-      final list = listOp(null, [xxx]);
+    if (_startPos != null) {
+      final list = listOp(null, [varOp(_prevResult)]);
       final result = va.newVar(b, 'final', list);
       context.result = result;
+      _prevResult = context.result;
       addLoop(b, (b) {
         final child = node.expression;
         final next = visitChild(child, b, context);
         addIfNotVar(b, m.success, addBreak);
+        final add = Variable('add');
+        addMbrCall(b, varOp(result), varOp(add), [varOp(next.result)]);
       });
     } else {
       super.visitOneOrMore(node);
@@ -114,9 +121,11 @@ class PostfixProductionRulesGenerator
   void visitOptional(OptionalExpression node) {
     final context = contexts.last;
     final b = context.block;
-    if (_result != null) {
+    if (_startPos != null) {
+      final result = va.newVar(b, 'final', varOp(_prevResult));
+      context.result = result;
+      _prevResult = result;
       addAssign(b, varOp(m.success), constOp(false));
-      context.result = va.newVar(b, 'final', null);
     } else {
       super.visitOptional(node);
     }
@@ -130,14 +139,22 @@ class PostfixProductionRulesGenerator
     final expressionChainResolver = ExpressionChainResolver();
     final root = expressionChainResolver.resolve(node);
     final choices = _flattenNode(root);
-    addLoop(b, (b) {
+    if (root.children.length > 1) {
+      final transitions = _computeTransitions(root);
+      addLoop(b, (b) {
+        //
+      });
+    } else {
       //
-    });
+    }
   }
 
   @override
   void visitSequence(SequenceExpression node) {
-    //
+    final startPos = _startPos;
+    _startPos = null;
+    // Processing
+    _startPos = startPos;
   }
 
   @override
@@ -154,17 +171,27 @@ class PostfixProductionRulesGenerator
   void visitZeroOrMore(ZeroOrMoreExpression node) {
     final context = contexts.last;
     final b = context.block;
-    if (_isPrologue) {
-      throw StateError('Prologue is not supported');
-    } else if (_isEpilogue) {
-      throw StateError('Epilogue is not supported');
+    if (_startPos != null) {
+      throw UnimplementedError();
     } else {
       super.visitZeroOrMore(node);
     }
   }
 
-  void _errorInvalidMode(_Mode mode) {
-    throw StateError('Invalid mode');
+  void _computeTransitions(ExpressionNode node) {
+    visit(ExpressionNode node, List<Expression> results) {
+      final children = node.children;
+      for (final child in children) {
+        visit(child, results);
+      }
+
+      if (children.isEmpty) {
+        results.add(node.expression);
+      }
+    }
+
+    final top = <Expression>[];
+    visit(node, top);
   }
 
   List<List<Expression>> _flattenNode(ExpressionNode node) {
@@ -209,16 +236,6 @@ class PostfixProductionRulesGenerator
 
     generate();
     final result = MethodOperation(returnType, name, params, body);
-    return result;
-  }
-
-  Map<String, Variable> _getData(Expression expression) {
-    var result = _data[expression];
-    if (result == null) {
-      result = {};
-      _data[expression] = result;
-    }
-
     return result;
   }
 

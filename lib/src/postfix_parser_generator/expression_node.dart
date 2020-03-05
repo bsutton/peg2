@@ -1,9 +1,9 @@
 part of '../../postfix_parser_generator.dart';
 
 class ExpressionNode {
-  final Expression expression;
-
   List<ExpressionNode> children = [];
+
+  final Expression expression;
 
   ExpressionNode(this.expression);
 

@@ -315,7 +315,8 @@ abstract class ExpressionsToOperationsGenerator<M extends ParserClassMembers>
     final b = context.block;
     final child = node.expression;
     final next = visitChild(child, b, context);
-    context.result = next.result;
+    final result = va.newVar(b, 'final', varOp(next.result));
+    context.result = result;
     var cannotOptimize = true;
     if (!node.isLast || child.isOptional) {
       cannotOptimize = false;
