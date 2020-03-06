@@ -33,11 +33,10 @@
             "type": "dart",
             "args": [
                 //"--inline-all",
-                //"--predict",
+                "--predict",
                 "--no-optimize-code",
                 "--parser=postfix",
-                "example/a.peg",
-                "example/a.dart"
+                "example/example.peg"
             ]
         },
         {

@@ -19,7 +19,6 @@ part 'src/expressions/prefix_expression.dart';
 part 'src/expressions/sequence_expression.dart';
 part 'src/expressions/simple_expression_visitor.dart';
 part 'src/expressions/single_expression.dart';
-part 'src/expressions/start_expression.dart';
 part 'src/expressions/subterminal_expression.dart';
 part 'src/expressions/suffix_expression.dart';
 part 'src/expressions/symbol_expression.dart';

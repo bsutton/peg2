@@ -1,6 +1,8 @@
 part of '../../parser_generator.dart';
 
 class ProductionRulesGeneratorContext {
+  Map<Variable, Variable> aliases = {};
+
   Map<String, Variable> arguments = {};
 
   final BlockOperation block;
@@ -8,8 +10,6 @@ class ProductionRulesGeneratorContext {
   Variable result;
 
   Map<Variable, Variable> savedVariables = {};
-
-  Map<Variable, Variable> variables = {};
 
   final _utils = OperationUtils();
 
@@ -26,25 +26,23 @@ class ProductionRulesGeneratorContext {
 
   Variable addVariable(
       BlockOperation block, VariableAllocator va, Variable variable) {
-    var result = variables[variable];
+    var result = aliases[variable];
     if (result != null) {
       return result;
     }
 
     result = va.newVar(block, 'final', _utils.varOp(variable));
-    variables[variable] = result;
+    aliases[variable] = result;
     return result;
   }
 
   ProductionRulesGeneratorContext copy(BlockOperation block,
-      [Iterable<Variable> variables]) {
+      {bool copyAliases = true}) {
     final result = ProductionRulesGeneratorContext(block);
-    if (variables != null) {
-      for (final variable in variables) {
-        final value = this.variables[variable];
-        if (value != null) {
-          result.variables[variable] = value;
-        }
+    if (copyAliases) {
+      for (final key in aliases.keys) {
+        final value = aliases[key];
+        result.aliases[key] = value;
       }
     }
 
@@ -61,14 +59,11 @@ class ProductionRulesGeneratorContext {
     return result;
   }
 
-  Variable getVariable(Variable variable) {
-    final result = variables[variable];
-    if (result == null) {
-      throw StateError('Variable not found: ${variable}');
-    }
-
+  Variable getAlias(Variable variable) {
+    var result = aliases[variable];
+    result ??= variable;
     return result;
-  }
+  }  
 
   void restoreVariables(BlockOperation block) {
     for (final key in savedVariables.keys) {
@@ -80,17 +75,13 @@ class ProductionRulesGeneratorContext {
   Variable saveVariable(
       BlockOperation block, VariableAllocator va, Variable variable) {
     if (savedVariables.containsKey(variable)) {
-      throw StateError('Variable alraedy saved: ${variable}');
+      throw StateError('Variable already saved: ${variable}');
     }
 
-    var result = variables[variable];
+    var result = aliases[variable];
     result ??= va.newVar(block, 'final', _utils.varOp(variable));
-    variables[variable] = result;
+    aliases[variable] = result;
     savedVariables[variable] = result;
     return result;
-  }
-
-  Variable tryGetVariable(Variable variable) {
-    return variables[variable];
   }
 }

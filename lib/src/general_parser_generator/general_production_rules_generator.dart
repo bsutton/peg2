@@ -7,8 +7,6 @@ class GeneralProductionRulesGenerator
 
   final ParserGeneratorOptions options;
 
-  bool _isProductive;
-
   GeneralProductionRulesGenerator(this.grammar, this.options)
       : super(GeneralParserClassMembers());
 
@@ -59,7 +57,6 @@ class GeneralProductionRulesGenerator
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
-    final context = contexts.last;
     final b = context.block;
     final expressions = node.expressions;
     final returnType = node.returnType;
@@ -82,7 +79,7 @@ class GeneralProductionRulesGenerator
       addLoop(b, (b) {
         for (var i = 0; i < expressions.length; i++) {
           final child = expressions[i];
-          final next = _visitChild(child, b, context, [m.c, m.pos]);
+          final next = visitChild(child, b, context);
           if (isTerminal) {
             final test = ltOp(varOp(failure), varOp(m.failure));
             addIf(b, test, (b) {
@@ -113,7 +110,7 @@ class GeneralProductionRulesGenerator
       });
     } else {
       final child = expressions[0];
-      final next = _visitChild(child, b, context, [m.c, m.pos]);
+      final next = visitChild(child, b, context);
       addAssign(b, varOp(result), varOp(next.result));
     }
 
@@ -182,97 +179,19 @@ class GeneralProductionRulesGenerator
 
   @override
   void visitSequence(SequenceExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final expressions = node.expressions;
-    final hasAction = node.actionIndex != null;
-    final variables = <Expression, Variable>{};
-    final returnType = node.returnType;
-    final result = va.newVar(b, returnType, null);
-    context.result = result;
-    void Function(BlockOperation) onSuccess;
-    final results = <Expression, Variable>{};
-    final isLastChildOptional = expressions.last.isOptional;
-    void plunge(BlockOperation b, int index) {
-      if (index > expressions.length - 1) {
-        return;
-      }
-
-      final child = expressions[index];
-      _isProductive = child.isProductive;
-      ProductionRulesGeneratorContext next;
-      if (index == 0) {
-        next = _visitChild(child, b, context, [m.c, m.pos]);
-      } else {
-        next = _visitChild(child, b, context);
-      }
-
-      final childResult = next.result;
-      results[child] = childResult;
-      if (child.variable != null) {
-        variables[child] = childResult;
-      }
-
-      if (index < expressions.length - 1) {
-        if (child.isOptional) {
-          plunge(b, index + 1);
-        } else {
-          addIfVar(b, m.success, (b) {
-            plunge(b, index + 1);
-          });
-        }
-      } else {
-        if (hasAction) {
-          addIfVar(b, m.success, (b) {
-            _buildAction(b, node, result, variables);
-          });
-        } else {
-          if (variables.isEmpty) {
-            onSuccess = (b) {
-              final variable = results.values.first;
-              addAssign(b, varOp(result), varOp(variable));
-            };
-          } else if (variables.length == 1) {
-            onSuccess = (b) {
-              final expression = variables.keys.first;
-              final variable = results[expression];
-              addAssign(b, varOp(result), varOp(variable));
-            };
-          } else {
-            if (node.isProductive) {
-              onSuccess = (b) {
-                addIfVar(b, m.success, (b) {
-                  final list =
-                      listOp(null, variables.values.map(varOp).toList());
-                  addAssign(b, varOp(result), list);
-                });
-              };
-            } else {
-              //addAssign(b, varOp(result), null);
-            }
-          }
-        }
-
-        if (onSuccess != null) {
-          if (isLastChildOptional) {
-            onSuccess(b);
-          } else {
-            addIfVar(b, m.success, onSuccess);
-          }
-        }
-      }
-
-      if (index == 1) {
-        addIfNotVar(b, m.success, (b) {
-          final c = context.getVariable(m.c);
-          final pos = context.getVariable(m.pos);
-          addAssign(b, varOp(m.c), varOp(c));
-          addAssign(b, varOp(m.pos), varOp(pos));
-        });
-      }
+    ProductionRulesGeneratorContext visit(
+        Expression expression,
+        BlockOperation block,
+        ProductionRulesGeneratorContext context,
+        bool copyAliases) {
+      return visitChild(expression, block, context, copyAliases: copyAliases);
     }
 
-    plunge(b, 0);
+    bool isOptional(Expression expression) {
+      return expression.isOptional;
+    }
+
+    generateSequence(node, visit, isOptional);
   }
 
   @override
@@ -287,98 +206,6 @@ class GeneralProductionRulesGenerator
     final rule = node.expression.rule;
     final inline = options.inlineNonterminals && _canInline(rule);
     _visitSymbol(node, inline);
-  }
-
-  @override
-  void visitZeroOrMore(ZeroOrMoreExpression node) {
-    final context = contexts.last;
-    final b = context.block;
-    final productive = context.getArgument(parameterProductive);
-    final returnType = node.returnType;
-    final result = va.newVar(b, returnType, null);
-    context.result = result;
-    if (node.isProductive) {
-      addIfElse(b, varOp(productive), (b) {
-        addAssign(b, varOp(result), listOp(null, []));
-      });
-    } else {
-      // Do nothing
-    }
-
-    addLoop(b, (b) {
-      final child = node.expression;
-      final next = _visitChild(child, b, context);
-      addIfNotVar(b, m.success, (b) {
-        addAssign(b, varOp(m.success), constOp(true));
-        addBreak(b);
-      });
-      if (node.isProductive) {
-        addIfElse(b, varOp(productive), (b) {
-          final add = Variable('add');
-          addMbrCall(b, varOp(result), varOp(add), [varOp(next.result)]);
-        });
-      } else {
-        // Do nothing
-      }
-    });
-  }
-
-  void _buildAction(BlockOperation b, SequenceExpression node, Variable result,
-      Map<Expression, Variable> variables) {
-    for (final expression in variables.keys) {
-      final variable = Variable(expression.variable, true);
-      final parameter =
-          paramOp('final', variable, varOp(variables[expression]));
-      b.operations.add(parameter);
-    }
-
-    final $$ = Variable('\$\$', true);
-    final returnType = node.returnType;
-    final parameter = paramOp(returnType, $$, null);
-    b.operations.add(parameter);
-    final code = <String>[];
-    final lineSplitter = LineSplitter();
-    var lines = lineSplitter.convert(node.actionSource);
-    if (lines.length == 1) {
-      final line = lines[0];
-      code.add(line.trim());
-    } else {
-      final temp = <String>[];
-      for (var i = 0; i < lines.length; i++) {
-        final line = lines[i];
-        if (line.trim().isNotEmpty) {
-          temp.add(line);
-        }
-      }
-
-      lines = temp;
-      int indent;
-      for (var i = 0; i < lines.length; i++) {
-        final line = lines[i];
-        var j = 0;
-        for (; j < line.length; j++) {
-          final c = line.codeUnitAt(j);
-          if (c != 32) {
-            break;
-          }
-        }
-
-        if (indent == null) {
-          indent = j;
-        } else if (indent > j) {
-          indent = j;
-        }
-      }
-
-      for (var i = 0; i < lines.length; i++) {
-        final line = lines[i];
-        code.add(line.substring(indent));
-      }
-    }
-
-    final action = ActionOperation(variables.values.map(varOp).toList(), code);
-    b.operations.add(action);
-    addAssign(b, varOp(result), varOp($$));
   }
 
   bool _canInline(ProductionRule rule) {
@@ -423,7 +250,7 @@ class GeneralProductionRulesGenerator
 
       final result = va.newVar(b, returnType, null);
       context.result = result;
-      final next = _visitChild(expression, b, context);
+      final next = visitChild(expression, b, context);
       addAssign(b, varOp(result), varOp(next.result));
       if (options.memoize && rule.directCallers.length > 1) {
         final listAccess =
@@ -602,22 +429,7 @@ class GeneralProductionRulesGenerator
     return true;
   }
 
-  ProductionRulesGeneratorContext _visitChild(Expression expression,
-      BlockOperation block, ProductionRulesGeneratorContext context,
-      [Iterable<Variable> variables]) {
-    final next = context.copy(block, variables);
-    contexts.add(next);
-    expression.accept(this);
-    contexts.removeLast();
-    if (next.result == null) {
-      throw StateError('Variable is not defined');
-    }
-
-    return next;
-  }
-
   void _visitSymbol(SymbolExpression node, bool inline) {
-    final context = contexts.last;
     final b = context.block;
     final rule = node.expression.rule;
     final name = Variable(_getRuleMethodName(rule));
@@ -637,13 +449,13 @@ class GeneralProductionRulesGenerator
       Variable result;
       if (inline) {
         final child = rule.expression;
-        final next = _visitChild(child, b, context);
+        final next = visitChild(child, b, context);
         result = next.result;
       } else {
         Operation _productive;
         if (node.isProductive) {
           final productive = context.getArgument(parameterProductive);
-          _productive = _isProductive ? varOp(productive) : constOp(false);
+          _productive = isProductive ? varOp(productive) : constOp(false);
         } else {
           _productive = constOp(false);
         }
@@ -656,7 +468,7 @@ class GeneralProductionRulesGenerator
     }
 
     if (predict) {
-      var c = context.tryGetVariable(m.c);
+      var c = context.getAlias(m.c);
       c ??= m.c;
       final test =
           createTestOperationForRanges(c, startCharacters, node.canMacthEof);

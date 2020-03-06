@@ -416,33 +416,35 @@ class Peg2Parser {
     final $5 = _pos;
     Grammar $6;
     _parse_leading_spaces(3, false);
-    final $8 = _parse_globals(5, $1);
-    final $9 = _parse_members(7, $1);
-    List<ProductionRule> $10;
+    final $9 = _parse_globals(5, $1);
+    final $10 = $9;
+    final $11 = _parse_members(7, $1);
+    final $12 = $11;
+    List<ProductionRule> $13;
     if ($1) {
-      $10 = [];
+      $13 = [];
     }
-    var $11 = false;
+    var $14 = false;
     for (;;) {
-      final $12 = _parseDefinition(9, $1);
+      final $15 = _parseDefinition(9, $1);
       if (!_success) {
-        _success = $11;
+        _success = $14;
         if (!_success) {
-          $10 = null;
+          $13 = null;
         }
         break;
       }
       if ($1) {
-        $10.add($12);
+        $13.add($15);
       }
-      $11 = true;
+      $14 = true;
     }
     if (_success) {
       _parse_end_of_file(10, false);
       if (_success) {
-        final g = $8;
-        final m = $9;
-        final d = $10;
+        final g = $10;
+        final m = $12;
+        final d = $13;
         Grammar $$;
         $$ = Grammar(d, g, m);
         $6 = $$;
@@ -668,10 +670,11 @@ class Peg2Parser {
     }
     if (_success) {
       final $10 = _parse_action(43, $1);
+      final $11 = $10;
       _success = true;
       {
         final e = $7;
-        final a = $10;
+        final a = $11;
         SequenceExpression $$;
         $$ = SequenceExpression(e, a);
         $6 = $$;
@@ -694,33 +697,35 @@ class Peg2Parser {
     final $5 = _pos;
     Expression $6;
     final $7 = _parse_semantic_value(47, $1);
-    String $8;
-    final $10 = _pos;
+    final $8 = $7;
+    String $9;
+    final $11 = _pos;
     for (;;) {
-      String $11;
-      final $12 = _parse_$Ampersand(51, $1);
+      String $12;
+      final $13 = _parse_$Ampersand(51, $1);
       if (_success) {
-        $11 = $12;
-        $8 = $11;
+        $12 = $13;
+        $9 = $12;
         break;
       }
-      String $13;
-      final $14 = _parse_$ExclamationMark(53, $1);
+      String $14;
+      final $15 = _parse_$ExclamationMark(53, $1);
       if (_success) {
-        $13 = $14;
-        $8 = $13;
+        $14 = $15;
+        $9 = $14;
         break;
       }
       break;
     }
-    if (!_success && _error == $10) {
+    if (!_success && _error == $11) {
       _fail(const ['\'&\'', '\'!\'']);
     }
-    final $15 = _parseNonterminalSuffix(54, $1);
+    final $16 = $9;
+    final $17 = _parseNonterminalSuffix(54, $1);
     if (_success) {
-      final s = $7;
-      final p = $8;
-      final e = $15;
+      final s = $8;
+      final p = $16;
+      final e = $17;
       Expression $$;
       $$ = _prefix(p, e, s);
       $6 = $$;
@@ -772,10 +777,11 @@ class Peg2Parser {
       if (!_success && _error == $10) {
         _fail(const ['\'?\'', '\'*\'', '\'+\'']);
       }
+      final $17 = $8;
       _success = true;
       {
         final e = $7;
-        final s = $8;
+        final s = $17;
         Expression $$;
         $$ = _suffix(s, e);
         $6 = $$;
@@ -1017,10 +1023,11 @@ class Peg2Parser {
     }
     if (_success) {
       final $10 = _parse_action(100, $1);
+      final $11 = $10;
       _success = true;
       {
         final e = $7;
-        final a = $10;
+        final a = $11;
         SequenceExpression $$;
         $$ = SequenceExpression(e, a);
         $6 = $$;
@@ -1050,33 +1057,35 @@ class Peg2Parser {
     final $5 = _pos;
     Expression $6;
     final $7 = _parse_semantic_value(104, $1);
-    String $8;
-    final $10 = _pos;
+    final $8 = $7;
+    String $9;
+    final $11 = _pos;
     for (;;) {
-      String $11;
-      final $12 = _parse_$Ampersand(108, $1);
+      String $12;
+      final $13 = _parse_$Ampersand(108, $1);
       if (_success) {
-        $11 = $12;
-        $8 = $11;
+        $12 = $13;
+        $9 = $12;
         break;
       }
-      String $13;
-      final $14 = _parse_$ExclamationMark(110, $1);
+      String $14;
+      final $15 = _parse_$ExclamationMark(110, $1);
       if (_success) {
-        $13 = $14;
-        $8 = $13;
+        $14 = $15;
+        $9 = $14;
         break;
       }
       break;
     }
-    if (!_success && _error == $10) {
+    if (!_success && _error == $11) {
       _fail(const ['\'&\'', '\'!\'']);
     }
-    final $15 = _parseSuffix(111, $1);
+    final $16 = $9;
+    final $17 = _parseSuffix(111, $1);
     if (_success) {
-      final s = $7;
-      final p = $8;
-      final e = $15;
+      final s = $8;
+      final p = $16;
+      final e = $17;
       Expression $$;
       $$ = _prefix(p, e, s);
       $6 = $$;
@@ -1135,10 +1144,11 @@ class Peg2Parser {
       if (!_success && _error == $10) {
         _fail(const ['\'?\'', '\'*\'', '\'+\'']);
       }
+      final $17 = $8;
       _success = true;
       {
         final e = $7;
-        final s = $8;
+        final s = $17;
         Expression $$;
         $$ = _suffix(s, e);
         $6 = $$;
@@ -1374,10 +1384,11 @@ class Peg2Parser {
       if (!_success && _error == $10) {
         _fail(const ['\'<\'']);
       }
+      final $15 = $8;
       _success = true;
       {
         final n = $7;
-        final a = $8;
+        final a = $15;
         String $$;
         $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
         $6 = $$;
@@ -1705,7 +1716,7 @@ class Peg2Parser {
     String $8;
     final $9 = $1;
     $1 = false;
-    if (_success = _c == 95) {
+    if (_success = $4 == 95) {
       _c = _input[++_pos];
     } else {
       _failure = _pos;
