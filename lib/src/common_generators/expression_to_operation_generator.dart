@@ -75,19 +75,19 @@ abstract class ExpressionsToOperationsGenerator<M extends ParserClassMembers>
   }
 
   Operation createTestOperationForRanges(
-      Variable c, SparseBoolList ranges, bool canMacthEof) {
+      Variable variable, SparseBoolList ranges, bool canMacthEof) {
     final list = SparseBoolList();
-    for (final group in ranges.groups) {
-      final g = GroupedRangeList<bool>(group.start, group.end, true);
-      list.addGroup(g);
+    for (final src in ranges.groups) {
+      final dest = GroupedRangeList<bool>(src.start, src.end, true);
+      list.addGroup(dest);
     }
 
     Operation op(int start, int end) {
       if (start == end) {
-        return eqOp(varOp(c), constOp(start));
+        return eqOp(varOp(variable), constOp(start));
       } else {
-        final left = gteOp(varOp(c), constOp(start));
-        final right = lteOp(varOp(c), constOp(end));
+        final left = gteOp(varOp(variable), constOp(start));
+        final right = lteOp(varOp(variable), constOp(end));
         return landOp(left, right);
       }
     }
@@ -109,12 +109,7 @@ abstract class ExpressionsToOperationsGenerator<M extends ParserClassMembers>
     return result;
   }
 
-  void generateSequence(
-      SequenceExpression node,
-      ProductionRulesGeneratorContext Function(
-              Expression, BlockOperation, ProductionRulesGeneratorContext, bool)
-          visit,
-      bool Function(Expression) isOptional) {
+  void generateSequence(SequenceExpression node, {bool isPostfix = false}) {
     final b = context.block;
     final expressions = node.expressions;
     final hasAction = node.actionIndex != null;
@@ -134,9 +129,14 @@ abstract class ExpressionsToOperationsGenerator<M extends ParserClassMembers>
       isProductive = child.isProductive;
       ProductionRulesGeneratorContext next;
       if (index == 0) {
-        next = visit(child, b, context, true);
+        if (isPostfix) {
+          final next = context.copy(b, copyAliases: false);
+          next.result = Variable('XXX');
+        } else {
+          next = visitChild(child, b, context);
+        }
       } else {
-        next = visit(child, b, context, false);
+        next = visitChild(child, b, context, copyAliases: false);
       }
 
       final childResult = next.result;
@@ -146,7 +146,7 @@ abstract class ExpressionsToOperationsGenerator<M extends ParserClassMembers>
       }
 
       if (index < expressions.length - 1) {
-        if (isOptional(child)) {
+        if (child.isOptional) {
           plunge(b, index + 1);
         } else {
           addIfVar(b, m.success, (b) {
@@ -195,12 +195,14 @@ abstract class ExpressionsToOperationsGenerator<M extends ParserClassMembers>
       }
 
       if (index == 1) {
-        addIfNotVar(b, m.success, (b) {
-          final c = context.getAlias(m.c);
-          final pos = context.getAlias(m.pos);
-          addAssign(b, varOp(m.c), varOp(c));
-          addAssign(b, varOp(m.pos), varOp(pos));
-        });
+        if (!isPostfix) {
+          addIfNotVar(b, m.success, (b) {
+            final c = context.getAlias(m.c);
+            final pos = context.getAlias(m.pos);
+            addAssign(b, varOp(m.c), varOp(c));
+            addAssign(b, varOp(m.pos), varOp(pos));
+          });
+        }
       }
     }
 
@@ -491,7 +493,7 @@ abstract class ExpressionsToOperationsGenerator<M extends ParserClassMembers>
 
     addLoop(b, (b) {
       final child = node.expression;
-      final next = visitChild(child, b, context);
+      final next = visitChild(child, b, context, copyAliases: false);
       addIfNotVar(b, m.success, (b) {
         addAssign(b, varOp(m.success), constOp(true));
         addBreak(b);

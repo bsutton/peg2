@@ -15,6 +15,8 @@ class PostfixProductionRulesGenerator
 
   Variable _result;
 
+  var _sequenceMethodVariables = <SequenceExpression, Variable>{};
+
   PostfixProductionRulesGenerator(this.grammar, this.options)
       : super(PostfixParseClassMembers());
 
@@ -22,9 +24,11 @@ class PostfixProductionRulesGenerator
   void generate(
       List<MethodOperation> methods, List<ParameterOperation> parameters) {
     _methods = {};
+    _sequenceMethodVariables = {};
     final rules = grammar.rules;
     for (final rule in rules) {
-      _generateRule(rule);
+      final method = _generateRule(rule);
+      methods.add(method);
     }
 
     methods.addAll(_methods.values);
@@ -54,6 +58,19 @@ class PostfixProductionRulesGenerator
   }
 
   @override
+  void visitCapture(CaptureExpression node) {
+    if (_isPrefix) {
+      final b = context.block;
+      final c = context.getAlias(m.c);
+      final result = va.newVar(b, 'final', varOp(c));
+      context.result = result;
+      throw null;
+    } else {
+      super.visitCapture(node);
+    }
+  }
+
+  @override
   void visitCharacterClass(CharacterClassExpression node) {
     if (_isPrefix) {
       final b = context.block;
@@ -68,7 +85,20 @@ class PostfixProductionRulesGenerator
   @override
   void visitLiteral(LiteralExpression node) {
     if (_isPrefix) {
-      super.visitLiteral(node);
+      final b = context.block;
+      final text = node.text;
+      final runes = text.runes.toList();
+      if (runes.isEmpty) {
+        final result = va.newVar(b, 'final', constOp(''));
+        context.result = result;
+      } else if (runes.length == 1) {
+        final result = va.newVar(b, 'final', constOp(text));
+        context.result = result;
+      } else {
+        final matchString = callOp(varOp(m.matchString), [constOp(text)]);
+        final result = va.newVar(b, 'final', matchString);
+        context.result = result;
+      }
     } else {
       super.visitLiteral(node);
     }
@@ -100,7 +130,9 @@ class PostfixProductionRulesGenerator
       context.result = result;
       addLoop(b, (b) {
         final child = node.expression;
+        _isPrefix = false;
         final next = visitChild(child, b, context);
+        _isPrefix = true;
         addIfNotVar(b, m.success, addBreak);
         final add = Variable('add');
         addMbrCall(b, varOp(result), varOp(add), [varOp(next.result)]);
@@ -125,42 +157,93 @@ class PostfixProductionRulesGenerator
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
     if (_isPrefix) {
-      final b = context.block;
-      final result = va.newVar(b, 'final', varOp(_result));
-      context.result = result;
       return;
     }
 
-    _isPrefix = true;
     final b = context.block;
-    context.saveVariable(b, va, m.c);
-    context.saveVariable(b, va, m.pos);
+    final c = context.saveVariable(b, va, m.c);
+    final pos = context.saveVariable(b, va, m.pos);
     final expressionChainResolver = ExpressionChainResolver();
     final root = expressionChainResolver.resolve(node);
     final choices = _flattenNode(root);
     final transitions = SparseList<List<int>>();
-    final eofTransitions = <int>[];
-    _computeTransitions(choices, transitions, eofTransitions);
+    final epsilons = <int>[];
+    _computeTransitions(choices, transitions, epsilons);
+    final testC = lteOp(varOp(m.c), constOp(0xffff));
+    final ternary = ternaryOp(testC, constOp(1), constOp(2));
+    final assignPos = addAssignOp(varOp(m.pos), ternary);
+    final listAcc = listAccOp(varOp(m.input), assignPos);
+    addAssign(b, varOp(m.c), listAcc);
     if (choices.length > 1) {
       addLoop(b, (b) {
-        for (final transition in transitions.groups) {
+        final list = SparseList<List<int>>();
+        final useStates = transitions.groups.any((e) => e.key.length > 1);
+        final groups = transitions.groups;
+        for (var i = 0; i < groups.length; i++) {
+          final src = groups[i];
+          GroupedRangeList<List<int>> dest;
+          if (useStates) {
+            dest = GroupedRangeList<List<int>>(i, i, src.key);
+          } else {
+            dest = GroupedRangeList<List<int>>(src.start, src.end, src.key);
+          }
+
+          list.addGroup(dest);
+        }
+
+        Variable transitionVariable;
+        if (useStates) {
+          transitionVariable = Variable('STATE');
+        } else {
+          transitionVariable = c;
+        }
+
+        for (final transition in list.groups) {
           final ranges = SparseBoolList();
           final group =
               GroupedRangeList<bool>(transition.start, transition.end, true);
           ranges.addGroup(group);
-          final c = context.getAlias(m.c);
-          testRanges(b, c, ranges, false, (b) {
+          final test =
+              createTestOperationForRanges(transitionVariable, ranges, false);
+          addIfElse(b, test, (b) {
+            addAssign(b, varOp(m.success), constOp(true));
             for (final i in transition.key) {
               final choice = choices[i];
               for (final expression in choice) {
+                _isPrefix = true;
                 final next = visitChild(expression, b, context);
+                _isPrefix = false;
                 _result = next.result;
               }
             }
+
+            addIfVar(b, m.success, (h) {
+              // TODO: Restore variables
+              final b = context.block;
+              final result = va.newVar(b, 'final', varOp(_result));
+              context.result = result;
+              addBreak(b);
+            });
           });
+        }
+
+        if (epsilons.isNotEmpty) {
+          addAssign(b, varOp(m.success), constOp(false));
+          for (final i in epsilons) {
+            final choice = choices[i];
+            for (final expression in choice) {
+              _isPrefix = true;
+              final next = visitChild(expression, b, context);
+              _isPrefix = false;
+              _result = next.result;
+            }
+          }
+
+          addIfVar(b, m.success, addBreak);
         }
       });
     } else {
+      // TODO: Make correction!!!
       final choice = choices.first;
       final c = context.getAlias(m.c);
       final ranges = SparseBoolList();
@@ -171,50 +254,22 @@ class PostfixProductionRulesGenerator
 
       testRanges(b, c, ranges, false, (b) {
         for (final expression in choice) {
+          _isPrefix = true;
           final next = visitChild(expression, b, context);
+          _isPrefix = false;
           _result = next.result;
         }
       });
 
-      if (eofTransitions.isNotEmpty) {
-        addIfNotVar(b, m.success, (b) {
-          for (final i in eofTransitions) {
-            final choice = choices[i];
-            for (final expression in choice) {
-              final next = visitChild(expression, b, context);
-              _result = next.result;
-            }
-          }
-        });
-      }
+      _generateUnsuccessfulChoices(b, choices, epsilons);
     }
 
-    final result = va.newVar(b, 'final', varOp(context.result));
+    final result = va.newVar(b, 'final', varOp(_result));
     context.result = result;
   }
 
   @override
   void visitSequence(SequenceExpression node) {
-    ProductionRulesGeneratorContext visit(
-        Expression expression,
-        BlockOperation block,
-        ProductionRulesGeneratorContext context,
-        bool copyAliases) {
-      final isFirst = expression.index == 0;
-      if (isFirst) {
-        final next = context.copy(block);
-        next.result = Variable('XXX');
-        return next;
-      } else {
-        return visitChild(expression, block, context, copyAliases: copyAliases);
-      }
-    }
-
-    bool isOptional(Expression expression) {
-      final isFirst = expression.index == 0;
-      return expression.isOptional || isFirst;
-    }
-
     final expressions = node.expressions;
     if (expressions.length == 1) {
       final b = context.block;
@@ -226,7 +281,28 @@ class PostfixProductionRulesGenerator
       }
     }
 
-    generateSequence(node, visit, isOptional);
+    final b = context.block;
+    final returnType = node.returnType;
+    final func = _getSequenceMethodVariable(node);
+    final method = MethodOperation(returnType, func.name, [], BlockOperation());
+    _methods[node] = method;
+    addCall(b, varOp(func), [varOp(_result)]);
+    final prev = context;
+    context = context.copy(b, copyAliases: false);
+    generateSequence(node, isPostfix: true);
+    prev.result = context.result;
+    context = prev;
+  }
+
+  Variable _getSequenceMethodVariable(SequenceExpression expression) {
+    var result = _sequenceMethodVariables[expression];
+    if (result == null) {
+      final name = _getExpressionMethodName(expression);
+      result = Variable(name, true);
+      _sequenceMethodVariables[expression] = result;
+    }
+
+    return result;
   }
 
   @override
@@ -248,7 +324,9 @@ class PostfixProductionRulesGenerator
       context.result = result;
       addLoop(b, (b) {
         final child = node.expression;
+        _isPrefix = false;
         final next = visitChild(child, b, context);
+        _isPrefix = true;
         addIfNotVar(b, m.success, addBreak);
         final add = Variable('add');
         addMbrCall(b, varOp(result), varOp(add), [varOp(next.result)]);
@@ -259,7 +337,7 @@ class PostfixProductionRulesGenerator
   }
 
   void _computeTransitions(List<List<Expression>> choices,
-      SparseList<List<int>> transitions, List<int> eofTransitions) {
+      SparseList<List<int>> transitions, List<int> epsilons) {
     for (var i = 0; i < choices.length; i++) {
       final choice = choices[i];
       final first = choice.first;
@@ -283,7 +361,7 @@ class PostfixProductionRulesGenerator
       final choice = choices[i];
       final last = choice.last;
       if (last.canMacthEof) {
-        eofTransitions.add(i);
+        epsilons.add(i);
       }
     }
   }
@@ -334,6 +412,30 @@ class PostfixProductionRulesGenerator
     return result;
   }
 
+  void _generateUnsuccessfulChoices(
+    BlockOperation block,
+    List<List<Expression>> choices,
+    List<int> epsilon,
+  ) {
+    final b = block;
+    if (epsilon.isNotEmpty) {
+      addAssign(b, varOp(m.success), constOp(false));
+      addIfNotVar(b, m.success, (b) {
+        for (final i in epsilon) {
+          final choice = choices[i];
+          for (var i = 1; i < choice.length; i++) {
+            final expression = choice[i];
+            final returnType = expression.returnType;
+            _result = va.newVar(b, returnType, null);
+            _isPrefix = true;
+            final next = visitChild(expression, b, context);
+            _result = next.result;
+          }
+        }
+      });
+    }
+  }
+
   String _getExpressionMethodName(Expression expression) {
     final id = expression.id;
     final name = '_e$id';
@@ -346,16 +448,15 @@ class PostfixProductionRulesGenerator
   }
 
   void _visitSymbolExpression(SymbolExpression node) {
-    /*
+    final b = context.block;
     final rule = node.expression.rule;
     var returnType = rule.returnType;
     final expression = rule.expression;
-    returnType ??= rule.expression.returnType;
-    final name = _getMethodVariable(expression);
+    returnType ??= expression.returnType;
+    final name = Variable(_getExpressionMethodName(node));
     final parameters = [constOp(0), constOp(true)];
     final call = callOp(varOp(name), parameters);
-    final result = _va.newVar(b, returnType, call);
-    resultVar = result;
-    */
+    final result = va.newVar(b, returnType, call);
+    context.result = result;
   }
 }

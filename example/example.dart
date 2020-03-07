@@ -387,11 +387,11 @@ class ExampleParser {
     final $5 = _pos;
     dynamic $6;
     _parse_leading_spaces(3, false);
-    final $8 = _parseValue(4, $1);
+    final $9 = _parseValue(4, $1);
     if (_success) {
       _parse_end_of_file(5, false);
       if (_success) {
-        $6 = $8;
+        $6 = $9;
       }
     }
     if (!_success) {
@@ -492,9 +492,10 @@ class ExampleParser {
     _parse_$LeftSquareBracket(23, false);
     if (_success) {
       final $8 = _parseValues(25, $1);
+      final $9 = $8;
       _parse_$RightSquareBracket(26, false);
       if (_success) {
-        final v = $8;
+        final v = $9;
         List $$;
         $$ = v ?? [];
         $6 = $$;
@@ -584,9 +585,10 @@ class ExampleParser {
     _parse_$LeftBrace(37, false);
     if (_success) {
       final $8 = _parseMembers(39, $1);
+      final $9 = $8;
       _parse_$RightBrace(40, false);
       if (_success) {
-        final m = $8;
+        final m = $9;
         Map<String, dynamic> $$;
         $$ = <String, dynamic>{}..addEntries(m ?? []);
         $6 = $$;
@@ -872,27 +874,27 @@ class ExampleParser {
     String $8;
     final $9 = $1;
     $1 = false;
-    if (_success = _c == 45) {
+    if (_success = $4 == 45) {
       _c = _input[++_pos];
     } else {
       _failure = _pos;
     }
-    final $15 = _c;
-    final $16 = _pos;
-    var $17 = _pos;
+    final $16 = _c;
+    final $17 = _pos;
+    var $18 = _pos;
     for (;;) {
-      if (_success = $15 == 48) {
+      if (_success = $16 == 48) {
         _c = _input[++_pos];
       } else {
         _failure = _pos;
       }
-      if ($17 < _failure) {
-        $17 = _failure;
+      if ($18 < _failure) {
+        $18 = _failure;
       }
       if (_success) {
         break;
       }
-      if (_success = $15 >= 49 && $15 <= 57) {
+      if (_success = $16 >= 49 && $16 <= 57) {
         _c = _input[++_pos];
       } else {
         _failure = _pos;
@@ -910,31 +912,31 @@ class ExampleParser {
           }
         }
         if (!_success) {
-          _c = $15;
-          _pos = $16;
+          _c = $16;
+          _pos = $17;
         }
       }
-      if ($17 < _failure) {
-        $17 = _failure;
+      if ($18 < _failure) {
+        $18 = _failure;
       }
       if (_success) {
         break;
       }
-      _c = $15;
-      _pos = $16;
-      _failure = $17;
+      _c = $16;
+      _pos = $17;
+      _failure = $18;
       break;
     }
     if (_success) {
-      final $25 = _c;
-      final $26 = _pos;
-      if (_success = $25 == 46) {
+      final $26 = _c;
+      final $27 = _pos;
+      if (_success = $26 == 46) {
         _c = _input[++_pos];
       } else {
         _failure = _pos;
       }
       if (_success) {
-        var $31 = false;
+        var $32 = false;
         for (;;) {
           if (_success = _c >= 48 && _c <= 57) {
             _c = _input[++_pos];
@@ -942,19 +944,19 @@ class ExampleParser {
             _failure = _pos;
           }
           if (!_success) {
-            _success = $31;
+            _success = $32;
             break;
           }
-          $31 = true;
+          $32 = true;
         }
         if (!_success) {
-          _c = $25;
-          _pos = $26;
+          _c = $26;
+          _pos = $27;
         }
       }
-      final $34 = _c;
-      final $35 = _pos;
-      if (_success = $34 == 69 || $34 == 101) {
+      final $36 = _c;
+      final $37 = _pos;
+      if (_success = $36 == 69 || $36 == 101) {
         _c = _input[++_pos];
       } else {
         _failure = _pos;
@@ -965,7 +967,7 @@ class ExampleParser {
         } else {
           _failure = _pos;
         }
-        var $41 = false;
+        var $44 = false;
         for (;;) {
           if (_success = _c >= 48 && _c <= 57) {
             _c = _input[++_pos];
@@ -973,14 +975,14 @@ class ExampleParser {
             _failure = _pos;
           }
           if (!_success) {
-            _success = $41;
+            _success = $44;
             break;
           }
-          $41 = true;
+          $44 = true;
         }
         if (!_success) {
-          _c = $34;
-          _pos = $35;
+          _c = $36;
+          _pos = $37;
         }
       }
       _success = true;

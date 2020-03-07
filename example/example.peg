@@ -1,4 +1,5 @@
 # Globals
+
 %{
 void main() {
   final parser = ExampleParser();
@@ -113,7 +114,7 @@ num
  ":" @spacing
   ;
 
-# Sub terminals
+# Subterminals
 
 @char =
   [\\] r:@escaped

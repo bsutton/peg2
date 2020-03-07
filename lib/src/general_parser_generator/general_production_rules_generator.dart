@@ -179,19 +179,7 @@ class GeneralProductionRulesGenerator
 
   @override
   void visitSequence(SequenceExpression node) {
-    ProductionRulesGeneratorContext visit(
-        Expression expression,
-        BlockOperation block,
-        ProductionRulesGeneratorContext context,
-        bool copyAliases) {
-      return visitChild(expression, block, context, copyAliases: copyAliases);
-    }
-
-    bool isOptional(Expression expression) {
-      return expression.isOptional;
-    }
-
-    generateSequence(node, visit, isOptional);
+    generateSequence(node);
   }
 
   @override
