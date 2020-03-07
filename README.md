@@ -166,6 +166,6 @@ Terminal rules, in turn, are the low level of parsing. They can consist of subte
 
 #### Subterminal rules
 
-Subterminal rules are a sublevel of the low level, which is essentially intended to simplify the writing of grammar, by transferring the most commonly used low-level parsing procedures to the subterminal rules. They can consist of terminal rules and terminal expressions.  
+Subterminal rules are a sublevel of the low level, which is essentially intended to simplify the writing of grammar, by transferring the most commonly used low-level parsing procedures to the subterminal rules. They can consist of subterminal rules and terminal expressions.  
 
 To be continued...
