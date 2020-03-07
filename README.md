@@ -127,8 +127,9 @@ String 'string' =
 
 ### Capture expression
 
-Expression `Capture` allows you to capture parsed text from the beginning to the end of the expression `Capture`, without the need to form the result from the results of child expressions.  
+The expression `Capture` allows you to capture parsed text from the beginning to the end of the expression `Capture`, without having to form the result from the results of child expressions.  
 The syntax for this expression is `<e>`, where `e` is any expression, including a sequence of expressions (`Sequence`).  
+This is convenient enough for obtaining a parsing result that corresponds to the parsed text and does not require transformations. You just capture the text and that’s all you need to do in this case.  
 
 Examples:  
 
@@ -143,5 +144,28 @@ Examples:
   "%{" b:<@GLOBALS_BODY*> "}%" @SPACING
   ;
 ```
+
+### Terminal expressions
+
+Terminal expressions respond directly to parsing the text.  
+The following expressions are terminal expressions: `AnyCharacter`, `CharacterClass` and `Literal`.  
+They can consume any character, a character from a specified range, or text, respectively.  
+Terminal expressions cannot be used directly in nonterminal rules.  
+
+### A little more words about production rules
+
+#### Nonterminal rules
+
+Nonterminal parsing rules are the high level of parsing.  
+They can consist of nonterminal and terminal rules, combined by any expressions.  
+Nonterminal parsing rules cannot contain terminal expressions such as `AnyCharacter`, `CharacterClass` and `Literal`.  
+
+#### Terminal rules
+
+Terminal rules, in turn, are the low level of parsing. They can consist of subtermial rules and terminal expressions such as `AnyCharacter`, `CharacterClass` and `Literal`.  
+
+#### Subterminal rules
+
+Subterminal rules are a sublevel of the low level, which is essentially intended to simplify the writing of grammar, by transferring the most commonly used low-level parsing procedures to the subterminal rules. They can consist of terminal rules and terminal expressions.  
 
 To be continued...
