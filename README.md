@@ -124,4 +124,24 @@ String 'string' =
   "\"" c:@char* "\"" @spacing { $$ = String.fromCharCodes(c); }
   ;
 ```
+
+### Capture expression
+
+Expression `Capture` allows you to capture parsed text from the beginning to the end of the expression `Capture`, without the need to form the result from the results of child expressions.  
+The syntax for this expression is `<e>`, where `e` is any expression, including a sequence of expressions (`Sequence`).  
+
+Examples:  
+
+```
+'library prefix' =
+  <[_]? @IDENTIFIER>
+  ;
+```
+
+```
+'globals' =
+  "%{" b:<@GLOBALS_BODY*> "}%" @SPACING
+  ;
+```
+
 To be continued...
