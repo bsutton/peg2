@@ -189,7 +189,7 @@ abstract class ExpressionOperationGenerator
     final returnType = node.returnType;
     final result1 = va.newVar(block, returnType, null);
     if (isProductive) {
-      addIfElse(block, varOp(productive), (block) {
+      addIfVar(block, productive, (block) {
         addAssign(block, varOp(result1), listOp(null, []));
       });
     } else {
@@ -210,7 +210,7 @@ abstract class ExpressionOperationGenerator
       });
 
       if (isProductive) {
-        addIfElse(block, varOp(productive), (block) {
+        addIfVar(block, productive, (block) {
           final add = Variable('add');
           addMbrCall(block, varOp(result1), varOp(add), [varOp(result)]);
         });
@@ -244,7 +244,7 @@ abstract class ExpressionOperationGenerator
     final returnType = node.returnType;
     final result1 = va.newVar(block, returnType, null);
     if (isProductive) {
-      addIfElse(block, varOp(productive), (block) {
+      addIfVar(block, productive, (block) {
         addAssign(block, varOp(result1), listOp(null, []));
       });
     } else {
@@ -259,7 +259,7 @@ abstract class ExpressionOperationGenerator
         addBreak(block);
       });
       if (isProductive) {
-        addIfElse(block, varOp(productive), (block) {
+        addIfVar(block, productive, (block) {
           final add = Variable('add');
           addMbrCall(block, varOp(result1), varOp(add), [varOp(result)]);
         });
