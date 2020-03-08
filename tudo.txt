@@ -16,7 +16,8 @@ use bit masks in fast check in predict?
 optimize internal check if repetitions cannot be non productive (ro reduce generated code)
 inplement malformed terminals reporting
 add support of memoization of inlining rules
-rework isProductive from `bool` to { always, never, sometimes }
+rework isProductive from `bool` to { always, never, sometimes }???
 add parenthesis to unary operator printer
 improve variable usage optimizer
-need make corrections to character classe `toString()`
+need make corrections to character class `toString()`
+remove context in favor to session

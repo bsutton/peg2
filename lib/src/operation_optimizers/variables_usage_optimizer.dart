@@ -4,6 +4,102 @@ class VariableUsageOptimizer with OperationUtils {
   VariablesStats _stats;
 
   void optimize(BlockOperation operation, VariablesStats stats) {
+    _optimizeUsage(operation, stats);
+    _optimizeFinalVariables(operation, stats);
+  }
+
+  void _analizeUsage(Operation operation, VariablesStats stats) {
+    final variablesUsageResolver = VariablesUsageResolver();
+    variablesUsageResolver.resolve(operation, stats);
+  }
+
+  bool _canOptimize(
+      VariableOperation left, VariableOperation right, Set<Variable> used) {
+    if (left == null || right == null) {
+      return false;
+    }
+
+    final leftVariable = left.variable;
+    final rightVariable = right.variable;
+    if (used.contains(rightVariable)) {
+      return false;
+    }
+
+    if (rightVariable.frozen) {
+      return false;
+    }
+
+    if (leftVariable.frozen) {
+      return false;
+    }
+
+    return true;
+  }
+
+  void _optimizeFinalVariables(BlockOperation operation, VariablesStats stats) {
+    final operations = operation.operations;
+    for (var i = operations.length - 1; i >= 0; i--) {
+      final current = operations[i];
+      final parameter0 = getOp<ParameterOperation>(current);
+      if (parameter0 == null) {
+        if (current.kind == OperationKind.block) {
+          final block = getOp<BlockOperation>(current);
+          _optimizeFinalVariables(block, stats);
+        } else if (current.kind == OperationKind.conditional) {
+          final conditional = getOp<ConditionalOperation>(current);
+          _optimizeFinalVariables(conditional.ifTrue, stats);
+          if (conditional.ifFalse != null) {
+            _optimizeFinalVariables(conditional.ifFalse, stats);
+          }
+        } else if (current.kind == OperationKind.loop) {
+          final loop = getOp<LoopOperation>(current);
+          _optimizeFinalVariables(loop.body, stats);
+        }
+
+        continue;
+      }
+
+      if (parameter0.type != 'final') {
+        continue;
+      }
+
+      final right0 = getOp<VariableOperation>(parameter0.operation);
+      if (right0 == null) {
+        continue;
+      }
+
+      final leftVariable0 = parameter0.variable;
+      final rightVariable0 = right0.variable;
+      for (var j = i + 1; j < operations.length; j++) {
+        final next = operations[j];
+        final parameter1 = getOp<ParameterOperation>(next);
+        if (parameter1 == null) {
+          break;
+        }
+
+        if (parameter1.type != 'final') {
+          continue;
+        }
+
+        final right1 = getOp<VariableOperation>(parameter1.operation);
+        if (right1 == null) {
+          continue;
+        }
+
+        final rightVariable1 = right1.variable;
+        if (rightVariable1 != rightVariable0) {
+          continue;
+        }
+
+        final leftVariable1 = parameter1.variable;
+        final variableReplacer = _VariableReplacer();
+        variableReplacer.replace(current.parent, leftVariable1, leftVariable0);
+        _analizeUsage(current, stats);
+      }
+    }
+  }
+
+  void _optimizeUsage(BlockOperation operation, VariablesStats stats) {
     _stats = stats;
     final used = <Variable>{};
     final operations = operation.operations;
@@ -132,34 +228,6 @@ class VariableUsageOptimizer with OperationUtils {
           binary, NopOperation('${leftVariable} = ${rightVariable}'), stats);
       _analizeUsage(lowerDeclarationParent, stats);
     }
-  }
-
-  void _analizeUsage(Operation operation, VariablesStats stats) {
-    final variablesUsageResolver = VariablesUsageResolver();
-    variablesUsageResolver.resolve(operation, stats);
-  }
-
-  bool _canOptimize(
-      VariableOperation left, VariableOperation right, Set<Variable> used) {
-    if (left == null || right == null) {
-      return false;
-    }
-
-    final leftVariable = left.variable;
-    final rightVariable = right.variable;
-    if (used.contains(rightVariable)) {
-      return false;
-    }
-
-    if (rightVariable.frozen) {
-      return false;
-    }
-
-    if (leftVariable.frozen) {
-      return false;
-    }
-
-    return true;
   }
 
   void _replaceAssign(

@@ -1,6 +1,8 @@
 ## 0.1.22
 
 - Fixed bugs in `ExpressionStartCharactersResolver`
+- Redesigned class hierarchy
+- Added new optimization method: final variables usage optimizer
 
 ## 0.1.21
 

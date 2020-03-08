@@ -20,8 +20,9 @@
             "type": "dart",
             "args": [
                 //"--inline-all",
-                //"--predict",
+                //"--memoize",
                 //"--no-optimize-code",
+                //"--predict",                
                 "example/example.peg",
                 "example/example.dart"
             ]

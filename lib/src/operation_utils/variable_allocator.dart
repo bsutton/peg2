@@ -3,12 +3,12 @@ part of '../../operation_utils.dart';
 class VariableAllocator {
   final _utils = OperationUtils();
 
-  final String Function() allocName;
+  final String Function() allocate;
 
-  VariableAllocator(this.allocName);
+  VariableAllocator(this.allocate);
 
   Variable alloc([bool frozen = false]) {
-    final name = allocName();
+    final name = allocate();
     return Variable(name, frozen);
   }
 
