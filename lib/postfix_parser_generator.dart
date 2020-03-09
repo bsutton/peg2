@@ -8,6 +8,7 @@ import 'operation_utils.dart';
 import 'operations.dart';
 import 'parser_generator.dart';
 
+part 'src/postfix_parser_generator/experimental_parser_generator.dart';
 part 'src/postfix_parser_generator/expression_chain_resolver.dart';
 part 'src/postfix_parser_generator/expression_node.dart';
 part 'src/postfix_parser_generator/postfix_expression_operation_generator0.dart';
