@@ -34,7 +34,7 @@
             "type": "dart",
             "args": [
                 //"--inline-all",
-                "--predict",
+                //"--predict",
                 "--no-optimize-code",
                 "--parser=postfix",
                 "example/example.peg"

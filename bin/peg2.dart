@@ -109,9 +109,10 @@ void main(List<String> args) {
   options.name = camelize(name);
   ParserGenerator parserGenerator;
   if (options.isPostfix()) {
-    print('Not implemented yet');
-    exit(-1);
-    parserGenerator = PostfixParserGenerator(grammar, options);
+    //print('Not implemented yet');
+    //exit(-1);
+    //parserGenerator = PostfixParserGenerator(grammar, options);
+    parserGenerator = ExperimentalParserGenerator(grammar, options);
   } else {
     parserGenerator = GeneralParserGenerator(grammar, options);
   }
