@@ -10,6 +10,8 @@ class PostfixProductionRulesGenerator
 
   final ParserGeneratorOptions options;
 
+  Set<ProductionRule> _calledRules;
+
   Map<SequenceExpression, MethodOperation> _methods;
 
   PostfixProductionRulesGenerator(this.grammar, this.options);
@@ -17,11 +19,22 @@ class PostfixProductionRulesGenerator
   @override
   void generate(
       List<MethodOperation> methods, List<ParameterOperation> parameters) {
+    _calledRules = {};
     _methods = {};
-    final rules = grammar.rules;
-    for (final rule in rules) {
-      final method = _generateRule(rule);
-      methods.add(method);
+    final start = grammar.start;
+    _calledRules.add(start);
+    final generated = <ProductionRule>{};
+    var success = true;
+    while (success) {
+      success = false;
+      for (final rule in _calledRules) {
+        if (generated.add(rule)) {
+          success = true;
+          final method = _generateRule(rule);
+          methods.add(method);
+          break;
+        }
+      }
     }
 
     methods.addAll(_methods.values);
@@ -39,12 +52,15 @@ class PostfixProductionRulesGenerator
     params.add(ParameterOperation('bool', productive));
     var returnType = rule.returnType;
     returnType ??= expression.returnType;
-    final generator = PostfixExpressionOperationGenerator0(options, block, va);
+    final generator = PostfixExpressionOperationGenerator(options, block, va);
     generator.callerId = callerId;
     generator.productive = productive;
+    generator.mode = 1;
     expression.accept(generator);
+    _methods.addAll(generator._methods);
     addReturn(block, varOp(generator.result));
     final result = MethodOperation(returnType, name, params, block);
+    _calledRules.addAll(generator.calledRules);
     return result;
   }
 }

@@ -14,7 +14,7 @@ abstract class ExpressionOperationGenerator
     saveVariable(session, productive);
     addAssign(block, varOp(productive), constOp(false));
     final child = node.expression;
-    visitChild(this, child, block);
+    visitChild(child, block);
     restoreVariables(session);
     result = va.newVar(block, 'final', null);
   }
@@ -54,7 +54,7 @@ abstract class ExpressionOperationGenerator
     saveVariable(session, productive);
     addAssign(block, varOp(productive), constOp(false));
     final child = node.expression;
-    visitChild(this, child, block);
+    visitChild(child, block);
     if (isProductive) {
       addIfVar(block, m.success, (block) {
         final substring = Variable('substring');
@@ -178,7 +178,7 @@ abstract class ExpressionOperationGenerator
     saveVariable(session, productive);
     addAssign(block, varOp(productive), constOp(false));
     final child = node.expression;
-    visitChild(this, child, block);
+    visitChild(child, block);
     addAssign(block, varOp(m.success), notOp(varOp(m.success)));
     restoreVariables(session);
     result = va.newVar(block, 'var', null);
@@ -199,7 +199,7 @@ abstract class ExpressionOperationGenerator
     final passed = va.newVar(block, 'var', constOp(false));
     addLoop(block, (block) {
       final child = node.expression;
-      visitChild(this, child, block);
+      visitChild(child, block);
       addIfNotVar(block, m.success, (block) {
         addAssign(block, varOp(m.success), varOp(passed));
         addIfNotVar(block, m.success, (block) {
@@ -227,7 +227,7 @@ abstract class ExpressionOperationGenerator
   @override
   void visitOptional(OptionalExpression node) {
     final child = node.expression;
-    visitChild(this, child, block);
+    visitChild(child, block);
     result = va.newVar(block, 'final', varOp(result));
     var cannotOptimize = true;
     if (!node.isLast || child.isOptional) {
@@ -253,7 +253,7 @@ abstract class ExpressionOperationGenerator
 
     addLoop(block, (block) {
       final child = node.expression;
-      visitChild(this, child, block);
+      visitChild(child, block);
       addIfNotVar(block, m.success, (block) {
         addAssign(block, varOp(m.success), constOp(true));
         addBreak(block);

@@ -1,19 +1,15 @@
 part of '../../common_generators.dart';
 
 class RangesOperationGenerator with OperationUtils {
-  void generateConditional(
-      BlockOperation block,
-      Variable c,
-      SparseBoolList ranges,
-      bool canMacthEof,
-      void Function(BlockOperation) ifTrue,
+  void generateConditional(BlockOperation block, Variable c, SparseList ranges,
+      bool canMacthEof, void Function(BlockOperation) ifTrue,
       [void Function(BlockOperation) ifFalse]) {
     final test = generateTest(c, ranges, canMacthEof);
     addIfElse(block, test, ifTrue, ifFalse);
   }
 
   Operation generateTest(
-      Variable variable, SparseBoolList ranges, bool canMacthEof) {
+      Variable variable, SparseList ranges, bool canMacthEof) {
     final list = SparseBoolList();
     for (final src in ranges.groups) {
       final dest = GroupedRangeList<bool>(src.start, src.end, true);

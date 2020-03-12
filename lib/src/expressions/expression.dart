@@ -1,7 +1,7 @@
 part of '../../expressions.dart';
 
 abstract class Expression {
-  bool canMacthEof = false;
+  bool canMatchEof = false;
 
   int id;
 

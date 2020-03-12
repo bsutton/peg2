@@ -98,7 +98,7 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
 
       final child = expressions[index];
       isProductive = child.isProductive;
-      visitChild(this, child, block);
+      visitChild(child, block);
       results[child] = result;
       if (child.variable != null) {
         variables[child] = result;
@@ -196,7 +196,7 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       addLoop(block, (block) {
         for (var i = 0; i < expressions.length; i++) {
           final child = expressions[i];
-          visitChild(this, child, block);
+          visitChild(child, block);
           if (isTerminal) {
             final test = ltOp(varOp(failure), varOp(m.failure));
             addIf(block, test, (block) {
@@ -227,7 +227,7 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       });
     } else {
       final child = expressions[0];
-      visitChild(this, child, block);
+      visitChild(child, block);
       addAssign(block, varOp(result1), varOp(result));
     }
 
@@ -315,7 +315,7 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       Variable result1;
       if (willInline) {
         final child = rule.expression;
-        visitChild(this, child, block);
+        visitChild(child, block);
         result1 = result;
       } else {
         final productionRuleNameGenerator = ProductionRuleNameGenerator();
@@ -362,7 +362,7 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       final c = va.newVar(block, 'final', varOp(m.c));
       final rangesOperationGenerator = RangesOperationGenerator();
       rangesOperationGenerator.generateConditional(
-          block, c, startCharacters, node.canMacthEof, onSuccess, onFail);
+          block, c, startCharacters, node.canMatchEof, onSuccess, onFail);
       final returnType = node.returnType;
       result1 = va.newVar(block, returnType, null);
     } else {

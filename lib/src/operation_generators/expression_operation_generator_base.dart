@@ -16,7 +16,7 @@ abstract class ExpressionOperationGeneratorBase extends ExpressionVisitor
 
   Variable result;
 
-  final VariableAllocator va;
+  VariableAllocator va;
 
   final _savedVariables = <int, Map<Variable, Variable>>{};
 
@@ -54,9 +54,8 @@ abstract class ExpressionOperationGeneratorBase extends ExpressionVisitor
     return result;
   }
 
-  void visitChild(
-      ExpressionVisitor visitor, Expression node, BlockOperation block) {
-    runInBlock(block, () => node.accept(visitor));
+  void visitChild(Expression node, BlockOperation block) {
+    runInBlock(block, () => node.accept(this));
   }
 
   Map<Variable, Variable> _getSessionVariables(int session) {
