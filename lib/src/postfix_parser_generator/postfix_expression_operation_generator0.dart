@@ -6,13 +6,96 @@ class PostfixExpressionOperationGenerator0 extends ExpressionOperationGenerator
 
   //final Map<SequenceExpression, Variable> _sequenceMethodVariables = {};
 
+  final Variable c;
+
+  final Variable pos;
+
   PostfixExpressionOperationGenerator0(ParserGeneratorOptions options,
-      BlockOperation block, VariableAllocator va)
+      BlockOperation block, VariableAllocator va, this.c, this.pos)
       : super(options, block, va);
 
   @override
+  void visitAndPredicate(AndPredicateExpression node) {
+    final result1 = va.newVar(block, 'final', constOp(null));
+    result = result1;
+  }
+
+  @override
+  void visitAnyCharacter(AnyCharacterExpression node) {
+    result = va.newVar(block, 'final', varOp(c));
+  }
+
+  @override
+  void visitCapture(CaptureExpression node) {
+    final substring = Variable('substring', true);
+    final call = mbrCallOp(
+        varOp(m.text), varOp(substring), [varOp(startPos), varOp(m.pos)]);
+    result = va.newVar(block, 'final', call);
+  }
+
+  @override
+  void visitCharacterClass(CharacterClassExpression node) {
+    result = va.newVar(block, 'final', varOp(c));
+  }
+
+  @override
+  void visitLiteral(LiteralExpression node) {
+    final text = node.text;
+    final runes = text.runes.toList();
+    if (runes.isEmpty) {
+      result = va.newVar(block, 'final', constOp(''));
+    } else if (runes.length == 1) {
+      result = va.newVar(block, 'final', constOp(text));
+    } else {
+      final offset = runes.first > 0xffff ? 1 : 0;
+      final text1 = text.substring(1 + offset);
+      final matchString2 =
+          callOp(varOp(m.matchString2), [constOp(text1), constOp(text)]);
+      result = va.newVar(block, 'final', matchString2);
+    }
+  }
+
+  @override
   void visitNonterminal(NonterminalExpression node) {
-    // TODO: implement visitNonterminal
+    throw UnimplementedError();
+  }
+
+  @override
+  void visitNotPredicate(NotPredicateExpression node) {
+    addAssign(block, varOp(m.success), constOp(false));
+    final result1 = va.newVar(block, 'final', constOp(null));
+    result = result1;
+  }
+
+  @override
+  void visitOneOrMore(OneOrMoreExpression node) {
+    Variable result1;
+    if (isProductive) {
+      addIfVar(block, productive, (block) {
+        final list = listOp(null, [varOp(result)]);
+        result1 = va.newVar(block, 'final', list);
+      });
+    } else {
+      final returnType = node.returnType;
+      result1 = va.newVar(block, returnType, null);
+    }
+
+    addLoop(block, (block) {
+      final child = node.expression;      
+      visitChild(super, child, block);
+      addIfNotVar(block, m.success, addBreak);
+      final add = Variable('add');
+      addMbrCall(block, varOp(result), varOp(add), [varOp(result)]);
+    });
+
+    result = result1;
+  }
+
+  @override
+  void visitOptional(OptionalExpression node) {
+    final returnType = node.returnType;
+    final result1 = va.newVar(block, returnType, varOp(result));
+    result = result1;
   }
 
   @override
@@ -36,6 +119,8 @@ class PostfixExpressionOperationGenerator0 extends ExpressionOperationGenerator
     final result1 = va.newVar(block, returnType, null);
     final generator =
         PostfixExpressionOperationGenerator1(options, block, va, c, pos);
+    generator.callerId = callerId;
+    generator.productive = productive;
     if (choices.length > 1) {
       addLoop(block, (block) {
         final workTransitions = SparseList<List<int>>();
@@ -91,7 +176,7 @@ class PostfixExpressionOperationGenerator0 extends ExpressionOperationGenerator
               addAssign(block, varOp(m.success), constOp(true));
               visitChild(generator, expression, block);
               addIfVar(block, m.success, (h) {
-                addAssign(block, varOp(result1), varOp(result));
+                addAssign(block, varOp(result1), varOp(generator.result));
                 addBreak(block);
               });
             }
@@ -107,7 +192,7 @@ class PostfixExpressionOperationGenerator0 extends ExpressionOperationGenerator
           addAssign(block, varOp(m.success), constOp(true));
           visitChild(generator, expression, block);
           addIfVar(block, m.success, (h) {
-            addAssign(block, varOp(result1), varOp(result));
+            addAssign(block, varOp(result1), varOp(generator.result));
             addBreak(block);
           });
         }
@@ -137,17 +222,41 @@ class PostfixExpressionOperationGenerator0 extends ExpressionOperationGenerator
 
   @override
   void visitSequence(SequenceExpression node) {
-    // TODO: implement visitSequence
+    throw UnimplementedError();
   }
 
   @override
   void visitSubterminal(SubterminalExpression node) {
-    // TODO: implement visitSubterminal
+    throw UnimplementedError();
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    // TODO: implement visitTerminal
+    throw UnimplementedError();
+  }
+
+  @override
+  void visitZeroOrMore(ZeroOrMoreExpression node) {
+    Variable result1;
+    if (isProductive) {
+      addIfVar(block, productive, (block) {
+        final list = listOp(null, [varOp(result)]);
+        result1 = va.newVar(block, 'final', list);
+      });
+    } else {
+      final returnType = node.returnType;
+      result1 = va.newVar(block, returnType, null);
+    }
+
+    addLoop(block, (block) {
+      final child = node.expression;      
+      visitChild(super, child, block);
+      addIfNotVar(block, m.success, addBreak);
+      final add = Variable('add');
+      addMbrCall(block, varOp(result), varOp(add), [varOp(result)]);
+    });
+
+    result = result1;
   }
 
   void _computeTransitions(List<List<Expression>> choices,

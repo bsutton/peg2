@@ -111,8 +111,8 @@ void main(List<String> args) {
   if (options.isPostfix()) {
     //print('Not implemented yet');
     //exit(-1);
-    //parserGenerator = PostfixParserGenerator(grammar, options);
-    parserGenerator = ExperimentalParserGenerator(grammar, options);
+    parserGenerator = PostfixParserGenerator(grammar, options);
+    //parserGenerator = ExperimentalParserGenerator(grammar, options);
   } else {
     parserGenerator = GeneralParserGenerator(grammar, options);
   }
