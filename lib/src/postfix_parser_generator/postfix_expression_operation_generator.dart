@@ -202,6 +202,17 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
             final choice = choices[index];
             final sequence = expressions[index];
             canMatchEof = sequence.canMatchEof;
+            SequenceExpression firstOptionalSequence;
+            var canUseSuccessCheck = false;
+            for (var i = choice.length - 1; i >= 0; i--) {
+              final expression = choice[i];
+              if (expression is SequenceExpression) {
+                if (expression.isOptional) {
+                  firstOptionalSequence = expression;
+                  break;
+                }
+              }
+            }
 
             void plunge(
                 BlockOperation block, List<Expression> expressions, int index) {
@@ -211,13 +222,21 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
 
               final expression = expressions[index];
               visitChild(expression, block);
-              addIfVar(block, m.success, (block) {
+              if (canUseSuccessCheck) {
+                addIfVar(block, m.success, (block) {
+                  plunge(block, choice, index + 1);
+                  if (index == expressions.length - 1) {
+                    addAssign(block, varOp(result1), varOp(result));
+                    addBreak(block);
+                  }
+                });
+              } else {
                 plunge(block, choice, index + 1);
                 if (index == expressions.length - 1) {
                   addAssign(block, varOp(result1), varOp(result));
                   addBreak(block);
                 }
-              });
+              }
             }
 
             plunge(block, choice, 0);
@@ -244,7 +263,11 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       _generateSequenceMethod(node);
       final name = getExpressionMethodName(node);
       final function = varOp(Variable(name, true));
-      final arguments = <Operation>[];
+      final arguments = <Operation>[
+        varOp(result),
+        varOp(callerId),
+        varOp(productive)
+      ];
       final call = callOp(function, arguments);
       final result1 = va.newVar(block, 'final', call);
       result = result1;
@@ -401,37 +424,56 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       return;
     }
 
-    final block1 = block;
+    if (node.rule.name == "Array") {
+      var x = 0;
+    }
+
+    final expressions = node.expressions;
+    final firstChild = expressions.first;
+    final block_ = block;
     block = BlockOperation();
-    final va1 = va;
+    final va_ = va;
+    final callerId_ = callerId;
+    final productive_ = productive;
+    final result_ = result;
+    final mode_ = mode;
+    final isProductive_ = isProductive;
+    final pos_ = pos;
+    final canMatchEof_ = canMatchEof;
+    mode = 1;
     va = newVarAlloc();
     final returnType = node.returnType;
-    final parameters = <ParameterOperation>[];
+    result = va.alloc(true);
+    callerId = va.alloc(true);
+    productive = va.alloc(true);
+    final params = <ParameterOperation>[];
+    params.add(paramOp(firstChild.returnType, result, null));
+    params.add(paramOp('int', callerId, null));
+    params.add(paramOp('bool', productive, null));
     final name = getExpressionMethodName(node);
-    method = MethodOperation(returnType, name, parameters, block);
+    method = MethodOperation(returnType, name, params, block);
     _methods[node] = method;
-    final expressions = node.expressions.skip(1).toList();
+    final result1 = va.newVar(block, returnType, null);
     final hasAction = node.actionIndex != null;
     final variables = <Expression, Variable>{};
-    final isProductive1 = isProductive;
-    final result1 = va.newVar(block, returnType, null);
     void Function(BlockOperation) onSuccess;
     final results = <Expression, Variable>{};
     final isLastChildOptional = expressions.last.isOptional;
+    results[firstChild] = result;
+    if (firstChild.variable != null) {
+      variables[firstChild] = result;
+    }
+
     void plunge(BlockOperation block, int index) {
-      if (index > expressions.length - 1) {
-        return;
-      }
-
-      final child = expressions[index];
-      isProductive = child.isProductive;
-      visitChild(child, block);
-      results[child] = result;
-      if (child.variable != null) {
-        variables[child] = result;
-      }
-
       if (index < expressions.length - 1) {
+        final child = expressions[index];
+        isProductive = child.isProductive;
+        visitChild(child, block);
+        results[child] = result;
+        if (child.variable != null) {
+          variables[child] = result;
+        }
+
         if (child.isOptional) {
           plunge(block, index + 1);
         } else {
@@ -482,10 +524,15 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       }
     }
 
-    plunge(block, 0);
-    isProductive = isProductive1;
-    result = result1;
-    va = va1;
-    block = block1;
+    plunge(block, 1);
+    canMatchEof = canMatchEof_;
+    pos = pos_;
+    isProductive = isProductive_;
+    mode = mode_;
+    result = result_;
+    productive = productive_;
+    callerId = callerId_;
+    va = va_;
+    block = block_;
   }
 }

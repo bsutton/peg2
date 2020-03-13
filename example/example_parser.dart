@@ -396,104 +396,32 @@ class ExampleParser {
           _success = false;
           _failure = _pos;
         }
-        if (_success) {
-          List<int> $06;
-          if ($01) {}
-          for (;;) {
-            int $07;
-            if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-              _success = true;
-              $07 = _c;
-              _c = _input[++_pos];
-            } else {
-              _success = false;
-              _failure = _pos;
-            }
-            if (!_success) {
-              break;
-            }
-            $06.add($07);
+        List<int> $06;
+        if ($01) {}
+        for (;;) {
+          int $07;
+          if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
+            _success = true;
+            $07 = _c;
+            _c = _input[++_pos];
+          } else {
+            _success = false;
+            _failure = _pos;
           }
-          if (_success) {
-            final $08 = _e180();
-            if (_success) {
-              List<int> $09 = $08;
-              if (_success) {
-                final $010 = _e63();
-                if (_success) {
-                  List<int> $011 = $010;
-                  if (_success) {
-                    List<int> $012 = $011;
-                    if (_success) {
-                      final $013 = _e1();
-                      if (_success) {
-                        dynamic $014 = $013;
-                        if (_success) {
-                          $04 = $014;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
+          if (!_success) {
+            break;
           }
+          $06.add($07);
         }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-    }
-    return $04;
-    return $04;
-  }
-
-  List<int> _e179(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    List<int> $04;
-    for (;;) {
-      if ($02 >= 0 && $02 <= 1114111) {
-        int $05;
-        if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-          _success = true;
-          $05 = _c;
-          _c = _input[++_pos];
-        } else {
-          _success = false;
-          _failure = _pos;
-        }
-        if (_success) {
-          List<int> $06;
-          if ($01) {}
-          for (;;) {
-            int $07;
-            if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-              _success = true;
-              $07 = _c;
-              _c = _input[++_pos];
-            } else {
-              _success = false;
-              _failure = _pos;
-            }
-            if (!_success) {
-              break;
-            }
-            $06.add($07);
-          }
-          if (_success) {
-            final $08 = _e180();
-            if (_success) {
-              List<int> $09 = $08;
-              if (_success) {
-                $04 = $09;
-                break;
-              }
-            }
-          }
-        }
+        final $08 = _e180($06, $00, $01);
+        List<int> $09 = $08;
+        final $010 = _e63($09, $00, $01);
+        List<int> $011 = $010;
+        List<int> $012 = $011;
+        final $013 = _e1($012, $00, $01);
+        dynamic $014 = $013;
+        $04 = $014;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -519,34 +447,16 @@ class ExampleParser {
           _success = false;
           _failure = _pos;
         }
-        if (_success) {
-          int $06 = $05;
-          if (_success) {
-            final $07 = _e84();
-            if (_success) {
-              int $08 = $07;
-              if (_success) {
-                final $09 = _text.substring($03, _pos);
-                if (_success) {
-                  final $010 = _e81();
-                  if (_success) {
-                    num $011 = $010;
-                    if (_success) {
-                      final $012 = _e17();
-                      if (_success) {
-                        dynamic $013 = $012;
-                        if (_success) {
-                          $04 = $013;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        int $06 = $05;
+        final $07 = _e84($06, $00, $01);
+        int $08 = $07;
+        final $09 = _text.substring($03, _pos);
+        final $010 = _e81($09, $00, $01);
+        num $011 = $010;
+        final $012 = _e17($011, $00, $01);
+        dynamic $013 = $012;
+        $04 = $013;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -554,22 +464,12 @@ class ExampleParser {
         final $014 = '\"';
         _success = true;
         _c = _input[++_pos];
-        if (_success) {
-          final $015 = _e74();
-          if (_success) {
-            String $016 = $015;
-            if (_success) {
-              final $017 = _e19();
-              if (_success) {
-                dynamic $018 = $017;
-                if (_success) {
-                  $04 = $018;
-                  break;
-                }
-              }
-            }
-          }
-        }
+        final $015 = _e74($014, $00, $01);
+        String $016 = $015;
+        final $017 = _e19($016, $00, $01);
+        dynamic $018 = $017;
+        $04 = $018;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -579,28 +479,14 @@ class ExampleParser {
         final $019 = '[';
         _success = true;
         _c = _input[++_pos];
-        if (_success) {
-          final $020 = _e118();
-          if (_success) {
-            String $021 = $020;
-            if (_success) {
-              final $022 = _e22();
-              if (_success) {
-                List $023 = $022;
-                if (_success) {
-                  final $024 = _e7();
-                  if (_success) {
-                    dynamic $025 = $024;
-                    if (_success) {
-                      $04 = $025;
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        final $020 = _e118($019, $00, $01);
+        String $021 = $020;
+        final $022 = _e22($021, $00, $01);
+        List $023 = $022;
+        final $024 = _e7($023, $00, $01);
+        dynamic $025 = $024;
+        $04 = $025;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -614,34 +500,16 @@ class ExampleParser {
           _success = false;
           _failure = _pos;
         }
-        if (_success) {
-          int $027 = $026;
-          if (_success) {
-            final $028 = _e84();
-            if (_success) {
-              int $029 = $028;
-              if (_success) {
-                final $030 = _text.substring($03, _pos);
-                if (_success) {
-                  final $031 = _e81();
-                  if (_success) {
-                    num $032 = $031;
-                    if (_success) {
-                      final $033 = _e17();
-                      if (_success) {
-                        dynamic $034 = $033;
-                        if (_success) {
-                          $04 = $034;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        int $027 = $026;
+        final $028 = _e84($027, $00, $01);
+        int $029 = $028;
+        final $030 = _text.substring($03, _pos);
+        final $031 = _e81($030, $00, $01);
+        num $032 = $031;
+        final $033 = _e17($032, $00, $01);
+        dynamic $034 = $033;
+        $04 = $034;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -661,34 +529,16 @@ class ExampleParser {
           _success = false;
           _failure = _pos;
         }
-        if (_success) {
-          int $036 = $035;
-          if (_success) {
-            final $037 = _e84();
-            if (_success) {
-              int $038 = $037;
-              if (_success) {
-                final $039 = _text.substring($03, _pos);
-                if (_success) {
-                  final $040 = _e81();
-                  if (_success) {
-                    num $041 = $040;
-                    if (_success) {
-                      final $042 = _e17();
-                      if (_success) {
-                        dynamic $043 = $042;
-                        if (_success) {
-                          $04 = $043;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        int $036 = $035;
+        final $037 = _e84($036, $00, $01);
+        int $038 = $037;
+        final $039 = _text.substring($03, _pos);
+        final $040 = _e81($039, $00, $01);
+        num $041 = $040;
+        final $042 = _e17($041, $00, $01);
+        dynamic $043 = $042;
+        $04 = $043;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -696,22 +546,12 @@ class ExampleParser {
       }
       if ($02 == 102) {
         final $044 = _matchString('false');
-        if (_success) {
-          final $045 = _e59();
-          if (_success) {
-            dynamic $046 = $045;
-            if (_success) {
-              final $047 = _e9();
-              if (_success) {
-                dynamic $048 = $047;
-                if (_success) {
-                  $04 = $048;
-                  break;
-                }
-              }
-            }
-          }
-        }
+        final $045 = _e59($044, $00, $01);
+        dynamic $046 = $045;
+        final $047 = _e9($046, $00, $01);
+        dynamic $048 = $047;
+        $04 = $048;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -725,34 +565,16 @@ class ExampleParser {
           _success = false;
           _failure = _pos;
         }
-        if (_success) {
-          int $050 = $049;
-          if (_success) {
-            final $051 = _e84();
-            if (_success) {
-              int $052 = $051;
-              if (_success) {
-                final $053 = _text.substring($03, _pos);
-                if (_success) {
-                  final $054 = _e81();
-                  if (_success) {
-                    num $055 = $054;
-                    if (_success) {
-                      final $056 = _e17();
-                      if (_success) {
-                        dynamic $057 = $056;
-                        if (_success) {
-                          $04 = $057;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        int $050 = $049;
+        final $051 = _e84($050, $00, $01);
+        int $052 = $051;
+        final $053 = _text.substring($03, _pos);
+        final $054 = _e81($053, $00, $01);
+        num $055 = $054;
+        final $056 = _e17($055, $00, $01);
+        dynamic $057 = $056;
+        $04 = $057;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -760,22 +582,12 @@ class ExampleParser {
       }
       if ($02 == 110) {
         final $058 = _matchString('null');
-        if (_success) {
-          final $059 = _e66();
-          if (_success) {
-            dynamic $060 = $059;
-            if (_success) {
-              final $061 = _e11();
-              if (_success) {
-                dynamic $062 = $061;
-                if (_success) {
-                  $04 = $062;
-                  break;
-                }
-              }
-            }
-          }
-        }
+        final $059 = _e66($058, $00, $01);
+        dynamic $060 = $059;
+        final $061 = _e11($060, $00, $01);
+        dynamic $062 = $061;
+        $04 = $062;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -789,34 +601,16 @@ class ExampleParser {
           _success = false;
           _failure = _pos;
         }
-        if (_success) {
-          int $064 = $063;
-          if (_success) {
-            final $065 = _e84();
-            if (_success) {
-              int $066 = $065;
-              if (_success) {
-                final $067 = _text.substring($03, _pos);
-                if (_success) {
-                  final $068 = _e81();
-                  if (_success) {
-                    num $069 = $068;
-                    if (_success) {
-                      final $070 = _e17();
-                      if (_success) {
-                        dynamic $071 = $070;
-                        if (_success) {
-                          $04 = $071;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        int $064 = $063;
+        final $065 = _e84($064, $00, $01);
+        int $066 = $065;
+        final $067 = _text.substring($03, _pos);
+        final $068 = _e81($067, $00, $01);
+        num $069 = $068;
+        final $070 = _e17($069, $00, $01);
+        dynamic $071 = $070;
+        $04 = $071;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -824,22 +618,12 @@ class ExampleParser {
       }
       if ($02 == 116) {
         final $072 = _matchString('true');
-        if (_success) {
-          final $073 = _e70();
-          if (_success) {
-            dynamic $074 = $073;
-            if (_success) {
-              final $075 = _e13();
-              if (_success) {
-                dynamic $076 = $075;
-                if (_success) {
-                  $04 = $076;
-                  break;
-                }
-              }
-            }
-          }
-        }
+        final $073 = _e70($072, $00, $01);
+        dynamic $074 = $073;
+        final $075 = _e13($074, $00, $01);
+        dynamic $076 = $075;
+        $04 = $076;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -853,34 +637,16 @@ class ExampleParser {
           _success = false;
           _failure = _pos;
         }
-        if (_success) {
-          int $078 = $077;
-          if (_success) {
-            final $079 = _e84();
-            if (_success) {
-              int $080 = $079;
-              if (_success) {
-                final $081 = _text.substring($03, _pos);
-                if (_success) {
-                  final $082 = _e81();
-                  if (_success) {
-                    num $083 = $082;
-                    if (_success) {
-                      final $084 = _e17();
-                      if (_success) {
-                        dynamic $085 = $084;
-                        if (_success) {
-                          $04 = $085;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        int $078 = $077;
+        final $079 = _e84($078, $00, $01);
+        int $080 = $079;
+        final $081 = _text.substring($03, _pos);
+        final $082 = _e81($081, $00, $01);
+        num $083 = $082;
+        final $084 = _e17($083, $00, $01);
+        dynamic $085 = $084;
+        $04 = $085;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -890,28 +656,14 @@ class ExampleParser {
         final $086 = '{';
         _success = true;
         _c = _input[++_pos];
-        if (_success) {
-          final $087 = _e110();
-          if (_success) {
-            String $088 = $087;
-            if (_success) {
-              final $089 = _e36();
-              if (_success) {
-                Map<String, dynamic> $090 = $089;
-                if (_success) {
-                  final $091 = _e15();
-                  if (_success) {
-                    dynamic $092 = $091;
-                    if (_success) {
-                      $04 = $092;
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        final $087 = _e110($086, $00, $01);
+        String $088 = $087;
+        final $089 = _e36($088, $00, $01);
+        Map<String, dynamic> $090 = $089;
+        final $091 = _e15($090, $00, $01);
+        dynamic $092 = $091;
+        $04 = $092;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -925,120 +677,16 @@ class ExampleParser {
           _success = false;
           _failure = _pos;
         }
-        if (_success) {
-          int $094 = $093;
-          if (_success) {
-            final $095 = _e84();
-            if (_success) {
-              int $096 = $095;
-              if (_success) {
-                final $097 = _text.substring($03, _pos);
-                if (_success) {
-                  final $098 = _e81();
-                  if (_success) {
-                    num $099 = $098;
-                    if (_success) {
-                      final $0100 = _e17();
-                      if (_success) {
-                        dynamic $0101 = $0100;
-                        if (_success) {
-                          $04 = $0101;
-                          break;
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-    }
-    return $04;
-    return $04;
-  }
-
-  dynamic _e54(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    dynamic $04;
-    for (;;) {
-      if ($02 >= 0 && $02 <= 1114111) {
-        int $05;
-        if (_c >= 0 && _c <= 1114111) {
-          _success = true;
-          $05 = _c;
-          _c = _input[_pos += _c <= 65535 ? 1 : 2];
-        } else {
-          _success = false;
-          _failure = _pos;
-        }
-        if (_success) {
-          _success = false;
-          final $06 = null;
-          if (_success) {
-            final $07 = _e55();
-            if (_success) {
-              dynamic $08 = $07;
-              if (_success) {
-                $04 = $08;
-                break;
-              }
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-    }
-    return $04;
-    return $04;
-  }
-
-  num _e80(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    num $04;
-    for (;;) {
-      if ($02 >= 0 && $02 <= 1114111) {
-        int $05;
-        if (_c == 45) {
-          _success = true;
-          $05 = _c;
-          _c = _input[++_pos];
-        } else {
-          _success = false;
-          _failure = _pos;
-        }
-        if (_success) {
-          int $06 = $05;
-          if (_success) {
-            final $07 = _e84();
-            if (_success) {
-              int $08 = $07;
-              if (_success) {
-                final $09 = _text.substring($03, _pos);
-                if (_success) {
-                  final $010 = _e81();
-                  if (_success) {
-                    num $011 = $010;
-                    if (_success) {
-                      $04 = $011;
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        int $094 = $093;
+        final $095 = _e84($094, $00, $01);
+        int $096 = $095;
+        final $097 = _text.substring($03, _pos);
+        final $098 = _e81($097, $00, $01);
+        num $099 = $098;
+        final $0100 = _e17($099, $00, $01);
+        dynamic $0101 = $0100;
+        $04 = $0101;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -1060,22 +708,12 @@ class ExampleParser {
         final $05 = _c;
         _success = true;
         _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e173();
-          if (_success) {
-            int $07 = $06;
-            if (_success) {
-              final $08 = _e137();
-              if (_success) {
-                int $09 = $08;
-                if (_success) {
-                  $04 = $09;
-                  break;
-                }
-              }
-            }
-          }
-        }
+        final $06 = _e173($05, $00, $01);
+        int $07 = $06;
+        final $08 = _e137($07, $00, $01);
+        int $09 = $08;
+        $04 = $09;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -1085,16 +723,10 @@ class ExampleParser {
         final $010 = _c;
         _success = true;
         _c = _input[++_pos];
-        if (_success) {
-          final $011 = _e134();
-          if (_success) {
-            int $012 = $011;
-            if (_success) {
-              $04 = $012;
-              break;
-            }
-          }
-        }
+        final $011 = _e134($010, $00, $01);
+        int $012 = $011;
+        $04 = $012;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -1105,25 +737,58 @@ class ExampleParser {
     return $04;
   }
 
-  String _e73(int $00, bool $01) {
+  List _e27(int $00, bool $01) {
     final $02 = _c;
     final $03 = _pos;
-    String $04;
+    List $04;
+    for (;;) {
+      if ($02 >= 0 && $02 <= 1114111) {
+        String $05;
+        if (_c == 91) {
+          _success = true;
+          $05 = '[';
+          _c = _input[++_pos];
+        } else {
+          _success = false;
+          _failure = _pos;
+        }
+        final $06 = _e118($05, $00, $01);
+        String $07 = $06;
+        final $08 = _e22($07, $00, $01);
+        List $09 = $08;
+        final $010 = _e7($09, $00, $01);
+        dynamic $011 = $010;
+        final $012 = _e28($011, $00, $01);
+        List $013 = $012;
+        $04 = $013;
+        break;
+        if (!_success) {
+          _c = $02;
+          _pos = $03;
+        }
+      }
+    }
+    return $04;
+    return $04;
+  }
+
+  List<MapEntry<String, dynamic>> _e41(int $00, bool $01) {
+    final $02 = _c;
+    final $03 = _pos;
+    List<MapEntry<String, dynamic>> $04;
     for (;;) {
       if ($02 == 34) {
         final $05 = '\"';
         _success = true;
         _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e74();
-          if (_success) {
-            String $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
+        final $06 = _e74($05, $00, $01);
+        String $07 = $06;
+        final $08 = _e50($07, $00, $01);
+        MapEntry<String, dynamic> $09 = $08;
+        final $010 = _e42($09, $00, $01);
+        List<MapEntry<String, dynamic>> $011 = $010;
+        $04 = $011;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -1134,25 +799,19 @@ class ExampleParser {
     return $04;
   }
 
-  String _e117(int $00, bool $01) {
+  String _e129(int $00, bool $01) {
     final $02 = _c;
     final $03 = _pos;
     String $04;
     for (;;) {
-      if ($02 == 91) {
-        final $05 = '[';
+      if ($02 == 58) {
+        final $05 = ':';
         _success = true;
         _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e118();
-          if (_success) {
-            String $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
+        final $06 = _e130($05, $00, $01);
+        String $07 = $06;
+        $04 = $07;
+        break;
         if (!_success) {
           _c = $02;
           _pos = $03;
@@ -1163,1078 +822,314 @@ class ExampleParser {
     return $04;
   }
 
-  String _e121(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    String $04;
+  List<int> _e180(List<int> $00, int $01, bool $02) {
+    List<int> $03;
+    $03 = $00;
+  }
+
+  List<int> _e63(List<int> $00, int $01, bool $02) {
+    List<int> $03;
+    $03 = $00;
+  }
+
+  dynamic _e1(List<int> $00, int $01, bool $02) {
+    dynamic $03;
+    final $04 = _e6(4, $02);
+    if (_success) {
+      if (_success) {
+        $03 = $04;
+      }
+    }
+  }
+
+  int _e84(int $00, int $01, bool $02) {
+    int $03;
+    final $04 = _c;
+    final $05 = _pos;
+    int $06;
     for (;;) {
-      if ($02 == 93) {
-        final $05 = ']';
+      if ($04 == 48) {
+        int $07;
         _success = true;
         _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e122();
-          if (_success) {
-            String $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
+        final $08 = _e88($07, $01, $02);
+        int $09 = $08;
+        $06 = $09;
+        break;
         if (!_success) {
-          _c = $02;
-          _pos = $03;
+          _c = $04;
+          _pos = $05;
+        }
+      }
+      if ($04 >= 49 && $04 <= 57) {
+        int $010;
+        _success = true;
+        _c = _input[++_pos];
+        final $011 = _e90($010, $01, $02);
+        int $012 = $011;
+        $06 = $012;
+        break;
+        if (!_success) {
+          _c = $04;
+          _pos = $05;
         }
       }
     }
-    return $04;
-    return $04;
-  }
-
-  List _e21(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    List $04;
-    for (;;) {
-      if ($02 == 91) {
-        final $05 = '[';
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e118();
-          if (_success) {
-            String $07 = $06;
-            if (_success) {
-              final $08 = _e22();
-              if (_success) {
-                List $09 = $08;
-                if (_success) {
-                  $04 = $09;
-                  break;
-                }
-              }
-            }
+    if (_success) {
+      final $013 = _c;
+      final $014 = _pos;
+      int $015;
+      for (;;) {
+        if ($013 == 46) {
+          int $016;
+          _success = true;
+          _c = _input[++_pos];
+          final $017 = _e96($016, $01, $02);
+          int $018 = $017;
+          $015 = $018;
+          break;
+          if (!_success) {
+            _c = $013;
+            _pos = $014;
           }
         }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
       }
+      final $019 = $015;
+      $03 = $00;
     }
-    return $04;
-    return $04;
   }
 
-  dynamic _e58(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    dynamic $04;
-    for (;;) {
-      if ($02 == 102) {
-        final $05 = _matchString('false');
-        if (_success) {
-          final $06 = _e59();
-          if (_success) {
-            dynamic $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
+  int _e88(int $00, int $01, bool $02) {
+    int $03;
+    if (_success) {
+      $03 = $00;
     }
-    return $04;
-    return $04;
   }
 
-  dynamic _e65(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    dynamic $04;
-    for (;;) {
-      if ($02 == 110) {
-        final $05 = _matchString('null');
-        if (_success) {
-          final $06 = _e66();
-          if (_success) {
-            dynamic $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
+  int _e90(int $00, int $01, bool $02) {
+    int $03;
+    $03 = $00;
+  }
+
+  int _e96(int $00, int $01, bool $02) {
+    int $03;
+    if (_success) {
+      $03 = $00;
     }
-    return $04;
-    return $04;
   }
 
-  dynamic _e69(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    dynamic $04;
-    for (;;) {
-      if ($02 == 116) {
-        final $05 = _matchString('true');
-        if (_success) {
-          final $06 = _e70();
-          if (_success) {
-            dynamic $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
+  num _e81(String $00, int $01, bool $02) {
+    num $03;
+    if (_success) {
+      final n = $00;
+      num $$;
+      $$ = num.parse(n);
+      $03 = $$;
     }
-    return $04;
-    return $04;
   }
 
-  String _e109(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    String $04;
-    for (;;) {
-      if ($02 == 123) {
-        final $05 = '{';
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e110();
-          if (_success) {
-            String $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
+  num _e17(num $00, int $01, bool $02) {
+    num $03;
+    if (_success) {
+      $03 = $00;
     }
-    return $04;
-    return $04;
   }
 
-  String _e113(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    String $04;
-    for (;;) {
-      if ($02 == 125) {
-        final $05 = '}';
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e114();
-          if (_success) {
-            String $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
+  String _e74(String $00, int $01, bool $02) {
+    String $03;
+    List<int> $04;
+    if ($02) {
+      $04 = [];
     }
-    return $04;
-    return $04;
-  }
-
-  Map<String, dynamic> _e35(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    Map<String, dynamic> $04;
     for (;;) {
-      if ($02 == 123) {
-        final $05 = '{';
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e110();
-          if (_success) {
-            String $07 = $06;
-            if (_success) {
-              final $08 = _e36();
-              if (_success) {
-                Map<String, dynamic> $09 = $08;
-                if (_success) {
-                  $04 = $09;
-                  break;
-                }
-              }
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-    }
-    return $04;
-    return $04;
-  }
-
-  int _e172(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    int $04;
-    for (;;) {
-      if ($02 >= 32 && $02 <= 33) {
-        final $05 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e173();
-          if (_success) {
-            int $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 >= 35 && $02 <= 91) {
-        final $08 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $09 = _e175();
-          if (_success) {
-            int $010 = $09;
-            if (_success) {
-              $04 = $010;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 >= 93 && $02 <= 1114111) {
-        final $011 = _c;
-        _success = true;
-        _c = _input[_pos += _c <= 65535 ? 1 : 2];
-        if (_success) {
-          final $012 = _e177();
-          if (_success) {
-            int $013 = $012;
-            if (_success) {
-              $04 = $013;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-    }
-    return $04;
-    return $04;
-  }
-
-  int _e139(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    int $04;
-    for (;;) {
-      if ($02 == 34) {
-        final $05 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e140();
-          if (_success) {
-            int $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 == 47) {
-        final $08 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $09 = _e144();
-          if (_success) {
-            int $010 = $09;
-            if (_success) {
-              $04 = $010;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 == 92) {
-        final $011 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $012 = _e142();
-          if (_success) {
-            int $013 = $012;
-            if (_success) {
-              $04 = $013;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 == 98) {
-        final $014 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $015 = _e146();
-          if (_success) {
-            int $016 = $015;
-            if (_success) {
-              $04 = $016;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 == 102) {
-        final $017 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $018 = _e148();
-          if (_success) {
-            int $019 = $018;
-            if (_success) {
-              $04 = $019;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 == 110) {
-        final $020 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $021 = _e150();
-          if (_success) {
-            int $022 = $021;
-            if (_success) {
-              $04 = $022;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 == 114) {
-        final $023 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $024 = _e152();
-          if (_success) {
-            int $025 = $024;
-            if (_success) {
-              $04 = $025;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 == 116) {
-        final $026 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $027 = _e154();
-          if (_success) {
-            int $028 = $027;
-            if (_success) {
-              $04 = $028;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 == 117) {
-        final $029 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $030 = _e156();
-          if (_success) {
-            int $031 = $030;
-            if (_success) {
-              $04 = $031;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-    }
-    return $04;
-    return $04;
-  }
-
-  int _e159(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    int $04;
-    for (;;) {
-      if ($02 >= 48 && $02 <= 57 ||
-          $02 >= 65 && $02 <= 70 ||
-          $02 >= 97 && $02 <= 102) {
-        final $05 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e166();
-          if (_success) {
-            int $07 = $06;
-            if (_success) {
-              final $08 = _e160();
-              if (_success) {
-                int $09 = $08;
-                if (_success) {
-                  $04 = $09;
-                  break;
-                }
-              }
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-    }
-    return $04;
-    return $04;
-  }
-
-  int _e165(int $00, bool $01) {
-    final $02 = _c;
-    final $03 = _pos;
-    int $04;
-    for (;;) {
-      if ($02 >= 48 && $02 <= 57) {
-        final $05 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $06 = _e170();
-          if (_success) {
-            int $07 = $06;
-            if (_success) {
-              $04 = $07;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 >= 65 && $02 <= 70) {
-        final $08 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $09 = _e168();
-          if (_success) {
-            int $010 = $09;
-            if (_success) {
-              $04 = $010;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-      if ($02 >= 97 && $02 <= 102) {
-        final $011 = _c;
-        _success = true;
-        _c = _input[++_pos];
-        if (_success) {
-          final $012 = _e166();
-          if (_success) {
-            int $013 = $012;
-            if (_success) {
-              $04 = $013;
-              break;
-            }
-          }
-        }
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
-        }
-      }
-    }
-    return $04;
-    return $04;
-  }
-
-  List<int> _e180() {
-    List<int> $00;
-    List<int> $01;
-    for (;;) {
-      int $02;
-      if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
+      final $05 = _e133(77, $02);
       if (!_success) {
+        _success = true;
         break;
       }
-      $01.add($02);
-    }
-    $00 = $01;
-  }
-
-  List<int> _e63() {
-    List<int> $00;
-    final $01 = _e179(64, $01);
-    $00 = $01;
-  }
-
-  dynamic _e1() {
-    dynamic $00;
-    List<int> $01 = $012;
-    final $02 = _e6(4, $01);
-    if (_success) {
-      final $03 = _e54(5, $01);
-      if (_success) {
-        $00 = $02;
+      if ($02) {
+        $04.add($05);
       }
     }
-  }
-
-  int _e84() {
-    int $00;
-    int $01 = $06;
-    int $02 = $01;
-    if (_success) {
-      int $03 = $02;
-      int $04 = $03;
-      $00 = $01;
-    }
-  }
-
-  num _e81() {
-    num $00;
-    final $01 = _text.substring($03, _pos);
-    if (_success) {
-      final $02 = _e179(108, $01);
-      if (_success) {
-        final n = $01;
-        num $$;
-        $$ = num.parse(n);
-        $00 = $$;
-      }
-    }
-  }
-
-  num _e17() {
-    num $00;
-    final $01 = _e80(18, $01);
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  String _e74() {
-    String $00;
-    final $01 = '\"';
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      List<int> $02;
-      if ($01) {}
-      for (;;) {
-        final $03 = _e133(77, $01);
-        if (!_success) {
-          break;
-        }
-        $02.add($03);
-      }
-      final $04 = '\"';
+    String $06;
+    if (_c == 34) {
       _success = true;
       _c = _input[++_pos];
+    } else {
+      _success = false;
+      _failure = _pos;
+    }
+    if (_success) {
       if (_success) {
-        final $05 = _e179(79, $01);
-        if (_success) {
-          final c = $02;
-          String $$;
-          $$ = String.fromCharCodes(c);
-          $00 = $$;
-        }
+        final c = $04;
+        String $$;
+        $$ = String.fromCharCodes(c);
+        $03 = $$;
       }
     }
   }
 
-  String _e19() {
-    String $00;
-    final $01 = _e73(20, $01);
+  String _e19(String $00, int $01, bool $02) {
+    String $03;
     if (_success) {
-      $00 = $01;
+      $03 = $00;
     }
   }
 
-  String _e118() {
-    String $00;
-    final $01 = '[';
-    _success = true;
-    _c = _input[++_pos];
+  String _e118(String $00, int $01, bool $02) {
+    String $03;
+    $03 = $00;
+  }
+
+  List _e22(String $00, int $01, bool $02) {
+    List $03;
+    final $04 = _e27(25, $02);
+    final $05 = $04;
     if (_success) {
-      final $02 = _e179(120, $01);
-      $00 = $01;
+      final v = $05;
+      List $$;
+      $$ = v ?? [];
+      $03 = $$;
     }
   }
 
-  List _e22() {
-    List $00;
-    final $01 = _e117(23, $01);
+  List _e7(List $00, int $01, bool $02) {
+    List $03;
     if (_success) {
-      List $02 = $01;
-      final $03 = _e121(26, $01);
+      $03 = $00;
+    }
+  }
+
+  dynamic _e59(String $00, int $01, bool $02) {
+    dynamic $03;
+    if (_success) {
+      dynamic $$;
+      $$ = false;
+      $03 = $$;
+    }
+  }
+
+  dynamic _e9(dynamic $00, int $01, bool $02) {
+    dynamic $03;
+    if (_success) {
+      $03 = $00;
+    }
+  }
+
+  dynamic _e66(String $00, int $01, bool $02) {
+    dynamic $03;
+    if (_success) {
+      dynamic $$;
+      $$ = null;
+      $03 = $$;
+    }
+  }
+
+  dynamic _e11(dynamic $00, int $01, bool $02) {
+    dynamic $03;
+    if (_success) {
+      $03 = $00;
+    }
+  }
+
+  dynamic _e70(String $00, int $01, bool $02) {
+    dynamic $03;
+    if (_success) {
+      dynamic $$;
+      $$ = true;
+      $03 = $$;
+    }
+  }
+
+  dynamic _e13(dynamic $00, int $01, bool $02) {
+    dynamic $03;
+    if (_success) {
+      $03 = $00;
+    }
+  }
+
+  String _e110(String $00, int $01, bool $02) {
+    String $03;
+    $03 = $00;
+  }
+
+  Map<String, dynamic> _e36(String $00, int $01, bool $02) {
+    Map<String, dynamic> $03;
+    final $04 = _e41(39, $02);
+    final $05 = $04;
+    if (_success) {
+      final m = $05;
+      Map<String, dynamic> $$;
+      $$ = <String, dynamic>{}..addEntries(m ?? []);
+      $03 = $$;
+    }
+  }
+
+  Map<String, dynamic> _e15(Map<String, dynamic> $00, int $01, bool $02) {
+    Map<String, dynamic> $03;
+    if (_success) {
+      $03 = $00;
+    }
+  }
+
+  int _e173(int $00, int $01, bool $02) {
+    int $03;
+    if (_success) {
+      $03 = $00;
+    }
+  }
+
+  int _e137(int $00, int $01, bool $02) {
+    int $03;
+    if (_success) {
+      $03 = $00;
+    }
+  }
+
+  int _e134(int $00, int $01, bool $02) {
+    int $03;
+    if (_success) {
+      $03 = $00;
+    }
+  }
+
+  List _e28(dynamic $00, int $01, bool $02) {
+    List $03;
+    if (_success) {
+      final v = $00;
+      List $$;
+      $$ = [v, ...n];
+      $03 = $$;
+    }
+  }
+
+  MapEntry<String, dynamic> _e50(String $00, int $01, bool $02) {
+    MapEntry<String, dynamic> $03;
+    final $04 = _e129(52, $02);
+    if (_success) {
       if (_success) {
-        final v = $02;
-        List $$;
-        $$ = v ?? [];
-        $00 = $$;
+        final k = $00;
+        MapEntry<String, dynamic> $$;
+        $$ = MapEntry(k, v);
+        $03 = $$;
       }
     }
   }
 
-  List _e7() {
-    List $00;
-    final $01 = _e21(8, $01);
+  List<MapEntry<String, dynamic>> _e42(
+      MapEntry<String, dynamic> $00, int $01, bool $02) {
+    List<MapEntry<String, dynamic>> $03;
     if (_success) {
-      $00 = $01;
+      final m = $00;
+      List<MapEntry<String, dynamic>> $$;
+      $$ = [m, ...n];
+      $03 = $$;
     }
   }
 
-  dynamic _e59() {
-    dynamic $00;
-    final $01 = _matchString('false');
-    if (_success) {
-      final $02 = _e179(61, $01);
-      if (_success) {
-        dynamic $$;
-        $$ = false;
-        $00 = $$;
-      }
-    }
-  }
-
-  dynamic _e9() {
-    dynamic $00;
-    final $01 = _e58(10, $01);
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  dynamic _e66() {
-    dynamic $00;
-    final $01 = _matchString('null');
-    if (_success) {
-      final $02 = _e179(68, $01);
-      if (_success) {
-        dynamic $$;
-        $$ = null;
-        $00 = $$;
-      }
-    }
-  }
-
-  dynamic _e11() {
-    dynamic $00;
-    final $01 = _e65(12, $01);
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  dynamic _e70() {
-    dynamic $00;
-    final $01 = _matchString('true');
-    if (_success) {
-      final $02 = _e179(72, $01);
-      if (_success) {
-        dynamic $$;
-        $$ = true;
-        $00 = $$;
-      }
-    }
-  }
-
-  dynamic _e13() {
-    dynamic $00;
-    final $01 = _e69(14, $01);
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  String _e110() {
-    String $00;
-    final $01 = '{';
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      final $02 = _e179(112, $01);
-      $00 = $01;
-    }
-  }
-
-  Map<String, dynamic> _e36() {
-    Map<String, dynamic> $00;
-    final $01 = _e109(37, $01);
-    if (_success) {
-      List<MapEntry<String, dynamic>> $02 = $01;
-      final $03 = _e113(40, $01);
-      if (_success) {
-        final m = $02;
-        Map<String, dynamic> $$;
-        $$ = <String, dynamic>{}..addEntries(m ?? []);
-        $00 = $$;
-      }
-    }
-  }
-
-  Map<String, dynamic> _e15() {
-    Map<String, dynamic> $00;
-    final $01 = _e35(16, $01);
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  dynamic _e55() {
-    dynamic $00;
-    _success = false;
-    final $01 = null;
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  int _e173() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  int _e137() {
-    int $00;
-    final $01 = _e172(138, $01);
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  int _e134() {
-    int $00;
-    int $01;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      final $02 = _e139(136, $01);
-      if (_success) {
-        $00 = $02;
-      }
-    }
-  }
-
-  String _e122() {
-    String $00;
-    final $01 = ']';
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      final $02 = _e179(124, $01);
-      $00 = $01;
-    }
-  }
-
-  String _e114() {
-    String $00;
-    final $01 = '}';
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      final $02 = _e179(116, $01);
-      $00 = $01;
-    }
-  }
-
-  int _e175() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  int _e177() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[_pos += _c <= 65535 ? 1 : 2];
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  int _e140() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  int _e144() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  int _e142() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      $00 = $01;
-    }
-  }
-
-  int _e146() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      int $$;
-      $$ = 0x8;
-      $00 = $$;
-    }
-  }
-
-  int _e148() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      int $$;
-      $$ = 0xC;
-      $00 = $$;
-    }
-  }
-
-  int _e150() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      int $$;
-      $$ = 0xA;
-      $00 = $$;
-    }
-  }
-
-  int _e152() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      int $$;
-      $$ = 0xD;
-      $00 = $$;
-    }
-  }
-
-  int _e154() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      int $$;
-      $$ = 0x9;
-      $00 = $$;
-    }
-  }
-
-  int _e156() {
-    int $00;
-    int $01;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      final $02 = _e159(158, $01);
-      if (_success) {
-        $00 = $02;
-      }
-    }
-  }
-
-  int _e166() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      int $$;
-      $$ = $$ - 97;
-      $00 = $$;
-    }
-  }
-
-  int _e160() {
-    int $00;
-    final $01 = _e165(161, $01);
-    if (_success) {
-      final $02 = _e165(162, $01);
-      if (_success) {
-        final $03 = _e165(163, $01);
-        if (_success) {
-          final $04 = _e165(164, $01);
-          if (_success) {
-            final a = $01;
-            final b = $02;
-            final c = $03;
-            final d = $04;
-            int $$;
-            $$ = a * 0xfff + b * 0xff + c * 0xf + d;
-            $00 = $$;
-          }
-        }
-      }
-    }
-  }
-
-  int _e170() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      int $$;
-      $$ = $$ - 48;
-      $00 = $$;
-    }
-  }
-
-  int _e168() {
-    int $00;
-    final $01 = _c;
-    _success = true;
-    _c = _input[++_pos];
-    if (_success) {
-      int $$;
-      $$ = $$ - 65;
-      $00 = $$;
-    }
+  String _e130(String $00, int $01, bool $02) {
+    String $03;
+    $03 = $00;
   }
 }
 
