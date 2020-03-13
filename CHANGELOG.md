@@ -1,3 +1,7 @@
+## 0.1.23
+
+- Fixed bugs in `ExpressionStartCharactersResolver`
+
 ## 0.1.22
 
 - Fixed bugs in `ExpressionStartCharactersResolver`

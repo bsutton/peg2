@@ -8,7 +8,7 @@ implement analyzer warning when terminal isSucessful (zero length terminal)
 implement analyzer warning when repetition child isSucessful (infinite loop)
 does not generate unused rules in postfix generator
 improve error message formatter (for Unicode)
-find bug with "break"
+find bug with "break" in postfix generator
 does not generate unused global parser methods
 make some classes private?
 add command line option "optimize-size"
@@ -20,4 +20,3 @@ rework isProductive from `bool` to { always, never, sometimes }???
 add parenthesis to unary operator printer
 improve variable usage optimizer
 need make corrections to character class `toString()`
-remove context in favor to session

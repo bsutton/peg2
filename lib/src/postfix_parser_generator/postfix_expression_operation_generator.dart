@@ -180,10 +180,6 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       return;
     }
 
-    if (node.id == 133) {
-      var x = 0;
-    }
-
     final mode1 = mode;
     mode = 0;
     final session = getSession();
@@ -211,13 +207,13 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
             final choice = choices[index];
             final sequence = expressions[index];
             canMatchEof = sequence.canMatchEof;
-            SequenceExpression firstOptionalSequence;
-            var canUseSuccessCheck = false;
+            //SequenceExpression firstOptionalSequence;
+            final canUseSuccessCheck = false;
             for (var i = choice.length - 1; i >= 0; i--) {
               final expression = choice[i];
               if (expression is SequenceExpression) {
                 if (expression.isOptional) {
-                  firstOptionalSequence = expression;
+                  //firstOptionalSequence = expression;
                   break;
                 }
               }
@@ -428,10 +424,6 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       return;
     }
 
-    if (node.rule.name == "Array") {
-      var x = 0;
-    }
-
     final expressions = node.expressions;
     final firstChild = expressions.first;
     final block_ = block;
@@ -463,21 +455,20 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
     void Function(BlockOperation) onSuccess;
     final results = <Expression, Variable>{};
     final isLastChildOptional = expressions.last.isOptional;
-    results[firstChild] = result;
-    if (firstChild.variable != null) {
-      variables[firstChild] = result;
-    }
 
     void plunge(BlockOperation block, int index) {
-      if (index < expressions.length - 1) {
-        final child = expressions[index];
-        isProductive = child.isProductive;
+      final child = expressions[index];
+      isProductive = child.isProductive;
+      if (index > 0) {
         visitChild(child, block);
-        results[child] = result;
-        if (child.variable != null) {
-          variables[child] = result;
-        }
+      }
 
+      results[child] = result;
+      if (child.variable != null) {
+        variables[child] = result;
+      }
+
+      if (index < expressions.length - 1) {
         if (child.isOptional) {
           plunge(block, index + 1);
         } else {
@@ -485,7 +476,9 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
             plunge(block, index + 1);
           });
         }
-      } else {
+      }
+
+      if (index == expressions.length - 1) {
         if (hasAction) {
           addIfVar(block, m.success, (block) {
             final actionGenerator = ActionGenerator();
@@ -528,7 +521,7 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       }
     }
 
-    plunge(block, 1);
+    plunge(block, 0);
     canMatchEof = canMatchEof_;
     pos = pos_;
     isProductive = isProductive_;

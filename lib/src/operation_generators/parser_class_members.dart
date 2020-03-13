@@ -19,7 +19,7 @@ class ParserClassMembers {
 
   final matchRanges = Variable('_matchRanges', true);
 
-  final matchString = Variable('_matchString', true);  
+  final matchString = Variable('_matchString', true);
 
   final input = Variable('_input', true);
 
