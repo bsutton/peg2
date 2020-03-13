@@ -10,6 +10,8 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
 
   Variable pos;
 
+  SparseBoolList startCharacters;
+
   final Map<SequenceExpression, MethodOperation> _methods = {};
 
   PostfixExpressionOperationGenerator(ParserGeneratorOptions options,
@@ -37,12 +39,13 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       }
 
       addAssign(block, varOp(m.success), constOp(true));
-      final ranges = SparseBoolList();
-      final group = GroupedRangeList<bool>(0, 0x10ffff, true);
-      ranges.addGroup(group);
-      final nextCharGenerator = NextCharGenerator();
-      nextCharGenerator.generate(block, ranges,
-          c: m.c, input: m.input, pos: m.pos);
+      //final ranges = SparseBoolList();
+      //final group = GroupedRangeList<bool>(0, 0x10ffff, true);
+      //ranges.addGroup(group);
+      //final nextCharGenerator = NextCharGenerator();
+      //nextCharGenerator.generate(block, ranges,
+      //     c: m.c, input: m.input, pos: m.pos);
+      _generateNextChar();
       result = result1;
     } else {
       super.visitAnyCharacter(node);
@@ -72,10 +75,10 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       }
 
       addAssign(block, varOp(m.success), constOp(true));
-      final ranges = node.startCharacters;
-      final nextCharGenerator = NextCharGenerator();
-      nextCharGenerator.generate(block, ranges,
-          c: m.c, input: m.input, pos: m.pos);
+      //final ranges = node.startCharacters;
+      //final nextCharGenerator = NextCharGenerator();
+      //nextCharGenerator.generate(block, ranges, c: m.c, input: m.input, pos: m.pos);
+      _generateNextChar();
       result = result1;
     } else {
       super.visitCharacterClass(node);
@@ -94,10 +97,11 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       } else if (runes.length == 1) {
         result1 = va.newVar(block, 'final', constOp(text));
         addAssign(block, varOp(m.success), constOp(true));
-        final ranges = node.startCharacters;
-        final nextCharGenerator = NextCharGenerator();
-        nextCharGenerator.generate(block, ranges,
-            c: m.c, input: m.input, pos: m.pos);
+        //final ranges = node.startCharacters;
+        //final nextCharGenerator = NextCharGenerator();
+        //nextCharGenerator.generate(block, ranges,
+        //    c: m.c, input: m.input, pos: m.pos);
+        _generateNextChar();
       } else {
         final matchString = callOp(varOp(m.matchString), [constOp(text)]);
         result1 = va.newVar(block, 'final', matchString);
@@ -176,6 +180,10 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       return;
     }
 
+    if (node.id == 133) {
+      var x = 0;
+    }
+
     final mode1 = mode;
     mode = 0;
     final session = getSession();
@@ -195,6 +203,7 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       for (var i = 0; i < states.length; i++) {
         final state = states[i];
         final ranges = stateCharacters[i];
+        startCharacters = ranges;
         final rangesOperationGenerator = RangesOperationGenerator();
         rangesOperationGenerator.generateConditional(block, c, ranges, false,
             (block) {
@@ -226,24 +235,26 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
                 addIfVar(block, m.success, (block) {
                   plunge(block, choice, index + 1);
                   if (index == expressions.length - 1) {
-                    addAssign(block, varOp(result1), varOp(result));
-                    addBreak(block);
+                    addIfVar(block, m.success, (block) {
+                      addAssign(block, varOp(result1), varOp(result));
+                      addBreak(block);
+                    });
                   }
                 });
               } else {
                 plunge(block, choice, index + 1);
                 if (index == expressions.length - 1) {
-                  addAssign(block, varOp(result1), varOp(result));
-                  addBreak(block);
+                  addIfVar(block, m.success, (block) {
+                    addAssign(block, varOp(result1), varOp(result));
+                    addBreak(block);
+                  });
                 }
               }
             }
 
             plunge(block, choice, 0);
-            addIfNotVar(block, m.success, (block) {
-              addAssign(block, varOp(m.c), varOp(c));
-              addAssign(block, varOp(m.pos), varOp(pos));
-            });
+            addAssign(block, varOp(m.c), varOp(c));
+            addAssign(block, varOp(m.pos), varOp(pos));
           }
         });
       }
@@ -279,19 +290,6 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
   @override
   void visitSubterminal(SubterminalExpression node) {
     _visitSymbol(node);
-  }
-
-  void _visitSymbol(SymbolExpression node) {
-    final expression = node.expression;
-    final rule = expression.rule;
-    calledRules.add(rule);
-    final arguments = <Operation>[];
-    arguments.add(constOp(node.id));
-    arguments.add(varOp(productive));
-    final name = getExpressionMethodName(expression);
-    final function = Variable(name, true);
-    final call = callOp(varOp(function), arguments);
-    result = va.newVar(block, 'final', call);
   }
 
   @override
@@ -418,6 +416,12 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
     return result;
   }
 
+  void _generateNextChar() {
+    final nextCharGenerator = NextCharGenerator();
+    nextCharGenerator.generate(block, startCharacters,
+        c: m.c, input: m.input, pos: m.pos);
+  }
+
   void _generateSequenceMethod(SequenceExpression node) {
     var method = _methods[node];
     if (method != null) {
@@ -534,5 +538,18 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
     callerId = callerId_;
     va = va_;
     block = block_;
+  }
+
+  void _visitSymbol(SymbolExpression node) {
+    final expression = node.expression;
+    final rule = expression.rule;
+    calledRules.add(rule);
+    final arguments = <Operation>[];
+    arguments.add(constOp(node.id));
+    arguments.add(varOp(productive));
+    final name = getExpressionMethodName(expression);
+    final function = Variable(name, true);
+    final call = callOp(varOp(function), arguments);
+    result = va.newVar(block, 'final', call);
   }
 }

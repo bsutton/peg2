@@ -420,12 +420,12 @@ class ExampleParser {
         List<int> $012 = $011;
         final $013 = _e1($012, $00, $01);
         dynamic $014 = $013;
-        $04 = $014;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $014;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
     }
     return $04;
@@ -455,12 +455,12 @@ class ExampleParser {
         num $011 = $010;
         final $012 = _e17($011, $00, $01);
         dynamic $013 = $012;
-        $04 = $013;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $013;
+          break;
         }
+        _c = $02;
+        _pos = $03;
         final $014 = '\"';
         _success = true;
         _c = _input[++_pos];
@@ -468,12 +468,12 @@ class ExampleParser {
         String $016 = $015;
         final $017 = _e19($016, $00, $01);
         dynamic $018 = $017;
-        $04 = $018;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $018;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
       if ($02 == 91) {
         final $019 = '[';
@@ -485,12 +485,12 @@ class ExampleParser {
         List $023 = $022;
         final $024 = _e7($023, $00, $01);
         dynamic $025 = $024;
-        $04 = $025;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $025;
+          break;
         }
+        _c = $02;
+        _pos = $03;
         int $026;
         if (_c == 45) {
           _success = true;
@@ -508,12 +508,12 @@ class ExampleParser {
         num $032 = $031;
         final $033 = _e17($032, $00, $01);
         dynamic $034 = $033;
-        $04 = $034;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $034;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
       if ($02 >= 92 && $02 <= 101 ||
           $02 >= 103 && $02 <= 109 ||
@@ -537,12 +537,12 @@ class ExampleParser {
         num $041 = $040;
         final $042 = _e17($041, $00, $01);
         dynamic $043 = $042;
-        $04 = $043;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $043;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
       if ($02 == 102) {
         final $044 = _matchString('false');
@@ -550,12 +550,12 @@ class ExampleParser {
         dynamic $046 = $045;
         final $047 = _e9($046, $00, $01);
         dynamic $048 = $047;
-        $04 = $048;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $048;
+          break;
         }
+        _c = $02;
+        _pos = $03;
         int $049;
         if (_c == 45) {
           _success = true;
@@ -573,12 +573,12 @@ class ExampleParser {
         num $055 = $054;
         final $056 = _e17($055, $00, $01);
         dynamic $057 = $056;
-        $04 = $057;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $057;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
       if ($02 == 110) {
         final $058 = _matchString('null');
@@ -586,12 +586,12 @@ class ExampleParser {
         dynamic $060 = $059;
         final $061 = _e11($060, $00, $01);
         dynamic $062 = $061;
-        $04 = $062;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $062;
+          break;
         }
+        _c = $02;
+        _pos = $03;
         int $063;
         if (_c == 45) {
           _success = true;
@@ -609,12 +609,12 @@ class ExampleParser {
         num $069 = $068;
         final $070 = _e17($069, $00, $01);
         dynamic $071 = $070;
-        $04 = $071;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $071;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
       if ($02 == 116) {
         final $072 = _matchString('true');
@@ -622,12 +622,12 @@ class ExampleParser {
         dynamic $074 = $073;
         final $075 = _e13($074, $00, $01);
         dynamic $076 = $075;
-        $04 = $076;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $076;
+          break;
         }
+        _c = $02;
+        _pos = $03;
         int $077;
         if (_c == 45) {
           _success = true;
@@ -645,12 +645,12 @@ class ExampleParser {
         num $083 = $082;
         final $084 = _e17($083, $00, $01);
         dynamic $085 = $084;
-        $04 = $085;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $085;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
       if ($02 == 123) {
         final $086 = '{';
@@ -662,12 +662,12 @@ class ExampleParser {
         Map<String, dynamic> $090 = $089;
         final $091 = _e15($090, $00, $01);
         dynamic $092 = $091;
-        $04 = $092;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $092;
+          break;
         }
+        _c = $02;
+        _pos = $03;
         int $093;
         if (_c == 45) {
           _success = true;
@@ -685,12 +685,12 @@ class ExampleParser {
         num $099 = $098;
         final $0100 = _e17($099, $00, $01);
         dynamic $0101 = $0100;
-        $04 = $0101;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $0101;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
     }
     return $04;
@@ -707,17 +707,17 @@ class ExampleParser {
           $02 >= 93 && $02 <= 1114111) {
         final $05 = _c;
         _success = true;
-        _c = _input[++_pos];
+        _c = _input[_pos += _c <= 65535 ? 1 : 2];
         final $06 = _e173($05, $00, $01);
         int $07 = $06;
         final $08 = _e137($07, $00, $01);
         int $09 = $08;
-        $04 = $09;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $09;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
       if ($02 == 92) {
         final $010 = _c;
@@ -725,12 +725,12 @@ class ExampleParser {
         _c = _input[++_pos];
         final $011 = _e134($010, $00, $01);
         int $012 = $011;
-        $04 = $012;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $012;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
     }
     return $04;
@@ -760,12 +760,12 @@ class ExampleParser {
         dynamic $011 = $010;
         final $012 = _e28($011, $00, $01);
         List $013 = $012;
-        $04 = $013;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $013;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
     }
     return $04;
@@ -787,12 +787,12 @@ class ExampleParser {
         MapEntry<String, dynamic> $09 = $08;
         final $010 = _e42($09, $00, $01);
         List<MapEntry<String, dynamic>> $011 = $010;
-        $04 = $011;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $011;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
     }
     return $04;
@@ -810,12 +810,12 @@ class ExampleParser {
         _c = _input[++_pos];
         final $06 = _e130($05, $00, $01);
         String $07 = $06;
-        $04 = $07;
-        break;
-        if (!_success) {
-          _c = $02;
-          _pos = $03;
+        if (_success) {
+          $04 = $07;
+          break;
         }
+        _c = $02;
+        _pos = $03;
       }
     }
     return $04;
@@ -854,12 +854,12 @@ class ExampleParser {
         _c = _input[++_pos];
         final $08 = _e88($07, $01, $02);
         int $09 = $08;
-        $06 = $09;
-        break;
-        if (!_success) {
-          _c = $04;
-          _pos = $05;
+        if (_success) {
+          $06 = $09;
+          break;
         }
+        _c = $04;
+        _pos = $05;
       }
       if ($04 >= 49 && $04 <= 57) {
         int $010;
@@ -867,12 +867,12 @@ class ExampleParser {
         _c = _input[++_pos];
         final $011 = _e90($010, $01, $02);
         int $012 = $011;
-        $06 = $012;
-        break;
-        if (!_success) {
-          _c = $04;
-          _pos = $05;
+        if (_success) {
+          $06 = $012;
+          break;
         }
+        _c = $04;
+        _pos = $05;
       }
     }
     if (_success) {
@@ -886,12 +886,12 @@ class ExampleParser {
           _c = _input[++_pos];
           final $017 = _e96($016, $01, $02);
           int $018 = $017;
-          $015 = $018;
-          break;
-          if (!_success) {
-            _c = $013;
-            _pos = $014;
+          if (_success) {
+            $015 = $018;
+            break;
           }
+          _c = $013;
+          _pos = $014;
         }
       }
       final $019 = $015;
