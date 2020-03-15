@@ -11,6 +11,9 @@ abstract class ExpressionOperationGenerator
     final session = getSession();
     saveVariable(session, m.c);
     saveVariable(session, m.pos);
+    saveVariable(session, m.error);
+    saveVariable(session, m.expected);
+    saveVariable(session, m.failure);
     saveVariable(session, productive);
     addAssign(block, varOp(productive), constOp(false));
     final child = node.expression;
@@ -175,6 +178,9 @@ abstract class ExpressionOperationGenerator
     final session = getSession();
     saveVariable(session, m.c);
     saveVariable(session, m.pos);
+    saveVariable(session, m.error);
+    saveVariable(session, m.expected);
+    saveVariable(session, m.failure);
     saveVariable(session, productive);
     addAssign(block, varOp(productive), constOp(false));
     final child = node.expression;

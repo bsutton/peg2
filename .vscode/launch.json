@@ -22,9 +22,9 @@
                 //"--inline-all",
                 //"--memoize",
                 //"--no-optimize-code",
-                //"--predict",                
+                //"--predict",
                 "example/example.peg",
-                "example/example.dart"
+                "example/example.dart"                
             ]
         },
         {
@@ -35,9 +35,10 @@
             "args": [
                 //"--inline-all",
                 //"--predict",
-                "--no-optimize-code",
-                "--parser=postfix",
-                "example/example.peg"
+                //"--no-optimize-code",
+                //"--parser=postfix",
+                //"example/example.peg"
+                "example/query.peg"
             ]
         },
         {

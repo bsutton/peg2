@@ -1,3 +1,7 @@
+## 0.1.24
+
+- Minor changes in the behavior of the predicate expression to improve error reporting
+
 ## 0.1.23
 
 - Fixed bugs in `ExpressionStartCharactersResolver`

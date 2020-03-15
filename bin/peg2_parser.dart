@@ -1556,7 +1556,10 @@ class Peg2Parser {
       for (;;) {
         final $026 = _pos;
         final $028 = _c;
-        final $036 = $01;
+        final $036 = _error;
+        final $037 = _expected;
+        final $038 = _failure;
+        final $039 = $01;
         $01 = false;
         if (_c == 39) {
           _success = true;
@@ -1568,7 +1571,10 @@ class Peg2Parser {
         _success = !_success;
         _c = $028;
         _pos = $026;
-        $01 = $036;
+        _error = $036;
+        _expected = $037;
+        _failure = $038;
+        $01 = $039;
         if (_success) {
           _parse$$TERMINAL_CHAR(191, false);
           if (!_success) {
@@ -1896,7 +1902,10 @@ class Peg2Parser {
         final $014 = _pos;
         final $016 = _c;
         List<int> $019;
-        final $024 = $01;
+        final $024 = _error;
+        final $025 = _expected;
+        final $026 = _failure;
+        final $027 = $01;
         $01 = false;
         if (_c == 93) {
           _success = true;
@@ -1908,11 +1917,14 @@ class Peg2Parser {
         _success = !_success;
         _c = $016;
         _pos = $014;
-        $01 = $024;
+        _error = $024;
+        _expected = $025;
+        _failure = $026;
+        $01 = $027;
         if (_success) {
-          final $027 = _parse$$RANGE(249, $01);
+          final $030 = _parse$$RANGE(249, $01);
           if (_success) {
-            $019 = $027;
+            $019 = $030;
           } else {
             _c = $016;
             _pos = $014;
@@ -2023,7 +2035,10 @@ class Peg2Parser {
     final $03 = _pos;
     final $04 = _c;
     dynamic $07;
-    final $012 = $01;
+    final $012 = _error;
+    final $013 = _expected;
+    final $014 = _failure;
+    final $015 = $01;
     $01 = false;
     if (_c >= 0 && _c <= 1114111) {
       _success = true;
@@ -2035,10 +2050,13 @@ class Peg2Parser {
     _success = !_success;
     _c = $04;
     _pos = $03;
-    $01 = $012;
-    var $014;
+    _error = $012;
+    _expected = $013;
+    _failure = $014;
+    $01 = $015;
+    var $017;
     if (_success) {
-      $07 = $014;
+      $07 = $017;
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2155,7 +2173,10 @@ class Peg2Parser {
         final $013 = _pos;
         final $015 = _c;
         int $018;
-        final $023 = $01;
+        final $023 = _error;
+        final $024 = _expected;
+        final $025 = _failure;
+        final $026 = $01;
         $01 = false;
         if (_c == 34) {
           _success = true;
@@ -2167,11 +2188,14 @@ class Peg2Parser {
         _success = !_success;
         _c = $015;
         _pos = $013;
-        $01 = $023;
+        _error = $023;
+        _expected = $024;
+        _failure = $025;
+        $01 = $026;
         if (_success) {
-          final $026 = _parse$$LITERAL_CHAR(289, $01);
+          final $029 = _parse$$LITERAL_CHAR(289, $01);
           if (_success) {
-            $018 = $026;
+            $018 = $029;
           } else {
             _c = $015;
             _pos = $013;
@@ -2568,7 +2592,10 @@ class Peg2Parser {
       dynamic $013;
       final $014 = _c;
       final $015 = _pos;
-      final $018 = $01;
+      final $018 = _error;
+      final $019 = _expected;
+      final $020 = _failure;
+      final $021 = $01;
       $01 = false;
       if (_c == 125) {
         _success = true;
@@ -2580,8 +2607,11 @@ class Peg2Parser {
       _success = !_success;
       _c = $014;
       _pos = $015;
-      $01 = $018;
-      var $020;
+      _error = $018;
+      _expected = $019;
+      _failure = $020;
+      $01 = $021;
+      var $023;
       if (_success) {
         if (_c >= 0 && _c <= 1114111) {
           _success = true;
@@ -2591,7 +2621,7 @@ class Peg2Parser {
           _failure = _pos;
         }
         if (_success) {
-          $013 = $020;
+          $013 = $023;
         } else {
           _c = $014;
           _pos = $015;
@@ -2625,13 +2655,19 @@ class Peg2Parser {
       for (;;) {
         final $012 = _pos;
         final $014 = _c;
-        final $021 = $01;
+        final $021 = _error;
+        final $022 = _expected;
+        final $023 = _failure;
+        final $024 = $01;
         $01 = false;
         _parse$$EOL(355, false);
         _success = !_success;
         _c = $014;
         _pos = $012;
-        $01 = $021;
+        _error = $021;
+        _expected = $022;
+        _failure = $023;
+        $01 = $024;
         if (_success) {
           if (_c >= 0 && _c <= 1114111) {
             _success = true;
@@ -2702,7 +2738,10 @@ class Peg2Parser {
     final $03 = _pos;
     final $04 = _c;
     dynamic $06;
-    final $011 = $01;
+    final $011 = _error;
+    final $012 = _expected;
+    final $013 = _failure;
+    final $014 = $01;
     $01 = false;
     if (_c == 125) {
       _matchString('}%');
@@ -2713,8 +2752,11 @@ class Peg2Parser {
     _success = !_success;
     _c = $04;
     _pos = $03;
-    $01 = $011;
-    var $013;
+    _error = $011;
+    _expected = $012;
+    _failure = $013;
+    $01 = $014;
+    var $016;
     if (_success) {
       if (_c >= 0 && _c <= 1114111) {
         _success = true;
@@ -2724,7 +2766,7 @@ class Peg2Parser {
         _failure = _pos;
       }
       if (_success) {
-        $06 = $013;
+        $06 = $016;
       } else {
         _c = $04;
         _pos = $03;
@@ -2929,7 +2971,10 @@ class Peg2Parser {
       int $015;
       final $016 = _c;
       final $017 = _pos;
-      final $020 = $01;
+      final $020 = _error;
+      final $021 = _expected;
+      final $022 = _failure;
+      final $023 = $01;
       $01 = false;
       if (_c == 92) {
         _success = true;
@@ -2941,29 +2986,38 @@ class Peg2Parser {
       _success = !_success;
       _c = $016;
       _pos = $017;
-      $01 = $020;
+      _error = $020;
+      _expected = $021;
+      _failure = $022;
+      $01 = $023;
       if (_success) {
-        final $023 = _c;
-        final $024 = _pos;
-        final $025 = $01;
+        final $026 = _c;
+        final $027 = _pos;
+        final $028 = _error;
+        final $029 = _expected;
+        final $030 = _failure;
+        final $031 = $01;
         $01 = false;
         _parse$$EOL(404, false);
         _success = !_success;
-        _c = $023;
-        _pos = $024;
-        $01 = $025;
+        _c = $026;
+        _pos = $027;
+        _error = $028;
+        _expected = $029;
+        _failure = $030;
+        $01 = $031;
         if (_success) {
-          int $028;
+          int $034;
           if (_c >= 0 && _c <= 1114111) {
             _success = true;
-            $028 = _c;
+            $034 = _c;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
             _failure = _pos;
           }
           if (_success) {
-            $015 = $028;
+            $015 = $034;
           }
         }
         if (!_success) {
@@ -3089,7 +3143,10 @@ class Peg2Parser {
       int $015;
       final $016 = _c;
       final $017 = _pos;
-      final $020 = $01;
+      final $020 = _error;
+      final $021 = _expected;
+      final $022 = _failure;
+      final $023 = $01;
       $01 = false;
       if (_c >= 92 && _c <= 93) {
         _success = true;
@@ -3101,29 +3158,38 @@ class Peg2Parser {
       _success = !_success;
       _c = $016;
       _pos = $017;
-      $01 = $020;
+      _error = $020;
+      _expected = $021;
+      _failure = $022;
+      $01 = $023;
       if (_success) {
-        final $023 = _c;
-        final $024 = _pos;
-        final $025 = $01;
+        final $026 = _c;
+        final $027 = _pos;
+        final $028 = _error;
+        final $029 = _expected;
+        final $030 = _failure;
+        final $031 = $01;
         $01 = false;
         _parse$$EOL(423, false);
         _success = !_success;
-        _c = $023;
-        _pos = $024;
-        $01 = $025;
+        _c = $026;
+        _pos = $027;
+        _error = $028;
+        _expected = $029;
+        _failure = $030;
+        $01 = $031;
         if (_success) {
-          int $028;
+          int $034;
           if (_c >= 0 && _c <= 1114111) {
             _success = true;
-            $028 = _c;
+            $034 = _c;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
             _failure = _pos;
           }
           if (_success) {
-            $015 = $028;
+            $015 = $034;
           }
         }
         if (!_success) {

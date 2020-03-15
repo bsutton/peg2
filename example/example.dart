@@ -695,7 +695,10 @@ class ExampleParser {
     final $03 = _pos;
     final $04 = _c;
     dynamic $07;
-    final $012 = $01;
+    final $012 = _error;
+    final $013 = _expected;
+    final $014 = _failure;
+    final $015 = $01;
     $01 = false;
     if (_c >= 0 && _c <= 1114111) {
       _success = true;
@@ -707,10 +710,13 @@ class ExampleParser {
     _success = !_success;
     _c = $04;
     _pos = $03;
-    $01 = $012;
-    var $014;
+    _error = $012;
+    _expected = $013;
+    _failure = $014;
+    $01 = $015;
+    var $017;
     if (_success) {
-      $07 = $014;
+      $07 = $017;
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
