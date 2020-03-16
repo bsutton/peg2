@@ -28,6 +28,8 @@ void main(List<String> args) {
       defaultsTo: false, help: 'Memoize results of calls');
   argParser.addFlag('optimize-code',
       defaultsTo: true, help: 'Optimize generated code');
+  argParser.addFlag('optimize-size',
+      defaultsTo: false, help: 'Optimize generated code by size');
   argParser.addOption('parser',
       allowed: ['general', 'postfix'],
       defaultsTo: 'general',
@@ -45,6 +47,7 @@ void main(List<String> args) {
   options.inlineTerminals = argResults['inline-terminals'] as bool;
   options.memoize = argResults['memoize'] as bool;
   options.optimizeCode = argResults['optimize-code'] as bool;
+  options.optimizeSize = argResults['optimize-size'] as bool;
   options.parserType = argResults['parser'] as String;
   options.predict = argResults['predict'] as bool;
   if (argResults['inline-all'] as bool) {

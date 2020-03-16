@@ -76,39 +76,65 @@ abstract class ExpressionOperationGenerator
     final ranges = node.ranges;
     final groups = ranges.groups;
     Variable result1;
-    if (groups.length <= 20) {
-      result1 = va.newVar(block, 'int', null);
+    if (options.optimizeSize) {
+      int char;
+      if (groups.length == 1) {
+        final first = groups.first;
+        if (first.start == first.end) {
+          char = first.start;
+        }
+      }
 
-      void onSuccess(BlockOperation block) {
-        addAssign(block, varOp(m.success), constOp(true));
-        if (isProductive) {
-          addAssign(block, varOp(result1), varOp(m.c));
+      if (char != null) {
+        final matchChar = callOp(varOp(m.matchChar), [constOp(char)]);
+        result1 = va.newVar(block, 'final', matchChar);
+      } else {
+        final elements = <ConstantOperation>[];
+        for (final group in groups) {
+          elements.add(constOp(group.start));
+          elements.add(constOp(group.end));
         }
 
-        final nextCharGenerator = NextCharGenerator();
-        nextCharGenerator.generate(block, ranges,
-            c: m.c, input: m.input, pos: m.pos);
+        final list = listOp(null, elements);
+        final chars = va.newVar(block, 'const', list);
+        final matchRanges = callOp(varOp(m.matchRanges), [varOp(chars)]);
+        result1 = va.newVar(block, 'final', matchRanges);
       }
-
-      void onFail(BlockOperation block) {
-        addAssign(block, varOp(m.success), constOp(false));
-        addAssign(block, varOp(m.failure), varOp(m.pos));
-      }
-
-      final rangesOperationGenerator = RangesOperationGenerator();
-      rangesOperationGenerator.generateConditional(
-          block, m.c, ranges, false, onSuccess, onFail);
     } else {
-      final elements = <ConstantOperation>[];
-      for (var i = 0; i < ranges.length; i += 2) {
-        elements.add(constOp(ranges[i]));
-        elements.add(constOp(ranges[i + 1]));
-      }
+      if (groups.length <= 20) {
+        result1 = va.newVar(block, 'int', null);
 
-      final list = listOp(null, elements);
-      final chars = va.newVar(block, 'const', list);
-      final matchRanges = callOp(varOp(m.matchRanges), [varOp(chars)]);
-      result1 = va.newVar(block, 'final', matchRanges);
+        void onSuccess(BlockOperation block) {
+          addAssign(block, varOp(m.success), constOp(true));
+          if (isProductive) {
+            addAssign(block, varOp(result1), varOp(m.c));
+          }
+
+          final nextCharGenerator = NextCharGenerator();
+          nextCharGenerator.generate(block, ranges,
+              c: m.c, input: m.input, pos: m.pos);
+        }
+
+        void onFail(BlockOperation block) {
+          addAssign(block, varOp(m.success), constOp(false));
+          addAssign(block, varOp(m.failure), varOp(m.pos));
+        }
+
+        final rangesOperationGenerator = RangesOperationGenerator();
+        rangesOperationGenerator.generateConditional(
+            block, m.c, ranges, false, onSuccess, onFail);
+      } else {
+        final elements = <ConstantOperation>[];
+        for (final group in ranges.groups) {
+          elements.add(constOp(group.start));
+          elements.add(constOp(group.end));
+        }
+
+        final list = listOp(null, elements);
+        final chars = va.newVar(block, 'const', list);
+        final matchRanges = callOp(varOp(m.matchRanges), [varOp(chars)]);
+        result1 = va.newVar(block, 'final', matchRanges);
+      }
     }
 
     result = result1;
@@ -119,55 +145,65 @@ abstract class ExpressionOperationGenerator
     final text = node.text;
     final runes = text.runes;
     Variable result1;
-    if (runes.length == 1) {
-      final rune = runes.first;
-      result1 = va.newVar(block, 'String', null);
-      final ranges = SparseBoolList();
-      final group = GroupedRangeList<bool>(rune, rune, true);
-      ranges.addGroup(group);
-
-      void onSuccess(BlockOperation block) {
+    if (options.optimizeSize) {
+      if (runes.isEmpty) {
+        result1 = va.newVar(block, 'final', constOp(''));
         addAssign(block, varOp(m.success), constOp(true));
-        if (isProductive) {
-          addAssign(block, varOp(result1), constOp(text));
+      } else {
+        final matchString = callOp(varOp(m.matchString), [constOp(text)]);
+        result1 = va.newVar(block, 'final', matchString);
+      }
+    } else {
+      if (runes.length == 1) {
+        final rune = runes.first;
+        result1 = va.newVar(block, 'String', null);
+        final ranges = SparseBoolList();
+        final group = GroupedRangeList<bool>(rune, rune, true);
+        ranges.addGroup(group);
+
+        void onSuccess(BlockOperation block) {
+          addAssign(block, varOp(m.success), constOp(true));
+          if (isProductive) {
+            addAssign(block, varOp(result1), constOp(text));
+          }
+
+          final nextCharGenerator = NextCharGenerator();
+          nextCharGenerator.generate(block, ranges,
+              c: m.c, input: m.input, pos: m.pos);
         }
 
-        final nextCharGenerator = NextCharGenerator();
-        nextCharGenerator.generate(block, ranges,
-            c: m.c, input: m.input, pos: m.pos);
+        void onFail(BlockOperation block) {
+          addAssign(block, varOp(m.success), constOp(false));
+          addAssign(block, varOp(m.failure), varOp(m.pos));
+        }
+
+        final rangesOperationGenerator = RangesOperationGenerator();
+        rangesOperationGenerator.generateConditional(
+            block, m.c, ranges, false, onSuccess, onFail);
+      } else if (runes.length > 1) {
+        final rune = runes.first;
+        result1 = va.newVar(block, 'String', null);
+        final ranges = SparseBoolList();
+        final group = GroupedRangeList<bool>(rune, rune, true);
+        ranges.addGroup(group);
+
+        void onSuccess(BlockOperation block) {
+          final matchString = callOp(varOp(m.matchString), [constOp(text)]);
+          addAssign(block, varOp(result1), matchString);
+        }
+
+        void onFail(BlockOperation block) {
+          addAssign(block, varOp(m.success), constOp(false));
+          addAssign(block, varOp(m.failure), varOp(m.pos));
+        }
+
+        final rangesOperationGenerator = RangesOperationGenerator();
+        rangesOperationGenerator.generateConditional(
+            block, m.c, ranges, false, onSuccess, onFail);
+      } else {
+        result1 = va.newVar(block, 'final', constOp(''));
+        addAssign(block, varOp(m.success), constOp(true));
       }
-
-      void onFail(BlockOperation block) {
-        addAssign(block, varOp(m.success), constOp(false));
-        addAssign(block, varOp(m.failure), varOp(m.pos));
-      }
-
-      final rangesOperationGenerator = RangesOperationGenerator();
-      rangesOperationGenerator.generateConditional(
-          block, m.c, ranges, false, onSuccess, onFail);
-    } else if (runes.length > 1) {
-      final rune = runes.first;
-      result1 = va.newVar(block, 'String', null);
-      final ranges = SparseBoolList();
-      final group = GroupedRangeList<bool>(rune, rune, true);
-      ranges.addGroup(group);
-
-      void onSuccess(BlockOperation block) {
-        final matchString = callOp(varOp(m.matchString), [constOp(text)]);
-        addAssign(block, varOp(result1), matchString);
-      }
-
-      void onFail(BlockOperation block) {
-        addAssign(block, varOp(m.success), constOp(false));
-        addAssign(block, varOp(m.failure), varOp(m.pos));
-      }
-
-      final rangesOperationGenerator = RangesOperationGenerator();
-      rangesOperationGenerator.generateConditional(
-          block, m.c, ranges, false, onSuccess, onFail);
-    } else {
-      result1 = va.newVar(block, 'final', constOp(''));
-      addAssign(block, varOp(m.success), constOp(true));
     }
 
     result = result1;

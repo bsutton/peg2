@@ -10,6 +10,7 @@
                 //"--inline-all",
                 //"--memoize",
                 //"--no-optimize-code",
+                "--optimize-size",
                 "bin/peg2.peg"
             ]
         },
@@ -22,6 +23,7 @@
                 //"--inline-all",
                 //"--memoize",
                 //"--no-optimize-code",
+                "--optimize-size",
                 //"--predict",
                 "example/example.peg",
                 "example/example.dart"                

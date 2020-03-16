@@ -1,3 +1,7 @@
+## 0.1.25
+
+- Added command line option `--optimize-size`
+
 ## 0.1.24
 
 - Minor changes in the behavior of the predicate expression to improve error reporting

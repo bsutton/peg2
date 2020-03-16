@@ -13,6 +13,8 @@ class ParserGeneratorOptions {
 
   bool optimizeCode = true;
 
+  bool optimizeSize = false;
+
   String parserType = 'general';
 
   bool predict = false;

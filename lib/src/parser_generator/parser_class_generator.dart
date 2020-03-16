@@ -232,6 +232,20 @@ void _fail(List<String> expected) {
   }
 }
 
+int _matchChar(int c) {
+  int result;
+  if (c == _c) {    
+    _success = true;
+    _c = _input[_pos += _c <= 0xffff ? 1 : 2];
+    result = c;
+  } else {
+    _success = false;
+    _failure = _pos;    
+  }
+
+  return result;
+}
+
 int _matchRanges(List<int> ranges) {
   int result;
   _success = false;
