@@ -1,6 +1,7 @@
 ## 0.1.27
 
 - Removed unnecessary leading zeros from the local variable generator
+- Minor fixes in the memoization algorithm
 
 ## 0.1.26
 

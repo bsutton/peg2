@@ -325,8 +325,8 @@ class ExampleParser {
     }
 
     if (lastPos == _pos) {
+      _memoizable[lastCid] = true;
       if (lastCid != cid) {
-        _memoizable[lastCid] = true;
         _memoizable[cid] = false;
       }
     }

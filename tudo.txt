@@ -13,3 +13,4 @@ rework isProductive from `bool` to { always, never, sometimes }???
 add parenthesis to unary operator printer
 improve variable usage optimizer
 need make corrections to character class `toString()`
+Add finite automaton for grammar analysis

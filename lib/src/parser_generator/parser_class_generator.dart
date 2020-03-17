@@ -320,8 +320,8 @@ bool _memoized(int id, int cid) {
   }
 
   if (lastPos == _pos) {
-    if (lastCid != cid) {
-      _memoizable[lastCid] = true;
+    _memoizable[lastCid] = true;
+    if (lastCid != cid) {        
       _memoizable[cid] = false;
     }
   }
