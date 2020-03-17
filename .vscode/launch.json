@@ -38,9 +38,11 @@
                 //"--inline-all",
                 //"--predict",
                 //"--no-optimize-code",
+                "--optimize-size",
                 //"--parser=postfix",
-                //"example/example.peg"
-                "example/query.peg"
+                "example/example.peg",
+                "example/example.dart"
+                //"example/query.peg"
             ]
         },
         {

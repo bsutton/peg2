@@ -527,7 +527,6 @@ class ExampleParser {
   List _parseValues(int $00, bool $01) {
     List $02;
     final $03 = _pos;
-    final $04 = _c;
     List $06;
     final $09 = _parseValue(29, $01);
     if (_success) {
@@ -562,17 +561,11 @@ class ExampleParser {
           $010.add($011);
         }
       }
-      if (_success) {
-        final v = $09;
-        final n = $010;
-        List $$;
-        $$ = [v, ...n];
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final v = $09;
+      final n = $010;
+      List $$;
+      $$ = [v, ...n];
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -620,7 +613,6 @@ class ExampleParser {
   List<MapEntry<String, dynamic>> _parseMembers(int $00, bool $01) {
     List<MapEntry<String, dynamic>> $02;
     final $03 = _pos;
-    final $04 = _c;
     List<MapEntry<String, dynamic>> $06;
     final $09 = _parseMember(43, $01);
     if (_success) {
@@ -655,17 +647,11 @@ class ExampleParser {
           $010.add($011);
         }
       }
-      if (_success) {
-        final m = $09;
-        final n = $010;
-        List<MapEntry<String, dynamic>> $$;
-        $$ = [m, ...n];
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final m = $09;
+      final n = $010;
+      List<MapEntry<String, dynamic>> $$;
+      $$ = [m, ...n];
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -741,21 +727,13 @@ class ExampleParser {
 
   dynamic _parse_false(int $00, bool $01) {
     dynamic $02;
-    final $03 = _pos;
-    final $04 = _c;
     dynamic $07;
     _matchString('false');
     if (_success) {
       _parse$$spacing(61, false);
-      if (_success) {
-        dynamic $$;
-        $$ = false;
-        $07 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      dynamic $$;
+      $$ = false;
+      $07 = $$;
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -775,21 +753,13 @@ class ExampleParser {
 
   dynamic _parse_null(int $00, bool $01) {
     dynamic $02;
-    final $03 = _pos;
-    final $04 = _c;
     dynamic $07;
     _matchString('null');
     if (_success) {
       _parse$$spacing(68, false);
-      if (_success) {
-        dynamic $$;
-        $$ = null;
-        $07 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      dynamic $$;
+      $$ = null;
+      $07 = $$;
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -800,21 +770,13 @@ class ExampleParser {
 
   dynamic _parse_true(int $00, bool $01) {
     dynamic $02;
-    final $03 = _pos;
-    final $04 = _c;
     dynamic $07;
     _matchString('true');
     if (_success) {
       _parse$$spacing(72, false);
-      if (_success) {
-        dynamic $$;
-        $$ = true;
-        $07 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      dynamic $$;
+      $$ = true;
+      $07 = $$;
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -847,12 +809,10 @@ class ExampleParser {
       _matchString('\"');
       if (_success) {
         _parse$$spacing(79, false);
-        if (_success) {
-          final c = $011;
-          String $$;
-          $$ = String.fromCharCodes(c);
-          $07 = $$;
-        }
+        final c = $011;
+        String $$;
+        $$ = String.fromCharCodes(c);
+        $07 = $$;
       }
       if (!_success) {
         _c = $04;
@@ -869,7 +829,6 @@ class ExampleParser {
   num _parse_number(int $00, bool $01) {
     num $02;
     final $03 = _pos;
-    final $04 = _c;
     num $07;
     String $010;
     final $012 = $01;
@@ -886,8 +845,6 @@ class ExampleParser {
       if (_success) {
         break;
       }
-      final $035 = _c;
-      final $036 = _pos;
       const $037 = [49, 57];
       _matchRanges($037);
       if (_success) {
@@ -898,10 +855,6 @@ class ExampleParser {
             _success = true;
             break;
           }
-        }
-        if (!_success) {
-          _c = $035;
-          _pos = $036;
         }
       }
       if ($029 < _failure) {
@@ -959,26 +912,16 @@ class ExampleParser {
       }
       _success = true;
     }
-    if (!_success) {
-      _c = $016;
-      _pos = $014;
-    }
     if (_success) {
       $010 = _text.substring($03, _pos);
     }
     $01 = $012;
     if (_success) {
       _parse$$spacing(108, false);
-      if (_success) {
-        final n = $010;
-        num $$;
-        $$ = num.parse(n);
-        $07 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final n = $010;
+      num $$;
+      $$ = num.parse(n);
+      $07 = $$;
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -989,17 +932,11 @@ class ExampleParser {
 
   String _parse_$LeftBrace(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('{');
     if (_success) {
       _parse$$spacing(112, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1010,17 +947,11 @@ class ExampleParser {
 
   String _parse_$RightBrace(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('}');
     if (_success) {
       _parse$$spacing(116, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1031,17 +962,11 @@ class ExampleParser {
 
   String _parse_$LeftSquareBracket(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('[');
     if (_success) {
       _parse$$spacing(120, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1052,17 +977,11 @@ class ExampleParser {
 
   String _parse_$RightSquareBracket(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString(']');
     if (_success) {
       _parse$$spacing(124, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1073,17 +992,11 @@ class ExampleParser {
 
   String _parse_$Comma(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString(',');
     if (_success) {
       _parse$$spacing(128, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1094,17 +1007,11 @@ class ExampleParser {
 
   String _parse_$Colon(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString(':');
     if (_success) {
       _parse$$spacing(132, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {

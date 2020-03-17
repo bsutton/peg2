@@ -1,3 +1,7 @@
+## 0.1.26
+
+- The algorithm for generating the expression `Sequence` has been improved
+
 ## 0.1.25
 
 - Added command line option `--optimize-size`

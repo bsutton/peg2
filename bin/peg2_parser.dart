@@ -604,7 +604,6 @@ class Peg2Parser {
   OrderedChoiceExpression _parseNonterminalExpression(int $00, bool $01) {
     OrderedChoiceExpression $02;
     final $03 = _pos;
-    final $04 = _c;
     OrderedChoiceExpression $06;
     final $09 = _parseNonterminalSequence(32, $01);
     if (_success) {
@@ -639,17 +638,11 @@ class Peg2Parser {
           $010.add($011);
         }
       }
-      if (_success) {
-        final e = $09;
-        final n = $010;
-        OrderedChoiceExpression $$;
-        $$ = OrderedChoiceExpression([e, ...n]);
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final e = $09;
+      final n = $010;
+      OrderedChoiceExpression $$;
+      $$ = OrderedChoiceExpression([e, ...n]);
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -661,7 +654,6 @@ class Peg2Parser {
   SequenceExpression _parseNonterminalSequence(int $00, bool $01) {
     SequenceExpression $02;
     final $03 = _pos;
-    final $04 = _c;
     SequenceExpression $06;
     List<Expression> $09;
     if ($01) {
@@ -686,17 +678,11 @@ class Peg2Parser {
       final $012 = _parse_action(43, $01);
       final $013 = $012;
       _success = true;
-      {
-        final e = $09;
-        final a = $013;
-        SequenceExpression $$;
-        $$ = SequenceExpression(e, a);
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final e = $09;
+      final a = $013;
+      SequenceExpression $$;
+      $$ = SequenceExpression(e, a);
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -708,7 +694,6 @@ class Peg2Parser {
   Expression _parseNonterminalPrefix(int $00, bool $01) {
     Expression $02;
     final $03 = _pos;
-    final $04 = _c;
     Expression $06;
     final $09 = _parse_semantic_value(47, $01);
     final $010 = $09;
@@ -743,10 +728,6 @@ class Peg2Parser {
       $$ = _prefix(p, e, s);
       $06 = $$;
     }
-    if (!_success) {
-      _c = $04;
-      _pos = $03;
-    }
     $02 = $06;
     if (!_success && _error == $03) {
       _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
@@ -757,7 +738,6 @@ class Peg2Parser {
   Expression _parseNonterminalSuffix(int $00, bool $01) {
     Expression $02;
     final $03 = _pos;
-    final $04 = _c;
     Expression $06;
     final $09 = _parseNonterminalPrimary(57, $01);
     if (_success) {
@@ -792,17 +772,11 @@ class Peg2Parser {
       }
       final $027 = $010;
       _success = true;
-      {
-        final e = $09;
-        final s = $027;
-        Expression $$;
-        $$ = _suffix(s, e);
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final e = $09;
+      final s = $027;
+      Expression $$;
+      $$ = _suffix(s, e);
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -951,7 +925,6 @@ class Peg2Parser {
   OrderedChoiceExpression _parseExpression(int $00, bool $01) {
     OrderedChoiceExpression $02;
     final $03 = _pos;
-    final $04 = _c;
     OrderedChoiceExpression $06;
     final $09 = _parseSequence(89, $01);
     if (_success) {
@@ -986,17 +959,11 @@ class Peg2Parser {
           $010.add($011);
         }
       }
-      if (_success) {
-        final e = $09;
-        final n = $010;
-        OrderedChoiceExpression $$;
-        $$ = OrderedChoiceExpression([e, ...n]);
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final e = $09;
+      final n = $010;
+      OrderedChoiceExpression $$;
+      $$ = OrderedChoiceExpression([e, ...n]);
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -1015,7 +982,6 @@ class Peg2Parser {
   SequenceExpression _parseSequence(int $00, bool $01) {
     SequenceExpression $02;
     final $03 = _pos;
-    final $04 = _c;
     SequenceExpression $06;
     List<Expression> $09;
     if ($01) {
@@ -1040,17 +1006,11 @@ class Peg2Parser {
       final $012 = _parse_action(100, $01);
       final $013 = $012;
       _success = true;
-      {
-        final e = $09;
-        final a = $013;
-        SequenceExpression $$;
-        $$ = SequenceExpression(e, a);
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final e = $09;
+      final a = $013;
+      SequenceExpression $$;
+      $$ = SequenceExpression(e, a);
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -1069,7 +1029,6 @@ class Peg2Parser {
   Expression _parsePrefix(int $00, bool $01) {
     Expression $02;
     final $03 = _pos;
-    final $04 = _c;
     Expression $06;
     final $09 = _parse_semantic_value(104, $01);
     final $010 = $09;
@@ -1104,10 +1063,6 @@ class Peg2Parser {
       $$ = _prefix(p, e, s);
       $06 = $$;
     }
-    if (!_success) {
-      _c = $04;
-      _pos = $03;
-    }
     $02 = $06;
     if (!_success && _error == $03) {
       _fail(const [
@@ -1125,7 +1080,6 @@ class Peg2Parser {
   Expression _parseSuffix(int $00, bool $01) {
     Expression $02;
     final $03 = _pos;
-    final $04 = _c;
     Expression $06;
     final $09 = _parsePrimary(114, $01);
     if (_success) {
@@ -1160,17 +1114,11 @@ class Peg2Parser {
       }
       final $027 = $010;
       _success = true;
-      {
-        final e = $09;
-        final s = $027;
-        Expression $$;
-        $$ = _suffix(s, e);
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final e = $09;
+      final s = $027;
+      Expression $$;
+      $$ = _suffix(s, e);
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -1376,7 +1324,6 @@ class Peg2Parser {
   String _parseType(int $00, bool $01) {
     String $02;
     final $03 = _pos;
-    final $04 = _c;
     String $06;
     final $09 = _parseTypeName(154, $01);
     if (_success) {
@@ -1404,17 +1351,11 @@ class Peg2Parser {
       }
       final $021 = $010;
       _success = true;
-      {
-        final n = $09;
-        final a = $021;
-        String $$;
-        $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final n = $09;
+      final a = $021;
+      String $$;
+      $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -1473,7 +1414,6 @@ class Peg2Parser {
   List<String> _parseTypeArguments(int $00, bool $01) {
     List<String> $02;
     final $03 = _pos;
-    final $04 = _c;
     List<String> $06;
     final $09 = _parseType(170, $01);
     if (_success) {
@@ -1508,17 +1448,11 @@ class Peg2Parser {
           $010.add($011);
         }
       }
-      if (_success) {
-        final t = $09;
-        final n = $010;
-        List<String> $$;
-        $$ = [t, ...n];
-        $06 = $$;
-      }
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
+      final t = $09;
+      final n = $010;
+      List<String> $$;
+      $$ = [t, ...n];
+      $06 = $$;
     }
     $02 = $06;
     if (!_success && _error == $03) {
@@ -1529,17 +1463,11 @@ class Peg2Parser {
 
   String _parse_non_terminal_name(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _parse$$IDENTIFIER(178, $01);
     if (_success) {
       _parse$$SPACING(179, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1551,7 +1479,6 @@ class Peg2Parser {
   String _parse_terminal_name(int $00, bool $01) {
     String $02;
     final $03 = _pos;
-    final $04 = _c;
     String $07;
     String $010;
     final $012 = $01;
@@ -1605,10 +1532,6 @@ class Peg2Parser {
     if (_success) {
       _parse$$SPACING(193, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1620,7 +1543,6 @@ class Peg2Parser {
   String _parse_sub_terminal_name(int $00, bool $01) {
     String $02;
     final $03 = _pos;
-    final $04 = _c;
     String $07;
     String $010;
     final $012 = $01;
@@ -1642,10 +1564,6 @@ class Peg2Parser {
     if (_success) {
       _parse$$SPACING(201, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1679,21 +1597,14 @@ class Peg2Parser {
   String _parse_type_name(int $00, bool $01) {
     String $02;
     final $03 = _pos;
-    final $04 = _c;
     String $07;
     String $010;
     final $012 = $01;
     $01 = false;
-    final $014 = _pos;
-    final $016 = _c;
     _parse$$IDENTIFIER(211, false);
     if (_success) {
       _matchChar(63);
       _success = true;
-      if (!_success) {
-        _c = $016;
-        _pos = $014;
-      }
     }
     if (_success) {
       $010 = _text.substring($03, _pos);
@@ -1702,10 +1613,6 @@ class Peg2Parser {
     if (_success) {
       _parse$$SPACING(214, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1721,14 +1628,8 @@ class Peg2Parser {
     String $010;
     final $012 = $01;
     $01 = false;
-    final $014 = _pos;
-    final $016 = _c;
     _matchChar(95);
     _parse$$IDENTIFIER(222, false);
-    if (!_success) {
-      _c = $016;
-      _pos = $014;
-    }
     if (_success) {
       $010 = _text.substring($03, _pos);
     }
@@ -1745,17 +1646,11 @@ class Peg2Parser {
 
   String _parse_$Semicolon(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString(';');
     if (_success) {
       _parse$$SPACING(226, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1805,17 +1700,11 @@ class Peg2Parser {
 
   String _parse_$Ampersand(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('&');
     if (_success) {
       _parse$$SPACING(240, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1880,12 +1769,10 @@ class Peg2Parser {
         _matchString(']');
         if (_success) {
           _parse$$SPACING(251, false);
-          if (_success) {
-            final r = $011;
-            Expression $$;
-            $$ = CharacterClassExpression(r);
-            $07 = $$;
-          }
+          final r = $011;
+          Expression $$;
+          $$ = CharacterClassExpression(r);
+          $07 = $$;
         }
       }
       if (!_success) {
@@ -1902,17 +1789,11 @@ class Peg2Parser {
 
   String _parse_$RightParenthesis(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString(')');
     if (_success) {
       _parse$$SPACING(255, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -1923,17 +1804,11 @@ class Peg2Parser {
 
   String _parse_$Period(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('.');
     if (_success) {
       _parse$$SPACING(259, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2027,17 +1902,11 @@ class Peg2Parser {
 
   String _parse_$EqualSign(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('=');
     if (_success) {
       _parse$$SPACING(280, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2096,12 +1965,10 @@ class Peg2Parser {
       _matchChar(34);
       if (_success) {
         _parse$$SPACING(291, false);
-        if (_success) {
-          final c = $011;
-          Expression $$;
-          $$ = LiteralExpression(String.fromCharCodes(c));
-          $07 = $$;
-        }
+        final c = $011;
+        Expression $$;
+        $$ = LiteralExpression(String.fromCharCodes(c));
+        $07 = $$;
       }
       if (!_success) {
         _c = $04;
@@ -2156,17 +2023,11 @@ class Peg2Parser {
 
   String _parse_$ExclamationMark(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('!');
     if (_success) {
       _parse$$SPACING(305, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2177,17 +2038,11 @@ class Peg2Parser {
 
   String _parse_$LeftParenthesis(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('(');
     if (_success) {
       _parse$$SPACING(309, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2198,17 +2053,11 @@ class Peg2Parser {
 
   String _parse_$PlusSign(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('+');
     if (_success) {
       _parse$$SPACING(313, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2219,17 +2068,11 @@ class Peg2Parser {
 
   String _parse_$Comma(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString(',');
     if (_success) {
       _parse$$SPACING(317, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2240,17 +2083,11 @@ class Peg2Parser {
 
   String _parse_$QuestionMark(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('?');
     if (_success) {
       _parse$$SPACING(321, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2261,17 +2098,11 @@ class Peg2Parser {
 
   String _parse_$Slash(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('/');
     if (_success) {
       _parse$$SPACING(325, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2282,17 +2113,11 @@ class Peg2Parser {
 
   String _parse_$Asterisk(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('*');
     if (_success) {
       _parse$$SPACING(329, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2303,17 +2128,11 @@ class Peg2Parser {
 
   String _parse_$LessThanSign(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('<');
     if (_success) {
       _parse$$SPACING(333, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2324,17 +2143,11 @@ class Peg2Parser {
 
   String _parse_$GreaterThanSign(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $07;
     final $010 = _matchString('>');
     if (_success) {
       _parse$$SPACING(337, false);
       $07 = $010;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $07;
     if (!_success && _error <= _failure) {
@@ -2419,8 +2232,6 @@ class Peg2Parser {
 
   String _parse$$COMMENT(int $00, bool $01) {
     String $02;
-    final $03 = _pos;
-    final $04 = _c;
     String $06;
     final $09 = _matchString('#');
     if (_success) {
@@ -2461,10 +2272,6 @@ class Peg2Parser {
       _parse$$EOL(358, false);
       _success = true;
       $06 = $09;
-      if (!_success) {
-        _c = $04;
-        _pos = $03;
-      }
     }
     $02 = $06;
     return $02;
@@ -2581,8 +2388,6 @@ class Peg2Parser {
     String $09;
     final $011 = $01;
     $01 = false;
-    final $013 = _pos;
-    final $015 = _c;
     _parse$$IDENT_START(383, false);
     if (_success) {
       for (;;) {
@@ -2591,10 +2396,6 @@ class Peg2Parser {
           _success = true;
           break;
         }
-      }
-      if (!_success) {
-        _c = $015;
-        _pos = $013;
       }
     }
     if (_success) {

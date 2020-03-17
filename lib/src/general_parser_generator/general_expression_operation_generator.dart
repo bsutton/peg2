@@ -80,6 +80,10 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
 
   @override
   void visitSequence(SequenceExpression node) {
+    if (node.rule.name == "'true'") {
+      var x = 0;
+    }
+
     final expressions = node.expressions;
     final hasAction = node.actionIndex != null;
     final variables = <Expression, Variable>{};
@@ -91,6 +95,7 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
     void Function(BlockOperation) onSuccess;
     final results = <Expression, Variable>{};
     final isLastChildOptional = expressions.last.isOptional;
+    var optionalCount = expressions.where((e) => e.isOptional).length;
     void plunge(BlockOperation block, int index) {
       if (index > expressions.length - 1) {
         return;
@@ -114,10 +119,10 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
         }
       } else {
         if (hasAction) {
-          addIfVar(block, m.success, (block) {
+          onSuccess = (block) {
             final actionGenerator = ActionGenerator();
             actionGenerator.generate(block, node, result1, variables);
-          });
+          };
         } else {
           if (variables.isEmpty) {
             onSuccess = (block) {
@@ -155,10 +160,12 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       }
 
       if (index == 1) {
-        addIfNotVar(block, m.success, (block) {
-          addAssign(block, varOp(m.c), varOp(c));
-          addAssign(block, varOp(m.pos), varOp(pos));
-        });
+        if (optionalCount != expressions.length - 1) {
+          addIfNotVar(block, m.success, (block) {
+            addAssign(block, varOp(m.c), varOp(c));
+            addAssign(block, varOp(m.pos), varOp(pos));
+          });
+        }
       }
     }
 
