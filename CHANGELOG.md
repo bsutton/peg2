@@ -1,3 +1,7 @@
+## 0.1.27
+
+- Removed unnecessary leading zeros from the local variable generator
+
 ## 0.1.26
 
 - The algorithm for generating the expression `Sequence` has been improved

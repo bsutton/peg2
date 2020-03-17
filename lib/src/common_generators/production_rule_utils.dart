@@ -52,7 +52,7 @@ class ProductionRuleUtils {
   VariableAllocator newVarAlloc() {
     var id = 0;
     String allocate() {
-      final name = '\$0${id++}';
+      final name = '\$${id++}';
       return name;
     }
 

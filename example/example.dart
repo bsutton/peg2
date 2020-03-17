@@ -395,25 +395,25 @@ class ExampleParser {
     return result;
   }
 
-  dynamic _parseJson(int $00, bool $01) {
-    dynamic $02;
-    final $03 = _pos;
-    final $04 = _c;
-    dynamic $06;
+  dynamic _parseJson(int $0, bool $1) {
+    dynamic $2;
+    final $3 = _pos;
+    final $4 = _c;
+    dynamic $6;
     _parse_leading_spaces(3, false);
-    final $011 = _parseValue(4, $01);
+    final $11 = _parseValue(4, $1);
     if (_success) {
       _parse_end_of_file(5, false);
       if (_success) {
-        $06 = $011;
+        $6 = $11;
       }
     }
     if (!_success) {
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const [
         '\'false\'',
         '\'null\'',
@@ -424,65 +424,65 @@ class ExampleParser {
         '\'{\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  dynamic _parseValue(int $00, bool $01) {
-    dynamic $02;
-    final $03 = _pos;
+  dynamic _parseValue(int $0, bool $1) {
+    dynamic $2;
+    final $3 = _pos;
     for (;;) {
-      List $06;
-      final $09 = _parseArray(8, $01);
+      List $6;
+      final $9 = _parseArray(8, $1);
       if (_success) {
-        $06 = $09;
-        $02 = $06;
+        $6 = $9;
+        $2 = $6;
         break;
       }
-      dynamic $010;
-      final $013 = _parse_false(10, $01);
+      dynamic $10;
+      final $13 = _parse_false(10, $1);
       if (_success) {
-        $010 = $013;
-        $02 = $010;
+        $10 = $13;
+        $2 = $10;
         break;
       }
-      dynamic $014;
-      final $017 = _parse_null(12, $01);
+      dynamic $14;
+      final $17 = _parse_null(12, $1);
       if (_success) {
-        $014 = $017;
-        $02 = $014;
+        $14 = $17;
+        $2 = $14;
         break;
       }
-      dynamic $018;
-      final $021 = _parse_true(14, $01);
+      dynamic $18;
+      final $21 = _parse_true(14, $1);
       if (_success) {
-        $018 = $021;
-        $02 = $018;
+        $18 = $21;
+        $2 = $18;
         break;
       }
-      Map<String, dynamic> $022;
-      final $025 = _parseObject(16, $01);
+      Map<String, dynamic> $22;
+      final $25 = _parseObject(16, $1);
       if (_success) {
-        $022 = $025;
-        $02 = $022;
+        $22 = $25;
+        $2 = $22;
         break;
       }
-      num $026;
-      final $029 = _parse_number(18, $01);
+      num $26;
+      final $29 = _parse_number(18, $1);
       if (_success) {
-        $026 = $029;
-        $02 = $026;
+        $26 = $29;
+        $2 = $26;
         break;
       }
-      String $030;
-      final $033 = _parse_string(20, $01);
+      String $30;
+      final $33 = _parse_string(20, $1);
       if (_success) {
-        $030 = $033;
-        $02 = $030;
+        $30 = $33;
+        $2 = $30;
         break;
       }
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const [
         '\'false\'',
         '\'null\'',
@@ -493,82 +493,82 @@ class ExampleParser {
         '\'{\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  List _parseArray(int $00, bool $01) {
-    List $02;
-    final $03 = _pos;
-    final $04 = _c;
-    List $06;
+  List _parseArray(int $0, bool $1) {
+    List $2;
+    final $3 = _pos;
+    final $4 = _c;
+    List $6;
     _parse_$LeftSquareBracket(23, false);
     if (_success) {
-      final $010 = _parseValues(25, $01);
-      final $011 = $010;
+      final $10 = _parseValues(25, $1);
+      final $11 = $10;
       _parse_$RightSquareBracket(26, false);
       if (_success) {
-        final v = $011;
+        final v = $11;
         List $$;
         $$ = v ?? [];
-        $06 = $$;
+        $6 = $$;
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'[\'']);
     }
-    return $02;
+    return $2;
   }
 
-  List _parseValues(int $00, bool $01) {
-    List $02;
-    final $03 = _pos;
-    List $06;
-    final $09 = _parseValue(29, $01);
+  List _parseValues(int $0, bool $1) {
+    List $2;
+    final $3 = _pos;
+    List $6;
+    final $9 = _parseValue(29, $1);
     if (_success) {
-      List $010;
-      if ($01) {
-        $010 = [];
+      List $10;
+      if ($1) {
+        $10 = [];
       }
       for (;;) {
-        dynamic $011;
-        final $012 = _pos;
-        final $014 = _c;
-        dynamic $016;
+        dynamic $11;
+        final $12 = _pos;
+        final $14 = _c;
+        dynamic $16;
         _parse_$Comma(33, false);
         if (_success) {
-          final $020 = _parseValue(34, $01);
+          final $20 = _parseValue(34, $1);
           if (_success) {
-            $016 = $020;
+            $16 = $20;
           } else {
-            _c = $014;
-            _pos = $012;
+            _c = $14;
+            _pos = $12;
           }
         }
-        $011 = $016;
-        if (!_success && _error == $012) {
+        $11 = $16;
+        if (!_success && _error == $12) {
           _fail(const ['\',\'']);
         }
         if (!_success) {
           _success = true;
           break;
         }
-        if ($01) {
-          $010.add($011);
+        if ($1) {
+          $10.add($11);
         }
       }
-      final v = $09;
-      final n = $010;
+      final v = $9;
+      final n = $10;
       List $$;
       $$ = [v, ...n];
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const [
         '\'false\'',
         '\'null\'',
@@ -579,127 +579,127 @@ class ExampleParser {
         '\'{\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  Map<String, dynamic> _parseObject(int $00, bool $01) {
-    Map<String, dynamic> $02;
-    final $03 = _pos;
-    final $04 = _c;
-    Map<String, dynamic> $06;
+  Map<String, dynamic> _parseObject(int $0, bool $1) {
+    Map<String, dynamic> $2;
+    final $3 = _pos;
+    final $4 = _c;
+    Map<String, dynamic> $6;
     _parse_$LeftBrace(37, false);
     if (_success) {
-      final $010 = _parseMembers(39, $01);
-      final $011 = $010;
+      final $10 = _parseMembers(39, $1);
+      final $11 = $10;
       _parse_$RightBrace(40, false);
       if (_success) {
-        final m = $011;
+        final m = $11;
         Map<String, dynamic> $$;
         $$ = <String, dynamic>{}..addEntries(m ?? []);
-        $06 = $$;
+        $6 = $$;
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'{\'']);
     }
-    return $02;
+    return $2;
   }
 
-  List<MapEntry<String, dynamic>> _parseMembers(int $00, bool $01) {
-    List<MapEntry<String, dynamic>> $02;
-    final $03 = _pos;
-    List<MapEntry<String, dynamic>> $06;
-    final $09 = _parseMember(43, $01);
+  List<MapEntry<String, dynamic>> _parseMembers(int $0, bool $1) {
+    List<MapEntry<String, dynamic>> $2;
+    final $3 = _pos;
+    List<MapEntry<String, dynamic>> $6;
+    final $9 = _parseMember(43, $1);
     if (_success) {
-      List<MapEntry<String, dynamic>> $010;
-      if ($01) {
-        $010 = [];
+      List<MapEntry<String, dynamic>> $10;
+      if ($1) {
+        $10 = [];
       }
       for (;;) {
-        MapEntry<String, dynamic> $011;
-        final $012 = _pos;
-        final $014 = _c;
-        MapEntry<String, dynamic> $016;
+        MapEntry<String, dynamic> $11;
+        final $12 = _pos;
+        final $14 = _c;
+        MapEntry<String, dynamic> $16;
         _parse_$Comma(47, false);
         if (_success) {
-          final $020 = _parseMember(48, $01);
+          final $20 = _parseMember(48, $1);
           if (_success) {
-            $016 = $020;
+            $16 = $20;
           } else {
-            _c = $014;
-            _pos = $012;
+            _c = $14;
+            _pos = $12;
           }
         }
-        $011 = $016;
-        if (!_success && _error == $012) {
+        $11 = $16;
+        if (!_success && _error == $12) {
           _fail(const ['\',\'']);
         }
         if (!_success) {
           _success = true;
           break;
         }
-        if ($01) {
-          $010.add($011);
+        if ($1) {
+          $10.add($11);
         }
       }
-      final m = $09;
-      final n = $010;
+      final m = $9;
+      final n = $10;
       List<MapEntry<String, dynamic>> $$;
       $$ = [m, ...n];
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'string\'']);
     }
-    return $02;
+    return $2;
   }
 
-  MapEntry<String, dynamic> _parseMember(int $00, bool $01) {
-    MapEntry<String, dynamic> $02;
-    final $03 = _pos;
-    final $04 = _c;
-    MapEntry<String, dynamic> $06;
-    final $09 = _parse_string(51, $01);
+  MapEntry<String, dynamic> _parseMember(int $0, bool $1) {
+    MapEntry<String, dynamic> $2;
+    final $3 = _pos;
+    final $4 = _c;
+    MapEntry<String, dynamic> $6;
+    final $9 = _parse_string(51, $1);
     if (_success) {
       _parse_$Colon(52, false);
       if (_success) {
-        final $011 = _parseValue(53, $01);
+        final $11 = _parseValue(53, $1);
         if (_success) {
-          final k = $09;
-          final v = $011;
+          final k = $9;
+          final v = $11;
           MapEntry<String, dynamic> $$;
           $$ = MapEntry(k, v);
-          $06 = $$;
+          $6 = $$;
         }
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'string\'']);
     }
-    return $02;
+    return $2;
   }
 
-  dynamic _parse_end_of_file(int $00, bool $01) {
-    dynamic $02;
-    final $03 = _pos;
-    final $04 = _c;
-    dynamic $07;
-    final $012 = _error;
-    final $013 = _expected;
-    final $014 = _failure;
-    final $015 = $01;
-    $01 = false;
+  dynamic _parse_end_of_file(int $0, bool $1) {
+    dynamic $2;
+    final $3 = _pos;
+    final $4 = _c;
+    dynamic $7;
+    final $12 = _error;
+    final $13 = _expected;
+    final $14 = _failure;
+    final $15 = $1;
+    $1 = false;
     if (_c >= 0 && _c <= 1114111) {
       _success = true;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
@@ -708,578 +708,578 @@ class ExampleParser {
       _failure = _pos;
     }
     _success = !_success;
-    _c = $04;
-    _pos = $03;
-    _error = $012;
-    _expected = $013;
-    _failure = $014;
-    $01 = $015;
-    var $017;
+    _c = $4;
+    _pos = $3;
+    _error = $12;
+    _expected = $13;
+    _failure = $14;
+    $1 = $15;
+    var $17;
     if (_success) {
-      $07 = $017;
+      $7 = $17;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'end of file\'']);
     }
-    return $02;
+    return $2;
   }
 
-  dynamic _parse_false(int $00, bool $01) {
-    dynamic $02;
-    dynamic $07;
+  dynamic _parse_false(int $0, bool $1) {
+    dynamic $2;
+    dynamic $7;
     _matchString('false');
     if (_success) {
       _parse$$spacing(61, false);
       dynamic $$;
       $$ = false;
-      $07 = $$;
+      $7 = $$;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'false\'']);
     }
-    return $02;
+    return $2;
   }
 
-  List<int> _parse_leading_spaces(int $00, bool $01) {
-    List<int> $02;
-    $02 = _parse$$spacing(64, false);
+  List<int> _parse_leading_spaces(int $0, bool $1) {
+    List<int> $2;
+    $2 = _parse$$spacing(64, false);
     if (!_success && _error <= _failure) {
       _fail(const ['\'leading spaces\'']);
     }
-    return $02;
+    return $2;
   }
 
-  dynamic _parse_null(int $00, bool $01) {
-    dynamic $02;
-    dynamic $07;
+  dynamic _parse_null(int $0, bool $1) {
+    dynamic $2;
+    dynamic $7;
     _matchString('null');
     if (_success) {
       _parse$$spacing(68, false);
       dynamic $$;
       $$ = null;
-      $07 = $$;
+      $7 = $$;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'null\'']);
     }
-    return $02;
+    return $2;
   }
 
-  dynamic _parse_true(int $00, bool $01) {
-    dynamic $02;
-    dynamic $07;
+  dynamic _parse_true(int $0, bool $1) {
+    dynamic $2;
+    dynamic $7;
     _matchString('true');
     if (_success) {
       _parse$$spacing(72, false);
       dynamic $$;
       $$ = true;
-      $07 = $$;
+      $7 = $$;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'true\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_string(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    final $04 = _c;
-    String $07;
+  String _parse_string(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    final $4 = _c;
+    String $7;
     _matchString('\"');
     if (_success) {
-      List<int> $011;
-      if ($01) {
-        $011 = [];
+      List<int> $11;
+      if ($1) {
+        $11 = [];
       }
       for (;;) {
-        final $012 = _parse$$char(77, $01);
+        final $12 = _parse$$char(77, $1);
         if (!_success) {
           _success = true;
           break;
         }
-        if ($01) {
-          $011.add($012);
+        if ($1) {
+          $11.add($12);
         }
       }
       _matchString('\"');
       if (_success) {
         _parse$$spacing(79, false);
-        final c = $011;
+        final c = $11;
         String $$;
         $$ = String.fromCharCodes(c);
-        $07 = $$;
+        $7 = $$;
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'string\'']);
     }
-    return $02;
+    return $2;
   }
 
-  num _parse_number(int $00, bool $01) {
-    num $02;
-    final $03 = _pos;
-    num $07;
-    String $010;
-    final $012 = $01;
-    $01 = false;
-    final $014 = _pos;
-    final $016 = _c;
+  num _parse_number(int $0, bool $1) {
+    num $2;
+    final $3 = _pos;
+    num $7;
+    String $10;
+    final $12 = $1;
+    $1 = false;
+    final $14 = _pos;
+    final $16 = _c;
     _matchChar(45);
-    var $029 = _pos;
+    var $29 = _pos;
     for (;;) {
       _matchChar(48);
-      if ($029 < _failure) {
-        $029 = _failure;
+      if ($29 < _failure) {
+        $29 = _failure;
       }
       if (_success) {
         break;
       }
-      const $037 = [49, 57];
-      _matchRanges($037);
+      const $37 = [49, 57];
+      _matchRanges($37);
       if (_success) {
         for (;;) {
-          const $040 = [48, 57];
-          _matchRanges($040);
+          const $40 = [48, 57];
+          _matchRanges($40);
           if (!_success) {
             _success = true;
             break;
           }
         }
       }
-      if ($029 < _failure) {
-        $029 = _failure;
+      if ($29 < _failure) {
+        $29 = _failure;
       }
       if (_success) {
         break;
       }
-      _c = $016;
-      _pos = $014;
-      _failure = $029;
+      _c = $16;
+      _pos = $14;
+      _failure = $29;
       break;
     }
     if (_success) {
-      final $043 = _pos;
-      final $045 = _c;
+      final $43 = _pos;
+      final $45 = _c;
       _matchChar(46);
       if (_success) {
-        var $053 = false;
+        var $53 = false;
         for (;;) {
-          const $054 = [48, 57];
-          _matchRanges($054);
+          const $54 = [48, 57];
+          _matchRanges($54);
           if (!_success) {
-            _success = $053;
+            _success = $53;
             break;
           }
-          $053 = true;
+          $53 = true;
         }
         if (!_success) {
-          _c = $045;
-          _pos = $043;
+          _c = $45;
+          _pos = $43;
         }
       }
-      final $058 = _pos;
-      final $060 = _c;
-      const $066 = [69, 69, 101, 101];
-      _matchRanges($066);
+      final $58 = _pos;
+      final $60 = _c;
+      const $66 = [69, 69, 101, 101];
+      _matchRanges($66);
       if (_success) {
-        const $068 = [43, 43, 45, 45];
-        _matchRanges($068);
-        var $072 = false;
+        const $68 = [43, 43, 45, 45];
+        _matchRanges($68);
+        var $72 = false;
         for (;;) {
-          const $073 = [48, 57];
-          _matchRanges($073);
+          const $73 = [48, 57];
+          _matchRanges($73);
           if (!_success) {
-            _success = $072;
+            _success = $72;
             break;
           }
-          $072 = true;
+          $72 = true;
         }
         if (!_success) {
-          _c = $060;
-          _pos = $058;
+          _c = $60;
+          _pos = $58;
         }
       }
       _success = true;
     }
     if (_success) {
-      $010 = _text.substring($03, _pos);
+      $10 = _text.substring($3, _pos);
     }
-    $01 = $012;
+    $1 = $12;
     if (_success) {
       _parse$$spacing(108, false);
-      final n = $010;
+      final n = $10;
       num $$;
       $$ = num.parse(n);
-      $07 = $$;
+      $7 = $$;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'number\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$LeftBrace(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('{');
+  String _parse_$LeftBrace(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('{');
     if (_success) {
       _parse$$spacing(112, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'{\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$RightBrace(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('}');
+  String _parse_$RightBrace(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('}');
     if (_success) {
       _parse$$spacing(116, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'}\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$LeftSquareBracket(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('[');
+  String _parse_$LeftSquareBracket(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('[');
     if (_success) {
       _parse$$spacing(120, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'[\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$RightSquareBracket(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString(']');
+  String _parse_$RightSquareBracket(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString(']');
     if (_success) {
       _parse$$spacing(124, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\']\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$Comma(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString(',');
+  String _parse_$Comma(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString(',');
     if (_success) {
       _parse$$spacing(128, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\',\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$Colon(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString(':');
+  String _parse_$Colon(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString(':');
     if (_success) {
       _parse$$spacing(132, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\':\'']);
     }
-    return $02;
+    return $2;
   }
 
-  int _parse$$char(int $00, bool $01) {
-    int $02;
-    final $03 = _pos;
-    final $04 = _c;
+  int _parse$$char(int $0, bool $1) {
+    int $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      int $06;
-      final $07 = _c;
-      final $08 = _pos;
+      int $6;
+      final $7 = _c;
+      final $8 = _pos;
       _matchChar(92);
       if (_success) {
-        final $010 = _parse$$escaped(136, $01);
+        final $10 = _parse$$escaped(136, $1);
         if (_success) {
-          $06 = $010;
+          $6 = $10;
         } else {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      int $011;
-      final $014 = _parse$$unescaped(138, $01);
+      _c = $4;
+      _pos = $3;
+      int $11;
+      final $14 = _parse$$unescaped(138, $1);
       if (_success) {
-        $011 = $014;
-        $02 = $011;
+        $11 = $14;
+        $2 = $11;
         break;
       }
       break;
     }
-    return $02;
+    return $2;
   }
 
-  int _parse$$escaped(int $00, bool $01) {
-    int $02;
-    final $03 = _pos;
-    final $04 = _c;
+  int _parse$$escaped(int $0, bool $1) {
+    int $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      int $06;
-      final $09 = _matchChar(34);
+      int $6;
+      final $9 = _matchChar(34);
       if (_success) {
-        $06 = $09;
-        $02 = $06;
+        $6 = $9;
+        $2 = $6;
         break;
       }
-      int $010;
-      final $013 = _matchChar(92);
+      int $10;
+      final $13 = _matchChar(92);
       if (_success) {
-        $010 = $013;
-        $02 = $010;
+        $10 = $13;
+        $2 = $10;
         break;
       }
-      int $014;
-      final $017 = _matchChar(47);
+      int $14;
+      final $17 = _matchChar(47);
       if (_success) {
-        $014 = $017;
-        $02 = $014;
+        $14 = $17;
+        $2 = $14;
         break;
       }
-      int $018;
+      int $18;
       _matchChar(98);
       if (_success) {
         int $$;
         $$ = 0x8;
-        $018 = $$;
+        $18 = $$;
       }
       if (_success) {
-        $02 = $018;
+        $2 = $18;
         break;
       }
-      int $022;
+      int $22;
       _matchChar(102);
       if (_success) {
         int $$;
         $$ = 0xC;
-        $022 = $$;
+        $22 = $$;
       }
       if (_success) {
-        $02 = $022;
+        $2 = $22;
         break;
       }
-      int $026;
+      int $26;
       _matchChar(110);
       if (_success) {
         int $$;
         $$ = 0xA;
-        $026 = $$;
+        $26 = $$;
       }
       if (_success) {
-        $02 = $026;
+        $2 = $26;
         break;
       }
-      int $030;
+      int $30;
       _matchChar(114);
       if (_success) {
         int $$;
         $$ = 0xD;
-        $030 = $$;
+        $30 = $$;
       }
       if (_success) {
-        $02 = $030;
+        $2 = $30;
         break;
       }
-      int $034;
+      int $34;
       _matchChar(116);
       if (_success) {
         int $$;
         $$ = 0x9;
-        $034 = $$;
+        $34 = $$;
       }
       if (_success) {
-        $02 = $034;
+        $2 = $34;
         break;
       }
-      int $038;
-      final $039 = _c;
-      final $040 = _pos;
+      int $38;
+      final $39 = _c;
+      final $40 = _pos;
       _matchChar(117);
       if (_success) {
-        final $042 = _parse$$hexdig4(158, $01);
+        final $42 = _parse$$hexdig4(158, $1);
         if (_success) {
-          $038 = $042;
+          $38 = $42;
         } else {
-          _c = $039;
-          _pos = $040;
+          _c = $39;
+          _pos = $40;
         }
       }
       if (_success) {
-        $02 = $038;
+        $2 = $38;
         break;
       }
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
       break;
     }
-    return $02;
+    return $2;
   }
 
-  int _parse$$hexdig4(int $00, bool $01) {
-    int $02;
-    final $03 = _pos;
-    final $04 = _c;
-    int $06;
-    final $09 = _parse$$hexdig(161, $01);
+  int _parse$$hexdig4(int $0, bool $1) {
+    int $2;
+    final $3 = _pos;
+    final $4 = _c;
+    int $6;
+    final $9 = _parse$$hexdig(161, $1);
     if (_success) {
-      final $010 = _parse$$hexdig(162, $01);
+      final $10 = _parse$$hexdig(162, $1);
       if (_success) {
-        final $011 = _parse$$hexdig(163, $01);
+        final $11 = _parse$$hexdig(163, $1);
         if (_success) {
-          final $012 = _parse$$hexdig(164, $01);
+          final $12 = _parse$$hexdig(164, $1);
           if (_success) {
-            final a = $09;
-            final b = $010;
-            final c = $011;
-            final d = $012;
+            final a = $9;
+            final b = $10;
+            final c = $11;
+            final d = $12;
             int $$;
             $$ = a * 0xfff + b * 0xff + c * 0xf + d;
-            $06 = $$;
+            $6 = $$;
           }
         }
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $06;
-    return $02;
+    $2 = $6;
+    return $2;
   }
 
-  int _parse$$hexdig(int $00, bool $01) {
-    int $02;
+  int _parse$$hexdig(int $0, bool $1) {
+    int $2;
     for (;;) {
-      int $06;
-      const $09 = [97, 102];
-      _matchRanges($09);
+      int $6;
+      const $9 = [97, 102];
+      _matchRanges($9);
       if (_success) {
         int $$;
         $$ = $$ - 97;
-        $06 = $$;
+        $6 = $$;
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      int $011;
-      const $014 = [65, 70];
-      _matchRanges($014);
+      int $11;
+      const $14 = [65, 70];
+      _matchRanges($14);
       if (_success) {
         int $$;
         $$ = $$ - 65;
-        $011 = $$;
+        $11 = $$;
       }
       if (_success) {
-        $02 = $011;
+        $2 = $11;
         break;
       }
-      int $016;
-      const $019 = [48, 57];
-      _matchRanges($019);
+      int $16;
+      const $19 = [48, 57];
+      _matchRanges($19);
       if (_success) {
         int $$;
         $$ = $$ - 48;
-        $016 = $$;
+        $16 = $$;
       }
       if (_success) {
-        $02 = $016;
+        $2 = $16;
         break;
       }
       break;
     }
-    return $02;
+    return $2;
   }
 
-  int _parse$$unescaped(int $00, bool $01) {
-    int $02;
+  int _parse$$unescaped(int $0, bool $1) {
+    int $2;
     for (;;) {
-      int $06;
-      const $09 = [32, 33];
-      final $010 = _matchRanges($09);
+      int $6;
+      const $9 = [32, 33];
+      final $10 = _matchRanges($9);
       if (_success) {
-        $06 = $010;
-        $02 = $06;
+        $6 = $10;
+        $2 = $6;
         break;
       }
-      int $011;
-      const $014 = [35, 91];
-      final $015 = _matchRanges($014);
+      int $11;
+      const $14 = [35, 91];
+      final $15 = _matchRanges($14);
       if (_success) {
-        $011 = $015;
-        $02 = $011;
+        $11 = $15;
+        $2 = $11;
         break;
       }
-      int $016;
-      const $019 = [93, 1114111];
-      final $020 = _matchRanges($019);
+      int $16;
+      const $19 = [93, 1114111];
+      final $20 = _matchRanges($19);
       if (_success) {
-        $016 = $020;
-        $02 = $016;
+        $16 = $20;
+        $2 = $16;
         break;
       }
       break;
     }
-    return $02;
+    return $2;
   }
 
-  List<int> _parse$$spacing(int $00, bool $01) {
-    List<int> $02;
+  List<int> _parse$$spacing(int $0, bool $1) {
+    List<int> $2;
     for (;;) {
-      const $010 = [9, 10, 13, 13, 32, 32];
-      _matchRanges($010);
+      const $10 = [9, 10, 13, 13, 32, 32];
+      _matchRanges($10);
       if (!_success) {
         _success = true;
         break;
       }
     }
-    return $02;
+    return $2;
   }
 }
 
