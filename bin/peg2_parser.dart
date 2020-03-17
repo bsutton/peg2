@@ -424,52 +424,52 @@ class Peg2Parser {
     return result;
   }
 
-  Grammar _parseGrammar(int $00, bool $01) {
-    Grammar $02;
-    final $03 = _pos;
-    final $04 = _c;
-    Grammar $06;
+  Grammar _parseGrammar(int $0, bool $1) {
+    Grammar $2;
+    final $3 = _pos;
+    final $4 = _c;
+    Grammar $6;
     _parse_leading_spaces(3, false);
-    final $011 = _parse_globals(5, $01);
-    final $012 = $011;
-    final $013 = _parse_members(7, $01);
-    final $014 = $013;
-    List<ProductionRule> $015;
-    if ($01) {
-      $015 = [];
+    final $11 = _parse_globals(5, $1);
+    final $12 = $11;
+    final $13 = _parse_members(7, $1);
+    final $14 = $13;
+    List<ProductionRule> $15;
+    if ($1) {
+      $15 = [];
     }
-    var $016 = false;
+    var $16 = false;
     for (;;) {
-      final $017 = _parseDefinition(9, $01);
+      final $17 = _parseDefinition(9, $1);
       if (!_success) {
-        _success = $016;
+        _success = $16;
         if (!_success) {
-          $015 = null;
+          $15 = null;
         }
         break;
       }
-      if ($01) {
-        $015.add($017);
+      if ($1) {
+        $15.add($17);
       }
-      $016 = true;
+      $16 = true;
     }
     if (_success) {
       _parse_end_of_file(10, false);
       if (_success) {
-        final g = $012;
-        final m = $014;
-        final d = $015;
+        final g = $12;
+        final m = $14;
+        final d = $15;
         Grammar $$;
         $$ = Grammar(d, g, m);
-        $06 = $$;
+        $6 = $$;
       }
     }
     if (!_success) {
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const [
         '\'non terminal name\'',
         '\'terminal name\'',
@@ -478,37 +478,37 @@ class Peg2Parser {
         '\'type name\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  ProductionRule _parseDefinition(int $00, bool $01) {
-    ProductionRule $02;
-    final $03 = _pos;
+  ProductionRule _parseDefinition(int $0, bool $1) {
+    ProductionRule $2;
+    final $3 = _pos;
     for (;;) {
-      ProductionRule $06;
-      final $09 = _parseNonterminalDefinition(13, $01);
+      ProductionRule $6;
+      final $9 = _parseNonterminalDefinition(13, $1);
       if (_success) {
-        $06 = $09;
-        $02 = $06;
+        $6 = $9;
+        $2 = $6;
         break;
       }
-      ProductionRule $010;
-      final $013 = _parseTerminalDefinition(15, $01);
+      ProductionRule $10;
+      final $13 = _parseTerminalDefinition(15, $1);
       if (_success) {
-        $010 = $013;
-        $02 = $010;
+        $10 = $13;
+        $2 = $10;
         break;
       }
-      ProductionRule $014;
-      final $017 = _parseSubterminalDefinition(17, $01);
+      ProductionRule $14;
+      final $17 = _parseSubterminalDefinition(17, $1);
       if (_success) {
-        $014 = $017;
-        $02 = $014;
+        $14 = $17;
+        $2 = $14;
         break;
       }
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const [
         '\'non terminal name\'',
         '\'terminal name\'',
@@ -517,456 +517,456 @@ class Peg2Parser {
         '\'type name\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  ProductionRule _parseNonterminalDefinition(int $00, bool $01) {
-    ProductionRule $02;
-    final $03 = _pos;
-    final $04 = _c;
+  ProductionRule _parseNonterminalDefinition(int $0, bool $1) {
+    ProductionRule $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      ProductionRule $06;
-      final $07 = _c;
-      final $08 = _pos;
-      final $09 = _parseType(20, $01);
+      ProductionRule $6;
+      final $7 = _c;
+      final $8 = _pos;
+      final $9 = _parseType(20, $1);
       if (_success) {
-        final $010 = _parse_non_terminal_name(21, $01);
+        final $10 = _parse_non_terminal_name(21, $1);
         if (_success) {
           _parse_$EqualSign(22, false);
           if (_success) {
-            final $012 = _parseNonterminalExpression(23, $01);
+            final $12 = _parseNonterminalExpression(23, $1);
             if (_success) {
               _parse_$Semicolon(24, false);
               if (_success) {
-                final t = $09;
-                final n = $010;
-                final e = $012;
+                final t = $9;
+                final n = $10;
+                final e = $12;
                 ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, t);
-                $06 = $$;
+                $6 = $$;
               }
             }
           }
         }
         if (!_success) {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      ProductionRule $014;
-      final $015 = _c;
-      final $016 = _pos;
-      final $017 = _parse_non_terminal_name(26, $01);
+      _c = $4;
+      _pos = $3;
+      ProductionRule $14;
+      final $15 = _c;
+      final $16 = _pos;
+      final $17 = _parse_non_terminal_name(26, $1);
       if (_success) {
         _parse_$EqualSign(27, false);
         if (_success) {
-          final $019 = _parseNonterminalExpression(28, $01);
+          final $19 = _parseNonterminalExpression(28, $1);
           if (_success) {
             _parse_$Semicolon(29, false);
             if (_success) {
-              final n = $017;
-              final e = $019;
+              final n = $17;
+              final e = $19;
               ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, null);
-              $014 = $$;
+              $14 = $$;
             }
           }
         }
         if (!_success) {
-          _c = $015;
-          _pos = $016;
+          _c = $15;
+          _pos = $16;
         }
       }
       if (_success) {
-        $02 = $014;
+        $2 = $14;
         break;
       }
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const [
         '\'non terminal name\'',
         '\'library prefix\'',
         '\'type name\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  OrderedChoiceExpression _parseNonterminalExpression(int $00, bool $01) {
-    OrderedChoiceExpression $02;
-    final $03 = _pos;
-    OrderedChoiceExpression $06;
-    final $09 = _parseNonterminalSequence(32, $01);
+  OrderedChoiceExpression _parseNonterminalExpression(int $0, bool $1) {
+    OrderedChoiceExpression $2;
+    final $3 = _pos;
+    OrderedChoiceExpression $6;
+    final $9 = _parseNonterminalSequence(32, $1);
     if (_success) {
-      List<SequenceExpression> $010;
-      if ($01) {
-        $010 = [];
+      List<SequenceExpression> $10;
+      if ($1) {
+        $10 = [];
       }
       for (;;) {
-        SequenceExpression $011;
-        final $012 = _pos;
-        final $014 = _c;
-        SequenceExpression $016;
+        SequenceExpression $11;
+        final $12 = _pos;
+        final $14 = _c;
+        SequenceExpression $16;
         _parse_$Slash(36, false);
         if (_success) {
-          final $020 = _parseNonterminalSequence(37, $01);
+          final $20 = _parseNonterminalSequence(37, $1);
           if (_success) {
-            $016 = $020;
+            $16 = $20;
           } else {
-            _c = $014;
-            _pos = $012;
+            _c = $14;
+            _pos = $12;
           }
         }
-        $011 = $016;
-        if (!_success && _error == $012) {
+        $11 = $16;
+        if (!_success && _error == $12) {
           _fail(const ['\'/\'']);
         }
         if (!_success) {
           _success = true;
           break;
         }
-        if ($01) {
-          $010.add($011);
+        if ($1) {
+          $10.add($11);
         }
       }
-      final e = $09;
-      final n = $010;
+      final e = $9;
+      final n = $10;
       OrderedChoiceExpression $$;
       $$ = OrderedChoiceExpression([e, ...n]);
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
     }
-    return $02;
+    return $2;
   }
 
-  SequenceExpression _parseNonterminalSequence(int $00, bool $01) {
-    SequenceExpression $02;
-    final $03 = _pos;
-    SequenceExpression $06;
-    List<Expression> $09;
-    if ($01) {
-      $09 = [];
+  SequenceExpression _parseNonterminalSequence(int $0, bool $1) {
+    SequenceExpression $2;
+    final $3 = _pos;
+    SequenceExpression $6;
+    List<Expression> $9;
+    if ($1) {
+      $9 = [];
     }
-    var $010 = false;
+    var $10 = false;
     for (;;) {
-      final $011 = _parseNonterminalPrefix(41, $01);
+      final $11 = _parseNonterminalPrefix(41, $1);
       if (!_success) {
-        _success = $010;
+        _success = $10;
         if (!_success) {
-          $09 = null;
+          $9 = null;
         }
         break;
       }
-      if ($01) {
-        $09.add($011);
+      if ($1) {
+        $9.add($11);
       }
-      $010 = true;
+      $10 = true;
     }
     if (_success) {
-      final $012 = _parse_action(43, $01);
-      final $013 = $012;
+      final $12 = _parse_action(43, $1);
+      final $13 = $12;
       _success = true;
-      final e = $09;
-      final a = $013;
+      final e = $9;
+      final a = $13;
       SequenceExpression $$;
       $$ = SequenceExpression(e, a);
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
     }
-    return $02;
+    return $2;
   }
 
-  Expression _parseNonterminalPrefix(int $00, bool $01) {
-    Expression $02;
-    final $03 = _pos;
-    Expression $06;
-    final $09 = _parse_semantic_value(47, $01);
-    final $010 = $09;
-    String $011;
+  Expression _parseNonterminalPrefix(int $0, bool $1) {
+    Expression $2;
+    final $3 = _pos;
+    Expression $6;
+    final $9 = _parse_semantic_value(47, $1);
+    final $10 = $9;
+    String $11;
     for (;;) {
-      String $016;
-      final $019 = _parse_$Ampersand(51, $01);
+      String $16;
+      final $19 = _parse_$Ampersand(51, $1);
       if (_success) {
-        $016 = $019;
-        $011 = $016;
+        $16 = $19;
+        $11 = $16;
         break;
       }
-      String $020;
-      final $023 = _parse_$ExclamationMark(53, $01);
+      String $20;
+      final $23 = _parse_$ExclamationMark(53, $1);
       if (_success) {
-        $020 = $023;
-        $011 = $020;
+        $20 = $23;
+        $11 = $20;
         break;
       }
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const ['\'&\'', '\'!\'']);
     }
-    final $024 = $011;
-    final $025 = _parseNonterminalSuffix(54, $01);
+    final $24 = $11;
+    final $25 = _parseNonterminalSuffix(54, $1);
     if (_success) {
-      final s = $010;
-      final p = $024;
-      final e = $025;
+      final s = $10;
+      final p = $24;
+      final e = $25;
       Expression $$;
       $$ = _prefix(p, e, s);
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
     }
-    return $02;
+    return $2;
   }
 
-  Expression _parseNonterminalSuffix(int $00, bool $01) {
-    Expression $02;
-    final $03 = _pos;
-    Expression $06;
-    final $09 = _parseNonterminalPrimary(57, $01);
+  Expression _parseNonterminalSuffix(int $0, bool $1) {
+    Expression $2;
+    final $3 = _pos;
+    Expression $6;
+    final $9 = _parseNonterminalPrimary(57, $1);
     if (_success) {
-      String $010;
-      final $011 = _pos;
+      String $10;
+      final $11 = _pos;
       for (;;) {
-        String $015;
-        final $018 = _parse_$QuestionMark(61, $01);
+        String $15;
+        final $18 = _parse_$QuestionMark(61, $1);
         if (_success) {
-          $015 = $018;
-          $010 = $015;
+          $15 = $18;
+          $10 = $15;
           break;
         }
-        String $019;
-        final $022 = _parse_$Asterisk(63, $01);
+        String $19;
+        final $22 = _parse_$Asterisk(63, $1);
         if (_success) {
-          $019 = $022;
-          $010 = $019;
+          $19 = $22;
+          $10 = $19;
           break;
         }
-        String $023;
-        final $026 = _parse_$PlusSign(65, $01);
+        String $23;
+        final $26 = _parse_$PlusSign(65, $1);
         if (_success) {
-          $023 = $026;
-          $010 = $023;
+          $23 = $26;
+          $10 = $23;
           break;
         }
         break;
       }
-      if (!_success && _error == $011) {
+      if (!_success && _error == $11) {
         _fail(const ['\'?\'', '\'*\'', '\'+\'']);
       }
-      final $027 = $010;
+      final $27 = $10;
       _success = true;
-      final e = $09;
-      final s = $027;
+      final e = $9;
+      final s = $27;
       Expression $$;
       $$ = _suffix(s, e);
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
     }
-    return $02;
+    return $2;
   }
 
-  Expression _parseNonterminalPrimary(int $00, bool $01) {
-    Expression $02;
-    final $03 = _pos;
-    final $04 = _c;
+  Expression _parseNonterminalPrimary(int $0, bool $1) {
+    Expression $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      Expression $06;
-      final $09 = _parse_non_terminal_name(68, $01);
+      Expression $6;
+      final $9 = _parse_non_terminal_name(68, $1);
       if (_success) {
-        final n = $09;
+        final n = $9;
         Expression $$;
         $$ = NonterminalExpression(n);
-        $06 = $$;
+        $6 = $$;
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      Expression $010;
-      final $013 = _parse_terminal_name(70, $01);
+      Expression $10;
+      final $13 = _parse_terminal_name(70, $1);
       if (_success) {
-        final n = $013;
+        final n = $13;
         Expression $$;
         $$ = TerminalExpression(n);
-        $010 = $$;
+        $10 = $$;
       }
       if (_success) {
-        $02 = $010;
+        $2 = $10;
         break;
       }
-      Expression $014;
-      final $015 = _c;
-      final $016 = _pos;
+      Expression $14;
+      final $15 = _c;
+      final $16 = _pos;
       _parse_$LeftParenthesis(72, false);
       if (_success) {
-        final $018 = _parseNonterminalExpression(73, $01);
+        final $18 = _parseNonterminalExpression(73, $1);
         if (_success) {
           _parse_$RightParenthesis(74, false);
           if (_success) {
-            $014 = $018;
+            $14 = $18;
           }
         }
         if (!_success) {
-          _c = $015;
-          _pos = $016;
+          _c = $15;
+          _pos = $16;
         }
       }
       if (_success) {
-        $02 = $014;
+        $2 = $14;
         break;
       }
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const ['\'non terminal name\'', '\'terminal name\'', '\'(\'']);
     }
-    return $02;
+    return $2;
   }
 
-  ProductionRule _parseTerminalDefinition(int $00, bool $01) {
-    ProductionRule $02;
-    final $03 = _pos;
-    final $04 = _c;
+  ProductionRule _parseTerminalDefinition(int $0, bool $1) {
+    ProductionRule $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      ProductionRule $06;
-      final $07 = _c;
-      final $08 = _pos;
-      final $09 = _parseType(77, $01);
+      ProductionRule $6;
+      final $7 = _c;
+      final $8 = _pos;
+      final $9 = _parseType(77, $1);
       if (_success) {
-        final $010 = _parse_terminal_name(78, $01);
+        final $10 = _parse_terminal_name(78, $1);
         if (_success) {
           _parse_$EqualSign(79, false);
           if (_success) {
-            final $012 = _parseExpression(80, $01);
+            final $12 = _parseExpression(80, $1);
             if (_success) {
               _parse_$Semicolon(81, false);
               if (_success) {
-                final t = $09;
-                final n = $010;
-                final e = $012;
+                final t = $9;
+                final n = $10;
+                final e = $12;
                 ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.terminal, e, t);
-                $06 = $$;
+                $6 = $$;
               }
             }
           }
         }
         if (!_success) {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      ProductionRule $014;
-      final $015 = _c;
-      final $016 = _pos;
-      final $017 = _parse_terminal_name(83, $01);
+      _c = $4;
+      _pos = $3;
+      ProductionRule $14;
+      final $15 = _c;
+      final $16 = _pos;
+      final $17 = _parse_terminal_name(83, $1);
       if (_success) {
         _parse_$EqualSign(84, false);
         if (_success) {
-          final $019 = _parseExpression(85, $01);
+          final $19 = _parseExpression(85, $1);
           if (_success) {
             _parse_$Semicolon(86, false);
             if (_success) {
-              final n = $017;
-              final e = $019;
+              final n = $17;
+              final e = $19;
               ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.terminal, e, null);
-              $014 = $$;
+              $14 = $$;
             }
           }
         }
         if (!_success) {
-          _c = $015;
-          _pos = $016;
+          _c = $15;
+          _pos = $16;
         }
       }
       if (_success) {
-        $02 = $014;
+        $2 = $14;
         break;
       }
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const ['\'terminal name\'', '\'library prefix\'', '\'type name\'']);
     }
-    return $02;
+    return $2;
   }
 
-  OrderedChoiceExpression _parseExpression(int $00, bool $01) {
-    OrderedChoiceExpression $02;
-    final $03 = _pos;
-    OrderedChoiceExpression $06;
-    final $09 = _parseSequence(89, $01);
+  OrderedChoiceExpression _parseExpression(int $0, bool $1) {
+    OrderedChoiceExpression $2;
+    final $3 = _pos;
+    OrderedChoiceExpression $6;
+    final $9 = _parseSequence(89, $1);
     if (_success) {
-      List<SequenceExpression> $010;
-      if ($01) {
-        $010 = [];
+      List<SequenceExpression> $10;
+      if ($1) {
+        $10 = [];
       }
       for (;;) {
-        SequenceExpression $011;
-        final $012 = _pos;
-        final $014 = _c;
-        SequenceExpression $016;
+        SequenceExpression $11;
+        final $12 = _pos;
+        final $14 = _c;
+        SequenceExpression $16;
         _parse_$Slash(93, false);
         if (_success) {
-          final $020 = _parseSequence(94, $01);
+          final $20 = _parseSequence(94, $1);
           if (_success) {
-            $016 = $020;
+            $16 = $20;
           } else {
-            _c = $014;
-            _pos = $012;
+            _c = $14;
+            _pos = $12;
           }
         }
-        $011 = $016;
-        if (!_success && _error == $012) {
+        $11 = $16;
+        if (!_success && _error == $12) {
           _fail(const ['\'/\'']);
         }
         if (!_success) {
           _success = true;
           break;
         }
-        if ($01) {
-          $010.add($011);
+        if ($1) {
+          $10.add($11);
         }
       }
-      final e = $09;
-      final n = $010;
+      final e = $9;
+      final n = $10;
       OrderedChoiceExpression $$;
       $$ = OrderedChoiceExpression([e, ...n]);
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const [
         '\'sub terminal name\'',
         '\'(\'',
@@ -976,44 +976,44 @@ class Peg2Parser {
         '\'<\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  SequenceExpression _parseSequence(int $00, bool $01) {
-    SequenceExpression $02;
-    final $03 = _pos;
-    SequenceExpression $06;
-    List<Expression> $09;
-    if ($01) {
-      $09 = [];
+  SequenceExpression _parseSequence(int $0, bool $1) {
+    SequenceExpression $2;
+    final $3 = _pos;
+    SequenceExpression $6;
+    List<Expression> $9;
+    if ($1) {
+      $9 = [];
     }
-    var $010 = false;
+    var $10 = false;
     for (;;) {
-      final $011 = _parsePrefix(98, $01);
+      final $11 = _parsePrefix(98, $1);
       if (!_success) {
-        _success = $010;
+        _success = $10;
         if (!_success) {
-          $09 = null;
+          $9 = null;
         }
         break;
       }
-      if ($01) {
-        $09.add($011);
+      if ($1) {
+        $9.add($11);
       }
-      $010 = true;
+      $10 = true;
     }
     if (_success) {
-      final $012 = _parse_action(100, $01);
-      final $013 = $012;
+      final $12 = _parse_action(100, $1);
+      final $13 = $12;
       _success = true;
-      final e = $09;
-      final a = $013;
+      final e = $9;
+      final a = $13;
       SequenceExpression $$;
       $$ = SequenceExpression(e, a);
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const [
         '\'sub terminal name\'',
         '\'(\'',
@@ -1023,48 +1023,48 @@ class Peg2Parser {
         '\'<\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  Expression _parsePrefix(int $00, bool $01) {
-    Expression $02;
-    final $03 = _pos;
-    Expression $06;
-    final $09 = _parse_semantic_value(104, $01);
-    final $010 = $09;
-    String $011;
+  Expression _parsePrefix(int $0, bool $1) {
+    Expression $2;
+    final $3 = _pos;
+    Expression $6;
+    final $9 = _parse_semantic_value(104, $1);
+    final $10 = $9;
+    String $11;
     for (;;) {
-      String $016;
-      final $019 = _parse_$Ampersand(108, $01);
+      String $16;
+      final $19 = _parse_$Ampersand(108, $1);
       if (_success) {
-        $016 = $019;
-        $011 = $016;
+        $16 = $19;
+        $11 = $16;
         break;
       }
-      String $020;
-      final $023 = _parse_$ExclamationMark(110, $01);
+      String $20;
+      final $23 = _parse_$ExclamationMark(110, $1);
       if (_success) {
-        $020 = $023;
-        $011 = $020;
+        $20 = $23;
+        $11 = $20;
         break;
       }
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const ['\'&\'', '\'!\'']);
     }
-    final $024 = $011;
-    final $025 = _parseSuffix(111, $01);
+    final $24 = $11;
+    final $25 = _parseSuffix(111, $1);
     if (_success) {
-      final s = $010;
-      final p = $024;
-      final e = $025;
+      final s = $10;
+      final p = $24;
+      final e = $25;
       Expression $$;
       $$ = _prefix(p, e, s);
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const [
         '\'sub terminal name\'',
         '\'(\'',
@@ -1074,54 +1074,54 @@ class Peg2Parser {
         '\'<\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  Expression _parseSuffix(int $00, bool $01) {
-    Expression $02;
-    final $03 = _pos;
-    Expression $06;
-    final $09 = _parsePrimary(114, $01);
+  Expression _parseSuffix(int $0, bool $1) {
+    Expression $2;
+    final $3 = _pos;
+    Expression $6;
+    final $9 = _parsePrimary(114, $1);
     if (_success) {
-      String $010;
-      final $011 = _pos;
+      String $10;
+      final $11 = _pos;
       for (;;) {
-        String $015;
-        final $018 = _parse_$QuestionMark(118, $01);
+        String $15;
+        final $18 = _parse_$QuestionMark(118, $1);
         if (_success) {
-          $015 = $018;
-          $010 = $015;
+          $15 = $18;
+          $10 = $15;
           break;
         }
-        String $019;
-        final $022 = _parse_$Asterisk(120, $01);
+        String $19;
+        final $22 = _parse_$Asterisk(120, $1);
         if (_success) {
-          $019 = $022;
-          $010 = $019;
+          $19 = $22;
+          $10 = $19;
           break;
         }
-        String $023;
-        final $026 = _parse_$PlusSign(122, $01);
+        String $23;
+        final $26 = _parse_$PlusSign(122, $1);
         if (_success) {
-          $023 = $026;
-          $010 = $023;
+          $23 = $26;
+          $10 = $23;
           break;
         }
         break;
       }
-      if (!_success && _error == $011) {
+      if (!_success && _error == $11) {
         _fail(const ['\'?\'', '\'*\'', '\'+\'']);
       }
-      final $027 = $010;
+      final $27 = $10;
       _success = true;
-      final e = $09;
-      final s = $027;
+      final e = $9;
+      final s = $27;
       Expression $$;
       $$ = _suffix(s, e);
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const [
         '\'sub terminal name\'',
         '\'(\'',
@@ -1131,103 +1131,103 @@ class Peg2Parser {
         '\'<\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  Expression _parsePrimary(int $00, bool $01) {
-    Expression $02;
-    final $03 = _pos;
-    final $04 = _c;
+  Expression _parsePrimary(int $0, bool $1) {
+    Expression $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      Expression $06;
-      final $09 = _parse_sub_terminal_name(125, $01);
+      Expression $6;
+      final $9 = _parse_sub_terminal_name(125, $1);
       if (_success) {
-        final n = $09;
+        final n = $9;
         Expression $$;
         $$ = SubterminalExpression(n);
-        $06 = $$;
+        $6 = $$;
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      Expression $010;
-      final $011 = _c;
-      final $012 = _pos;
+      Expression $10;
+      final $11 = _c;
+      final $12 = _pos;
       _parse_$LeftParenthesis(127, false);
       if (_success) {
-        final $014 = _parseExpression(128, $01);
+        final $14 = _parseExpression(128, $1);
         if (_success) {
           _parse_$RightParenthesis(129, false);
           if (_success) {
-            $010 = $014;
+            $10 = $14;
           }
         }
         if (!_success) {
-          _c = $011;
-          _pos = $012;
+          _c = $11;
+          _pos = $12;
         }
       }
       if (_success) {
-        $02 = $010;
+        $2 = $10;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      Expression $016;
-      final $019 = _parse_literal(131, $01);
+      _c = $4;
+      _pos = $3;
+      Expression $16;
+      final $19 = _parse_literal(131, $1);
       if (_success) {
-        $016 = $019;
-        $02 = $016;
+        $16 = $19;
+        $2 = $16;
         break;
       }
-      Expression $020;
-      final $023 = _parse_character_class(133, $01);
+      Expression $20;
+      final $23 = _parse_character_class(133, $1);
       if (_success) {
-        $020 = $023;
-        $02 = $020;
+        $20 = $23;
+        $2 = $20;
         break;
       }
-      Expression $024;
-      _parse_$Period(135, $01);
+      Expression $24;
+      _parse_$Period(135, $1);
       if (_success) {
         Expression $$;
         $$ = AnyCharacterExpression();
-        $024 = $$;
+        $24 = $$;
       }
       if (_success) {
-        $02 = $024;
+        $2 = $24;
         break;
       }
-      Expression $028;
-      final $029 = _c;
-      final $030 = _pos;
+      Expression $28;
+      final $29 = _c;
+      final $30 = _pos;
       _parse_$LessThanSign(137, false);
       if (_success) {
-        final $032 = _parseExpression(138, $01);
+        final $32 = _parseExpression(138, $1);
         if (_success) {
           _parse_$GreaterThanSign(139, false);
           if (_success) {
-            final e = $032;
+            final e = $32;
             Expression $$;
             $$ = CaptureExpression(e);
-            $028 = $$;
+            $28 = $$;
           }
         }
         if (!_success) {
-          _c = $029;
-          _pos = $030;
+          _c = $29;
+          _pos = $30;
         }
       }
       if (_success) {
-        $02 = $028;
+        $2 = $28;
         break;
       }
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const [
         '\'sub terminal name\'',
         '\'(\'',
@@ -1237,439 +1237,439 @@ class Peg2Parser {
         '\'<\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  ProductionRule _parseSubterminalDefinition(int $00, bool $01) {
-    ProductionRule $02;
-    final $03 = _pos;
-    final $04 = _c;
+  ProductionRule _parseSubterminalDefinition(int $0, bool $1) {
+    ProductionRule $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      ProductionRule $06;
-      final $07 = _c;
-      final $08 = _pos;
-      final $09 = _parseType(142, $01);
+      ProductionRule $6;
+      final $7 = _c;
+      final $8 = _pos;
+      final $9 = _parseType(142, $1);
       if (_success) {
-        final $010 = _parse_sub_terminal_name(143, $01);
+        final $10 = _parse_sub_terminal_name(143, $1);
         if (_success) {
           _parse_$EqualSign(144, false);
           if (_success) {
-            final $012 = _parseExpression(145, $01);
+            final $12 = _parseExpression(145, $1);
             if (_success) {
               _parse_$Semicolon(146, false);
               if (_success) {
-                final t = $09;
-                final n = $010;
-                final e = $012;
+                final t = $9;
+                final n = $10;
+                final e = $12;
                 ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, t);
-                $06 = $$;
+                $6 = $$;
               }
             }
           }
         }
         if (!_success) {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      ProductionRule $014;
-      final $015 = _c;
-      final $016 = _pos;
-      final $017 = _parse_sub_terminal_name(148, $01);
+      _c = $4;
+      _pos = $3;
+      ProductionRule $14;
+      final $15 = _c;
+      final $16 = _pos;
+      final $17 = _parse_sub_terminal_name(148, $1);
       if (_success) {
         _parse_$EqualSign(149, false);
         if (_success) {
-          final $019 = _parseExpression(150, $01);
+          final $19 = _parseExpression(150, $1);
           if (_success) {
             _parse_$Semicolon(151, false);
             if (_success) {
-              final n = $017;
-              final e = $019;
+              final n = $17;
+              final e = $19;
               ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, null);
-              $014 = $$;
+              $14 = $$;
             }
           }
         }
         if (!_success) {
-          _c = $015;
-          _pos = $016;
+          _c = $15;
+          _pos = $16;
         }
       }
       if (_success) {
-        $02 = $014;
+        $2 = $14;
         break;
       }
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const [
         '\'sub terminal name\'',
         '\'library prefix\'',
         '\'type name\''
       ]);
     }
-    return $02;
+    return $2;
   }
 
-  String _parseType(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    String $06;
-    final $09 = _parseTypeName(154, $01);
+  String _parseType(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    String $6;
+    final $9 = _parseTypeName(154, $1);
     if (_success) {
-      List<String> $010;
-      final $011 = _pos;
-      final $013 = _c;
-      List<String> $015;
+      List<String> $10;
+      final $11 = _pos;
+      final $13 = _c;
+      List<String> $15;
       _parse_$LessThanSign(158, false);
       if (_success) {
-        final $019 = _parseTypeArguments(159, $01);
+        final $19 = _parseTypeArguments(159, $1);
         if (_success) {
           _parse_$GreaterThanSign(160, false);
           if (_success) {
-            $015 = $019;
+            $15 = $19;
           }
         }
         if (!_success) {
-          _c = $013;
-          _pos = $011;
+          _c = $13;
+          _pos = $11;
         }
       }
-      $010 = $015;
-      if (!_success && _error == $011) {
+      $10 = $15;
+      if (!_success && _error == $11) {
         _fail(const ['\'<\'']);
       }
-      final $021 = $010;
+      final $21 = $10;
       _success = true;
-      final n = $09;
-      final a = $021;
+      final n = $9;
+      final a = $21;
       String $$;
       $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'library prefix\'', '\'type name\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parseTypeName(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    final $04 = _c;
+  String _parseTypeName(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      String $06;
-      final $07 = _c;
-      final $08 = _pos;
-      final $09 = _parse_library_prefix(163, $01);
+      String $6;
+      final $7 = _c;
+      final $8 = _pos;
+      final $9 = _parse_library_prefix(163, $1);
       if (_success) {
         _parse_$Period(164, false);
         if (_success) {
-          final $011 = _parse_type_name(165, $01);
+          final $11 = _parse_type_name(165, $1);
           if (_success) {
-            final p = $09;
-            final n = $011;
+            final p = $9;
+            final n = $11;
             String $$;
             $$ = '$p.$n';
-            $06 = $$;
+            $6 = $$;
           }
         }
         if (!_success) {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      String $012;
-      final $015 = _parse_type_name(167, $01);
+      _c = $4;
+      _pos = $3;
+      String $12;
+      final $15 = _parse_type_name(167, $1);
       if (_success) {
-        $012 = $015;
-        $02 = $012;
+        $12 = $15;
+        $2 = $12;
         break;
       }
       break;
     }
-    if (!_success && _error == $03) {
+    if (!_success && _error == $3) {
       _fail(const ['\'library prefix\'', '\'type name\'']);
     }
-    return $02;
+    return $2;
   }
 
-  List<String> _parseTypeArguments(int $00, bool $01) {
-    List<String> $02;
-    final $03 = _pos;
-    List<String> $06;
-    final $09 = _parseType(170, $01);
+  List<String> _parseTypeArguments(int $0, bool $1) {
+    List<String> $2;
+    final $3 = _pos;
+    List<String> $6;
+    final $9 = _parseType(170, $1);
     if (_success) {
-      List<String> $010;
-      if ($01) {
-        $010 = [];
+      List<String> $10;
+      if ($1) {
+        $10 = [];
       }
       for (;;) {
-        String $011;
-        final $012 = _pos;
-        final $014 = _c;
-        String $016;
+        String $11;
+        final $12 = _pos;
+        final $14 = _c;
+        String $16;
         _parse_$Comma(174, false);
         if (_success) {
-          final $020 = _parseType(175, $01);
+          final $20 = _parseType(175, $1);
           if (_success) {
-            $016 = $020;
+            $16 = $20;
           } else {
-            _c = $014;
-            _pos = $012;
+            _c = $14;
+            _pos = $12;
           }
         }
-        $011 = $016;
-        if (!_success && _error == $012) {
+        $11 = $16;
+        if (!_success && _error == $12) {
           _fail(const ['\',\'']);
         }
         if (!_success) {
           _success = true;
           break;
         }
-        if ($01) {
-          $010.add($011);
+        if ($1) {
+          $10.add($11);
         }
       }
-      final t = $09;
-      final n = $010;
+      final t = $9;
+      final n = $10;
       List<String> $$;
       $$ = [t, ...n];
-      $06 = $$;
+      $6 = $$;
     }
-    $02 = $06;
-    if (!_success && _error == $03) {
+    $2 = $6;
+    if (!_success && _error == $3) {
       _fail(const ['\'library prefix\'', '\'type name\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_non_terminal_name(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _parse$$IDENTIFIER(178, $01);
+  String _parse_non_terminal_name(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _parse$$IDENTIFIER(178, $1);
     if (_success) {
       _parse$$SPACING(179, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'non terminal name\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_terminal_name(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    String $07;
-    String $010;
-    final $012 = $01;
-    $01 = false;
-    final $014 = _pos;
-    final $016 = _c;
+  String _parse_terminal_name(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    String $7;
+    String $10;
+    final $12 = $1;
+    $1 = false;
+    final $14 = _pos;
+    final $16 = _c;
     _matchChar(39);
     if (_success) {
-      var $024 = false;
+      var $24 = false;
       for (;;) {
-        final $026 = _pos;
-        final $028 = _c;
-        final $036 = _error;
-        final $037 = _expected;
-        final $038 = _failure;
-        final $039 = $01;
-        $01 = false;
+        final $26 = _pos;
+        final $28 = _c;
+        final $36 = _error;
+        final $37 = _expected;
+        final $38 = _failure;
+        final $39 = $1;
+        $1 = false;
         _matchChar(39);
         _success = !_success;
-        _c = $028;
-        _pos = $026;
-        _error = $036;
-        _expected = $037;
-        _failure = $038;
-        $01 = $039;
+        _c = $28;
+        _pos = $26;
+        _error = $36;
+        _expected = $37;
+        _failure = $38;
+        $1 = $39;
         if (_success) {
           _parse$$TERMINAL_CHAR(191, false);
           if (!_success) {
-            _c = $028;
-            _pos = $026;
+            _c = $28;
+            _pos = $26;
           }
         }
         if (!_success) {
-          _success = $024;
+          _success = $24;
           break;
         }
-        $024 = true;
+        $24 = true;
       }
       if (_success) {
         _matchChar(39);
       }
       if (!_success) {
-        _c = $016;
-        _pos = $014;
+        _c = $16;
+        _pos = $14;
       }
     }
     if (_success) {
-      $010 = _text.substring($03, _pos);
+      $10 = _text.substring($3, _pos);
     }
-    $01 = $012;
+    $1 = $12;
     if (_success) {
       _parse$$SPACING(193, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'terminal name\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_sub_terminal_name(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    String $07;
-    String $010;
-    final $012 = $01;
-    $01 = false;
-    final $014 = _pos;
-    final $016 = _c;
+  String _parse_sub_terminal_name(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    String $7;
+    String $10;
+    final $12 = $1;
+    $1 = false;
+    final $14 = _pos;
+    final $16 = _c;
     _matchChar(64);
     if (_success) {
       _parse$$IDENTIFIER(200, false);
       if (!_success) {
-        _c = $016;
-        _pos = $014;
+        _c = $16;
+        _pos = $14;
       }
     }
     if (_success) {
-      $010 = _text.substring($03, _pos);
+      $10 = _text.substring($3, _pos);
     }
-    $01 = $012;
+    $1 = $12;
     if (_success) {
       _parse$$SPACING(201, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'sub terminal name\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_semantic_value(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    final $04 = _c;
-    String $07;
-    final $010 = _parse$$IDENTIFIER(204, $01);
+  String _parse_semantic_value(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    final $4 = _c;
+    String $7;
+    final $10 = _parse$$IDENTIFIER(204, $1);
     if (_success) {
       _matchString(':');
       if (_success) {
-        $07 = $010;
+        $7 = $10;
       } else {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'semantic value\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_type_name(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    String $07;
-    String $010;
-    final $012 = $01;
-    $01 = false;
+  String _parse_type_name(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    String $7;
+    String $10;
+    final $12 = $1;
+    $1 = false;
     _parse$$IDENTIFIER(211, false);
     if (_success) {
       _matchChar(63);
       _success = true;
     }
     if (_success) {
-      $010 = _text.substring($03, _pos);
+      $10 = _text.substring($3, _pos);
     }
-    $01 = $012;
+    $1 = $12;
     if (_success) {
       _parse$$SPACING(214, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'type name\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_library_prefix(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    String $07;
-    String $010;
-    final $012 = $01;
-    $01 = false;
+  String _parse_library_prefix(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    String $7;
+    String $10;
+    final $12 = $1;
+    $1 = false;
     _matchChar(95);
     _parse$$IDENTIFIER(222, false);
     if (_success) {
-      $010 = _text.substring($03, _pos);
+      $10 = _text.substring($3, _pos);
     }
-    $01 = $012;
+    $1 = $12;
     if (_success) {
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'library prefix\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$Semicolon(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString(';');
+  String _parse_$Semicolon(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString(';');
     if (_success) {
       _parse$$SPACING(226, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\';\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_action(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    final $04 = _c;
-    String $07;
+  String _parse_action(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    final $4 = _c;
+    String $7;
     _matchString('{');
     if (_success) {
-      String $011;
-      final $012 = _pos;
-      final $013 = $01;
-      $01 = false;
+      String $11;
+      final $12 = _pos;
+      final $13 = $1;
+      $1 = false;
       for (;;) {
         _parse$$ACTION_BODY(234, false);
         if (!_success) {
@@ -1678,155 +1678,155 @@ class Peg2Parser {
         }
       }
       if (_success) {
-        $011 = _text.substring($012, _pos);
+        $11 = _text.substring($12, _pos);
       }
-      $01 = $013;
+      $1 = $13;
       _matchString('}');
       if (_success) {
         _parse$$SPACING(236, false);
-        $07 = $011;
+        $7 = $11;
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'action\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$Ampersand(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('&');
+  String _parse_$Ampersand(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('&');
     if (_success) {
       _parse$$SPACING(240, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'&\'']);
     }
-    return $02;
+    return $2;
   }
 
-  Expression _parse_character_class(int $00, bool $01) {
-    Expression $02;
-    final $03 = _pos;
-    final $04 = _c;
-    Expression $07;
+  Expression _parse_character_class(int $0, bool $1) {
+    Expression $2;
+    final $3 = _pos;
+    final $4 = _c;
+    Expression $7;
     _matchString('[');
     if (_success) {
-      List<List<int>> $011;
-      if ($01) {
-        $011 = [];
+      List<List<int>> $11;
+      if ($1) {
+        $11 = [];
       }
-      var $012 = false;
+      var $12 = false;
       for (;;) {
-        List<int> $013;
-        final $014 = _pos;
-        final $016 = _c;
-        List<int> $019;
-        final $024 = _error;
-        final $025 = _expected;
-        final $026 = _failure;
-        final $027 = $01;
-        $01 = false;
+        List<int> $13;
+        final $14 = _pos;
+        final $16 = _c;
+        List<int> $19;
+        final $24 = _error;
+        final $25 = _expected;
+        final $26 = _failure;
+        final $27 = $1;
+        $1 = false;
         _matchString(']');
         _success = !_success;
-        _c = $016;
-        _pos = $014;
-        _error = $024;
-        _expected = $025;
-        _failure = $026;
-        $01 = $027;
+        _c = $16;
+        _pos = $14;
+        _error = $24;
+        _expected = $25;
+        _failure = $26;
+        $1 = $27;
         if (_success) {
-          final $030 = _parse$$RANGE(249, $01);
+          final $30 = _parse$$RANGE(249, $1);
           if (_success) {
-            $019 = $030;
+            $19 = $30;
           } else {
-            _c = $016;
-            _pos = $014;
+            _c = $16;
+            _pos = $14;
           }
         }
-        $013 = $019;
+        $13 = $19;
         if (!_success) {
-          _success = $012;
+          _success = $12;
           if (!_success) {
-            $011 = null;
+            $11 = null;
           }
           break;
         }
-        if ($01) {
-          $011.add($013);
+        if ($1) {
+          $11.add($13);
         }
-        $012 = true;
+        $12 = true;
       }
       if (_success) {
         _matchString(']');
         if (_success) {
           _parse$$SPACING(251, false);
-          final r = $011;
+          final r = $11;
           Expression $$;
           $$ = CharacterClassExpression(r);
-          $07 = $$;
+          $7 = $$;
         }
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'character class\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$RightParenthesis(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString(')');
+  String _parse_$RightParenthesis(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString(')');
     if (_success) {
       _parse$$SPACING(255, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\')\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$Period(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('.');
+  String _parse_$Period(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('.');
     if (_success) {
       _parse$$SPACING(259, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'.\'']);
     }
-    return $02;
+    return $2;
   }
 
-  dynamic _parse_end_of_file(int $00, bool $01) {
-    dynamic $02;
-    final $03 = _pos;
-    final $04 = _c;
-    dynamic $07;
-    final $012 = _error;
-    final $013 = _expected;
-    final $014 = _failure;
-    final $015 = $01;
-    $01 = false;
+  dynamic _parse_end_of_file(int $0, bool $1) {
+    dynamic $2;
+    final $3 = _pos;
+    final $4 = _c;
+    dynamic $7;
+    final $12 = _error;
+    final $13 = _expected;
+    final $14 = _failure;
+    final $15 = $1;
+    $1 = false;
     if (_c >= 0 && _c <= 1114111) {
       _success = true;
       _c = _input[_pos += _c <= 65535 ? 1 : 2];
@@ -1835,34 +1835,34 @@ class Peg2Parser {
       _failure = _pos;
     }
     _success = !_success;
-    _c = $04;
-    _pos = $03;
-    _error = $012;
-    _expected = $013;
-    _failure = $014;
-    $01 = $015;
-    var $017;
+    _c = $4;
+    _pos = $3;
+    _error = $12;
+    _expected = $13;
+    _failure = $14;
+    $1 = $15;
+    var $17;
     if (_success) {
-      $07 = $017;
+      $7 = $17;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'end of file\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_globals(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    final $04 = _c;
-    String $07;
+  String _parse_globals(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    final $4 = _c;
+    String $7;
     _matchString('%{');
     if (_success) {
-      String $011;
-      final $012 = _pos;
-      final $013 = $01;
-      $01 = false;
+      String $11;
+      final $12 = _pos;
+      final $13 = $1;
+      $1 = false;
       for (;;) {
         _parse$$GLOBALS_BODY(271, false);
         if (!_success) {
@@ -1871,128 +1871,128 @@ class Peg2Parser {
         }
       }
       if (_success) {
-        $011 = _text.substring($012, _pos);
+        $11 = _text.substring($12, _pos);
       }
-      $01 = $013;
+      $1 = $13;
       _matchString('}%');
       if (_success) {
         _parse$$SPACING(273, false);
-        $07 = $011;
+        $7 = $11;
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'globals\'']);
     }
-    return $02;
+    return $2;
   }
 
-  List _parse_leading_spaces(int $00, bool $01) {
-    List $02;
-    $02 = _parse$$SPACING(276, false);
+  List _parse_leading_spaces(int $0, bool $1) {
+    List $2;
+    $2 = _parse$$SPACING(276, false);
     if (!_success && _error <= _failure) {
       _fail(const ['\'leading spaces\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$EqualSign(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('=');
+  String _parse_$EqualSign(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('=');
     if (_success) {
       _parse$$SPACING(280, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'=\'']);
     }
-    return $02;
+    return $2;
   }
 
-  Expression _parse_literal(int $00, bool $01) {
-    Expression $02;
-    final $03 = _pos;
-    final $04 = _c;
-    Expression $07;
+  Expression _parse_literal(int $0, bool $1) {
+    Expression $2;
+    final $3 = _pos;
+    final $4 = _c;
+    Expression $7;
     _matchChar(34);
     if (_success) {
-      List<int> $011;
-      if ($01) {
-        $011 = [];
+      List<int> $11;
+      if ($1) {
+        $11 = [];
       }
       for (;;) {
-        int $012;
-        final $013 = _pos;
-        final $015 = _c;
-        int $018;
-        final $023 = _error;
-        final $024 = _expected;
-        final $025 = _failure;
-        final $026 = $01;
-        $01 = false;
+        int $12;
+        final $13 = _pos;
+        final $15 = _c;
+        int $18;
+        final $23 = _error;
+        final $24 = _expected;
+        final $25 = _failure;
+        final $26 = $1;
+        $1 = false;
         _matchChar(34);
         _success = !_success;
-        _c = $015;
-        _pos = $013;
-        _error = $023;
-        _expected = $024;
-        _failure = $025;
-        $01 = $026;
+        _c = $15;
+        _pos = $13;
+        _error = $23;
+        _expected = $24;
+        _failure = $25;
+        $1 = $26;
         if (_success) {
-          final $029 = _parse$$LITERAL_CHAR(289, $01);
+          final $29 = _parse$$LITERAL_CHAR(289, $1);
           if (_success) {
-            $018 = $029;
+            $18 = $29;
           } else {
-            _c = $015;
-            _pos = $013;
+            _c = $15;
+            _pos = $13;
           }
         }
-        $012 = $018;
+        $12 = $18;
         if (!_success) {
           _success = true;
           break;
         }
-        if ($01) {
-          $011.add($012);
+        if ($1) {
+          $11.add($12);
         }
       }
       _matchChar(34);
       if (_success) {
         _parse$$SPACING(291, false);
-        final c = $011;
+        final c = $11;
         Expression $$;
         $$ = LiteralExpression(String.fromCharCodes(c));
-        $07 = $$;
+        $7 = $$;
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'literal\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_members(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    final $04 = _c;
-    String $07;
+  String _parse_members(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    final $4 = _c;
+    String $7;
     _matchString('{');
     if (_success) {
-      String $011;
-      final $012 = _pos;
-      final $013 = $01;
-      $01 = false;
+      String $11;
+      final $12 = _pos;
+      final $13 = $1;
+      $1 = false;
       for (;;) {
         _parse$$ACTION_BODY(299, false);
         if (!_success) {
@@ -2001,170 +2001,170 @@ class Peg2Parser {
         }
       }
       if (_success) {
-        $011 = _text.substring($012, _pos);
+        $11 = _text.substring($12, _pos);
       }
-      $01 = $013;
+      $1 = $13;
       _matchString('}');
       if (_success) {
         _parse$$SPACING(301, false);
-        $07 = $011;
+        $7 = $11;
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'members\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$ExclamationMark(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('!');
+  String _parse_$ExclamationMark(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('!');
     if (_success) {
       _parse$$SPACING(305, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'!\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$LeftParenthesis(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('(');
+  String _parse_$LeftParenthesis(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('(');
     if (_success) {
       _parse$$SPACING(309, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'(\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$PlusSign(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('+');
+  String _parse_$PlusSign(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('+');
     if (_success) {
       _parse$$SPACING(313, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'+\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$Comma(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString(',');
+  String _parse_$Comma(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString(',');
     if (_success) {
       _parse$$SPACING(317, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\',\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$QuestionMark(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('?');
+  String _parse_$QuestionMark(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('?');
     if (_success) {
       _parse$$SPACING(321, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'?\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$Slash(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('/');
+  String _parse_$Slash(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('/');
     if (_success) {
       _parse$$SPACING(325, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'/\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$Asterisk(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('*');
+  String _parse_$Asterisk(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('*');
     if (_success) {
       _parse$$SPACING(329, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'*\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$LessThanSign(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('<');
+  String _parse_$LessThanSign(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('<');
     if (_success) {
       _parse$$SPACING(333, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'<\'']);
     }
-    return $02;
+    return $2;
   }
 
-  String _parse_$GreaterThanSign(int $00, bool $01) {
-    String $02;
-    String $07;
-    final $010 = _matchString('>');
+  String _parse_$GreaterThanSign(int $0, bool $1) {
+    String $2;
+    String $7;
+    final $10 = _matchString('>');
     if (_success) {
       _parse$$SPACING(337, false);
-      $07 = $010;
+      $7 = $10;
     }
-    $02 = $07;
+    $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'>\'']);
     }
-    return $02;
+    return $2;
   }
 
-  dynamic _parse$$ACTION_BODY(int $00, bool $01) {
-    dynamic $02;
-    final $03 = _pos;
-    final $04 = _c;
+  dynamic _parse$$ACTION_BODY(int $0, bool $1) {
+    dynamic $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      String $06;
-      final $07 = _c;
-      final $08 = _pos;
-      final $09 = _matchString('{');
+      String $6;
+      final $7 = _c;
+      final $8 = _pos;
+      final $9 = _matchString('{');
       if (_success) {
         for (;;) {
           _parse$$ACTION_BODY(342, false);
@@ -2175,35 +2175,35 @@ class Peg2Parser {
         }
         _matchString('}');
         if (_success) {
-          $06 = $09;
+          $6 = $9;
         } else {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      dynamic $013;
-      final $014 = _c;
-      final $015 = _pos;
-      final $018 = _error;
-      final $019 = _expected;
-      final $020 = _failure;
-      final $021 = $01;
-      $01 = false;
+      _c = $4;
+      _pos = $3;
+      dynamic $13;
+      final $14 = _c;
+      final $15 = _pos;
+      final $18 = _error;
+      final $19 = _expected;
+      final $20 = _failure;
+      final $21 = $1;
+      $1 = false;
       _matchString('}');
       _success = !_success;
-      _c = $014;
-      _pos = $015;
-      _error = $018;
-      _expected = $019;
-      _failure = $020;
-      $01 = $021;
-      var $023;
+      _c = $14;
+      _pos = $15;
+      _error = $18;
+      _expected = $19;
+      _failure = $20;
+      $1 = $21;
+      var $23;
       if (_success) {
         if (_c >= 0 && _c <= 1114111) {
           _success = true;
@@ -2213,44 +2213,44 @@ class Peg2Parser {
           _failure = _pos;
         }
         if (_success) {
-          $013 = $023;
+          $13 = $23;
         } else {
-          _c = $014;
-          _pos = $015;
+          _c = $14;
+          _pos = $15;
         }
       }
       if (_success) {
-        $02 = $013;
+        $2 = $13;
         break;
       }
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
       break;
     }
-    return $02;
+    return $2;
   }
 
-  String _parse$$COMMENT(int $00, bool $01) {
-    String $02;
-    String $06;
-    final $09 = _matchString('#');
+  String _parse$$COMMENT(int $0, bool $1) {
+    String $2;
+    String $6;
+    final $9 = _matchString('#');
     if (_success) {
       for (;;) {
-        final $012 = _pos;
-        final $014 = _c;
-        final $021 = _error;
-        final $022 = _expected;
-        final $023 = _failure;
-        final $024 = $01;
-        $01 = false;
+        final $12 = _pos;
+        final $14 = _c;
+        final $21 = _error;
+        final $22 = _expected;
+        final $23 = _failure;
+        final $24 = $1;
+        $1 = false;
         _parse$$EOL(355, false);
         _success = !_success;
-        _c = $014;
-        _pos = $012;
-        _error = $021;
-        _expected = $022;
-        _failure = $023;
-        $01 = $024;
+        _c = $14;
+        _pos = $12;
+        _error = $21;
+        _expected = $22;
+        _failure = $23;
+        $1 = $24;
         if (_success) {
           if (_c >= 0 && _c <= 1114111) {
             _success = true;
@@ -2260,8 +2260,8 @@ class Peg2Parser {
             _failure = _pos;
           }
           if (!_success) {
-            _c = $014;
-            _pos = $012;
+            _c = $14;
+            _pos = $12;
           }
         }
         if (!_success) {
@@ -2271,54 +2271,54 @@ class Peg2Parser {
       }
       _parse$$EOL(358, false);
       _success = true;
-      $06 = $09;
+      $6 = $9;
     }
-    $02 = $06;
-    return $02;
+    $2 = $6;
+    return $2;
   }
 
-  dynamic _parse$$EOL(int $00, bool $01) {
-    dynamic $02;
+  dynamic _parse$$EOL(int $0, bool $1) {
+    dynamic $2;
     for (;;) {
-      String $06;
-      final $09 = _matchString('\r\n');
+      String $6;
+      final $9 = _matchString('\r\n');
       if (_success) {
-        $06 = $09;
-        $02 = $06;
+        $6 = $9;
+        $2 = $6;
         break;
       }
-      int $010;
-      const $013 = [10, 10, 13, 13];
-      final $014 = _matchRanges($013);
+      int $10;
+      const $13 = [10, 10, 13, 13];
+      final $14 = _matchRanges($13);
       if (_success) {
-        $010 = $014;
-        $02 = $010;
+        $10 = $14;
+        $2 = $10;
         break;
       }
       break;
     }
-    return $02;
+    return $2;
   }
 
-  dynamic _parse$$GLOBALS_BODY(int $00, bool $01) {
-    dynamic $02;
-    final $03 = _pos;
-    final $04 = _c;
-    dynamic $06;
-    final $011 = _error;
-    final $012 = _expected;
-    final $013 = _failure;
-    final $014 = $01;
-    $01 = false;
+  dynamic _parse$$GLOBALS_BODY(int $0, bool $1) {
+    dynamic $2;
+    final $3 = _pos;
+    final $4 = _c;
+    dynamic $6;
+    final $11 = _error;
+    final $12 = _expected;
+    final $13 = _failure;
+    final $14 = $1;
+    $1 = false;
     _matchString('}%');
     _success = !_success;
-    _c = $04;
-    _pos = $03;
-    _error = $011;
-    _expected = $012;
-    _failure = $013;
-    $01 = $014;
-    var $016;
+    _c = $4;
+    _pos = $3;
+    _error = $11;
+    _expected = $12;
+    _failure = $13;
+    $1 = $14;
+    var $16;
     if (_success) {
       if (_c >= 0 && _c <= 1114111) {
         _success = true;
@@ -2328,66 +2328,66 @@ class Peg2Parser {
         _failure = _pos;
       }
       if (_success) {
-        $06 = $016;
+        $6 = $16;
       } else {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $06;
-    return $02;
+    $2 = $6;
+    return $2;
   }
 
-  int _parse$$HEX_NUMBER(int $00, bool $01) {
-    int $02;
-    final $03 = _pos;
-    final $04 = _c;
-    int $06;
+  int _parse$$HEX_NUMBER(int $0, bool $1) {
+    int $2;
+    final $3 = _pos;
+    final $4 = _c;
+    int $6;
     _matchChar(92);
     if (_success) {
       _matchString('u');
       if (_success) {
-        String $011;
-        final $012 = _pos;
-        final $013 = $01;
-        $01 = false;
-        var $023 = false;
+        String $11;
+        final $12 = _pos;
+        final $13 = $1;
+        $1 = false;
+        var $23 = false;
         for (;;) {
-          const $024 = [48, 57, 65, 70, 97, 102];
-          _matchRanges($024);
+          const $24 = [48, 57, 65, 70, 97, 102];
+          _matchRanges($24);
           if (!_success) {
-            _success = $023;
+            _success = $23;
             break;
           }
-          $023 = true;
+          $23 = true;
         }
         if (_success) {
-          $011 = _text.substring($012, _pos);
+          $11 = _text.substring($12, _pos);
         }
-        $01 = $013;
+        $1 = $13;
         if (_success) {
-          final d = $011;
+          final d = $11;
           int $$;
           $$ = int.parse(d, radix: 16);
-          $06 = $$;
+          $6 = $$;
         }
       }
       if (!_success) {
-        _c = $04;
-        _pos = $03;
+        _c = $4;
+        _pos = $3;
       }
     }
-    $02 = $06;
-    return $02;
+    $2 = $6;
+    return $2;
   }
 
-  String _parse$$IDENTIFIER(int $00, bool $01) {
-    String $02;
-    final $03 = _pos;
-    String $06;
-    String $09;
-    final $011 = $01;
-    $01 = false;
+  String _parse$$IDENTIFIER(int $0, bool $1) {
+    String $2;
+    final $3 = _pos;
+    String $6;
+    String $9;
+    final $11 = $1;
+    $1 = false;
     _parse$$IDENT_START(383, false);
     if (_success) {
       for (;;) {
@@ -2399,322 +2399,322 @@ class Peg2Parser {
       }
     }
     if (_success) {
-      $09 = _text.substring($03, _pos);
+      $9 = _text.substring($3, _pos);
     }
-    $01 = $011;
+    $1 = $11;
     if (_success) {
-      $06 = $09;
+      $6 = $9;
     }
-    $02 = $06;
-    return $02;
+    $2 = $6;
+    return $2;
   }
 
-  int _parse$$IDENT_CONT(int $00, bool $01) {
-    int $02;
+  int _parse$$IDENT_CONT(int $0, bool $1) {
+    int $2;
     for (;;) {
-      int $06;
-      final $09 = _parse$$IDENT_START(388, false);
+      int $6;
+      final $9 = _parse$$IDENT_START(388, false);
       if (_success) {
-        $06 = $09;
-        $02 = $06;
+        $6 = $9;
+        $2 = $6;
         break;
       }
-      int $010;
-      const $013 = [48, 57, 95, 95];
-      final $014 = _matchRanges($013);
+      int $10;
+      const $13 = [48, 57, 95, 95];
+      final $14 = _matchRanges($13);
       if (_success) {
-        $010 = $014;
-        $02 = $010;
+        $10 = $14;
+        $2 = $10;
         break;
       }
       break;
     }
-    return $02;
+    return $2;
   }
 
-  int _parse$$IDENT_START(int $00, bool $01) {
-    int $02;
-    int $06;
-    const $09 = [65, 90, 97, 122];
-    final $010 = _matchRanges($09);
+  int _parse$$IDENT_START(int $0, bool $1) {
+    int $2;
+    int $6;
+    const $9 = [65, 90, 97, 122];
+    final $10 = _matchRanges($9);
     if (_success) {
-      $06 = $010;
+      $6 = $10;
     }
-    $02 = $06;
-    return $02;
+    $2 = $6;
+    return $2;
   }
 
-  int _parse$$LITERAL_CHAR(int $00, bool $01) {
-    int $02;
-    final $03 = _pos;
-    final $04 = _c;
+  int _parse$$LITERAL_CHAR(int $0, bool $1) {
+    int $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      int $06;
-      final $07 = _c;
-      final $08 = _pos;
+      int $6;
+      final $7 = _c;
+      final $8 = _pos;
       _matchString('\\');
       if (_success) {
-        const $010 = [34, 34, 92, 92, 110, 110, 114, 114, 116, 116];
-        final $011 = _matchRanges($010);
+        const $10 = [34, 34, 92, 92, 110, 110, 114, 114, 116, 116];
+        final $11 = _matchRanges($10);
         if (_success) {
-          final c = $011;
+          final c = $11;
           int $$;
           $$ = _escape(c);
-          $06 = $$;
+          $6 = $$;
         }
         if (!_success) {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      int $012;
-      final $015 = _parse$$HEX_NUMBER(399, $01);
+      _c = $4;
+      _pos = $3;
+      int $12;
+      final $15 = _parse$$HEX_NUMBER(399, $1);
       if (_success) {
-        $012 = $015;
-        $02 = $012;
+        $12 = $15;
+        $2 = $12;
         break;
       }
-      int $016;
-      final $017 = _c;
-      final $018 = _pos;
-      final $021 = _error;
-      final $022 = _expected;
-      final $023 = _failure;
-      final $024 = $01;
-      $01 = false;
+      int $16;
+      final $17 = _c;
+      final $18 = _pos;
+      final $21 = _error;
+      final $22 = _expected;
+      final $23 = _failure;
+      final $24 = $1;
+      $1 = false;
       _matchString('\\');
       _success = !_success;
-      _c = $017;
-      _pos = $018;
-      _error = $021;
-      _expected = $022;
-      _failure = $023;
-      $01 = $024;
+      _c = $17;
+      _pos = $18;
+      _error = $21;
+      _expected = $22;
+      _failure = $23;
+      $1 = $24;
       if (_success) {
-        final $027 = _c;
-        final $028 = _pos;
-        final $029 = _error;
-        final $030 = _expected;
-        final $031 = _failure;
-        final $032 = $01;
-        $01 = false;
+        final $27 = _c;
+        final $28 = _pos;
+        final $29 = _error;
+        final $30 = _expected;
+        final $31 = _failure;
+        final $32 = $1;
+        $1 = false;
         _parse$$EOL(404, false);
         _success = !_success;
-        _c = $027;
-        _pos = $028;
-        _error = $029;
-        _expected = $030;
-        _failure = $031;
-        $01 = $032;
+        _c = $27;
+        _pos = $28;
+        _error = $29;
+        _expected = $30;
+        _failure = $31;
+        $1 = $32;
         if (_success) {
-          int $035;
+          int $35;
           if (_c >= 0 && _c <= 1114111) {
             _success = true;
-            $035 = _c;
+            $35 = _c;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
             _failure = _pos;
           }
           if (_success) {
-            $016 = $035;
+            $16 = $35;
           }
         }
         if (!_success) {
-          _c = $017;
-          _pos = $018;
+          _c = $17;
+          _pos = $18;
         }
       }
       if (_success) {
-        $02 = $016;
+        $2 = $16;
         break;
       }
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
       break;
     }
-    return $02;
+    return $2;
   }
 
-  List<int> _parse$$RANGE(int $00, bool $01) {
-    List<int> $02;
-    final $03 = _pos;
-    final $04 = _c;
+  List<int> _parse$$RANGE(int $0, bool $1) {
+    List<int> $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      List<int> $06;
-      final $07 = _c;
-      final $08 = _pos;
-      final $09 = _parse$$RANGE_CHAR(408, $01);
+      List<int> $6;
+      final $7 = _c;
+      final $8 = _pos;
+      final $9 = _parse$$RANGE_CHAR(408, $1);
       if (_success) {
         _matchString('-');
         if (_success) {
-          final $011 = _parse$$RANGE_CHAR(410, $01);
+          final $11 = _parse$$RANGE_CHAR(410, $1);
           if (_success) {
-            final s = $09;
-            final e = $011;
+            final s = $9;
+            final e = $11;
             List<int> $$;
             $$ = [s, e];
-            $06 = $$;
+            $6 = $$;
           }
         }
         if (!_success) {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      List<int> $012;
-      final $015 = _parse$$RANGE_CHAR(412, $01);
+      _c = $4;
+      _pos = $3;
+      List<int> $12;
+      final $15 = _parse$$RANGE_CHAR(412, $1);
       if (_success) {
-        final c = $015;
+        final c = $15;
         List<int> $$;
         $$ = [c, c];
-        $012 = $$;
+        $12 = $$;
       }
       if (_success) {
-        $02 = $012;
+        $2 = $12;
         break;
       }
       break;
     }
-    return $02;
+    return $2;
   }
 
-  int _parse$$RANGE_CHAR(int $00, bool $01) {
-    int $02;
-    final $03 = _pos;
-    final $04 = _c;
+  int _parse$$RANGE_CHAR(int $0, bool $1) {
+    int $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      int $06;
-      final $07 = _c;
-      final $08 = _pos;
+      int $6;
+      final $7 = _c;
+      final $8 = _pos;
       _matchString('\\');
       if (_success) {
-        const $010 = [92, 93, 110, 110, 114, 114, 116, 116];
-        final $011 = _matchRanges($010);
+        const $10 = [92, 93, 110, 110, 114, 114, 116, 116];
+        final $11 = _matchRanges($10);
         if (_success) {
-          final c = $011;
+          final c = $11;
           int $$;
           $$ = _escape(c);
-          $06 = $$;
+          $6 = $$;
         }
         if (!_success) {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      int $012;
-      final $015 = _parse$$HEX_NUMBER(418, $01);
+      _c = $4;
+      _pos = $3;
+      int $12;
+      final $15 = _parse$$HEX_NUMBER(418, $1);
       if (_success) {
-        $012 = $015;
-        $02 = $012;
+        $12 = $15;
+        $2 = $12;
         break;
       }
-      int $016;
-      final $017 = _c;
-      final $018 = _pos;
-      final $021 = _error;
-      final $022 = _expected;
-      final $023 = _failure;
-      final $024 = $01;
-      $01 = false;
-      const $025 = [92, 93];
-      _matchRanges($025);
+      int $16;
+      final $17 = _c;
+      final $18 = _pos;
+      final $21 = _error;
+      final $22 = _expected;
+      final $23 = _failure;
+      final $24 = $1;
+      $1 = false;
+      const $25 = [92, 93];
+      _matchRanges($25);
       _success = !_success;
-      _c = $017;
-      _pos = $018;
-      _error = $021;
-      _expected = $022;
-      _failure = $023;
-      $01 = $024;
+      _c = $17;
+      _pos = $18;
+      _error = $21;
+      _expected = $22;
+      _failure = $23;
+      $1 = $24;
       if (_success) {
-        final $028 = _c;
-        final $029 = _pos;
-        final $030 = _error;
-        final $031 = _expected;
-        final $032 = _failure;
-        final $033 = $01;
-        $01 = false;
+        final $28 = _c;
+        final $29 = _pos;
+        final $30 = _error;
+        final $31 = _expected;
+        final $32 = _failure;
+        final $33 = $1;
+        $1 = false;
         _parse$$EOL(423, false);
         _success = !_success;
-        _c = $028;
-        _pos = $029;
-        _error = $030;
-        _expected = $031;
-        _failure = $032;
-        $01 = $033;
+        _c = $28;
+        _pos = $29;
+        _error = $30;
+        _expected = $31;
+        _failure = $32;
+        $1 = $33;
         if (_success) {
-          int $036;
+          int $36;
           if (_c >= 0 && _c <= 1114111) {
             _success = true;
-            $036 = _c;
+            $36 = _c;
             _c = _input[_pos += _c <= 65535 ? 1 : 2];
           } else {
             _success = false;
             _failure = _pos;
           }
           if (_success) {
-            $016 = $036;
+            $16 = $36;
           }
         }
         if (!_success) {
-          _c = $017;
-          _pos = $018;
+          _c = $17;
+          _pos = $18;
         }
       }
       if (_success) {
-        $02 = $016;
+        $2 = $16;
         break;
       }
-      _c = $04;
-      _pos = $03;
+      _c = $4;
+      _pos = $3;
       break;
     }
-    return $02;
+    return $2;
   }
 
-  dynamic _parse$$SPACE(int $00, bool $01) {
-    dynamic $02;
+  dynamic _parse$$SPACE(int $0, bool $1) {
+    dynamic $2;
     for (;;) {
-      int $06;
-      const $09 = [9, 9, 32, 32];
-      final $010 = _matchRanges($09);
+      int $6;
+      const $9 = [9, 9, 32, 32];
+      final $10 = _matchRanges($9);
       if (_success) {
-        $06 = $010;
-        $02 = $06;
+        $6 = $10;
+        $2 = $6;
         break;
       }
-      dynamic $011;
-      final $014 = _parse$$EOL(429, false);
+      dynamic $11;
+      final $14 = _parse$$EOL(429, false);
       if (_success) {
-        $011 = $014;
-        $02 = $011;
+        $11 = $14;
+        $2 = $11;
         break;
       }
       break;
     }
-    return $02;
+    return $2;
   }
 
-  List _parse$$SPACING(int $00, bool $01) {
-    List $02;
+  List _parse$$SPACING(int $0, bool $1) {
+    List $2;
     for (;;) {
       for (;;) {
         _parse$$SPACE(435, false);
@@ -2732,44 +2732,44 @@ class Peg2Parser {
         break;
       }
     }
-    return $02;
+    return $2;
   }
 
-  int _parse$$TERMINAL_CHAR(int $00, bool $01) {
-    int $02;
-    final $03 = _pos;
-    final $04 = _c;
+  int _parse$$TERMINAL_CHAR(int $0, bool $1) {
+    int $2;
+    final $3 = _pos;
+    final $4 = _c;
     for (;;) {
-      int $06;
-      final $07 = _c;
-      final $08 = _pos;
+      int $6;
+      final $7 = _c;
+      final $8 = _pos;
       _matchString('//');
       if (_success) {
-        final $010 = _matchChar(39);
+        final $10 = _matchChar(39);
         if (_success) {
-          $06 = $010;
+          $6 = $10;
         } else {
-          _c = $07;
-          _pos = $08;
+          _c = $7;
+          _pos = $8;
         }
       }
       if (_success) {
-        $02 = $06;
+        $2 = $6;
         break;
       }
-      _c = $04;
-      _pos = $03;
-      int $011;
-      const $014 = [32, 38, 40, 126];
-      final $015 = _matchRanges($014);
+      _c = $4;
+      _pos = $3;
+      int $11;
+      const $14 = [32, 38, 40, 126];
+      final $15 = _matchRanges($14);
       if (_success) {
-        $011 = $015;
-        $02 = $011;
+        $11 = $15;
+        $2 = $11;
         break;
       }
       break;
     }
-    return $02;
+    return $2;
   }
 }
 
