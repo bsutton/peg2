@@ -5,7 +5,7 @@ import 'package:path/path.dart' as _path;
 import 'package:peg2/general_parser_generator.dart';
 import 'package:peg2/grammar.dart';
 import 'package:peg2/parser_generator.dart';
-import 'package:peg2/postfix_parser_generator.dart';
+//import 'package:peg2/postfix_parser_generator.dart';
 import 'package:strings/strings.dart';
 
 import 'peg2_parser.dart';
