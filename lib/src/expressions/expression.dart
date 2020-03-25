@@ -1,6 +1,9 @@
 part of '../../expressions.dart';
 
 abstract class Expression {
+  static final SparseBoolList allChararcters = SparseBoolList()
+    ..addGroup(GroupedRangeList<bool>(0, 0x10ffff, true));
+
   bool canMatchEof = false;
 
   int id;
