@@ -7,20 +7,21 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   List<State> _epsilon;
 
-  List<Expression> _recursive;
+  int _id;
 
   State _start;
 
-  State process(
-      OrderedChoiceExpression expression, List<Expression> recursive) {
+  Map<SymbolExpression, List<State>> _symbolStates;
+
+  State process(OrderedChoiceExpression expression) {
     _active = [];
     _epsilon = [];
-    _recursive = recursive;
+    _id = 0;
+    _symbolStates = {};
     final start = _createState();
-    expression.accept(this);
     final end = _createState();
-    _addEpsilon(start, _start);
-    _addEpsilon(_end, end);
+    expression.accept(this);
+    _connect(start, end);
     return start;
   }
 
@@ -31,14 +32,10 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
-    _active.add(node);
-    _start = _createState();
-    _addStarts(_start, node);
-    _end = _createState();
+    _processStart(node, false);
     final startCharacters = Expression.allChararcters;
     _addTransitions(_start, startCharacters, _end);
-    _addEnds(_end, node);
-    _active.remove(node);
+    _processEnd(node, _start, _end, false);
   }
 
   @override
@@ -48,14 +45,10 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   @override
   void visitCharacterClass(CharacterClassExpression node) {
-    _active.add(node);
-    _start = _createState();
-    _addStarts(_start, node);
-    _end = _createState();
+    _processStart(node, false);
     final startCharacters = node.startCharacters;
     _addTransitions(_start, startCharacters, _end);
-    _addEnds(_end, node);
-    _active.remove(node);
+    _processEnd(node, _start, _end, false);
   }
 
   @override
@@ -63,36 +56,32 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     final text = node.text;
     if (text.isEmpty) {
       _processStart(node, true);
-      _processEnd(node, _start, _end, true);
+      _processEnd(node, _start, _end, false);
     } else {
       _processStart(node, false);
       final start = _start;
       final end = _end;
       final runes = text.runes.toList();
-      var prev = _start;
-      State next;
+      final states = <List<State>>[];
       for (var i = 0; i < runes.length; i++) {
         final rune = runes[i];
+        final start = _createState();
+        final end = _createState();
         final group = GroupedRangeList<bool>(rune, rune, true);
         final startCharacters = SparseBoolList();
         startCharacters.addGroup(group);
-        if (i < runes.length - 1) {
-          next = _createState();
-        } else {
-          next = end;
-        }
-
-        _addTransitions(prev, startCharacters, next);
-        prev = next;
+        _addTransitions(start, startCharacters, end);
+        states.add([start, end]);
       }
 
+      _connectStates(states);
       _processEnd(node, start, end, false);
     }
   }
 
   @override
   void visitNonterminal(NonterminalExpression node) {
-    _processChild(node, node.expression, false);
+    _processSymbol(node);
   }
 
   @override
@@ -129,36 +118,43 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     _processStart(node, false);
     final start = _start;
     final end = _end;
-    if (_start.starts.contains(node)) {
-      _processEnd(node, _start, _end, false);
-      _recursive.add(node);
-      return;
-    }
-
     final expressions = node.expressions;
     for (var i = 0; i < expressions.length; i++) {
       final child = expressions[i];
       child.accept(this);
-      start.epsilon.add(_start);
-      end.epsilon.add(_end);
+      _connect(start, end);
     }
 
+    _start = start;
+    _end = end;
     _processEnd(node, start, end, true);
   }
 
   @override
   void visitSequence(SequenceExpression node) {
-    //
+    _processStart(node, false);
+    final start = _start;
+    final end = _end;
+    final expressions = node.expressions;
+    final states = <List<State>>[];
+    for (var i = 0; i < expressions.length; i++) {
+      final child = expressions[i];
+      child.accept(this);
+      states.add([_start, _end]);
+    }
+
+    _connectStates(states);
+    _processEnd(node, start, end, true);
   }
 
   @override
   void visitSubterminal(SubterminalExpression node) {
-    _processChild(node, node.expression, false);
+    _processSymbol(node);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    _processChild(node, node.expression, false);
+    _processSymbol(node);
   }
 
   @override
@@ -169,11 +165,9 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     final child = node.expression;
     child.accept(this);
     final middle = _createState();
-    start.epsilon.add(_start);
-    _end.epsilon.add(middle);
+    _connect(start, middle);
     child.accept(this);
-    middle.epsilon.add(_start);
-    _end.epsilon.add(end);
+    _connect(middle, end);
     end.epsilon.add(middle);
     _processEnd(node, start, end, true);
   }
@@ -192,11 +186,43 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   void _addTransitions(
       State state, SparseBoolList startCharacters, State transition) {
-    throw UnimplementedError();
+    final transitions = state.transitions;
+    if (transitions.groupCount != 0) {
+      throw StateError('State already has transitions');
+    }
+
+    for (final src in startCharacters.groups) {
+      final dest = GroupedRangeList<State>(src.start, src.end, transition);
+      transitions.addGroup(dest);
+    }
+  }
+
+  void _connect(State start, State end) {
+    if (start != _start) {
+      start.epsilon.add(_start);
+    }
+
+    if (end != _end) {
+      end.epsilon.add(_end);
+    }
+  }
+
+  void _connectStates(List<List<State>> states) {
+    final first = states.first;
+    final last = states.last;
+    var prev = first[0];
+    for (var i = 1; i < states.length; i++) {
+      final state = states[i];
+      prev.epsilon.add(state[0]);
+      prev = state[1];
+    }
+
+    _start = first[0];
+    _end = last[1];
   }
 
   State _createState() {
-    final state = State();
+    final state = State(_id++);
     state.active.addAll(_active);
     state.epsilon.addAll(_epsilon);
     return state;
@@ -211,8 +237,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
   }
 
   void _processEnd(Expression node, State start, State end, bool isEpsilon) {
-    _addEpsilon(start, _start);
-    _addEpsilon(_end, end);
+    _connect(start, end);
     _start = start;
     _end = end;
     if (isEpsilon) {
@@ -224,18 +249,36 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   void _processStart(Expression node, bool isEpsilon) {
     _active.add(node);
-    _end = _createState();
-    if (isEpsilon) {
-      _epsilon.add(_end);
-    }
-
     _start = _createState();
+    _end = _createState();
     _addStarts(_start, node);
     _addEnds(_end, node);
+    if (isEpsilon) {
+      _epsilon.add(_end);
+      _start.epsilon.add(_end);
+    }
+  }
+
+  void _processSymbol(SymbolExpression node) {
+    if (_symbolStates.containsKey(node)) {
+      final states = _symbolStates[node];
+      _start = states[0];
+      _end = states[1];
+      return;
+    }
+
+    _processStart(node, false);
+    final start = _start;
+    final end = _end;
+    _symbolStates[node] = [start, end];
+    node.expression.accept(this);
+    _processEnd(node, start, end, false);
   }
 }
 
 class State {
+  final id;
+
   final active = <Expression>{};
 
   final ends = <Expression>{};
@@ -244,5 +287,12 @@ class State {
 
   final starts = <Expression>{};
 
-  final transitions = SparseList<List<State>>();
+  final transitions = SparseList<State>();
+
+  State(this.id);
+
+  @override
+  String toString() {
+    return '$id';
+  }
 }

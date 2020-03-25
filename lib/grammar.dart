@@ -1,4 +1,5 @@
 import 'expressions.dart';
+import 'finite_automaton.dart';
 import 'grammar_analyzers.dart';
 
 part 'src/grammar/grammar.dart';

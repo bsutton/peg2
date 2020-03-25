@@ -4,7 +4,6 @@ class GrammarInitializer0 {
   void initialize(Grammar grammar, List<String> errors, List<String> warnings) {
     final expressionInitializer0 = ExpressionInitializer0();
     expressionInitializer0.initialize(grammar);
-
     final invocationsResolver = InvocationsResolver();
     invocationsResolver.resolve(grammar);
     final startingRulesFinder = StartingRulesFinder();
