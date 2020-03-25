@@ -110,7 +110,6 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     final middle = _createState();
     start.epsilon.add(_start);
     _end.epsilon.add(middle);
-    child.accept(this);
     _epsilon.add(end);
     child.accept(this);
     _epsilon.remove(end);
@@ -127,8 +126,10 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
+    _processStart(node, false);
+    final start = _start;
+    final end = _end;
     if (_start.starts.contains(node)) {
-      _processStart(node, false);
       _processEnd(node, _start, _end, false);
       _recursive.add(node);
       return;
@@ -138,12 +139,16 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     for (var i = 0; i < expressions.length; i++) {
       final child = expressions[i];
       child.accept(this);
+      start.epsilon.add(_start);
+      end.epsilon.add(_end);
     }
+
+    _processEnd(node, start, end, true);
   }
 
   @override
   void visitSequence(SequenceExpression node) {
-    // TODO: implement visitSequence
+    //
   }
 
   @override
