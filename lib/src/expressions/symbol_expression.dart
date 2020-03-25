@@ -3,7 +3,7 @@ part of '../../expressions.dart';
 abstract class SymbolExpression extends Expression {
   final String name;
 
-  Expression expression;
+  OrderedChoiceExpression expression;
 
   SymbolExpression(this.name) {
     if (name == null) {
