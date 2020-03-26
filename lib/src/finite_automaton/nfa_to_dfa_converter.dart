@@ -38,7 +38,7 @@ class NfaToDfaConverter {
       final active = dfa.active;
       final ends = dfa.ends;
       for (final nfa in nfas) {
-        _printNfa(nfa);
+        //_printNfa(nfa);
         starts.addAll(nfa.starts);
         active.addAll(nfa.active);
         ends.addAll(nfa.ends);
@@ -51,6 +51,11 @@ class NfaToDfaConverter {
       }
 
       _printNfa(dfa);
+      print('=================');
+    }
+
+    for (final dfa in _dfas) {
+      //
     }
 
     return null;
@@ -89,6 +94,29 @@ class NfaToDfaConverter {
     _pending.add(nfa);
   }
 
+  void _foo() {
+    for (final dfa in _dfas) {
+      final list = SparseList<Set<State>>();
+      for (final nfa in _getDfaNfas(dfa)) {
+        for (final src in nfa.transitions.getGroups()) {
+          final allSpace = list.getAllSpace(src);
+          for (final dest in allSpace) {
+            var key = dest.key;
+            if (key == null) {
+              key = {nfa};
+            } else {
+              key.add(nfa);
+            }
+
+            final group =
+                GroupedRangeList<Set<State>>(dest.start, dest.end, key);
+            list.addGroup(group);
+          }
+        }
+      }
+    }
+  }
+
   Set<State> _getDfaNfas(State dfa) {
     var nfas = _dfaNfa[dfa];
     if (nfas == null) {
@@ -119,7 +147,7 @@ class NfaToDfaConverter {
     writeExpr(sb, nfa.active);
     sb.writeln('ends: ');
     writeExpr(sb, nfa.ends);
-    sb.writeln('===========');
+    sb.writeln('---------');
     print(sb);
   }
 

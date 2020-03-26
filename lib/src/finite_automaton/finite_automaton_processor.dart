@@ -5,8 +5,6 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   State _end;
 
-  List<State> _epsilon;
-
   int _id;
 
   State _start;
@@ -15,7 +13,6 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   State process(OrderedChoiceExpression expression) {
     _active = [];
-    _epsilon = [];
     _id = 0;
     _symbolStates = {};
     final start = _createState();
@@ -27,38 +24,39 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   @override
   void visitAndPredicate(AndPredicateExpression node) {
-    _processChild(node, node.expression, true);
+    _processChild(node, node.expression);
+    _start.epsilon.add(_end);
   }
 
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
-    _processStart(node, false);
+    _processStart(node);
     final startCharacters = Expression.allChararcters;
     _addTransitions(_start, startCharacters, _end);
-    _processEnd(node, _start, _end, false);
+    _processEnd(node, _start, _end);
   }
 
   @override
   void visitCapture(CaptureExpression node) {
-    _processChild(node, node.expression, false);
+    _processChild(node, node.expression);
   }
 
   @override
   void visitCharacterClass(CharacterClassExpression node) {
-    _processStart(node, false);
+    _processStart(node);
     final startCharacters = node.startCharacters;
     _addTransitions(_start, startCharacters, _end);
-    _processEnd(node, _start, _end, false);
+    _processEnd(node, _start, _end);
   }
 
   @override
   void visitLiteral(LiteralExpression node) {
     final text = node.text;
     if (text.isEmpty) {
-      _processStart(node, true);
-      _processEnd(node, _start, _end, false);
+      _processStart(node);
+      _processEnd(node, _start, _end);
     } else {
-      _processStart(node, false);
+      _processStart(node);
       final start = _start;
       final end = _end;
       final runes = text.runes.toList();
@@ -75,7 +73,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
       }
 
       _connectStates(states);
-      _processEnd(node, start, end, false);
+      _processEnd(node, start, end);
     }
   }
 
@@ -86,36 +84,35 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
-    _processChild(node, node.expression, true);
+    _processChild(node, node.expression);
+    _start.epsilon.add(_end);
   }
 
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
-    _processStart(node, false);
+    _processStart(node);
     final start = _start;
     final end = _end;
     final child = node.expression;
     child.accept(this);
     final middle = _createState();
-    start.epsilon.add(_start);
-    _end.epsilon.add(middle);
-    _epsilon.add(end);
-    child.accept(this);
-    _epsilon.remove(end);
-    middle.epsilon.add(_start);
-    _end.epsilon.add(end);
+    middle.epsilon.add(end);
     end.epsilon.add(middle);
-    _processEnd(node, start, end, false);
+    _connect(start, middle);
+    child.accept(this);
+    _connect(middle, end);
+    _processEnd(node, start, end);
   }
 
   @override
   void visitOptional(OptionalExpression node) {
-    _processChild(node, node.expression, true);
+    _processChild(node, node.expression);
+    _start.epsilon.add(_end);
   }
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
-    _processStart(node, false);
+    _processStart(node);
     final start = _start;
     final end = _end;
     final expressions = node.expressions;
@@ -127,12 +124,12 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
     _start = start;
     _end = end;
-    _processEnd(node, start, end, true);
+    _processEnd(node, start, end);
   }
 
   @override
   void visitSequence(SequenceExpression node) {
-    _processStart(node, false);
+    _processStart(node);
     final start = _start;
     final end = _end;
     final expressions = node.expressions;
@@ -144,7 +141,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     }
 
     _connectStates(states);
-    _processEnd(node, start, end, true);
+    _processEnd(node, start, end);
   }
 
   @override
@@ -159,17 +156,19 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
-    _processStart(node, true);
+    _processStart(node);
     final start = _start;
     final end = _end;
+    start.epsilon.add(end);
     final child = node.expression;
     child.accept(this);
     final middle = _createState();
+    middle.epsilon.add(end);
+    end.epsilon.add(middle);
     _connect(start, middle);
     child.accept(this);
     _connect(middle, end);
-    end.epsilon.add(middle);
-    _processEnd(node, start, end, true);
+    _processEnd(node, start, end);
   }
 
   void _addEnds(State state, Expression expression) {
@@ -203,14 +202,14 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     }
 
     if (end != _end) {
-      end.epsilon.add(_end);
+      _end.epsilon.add(end);
     }
   }
 
   void _connectStates(List<List<State>> states) {
     final first = states.first;
     final last = states.last;
-    var prev = first[0];
+    var prev = first[1];
     for (var i = 1; i < states.length; i++) {
       final state = states[i];
       prev.epsilon.add(state[0]);
@@ -224,39 +223,30 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
   State _createState() {
     final state = State(_id++);
     state.active.addAll(_active);
-    state.epsilon.addAll(_epsilon);
     return state;
   }
 
-  void _processChild(Expression parent, Expression child, bool isEpsilon) {
-    _processStart(parent, isEpsilon);
+  void _processChild(Expression parent, Expression child) {
+    _processStart(parent);
     final start = _start;
     final end = _end;
     child.accept(this);
-    _processEnd(parent, start, end, isEpsilon);
+    _processEnd(parent, start, end);
   }
 
-  void _processEnd(Expression node, State start, State end, bool isEpsilon) {
+  void _processEnd(Expression node, State start, State end) {
     _connect(start, end);
     _start = start;
     _end = end;
-    if (isEpsilon) {
-      _epsilon.remove(end);
-    }
-
     _active.remove(node);
   }
 
-  void _processStart(Expression node, bool isEpsilon) {
+  void _processStart(Expression node) {
     _active.add(node);
     _start = _createState();
     _end = _createState();
     _addStarts(_start, node);
     _addEnds(_end, node);
-    if (isEpsilon) {
-      _epsilon.add(_end);
-      _start.epsilon.add(_end);
-    }
   }
 
   void _processSymbol(SymbolExpression node) {
@@ -267,12 +257,12 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
       return;
     }
 
-    _processStart(node, false);
+    _processStart(node);
     final start = _start;
     final end = _end;
     _symbolStates[node] = [start, end];
     node.expression.accept(this);
-    _processEnd(node, start, end, false);
+    _processEnd(node, start, end);
   }
 }
 
