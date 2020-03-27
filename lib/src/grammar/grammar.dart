@@ -60,8 +60,8 @@ class Grammar {
     grammarInitializer1.initialize(this, errors, warnings);
 
     final finiteAutomatonProcessor = FiniteAutomatonProcessor();
-    final nfa = finiteAutomatonProcessor.process(start.expression);
-    final nfaToDfaConverter = NfaToDfaConverter();
-    nfaToDfaConverter.convert(nfa);
+    final enfa = finiteAutomatonProcessor.process(start.expression);
+    final enfaToNfaConverter = ENfaToNfaConverter();
+    enfaToNfaConverter.convert(enfa);
   }
 }
