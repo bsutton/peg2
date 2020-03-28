@@ -59,11 +59,10 @@ class Grammar {
     final grammarInitializer1 = GrammarInitializer1();
     grammarInitializer1.initialize(this, errors, warnings);
 
-    final finiteAutomatonProcessor = FiniteAutomatonProcessor();
-    final enfa = finiteAutomatonProcessor.process(start.expression);
+    final expressionToEnfaConverter = ExpressionToEnfaConverter();
+    final enfa = expressionToEnfaConverter.convert(start.expression);
     final alphabetResolver = AlphabetResolver();
-    final alphabet = alphabetResolver.resolve(enfa);
-    print(alphabet);
+    final alphabet = alphabetResolver.resolve(enfa);    
     //final enfaToNfaConverter = ENfaToNfaConverter();
     //enfaToNfaConverter.convert(enfa);
   }

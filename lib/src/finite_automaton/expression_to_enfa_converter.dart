@@ -1,6 +1,6 @@
 part of '../../finite_automaton.dart';
 
-class FiniteAutomatonProcessor extends ExpressionVisitor {
+class ExpressionToEnfaConverter extends ExpressionVisitor {
   List<Expression> _active;
 
   ENfaState _last;
@@ -9,7 +9,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   Map<SymbolExpression, List<ENfaState>> _symbolStates;
 
-  ENfaState process(OrderedChoiceExpression expression) {
+  ENfaState convert(OrderedChoiceExpression expression) {
     _active = [];
     _id = 0;
     _symbolStates = {};
@@ -22,7 +22,22 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   @override
   void visitAndPredicate(AndPredicateExpression node) {
-    throw null;
+    _start(node);
+    final s0 = _last;
+    final s1 = _createState();
+    _connect(s0, s1);
+    _last = s1;
+    final child = node.expression;
+    child.accept(this);
+    final s2 = _last;
+    final s3 = _createState();
+    _connect(s0, s3);
+    final s4 = _createState();
+    _connect(s3, s4);
+    final s5 = _createState();
+    _connect(s2, s5);
+    _connect(s4, s5);
+    _end(node, s5);
   }
 
   @override
@@ -85,7 +100,22 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
-    throw null;
+    _start(node);
+    final s0 = _last;
+    final s1 = _createState();
+    _connect(s0, s1);
+    _last = s1;
+    final child = node.expression;
+    child.accept(this);
+    final s2 = _last;
+    final s3 = _createState();
+    _connect(s0, s3);
+    final s4 = _createState();
+    _connect(s3, s4);
+    final s5 = _createState();
+    _connect(s2, s5);
+    _connect(s4, s5);
+    _end(node, s5);
   }
 
   @override
@@ -239,6 +269,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
 
   ENfaState _start(Expression node) {
     _active.add(node);
+    _last.starts.add(node);
     _last.active.addAll(_active);
     return _last;
   }
