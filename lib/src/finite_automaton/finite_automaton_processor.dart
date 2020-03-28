@@ -60,7 +60,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
       final s0 = _last;
       final s1 = _createState();
       _connect(s0, s1);
-      _end(s1, node);
+      _end(node, s1);
     } else {
       final runes = text.runes.toList();
       final s0 = _last;
@@ -74,7 +74,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
         s1 = _last;
       }
 
-      _end(s1, node);
+      _end(node);
     }
   }
 
@@ -103,7 +103,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     final s4 = _createState();
     _connect(s1, s4);
     _connect(s3, s4);
-    _end(s4, node);
+    _end(node, s4);
   }
 
   @override
@@ -123,7 +123,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     final s5 = _createState();
     _connect(s2, s5);
     _connect(s4, s5);
-    _end(s5, node);
+    _end(node, s5);
   }
 
   @override
@@ -144,7 +144,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
       _connect(state, s1);
     }
 
-    _end(s1, node);
+    _end(node, s1);
   }
 
   @override
@@ -154,7 +154,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
       child.accept(this);
     }
 
-    _end(_last, node);
+    _end(node);
   }
 
   @override
@@ -181,7 +181,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     final s3 = _createState();
     _connect(s0, s3);
     _connect(s2, s3);
-    _end(s3, node);
+    _end(node, s3);
   }
 
   void _addEnds(ENfaState state, Expression node) {
@@ -234,7 +234,7 @@ class FiniteAutomatonProcessor extends ExpressionVisitor {
     final s2 = _createState();
     _symbolStates[node] = [s1, s2];
     node.expression.accept(this);
-    _end(s2, node);
+    _end(node, s2);
   }
 
   ENfaState _start(Expression node) {

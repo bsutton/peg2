@@ -61,7 +61,10 @@ class Grammar {
 
     final finiteAutomatonProcessor = FiniteAutomatonProcessor();
     final enfa = finiteAutomatonProcessor.process(start.expression);
-    final enfaToNfaConverter = ENfaToNfaConverter();
-    enfaToNfaConverter.convert(enfa);
+    final alphabetResolver = AlphabetResolver();
+    final alphabet = alphabetResolver.resolve(enfa);
+    print(alphabet);
+    //final enfaToNfaConverter = ENfaToNfaConverter();
+    //enfaToNfaConverter.convert(enfa);
   }
 }

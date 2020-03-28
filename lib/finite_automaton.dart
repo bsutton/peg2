@@ -2,6 +2,7 @@ import 'package:lists/lists.dart';
 
 import 'expressions.dart';
 
+part 'src/finite_automaton/alphabet_resolver.dart';
 part 'src/finite_automaton/dfa_state.dart';
 part 'src/finite_automaton/enfa_state.dart';
 part 'src/finite_automaton/enfa_to_nfa_converter.dart';
