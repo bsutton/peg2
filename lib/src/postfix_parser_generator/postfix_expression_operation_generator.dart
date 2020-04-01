@@ -272,7 +272,7 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
       final function = varOp(Variable(name, true));
       final arguments = <Operation>[
         varOp(result),
-        varOp(callerId),
+        varOp(memoize),
         varOp(productive)
       ];
       final call = callOp(function, arguments);
@@ -429,7 +429,7 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
     final block_ = block;
     block = BlockOperation();
     final va_ = va;
-    final callerId_ = callerId;
+    final memoize_ = memoize;
     final productive_ = productive;
     final result_ = result;
     final mode_ = mode;
@@ -440,11 +440,11 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
     va = newVarAlloc();
     final returnType = node.returnType;
     result = va.alloc(true);
-    callerId = va.alloc(true);
+    memoize = va.alloc(true);
     productive = va.alloc(true);
     final params = <ParameterOperation>[];
     params.add(paramOp(firstChild.returnType, result, null));
-    params.add(paramOp('int', callerId, null));
+    params.add(paramOp('bool', memoize, null));
     params.add(paramOp('bool', productive, null));
     final name = getExpressionMethodName(node);
     method = MethodOperation(returnType, name, params, block);
@@ -528,7 +528,7 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
     mode = mode_;
     result = result_;
     productive = productive_;
-    callerId = callerId_;
+    memoize = memoize_;
     va = va_;
     block = block_;
   }

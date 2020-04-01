@@ -17,6 +17,8 @@ class ProductionRule {
 
   int id;
 
+  Set<SymbolExpression> memoizationRequests = {};
+
   final String name;
 
   String returnType;

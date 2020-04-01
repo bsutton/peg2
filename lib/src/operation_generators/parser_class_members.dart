@@ -23,8 +23,6 @@ class ParserClassMembers {
 
   final input = Variable('_input', true);
 
-  final memoizable = Variable('_memoizable', true);
-
   final memoize = Variable('_memoize', true);
 
   final memoized = Variable('_memoized', true);

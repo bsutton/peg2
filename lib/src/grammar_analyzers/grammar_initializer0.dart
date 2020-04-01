@@ -9,7 +9,7 @@ class GrammarInitializer0 {
     final startingRulesFinder = StartingRulesFinder();
     final startingRules = startingRulesFinder.find(grammar);
     if (startingRules.isEmpty) {
-      errors.add('Unable to find starting rule');
+      grammar.start = grammar.rules.first;
     } else if (startingRules.length > 1) {
       final names = startingRules.map((e) => e.name);
       errors.add('Found several starting rules: ${names.join(', ')}');

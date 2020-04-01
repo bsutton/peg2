@@ -11,9 +11,9 @@ class RangesOperationGenerator with OperationUtils {
   Operation generateTest(
       Variable variable, SparseList ranges, bool canMacthEof) {
     final list = SparseBoolList();
-    for (final src in ranges.groups) {
-      final dest = GroupedRangeList<bool>(src.start, src.end, true);
-      list.addGroup(dest);
+    for (final range in ranges.groups) {
+      final group = GroupedRangeList(range.start, range.end, true);
+      list.addGroup(group);
     }
 
     Operation op(int start, int end) {
@@ -27,7 +27,7 @@ class RangesOperationGenerator with OperationUtils {
     }
 
     if (canMacthEof) {
-      final group = GroupedRangeList<bool>(0x10ffff + 1, 0x10ffff + 1, true);
+      final group = GroupedRangeList(0x10ffff + 1, 0x10ffff + 1, true);
       list.addGroup(group);
     }
 

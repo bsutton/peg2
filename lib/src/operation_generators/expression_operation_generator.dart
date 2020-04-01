@@ -25,9 +25,7 @@ abstract class ExpressionOperationGenerator
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
     result = va.newVar(block, 'int', null);
-    final ranges = SparseBoolList();
-    final group = GroupedRangeList<bool>(0, 0x10ffff, true);
-    ranges.addGroup(group);
+    final ranges = Expression.allChararcters;
     void onSuccess(BlockOperation block) {
       addAssign(block, varOp(m.success), constOp(true));
       if (isProductive) {

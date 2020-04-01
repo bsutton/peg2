@@ -1,3 +1,9 @@
+## 0.1.28
+
+- Added a new feature `finite automaton`, for better grammar analysis
+- Improved the analysis and search for expressions and rules that may be involved in the process of memoization
+- Changed the memoization algorithm
+
 ## 0.1.27
 
 - Removed unnecessary leading zeros from the local variable generator

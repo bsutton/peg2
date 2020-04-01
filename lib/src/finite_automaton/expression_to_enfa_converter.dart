@@ -3,41 +3,31 @@ part of '../../finite_automaton.dart';
 class ExpressionToEnfaConverter extends ExpressionVisitor {
   List<Expression> _active;
 
-  ENfaState _last;
+  Map<OrderedChoiceExpression, List<EnfaState>> _choiceStates;
+
+  EnfaState _last;
 
   int _id;
 
-  Map<SymbolExpression, List<ENfaState>> _symbolStates;
+  void Function(SymbolExpression, EnfaState, EnfaState) _separate;
 
-  ENfaState convert(OrderedChoiceExpression expression) {
+  EnfaState convert(OrderedChoiceExpression expression,
+      Function(SymbolExpression, EnfaState, EnfaState) separate) {
     _active = [];
     _id = 0;
-    _symbolStates = {};
+    _choiceStates = {};
+    _separate = separate;
     final s0 = _createState();
     _last = s0;
     expression.accept(this);
-    _last.accept = true;
+    _last.isFinal = true;
     return s0;
   }
 
   @override
   void visitAndPredicate(AndPredicateExpression node) {
     _start(node);
-    final s0 = _last;
-    final s1 = _createState();
-    _connect(s0, s1);
-    _last = s1;
-    final child = node.expression;
-    child.accept(this);
-    final s2 = _last;
-    final s3 = _createState();
-    _connect(s0, s3);
-    final s4 = _createState();
-    _connect(s3, s4);
-    final s5 = _createState();
-    _connect(s2, s5);
-    _connect(s4, s5);
-    _end(node, s5);
+    _end(node);
   }
 
   @override
@@ -101,21 +91,7 @@ class ExpressionToEnfaConverter extends ExpressionVisitor {
   @override
   void visitNotPredicate(NotPredicateExpression node) {
     _start(node);
-    final s0 = _last;
-    final s1 = _createState();
-    _connect(s0, s1);
-    _last = s1;
-    final child = node.expression;
-    child.accept(this);
-    final s2 = _last;
-    final s3 = _createState();
-    _connect(s0, s3);
-    final s4 = _createState();
-    _connect(s3, s4);
-    final s5 = _createState();
-    _connect(s2, s5);
-    _connect(s4, s5);
-    _end(node, s5);
+    _end(node);
   }
 
   @override
@@ -158,9 +134,16 @@ class ExpressionToEnfaConverter extends ExpressionVisitor {
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
+    final states = _getChoiceStates(node);
+    if (states[0] != null) {
+      states[1] = _getChoiceEndState(node);
+      return;
+    }
+
+    states[0] = _last;
     _start(node);
     final s0 = _last;
-    final last = <ENfaState>[];
+    final last = <EnfaState>[];
     for (final child in node.expressions) {
       final next = _createState();
       _connect(s0, next);
@@ -169,7 +152,7 @@ class ExpressionToEnfaConverter extends ExpressionVisitor {
       last.add(_last);
     }
 
-    final s1 = _createState();
+    final s1 = _getChoiceEndState(node);
     for (final state in last) {
       _connect(state, s1);
     }
@@ -214,60 +197,97 @@ class ExpressionToEnfaConverter extends ExpressionVisitor {
     _end(node, s3);
   }
 
-  void _addEnds(ENfaState state, Expression node) {
+  void _addEnds(EnfaState state, Expression node) {
     state.ends.add(node);
   }
 
   void _addTransitions(
-      ENfaState state, SparseBoolList startCharacters, ENfaState transition) {
-    final transitions = state.transitions;
-    if (transitions.groupCount != 0) {
-      throw StateError('State already has transitions');
-    }
+      EnfaState from, SparseBoolList startCharacters, EnfaState to) {
+    final transitions = from.transitions;
+    for (final range in startCharacters.groups) {
+      for (final group in transitions.getAllSpace(range)) {
+        var key = group.key;
+        key ??= [];
+        if (!key.contains(to)) {
+          key.add(to);
+        }
 
-    for (final src in startCharacters.groups) {
-      final dest = GroupedRangeList<ENfaState>(src.start, src.end, transition);
-      transitions.addGroup(dest);
+        if (group.key == null) {
+          final start = group.start;
+          final end = group.end;
+          final newGroup = GroupedRangeList(start, end, key);
+          transitions.addGroup(newGroup);
+        }
+      }
     }
   }
 
-  void _connect(ENfaState from, ENfaState to) {
+  void _connect(EnfaState from, EnfaState to) {
     from.states.add(to);
   }
 
-  ENfaState _createState() {
-    final state = ENfaState(_id++);
+  EnfaState _createState() {
+    final state = EnfaState(_id++);
     state.active.addAll(_active);
     return state;
   }
 
-  void _end(Expression node, [ENfaState state]) {
+  void _end(Expression node, [EnfaState state]) {
     state ??= _last;
     _addEnds(state, node);
     _active.remove(node);
     _last = state;
   }
 
-  void _processSymbol(SymbolExpression node) {
-    if (_symbolStates.containsKey(node)) {
-      final states = _symbolStates[node];
-      final s1 = states[0];
-      final s2 = states[1];
-      _connect(_last, s1);
-      _last = s2;
-      return;
+  EnfaState _getChoiceEndState(OrderedChoiceExpression node) {
+    final states = _getChoiceStates(node);
+    var result = states[1];
+    if (result == null) {
+      result = _createState();
+      states[1] = result;
     }
 
-    _start(node);
-    final s1 = _createState();
-    _connect(_last, s1);
-    final s2 = _createState();
-    _symbolStates[node] = [s1, s2];
-    node.expression.accept(this);
-    _end(node, s2);
+    return result;
   }
 
-  ENfaState _start(Expression node) {
+  List<EnfaState> _getChoiceStates(OrderedChoiceExpression node) {
+    var result = _choiceStates[node];
+    if (result == null) {
+      result = [null, null];
+      _choiceStates[node] = result;
+    }
+
+    return result;
+  }
+
+  void _processSymbol(SymbolExpression node) {
+    final expression = node.expression;
+    final states = _getChoiceStates(expression);
+    if (states[0] == null) {
+      final s0 = _last;
+      s0.starts.add(node);
+      _last = _createState();
+      expression.accept(this);
+      _separate(node, s0, states[0]);
+      final s1 = _last;
+      final s2 = _createState();
+      _connect(s1, s2);
+      s2.ends.add(node);
+      _last = s2;
+    } else {
+      final s0 = _last;
+      s0.starts.add(node);
+      final s1 = states[0];
+      _separate(node, s0, s1);
+      final s2 = _getChoiceEndState(expression);
+      final s3 = _createState();
+      _separate(node, s2, s3);
+      s3.ends.add(node);
+      _last = s3;
+    }
+  }
+
+  EnfaState _start(Expression node) {
     _active.add(node);
     _last.starts.add(node);
     _last.active.addAll(_active);

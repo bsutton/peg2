@@ -1,8 +1,6 @@
 part of '../../general_parser_generator.dart';
 
 class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
-  int _callerId;
-
   GeneralExpressionOperationGenerator(ParserGeneratorOptions options,
       BlockOperation block, VariableAllocator va)
       : super(options, block, va);
@@ -27,17 +25,8 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
     final willMemoize = isOnTop && needToMemoize(rule, options);
     final result1 = va.newVar(block, returnType, null);
     final pos = va.newVar(block, 'final', varOp(m.pos));
-    Variable prevCallerId;
-    if (willInline) {
-      prevCallerId = callerId;
-      callerId = va.newVar(block, 'final', constOp(_callerId));
-    }
-
-    void memoize() {
-      final listAccess =
-          ListAccessOperation(varOp(m.memoizable), varOp(callerId));
-      final test =
-          BinaryOperation(listAccess, OperationKind.equal, constOp(true));
+    void callMemoize() {
+      final test = varOp(memoize);
       addIf(block, test, (block) {
         final memoize =
             callOp(varOp(m.memoize), [constOp(id), varOp(pos), varOp(result)]);
@@ -46,23 +35,23 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
     }
 
     if (willMemoize) {
-      final memoized =
-          callOp(varOp(m.memoized), [constOp(id), varOp(callerId)]);
+      final memoized = callOp(varOp(m.memoized), [constOp(id)]);
+      final testMemoized = landOp(varOp(memoize), memoized);
       if (isOnTop) {
-        addIf(block, memoized, (block) {
+        addIf(block, testMemoized, (block) {
           final convert = convertOp(varOp(m.mresult), returnType);
           addReturn(block, convert);
         });
 
         runInBlock(block, () => _generateOrderedChoice(node, result1));
-        runInBlock(block, memoize);
+        runInBlock(block, callMemoize);
       } else {
-        addIf(block, memoized, (block) {
+        addIf(block, testMemoized, (block) {
           final convert = convertOp(varOp(m.mresult), returnType);
           addAssign(block, varOp(result1), convert);
         }, (block) {
           runInBlock(block, () => _generateOrderedChoice(node, result1));
-          runInBlock(block, memoize);
+          runInBlock(block, callMemoize);
         });
       }
     } else {
@@ -71,10 +60,6 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
 
     if (isOnTop && !willInline) {
       addReturn(block, varOp(result1));
-    }
-
-    if (willInline) {
-      callerId = prevCallerId;
     }
   }
 
@@ -302,7 +287,6 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
   void _visitSymbol(SymbolExpression node) {
     final rule = node.expression.rule;
     final willInline = needToInline(rule, options);
-    _callerId = node.id;
     final startCharacters = node.startCharacters;
     var predict = false;
     if (options.predict) {
@@ -331,7 +315,7 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
           productive1 = constOp(false);
         }
 
-        final call = callOp(varOp(name), [constOp(_callerId), productive1]);
+        final call = callOp(varOp(name), [constOp(node.memoize), productive1]);
         result1 = va.newVar(block, 'final', call);
       }
 

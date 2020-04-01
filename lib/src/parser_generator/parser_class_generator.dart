@@ -25,7 +25,6 @@ class ParserClassGenerator {
       'List<String> _expected',
       'int _failure',
       'List<int> _input',
-      'List<bool> _memoizable',
       'List<List<_Memo>> _memos',
       'var _mresult',
       'int _pos',
@@ -33,8 +32,6 @@ class ParserClassGenerator {
       'dynamic _result',
       'bool _success',
       'String _text',
-      'List<int> _trackCid',
-      'List<int> _trackPos',
     ];
 
     for (final variable in variables) {
@@ -292,40 +289,21 @@ String _matchString(String text) {
   return result;
 }
 
-bool _memoized(int id, int cid) {
+bool _memoized(int id) {
   final memos = _memos[_pos];
   if (memos != null) {
     for (var i = 0; i < memos.length; i++) {
       final memo = memos[i];
-      if (memo.id == id) {        
+      if (memo.id == id) {
         _pos = memo.pos;
         _mresult = memo.result;
-        _success = memo.success;  
+        _success = memo.success;
         _c = _input[_pos];
         return true;
       }
     }
-  }  
-
-  if (_memoizable[cid] != null) {
-    return false;
   }
 
-  final lastCid = _trackCid[id];
-  final lastPos = _trackPos[id];
-  _trackCid[id] = cid;
-  _trackPos[id] = _pos;
-  if (lastCid == null) {    
-    return false;
-  }
-
-  if (lastPos == _pos) {
-    _memoizable[lastCid] = true;
-    if (lastCid != cid) {        
-      _memoizable[cid] = false;
-    }
-  }
-  
   return false;
 }
 
@@ -350,18 +328,12 @@ void _reset() {
   _c = _input[0];
   _error = 0;
   _expected = [];
-  _failure = -1;
-  _memoizable = [];
-  _memoizable.length = {{EXPR_COUNT}};
+  _failure = -1;  
   _memos = [];
   _memos.length = _input.length + 1;
   _pos = 0;
   _predicate = false;
-  _success = false;
-  _trackCid = [];
-  _trackCid.length = {{EXPR_COUNT}};
-  _trackPos = [];
-  _trackPos.length = {{EXPR_COUNT}};
+  _success = false;  
 }
 
 List<int> _toRunes(String source) {
@@ -401,9 +373,8 @@ List<int> _toRunes(String source) {
     }
 
     var methods = _methods;
-    methods = methods.replaceFirst('{{START}}', '$name($cid, true)');
-    methods =
-        methods.replaceAll('{{EXPR_COUNT}}', '${grammar.expressionCount}');
+    methods = methods.replaceFirst('{{START}}', '$name(false, true)');
+    //methods = methods.replaceAll('{{EXPR_COUNT}}', '${grammar.expressionCount}');
     final lineSplitter = LineSplitter();
     final lines = lineSplitter.convert(methods);
     builder.addAll(lines);

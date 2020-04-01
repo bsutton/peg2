@@ -161,30 +161,21 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
   }
 
   void _addAllCharacters(Expression node) {
-    final characters = SparseBoolList();
-    final group = GroupedRangeList<bool>(0, 0x10ffff, true);
-    characters.addGroup(group);
-    _addCharacters(node, characters);
+    _addCharacters(node, Expression.allChararcters);
   }
 
   void _addCharacters(Expression node, SparseBoolList characters) {
     final startCharacters = node.startCharacters;
-    var isEqual = true;
-    for (final group in characters.getGroups()) {
-      for (final group in startCharacters.getAllSpace(group)) {
+    for (final range in characters.groups) {
+      for (final group in startCharacters.getAllSpace(range)) {
         if (!group.key) {
-          isEqual = false;
-          break;
+          _hasModifications = true;
+          final start = group.start;
+          final end = group.end;
+          final newGroup = GroupedRangeList(start, end, true);
+          startCharacters.addGroup(newGroup);
         }
       }
-    }
-
-    if (!isEqual) {
-      for (final group in characters.getGroups()) {
-        startCharacters.addGroup(group);
-      }
-
-      _hasModifications = true;
     }
   }
 

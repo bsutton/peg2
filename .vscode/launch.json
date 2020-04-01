@@ -8,7 +8,7 @@
             "type": "dart",
             "args": [
                 //"--inline-all",
-                //"--memoize",
+                "--memoize",
                 //"--no-optimize-code",
                 "--optimize-size",
                 "bin/peg2.peg"
@@ -26,7 +26,7 @@
                 "--optimize-size",
                 //"--predict",
                 "example/example.peg",
-                "example/example.dart"                
+                "example/example.dart"
             ]
         },
         {

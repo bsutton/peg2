@@ -36,7 +36,7 @@ class CharacterClassExpression extends Expression {
         throw RangeError.value(start, 'end');
       }
 
-      final group = GroupedRangeList<bool>(start, end, true);
+      final group = GroupedRangeList(start, end, true);
       list.addGroup(group);
     }
 

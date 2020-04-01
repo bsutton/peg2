@@ -1,47 +1,48 @@
 part of '../../finite_automaton.dart';
 
-abstract class State<TParent, TChild> extends Comparable<State> {
-  bool accept = false;
-
+abstract class State<TSelf extends State<TSelf, TState>,
+    TState extends State<dynamic, dynamic>> {
   final active = <Expression>{};
 
   final ends = <Expression>{};
 
   final int id;
 
+  bool isFinal = false;
+
   final starts = <Expression>{};
 
-  final states = <TChild>{};
+  final states = <TState>{};
 
-  final transitions = SparseList<TParent>();
+  final transitions = SparseList<List<TSelf>>();
 
   State(this.id);
 
-  String get kind;
+  @override
+  int get hashCode => id.hashCode;
 
   @override
-  int compareTo(State other) {
-    if (other == null) {
-      return 1;
+  bool operator ==(other) {
+    if (other is TSelf) {
+      return id == other.id;
     }
 
-    return id.compareTo(other.id);
+    return false;
   }
 
   @override
   String toString() {
     final sb = StringBuffer();
+    if (isFinal) {
+      sb.write('V');
+    }
+
     sb.write(id);
-    sb.write(':');
     if (states.isNotEmpty) {
       sb.write('(');
       final list = <String>[];
-      for (final state in states.toList()..sort()) {
-        if (state is State) {
-          list.add(state.id.toString());
-        } else {
-          list.add('?');
-        }
+      for (final state in states) {
+        list.add('${state.id}');
       }
 
       sb.write(list.join(', '));

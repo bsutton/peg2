@@ -36,17 +36,7 @@ class ProductionRuleUtils {
       return false;
     }
 
-    final directCallers = rule.directCallers;
-    if (directCallers.length == 1) {
-      return false;
-    }
-
-    final parents = directCallers.map((e) => e.parent).toSet();
-    if (parents.length == 1) {
-      return false;
-    }
-
-    return true;
+    return rule.memoizationRequests.length > 1;
   }
 
   VariableAllocator newVarAlloc() {

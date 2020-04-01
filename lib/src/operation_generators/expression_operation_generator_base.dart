@@ -4,11 +4,11 @@ abstract class ExpressionOperationGeneratorBase extends ExpressionVisitor
     with OperationUtils, ProductionRuleUtils {
   BlockOperation block;
 
-  Variable callerId;
-
   bool isProductive = true;
 
   final ParserClassMembers m = ParserClassMembers();
+
+  Variable memoize;
 
   final ParserGeneratorOptions options;
 
