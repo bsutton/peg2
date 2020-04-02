@@ -21,7 +21,7 @@
             "type": "dart",
             "args": [
                 //"--inline-all",
-                //"--memoize",
+                "--memoize",
                 //"--no-optimize-code",
                 "--optimize-size",
                 //"--predict",
@@ -38,11 +38,12 @@
                 //"--inline-all",
                 //"--predict",
                 //"--no-optimize-code",
+                "--memoize",
                 "--optimize-size",
                 //"--parser=postfix",
-                //"example/example.peg",
-                //"example/example.dart"
-                "example/a.peg"
+                "example/example.peg",
+                "example/example.dart"
+                //"example/a.peg"
             ]
         },
         {

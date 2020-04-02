@@ -399,6 +399,10 @@ class ExampleParser {
   dynamic _parseValue(bool $0, bool $1) {
     dynamic $2;
     final $3 = _pos;
+    if ($0 && _memoized(6)) {
+      return _mresult as dynamic;
+    }
+    final $5 = _pos;
     for (;;) {
       List $6;
       final $9 = _parseArray(false, $1);
@@ -443,7 +447,7 @@ class ExampleParser {
         break;
       }
       String $30;
-      final $33 = _parse_string(false, $1);
+      final $33 = _parse_string(true, $1);
       if (_success) {
         $30 = $33;
         $2 = $30;
@@ -451,7 +455,7 @@ class ExampleParser {
       }
       break;
     }
-    if (!_success && _error == $3) {
+    if (!_success && _error == $5) {
       _fail(const [
         '\'false\'',
         '\'null\'',
@@ -461,6 +465,9 @@ class ExampleParser {
         '\'[\'',
         '\'{\''
       ]);
+    }
+    if ($0) {
+      _memoize(6, $3, $2);
     }
     return $2;
   }
@@ -497,7 +504,7 @@ class ExampleParser {
     List $2;
     final $3 = _pos;
     List $6;
-    final $9 = _parseValue(false, $1);
+    final $9 = _parseValue(true, $1);
     if (_success) {
       List $10;
       if ($1) {
@@ -757,7 +764,11 @@ class ExampleParser {
   String _parse_string(bool $0, bool $1) {
     String $2;
     final $3 = _pos;
+    if ($0 && _memoized(73)) {
+      return _mresult as String;
+    }
     final $4 = _c;
+    final $5 = _pos;
     String $7;
     _matchString('\"');
     if (_success) {
@@ -785,12 +796,15 @@ class ExampleParser {
       }
       if (!_success) {
         _c = $4;
-        _pos = $3;
+        _pos = $5;
       }
     }
     $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'string\'']);
+    }
+    if ($0) {
+      _memoize(73, $3, $2);
     }
     return $2;
   }
@@ -961,6 +975,10 @@ class ExampleParser {
 
   String _parse_$Comma(bool $0, bool $1) {
     String $2;
+    final $3 = _pos;
+    if ($0 && _memoized(125)) {
+      return _mresult as String;
+    }
     String $7;
     final $10 = _matchString(',');
     if (_success) {
@@ -970,6 +988,9 @@ class ExampleParser {
     $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\',\'']);
+    }
+    if ($0) {
+      _memoize(125, $3, $2);
     }
     return $2;
   }

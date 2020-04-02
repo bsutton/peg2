@@ -1,8 +1,8 @@
 ## 0.1.28
 
-- Added a new feature `finite automaton`, for better grammar analysis
-- Improved the analysis and search for expressions and rules that may be involved in the process of memoization
-- Changed the memoization algorithm
+- Added a new (experimental) feature `finite automaton`, for better grammar analysis
+- Improved the analysis and search (using a `finite automaton`) for symbol expressions and production rules that may be involved in the process of memoization
+- Changed (simplified) the memoization algorithm in generated parser, excluded the procedure for dynamic determination of the need for memoization of rules
 
 ## 0.1.27
 

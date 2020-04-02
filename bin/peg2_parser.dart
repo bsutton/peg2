@@ -589,7 +589,7 @@ class Peg2Parser {
         final $12 = _pos;
         final $13 = _c;
         SequenceExpression $15;
-        _parse_$Slash(false, false);
+        _parse_$Slash(true, false);
         if (_success) {
           final $19 = _parseNonterminalSequence(false, $1);
           if (_success) {
@@ -917,7 +917,7 @@ class Peg2Parser {
         final $12 = _pos;
         final $13 = _c;
         SequenceExpression $15;
-        _parse_$Slash(false, false);
+        _parse_$Slash(true, false);
         if (_success) {
           final $19 = _parseSequence(false, $1);
           if (_success) {
@@ -1318,7 +1318,7 @@ class Peg2Parser {
       final $11 = _pos;
       final $12 = _c;
       List<String> $14;
-      _parse_$LessThanSign(false, false);
+      _parse_$LessThanSign(true, false);
       if (_success) {
         final $18 = _parseTypeArguments(false, $1);
         if (_success) {
@@ -1405,7 +1405,7 @@ class Peg2Parser {
     List<String> $2;
     final $3 = _pos;
     List<String> $6;
-    final $9 = _parseType(false, $1);
+    final $9 = _parseType(true, $1);
     if (_success) {
       List<String> $10;
       if ($1) {
@@ -1458,7 +1458,7 @@ class Peg2Parser {
       return _mresult as String;
     }
     String $7;
-    final $10 = _parse$$IDENTIFIER(false, $1);
+    final $10 = _parse$$IDENTIFIER(true, $1);
     if (_success) {
       _parse$$SPACING(false, false);
       $7 = $10;
@@ -1559,7 +1559,7 @@ class Peg2Parser {
     final $15 = _c;
     _matchChar(64);
     if (_success) {
-      _parse$$IDENTIFIER(false, false);
+      _parse$$IDENTIFIER(true, false);
       if (!_success) {
         _c = $15;
         _pos = $14;
@@ -2130,6 +2130,10 @@ class Peg2Parser {
 
   String _parse_$Slash(bool $0, bool $1) {
     String $2;
+    final $3 = _pos;
+    if ($0 && _memoized(322)) {
+      return _mresult as String;
+    }
     String $7;
     final $10 = _matchString('/');
     if (_success) {
@@ -2139,6 +2143,9 @@ class Peg2Parser {
     $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'/\'']);
+    }
+    if ($0) {
+      _memoize(322, $3, $2);
     }
     return $2;
   }
@@ -2160,6 +2167,10 @@ class Peg2Parser {
 
   String _parse_$LessThanSign(bool $0, bool $1) {
     String $2;
+    final $3 = _pos;
+    if ($0 && _memoized(330)) {
+      return _mresult as String;
+    }
     String $7;
     final $10 = _matchString('<');
     if (_success) {
@@ -2169,6 +2180,9 @@ class Peg2Parser {
     $2 = $7;
     if (!_success && _error <= _failure) {
       _fail(const ['\'<\'']);
+    }
+    if ($0) {
+      _memoize(330, $3, $2);
     }
     return $2;
   }
@@ -2424,7 +2438,7 @@ class Peg2Parser {
     String $9;
     final $11 = $1;
     $1 = false;
-    _parse$$IDENT_START(false, false);
+    _parse$$IDENT_START(true, false);
     if (_success) {
       for (;;) {
         _parse$$IDENT_CONT(false, false);
@@ -2473,6 +2487,10 @@ class Peg2Parser {
 
   int _parse$$IDENT_START(bool $0, bool $1) {
     int $2;
+    final $3 = _pos;
+    if ($0 && _memoized(391)) {
+      return _mresult as int;
+    }
     int $6;
     const $9 = [65, 90, 97, 122];
     final $10 = _matchRanges($9);
@@ -2480,6 +2498,9 @@ class Peg2Parser {
       $6 = $10;
     }
     $2 = $6;
+    if ($0) {
+      _memoize(391, $3, $2);
+    }
     return $2;
   }
 

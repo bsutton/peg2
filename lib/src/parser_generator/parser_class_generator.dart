@@ -364,7 +364,6 @@ List<int> _toRunes(String source) {
 
 ''';
 
-    final cid = start.id;
     String name;
     if (options.isPostfix()) {
       name = '_e${start.id}';
