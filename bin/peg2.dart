@@ -145,39 +145,38 @@ void _analyzeAndOptimizeGrammar(Grammar grammar, ParserGeneratorOptions options,
 
   final start = grammar.start;
   // ignore: unused_local_variable
-  final _label = _labelState0;
+  //final _label = _labelState0;
   final expressionToEnfaConverter = ExpressionToEnfaConverter();
   final enfa0 = expressionToEnfaConverter.convert(start.expression);
-  final expressionToTokenizedEnfaConverter =
-      ExpressionToTokenizedEnfaConverter();
-  final enfa1 = expressionToTokenizedEnfaConverter.convert(start.expression);
+  //final expressionToTokenizedEnfaConverter =  ExpressionToTokenizedEnfaConverter();
+  //final enfa1 = expressionToTokenizedEnfaConverter.convert(start.expression);
   final enfaToNfaConverter = ENfaToNfaConverter();
   final nfa0 = enfaToNfaConverter.convert(enfa0);
-  final nfa1 = enfaToNfaConverter.convert(enfa1);
+  //final nfa1 = enfaToNfaConverter.convert(enfa1);
   final nfaToDfaConverter = NfaToDfaConverter();
   final dfa0 = nfaToDfaConverter.convert(nfa0);
   // ignore: unused_local_variable
-  final dfa1 = nfaToDfaConverter.convert(nfa1);
+  //final dfa1 = nfaToDfaConverter.convert(nfa1);
 
   // ignore: unused_local_variable
-  final detailizer1 = _DotDetailizerForTokens(grammar);
+  //final detailizer1 = _DotDetailizerForTokens(grammar);
 
   // ignore: unused_local_variable
-  final faToDotConverter = FaToDotConverter();
+  //final faToDotConverter = FaToDotConverter();
   //final enfaDot0 = faToDotConverter.convert(enfa0, true, labelState: _label);
   //final enfaDot1 = faToDotConverter.convert(enfa1, true, labelState: _label);
   //final nfaDot0 = faToDotConverter.convert(nfa0, false, labelState: _label);
   //final nfaDot1 = faToDotConverter.convert(nfa1, false, labelState: _label);
   //final dfaDot0 = faToDotConverter.convert(dfa0, false, labelState: _label);
-  final dfaDot1 = faToDotConverter.convert(dfa1, false,
-      labelState: detailizer1.labelState,
-      rangeToString: detailizer1.rangeToString);
+  //final dfaDot1 = faToDotConverter.convert(dfa1, false,
+  //    labelState: detailizer1.labelState,
+  //    rangeToString: detailizer1.rangeToString);
   //File('enfa0.dot').writeAsStringSync(enfaDot0);
   //File('enfa1.dot').writeAsStringSync(enfaDot1);
   //File('nfa0.dot').writeAsStringSync(nfaDot0);
   //File('nfa1.dot').writeAsStringSync(nfaDot1);
   //File('dfa0.dot').writeAsStringSync(dfaDot0);
-  File('dfa1.dot').writeAsStringSync(dfaDot1);
+  //File('dfa1.dot').writeAsStringSync(dfaDot1);
 
   final grammarFaAnalyzer = GrammarFaAnalyzer();
   grammarFaAnalyzer.analyze(options, dfa0, errors, warnings);
