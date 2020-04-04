@@ -16,5 +16,8 @@ class GrammarInitializer0 {
     } else {
       grammar.start = startingRules.first;
     }
+
+    final expresionMapInitializer = ExpresionMapInitializer();
+    expresionMapInitializer.initialize(grammar);
   }
 }

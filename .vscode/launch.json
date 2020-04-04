@@ -11,6 +11,7 @@
                 "--memoize",
                 //"--no-optimize-code",
                 "--optimize-size",
+                "--predict",
                 "bin/peg2.peg"
             ]
         },
@@ -24,7 +25,7 @@
                 "--memoize",
                 //"--no-optimize-code",
                 "--optimize-size",
-                //"--predict",
+                "--predict",
                 "example/example.peg",
                 "example/example.dart"
             ]
@@ -36,14 +37,14 @@
             "type": "dart",
             "args": [
                 //"--inline-all",
-                //"--predict",
-                //"--no-optimize-code",
+                "--predict",
+                "--no-optimize-code",
                 "--memoize",
                 "--optimize-size",
                 //"--parser=postfix",
-                "example/example.peg",
-                "example/example.dart"
-                //"example/a.peg"
+                //"example/example.peg",
+                //"example/example.dart"
+                "example/a.peg"
             ]
         },
         {

@@ -22,12 +22,11 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final child = node.expression;
     child.accept(this);
     _addCharacters(node, child.startCharacters);
-    _setCanMatchEof(node, child.canMatchEof);
   }
 
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
-    _addAllCharacters(node);
+    _addCharacters(node, Expression.allChararcters);
   }
 
   @override
@@ -35,7 +34,6 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final child = node.expression;
     child.accept(this);
     _addCharacters(node, child.startCharacters);
-    _setCanMatchEof(node, child.canMatchEof);
   }
 
   @override
@@ -47,7 +45,7 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
   void visitLiteral(LiteralExpression node) {
     final text = node.text;
     if (text.isEmpty) {
-      _addAllCharacters(node);
+      _addAllCharactersWithEof(node);
     } else {
       final characters = SparseBoolList();
       int c;
@@ -74,15 +72,42 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final rule = node.expression.rule;
     final child = rule.expression;
     _addCharacters(node, child.startCharacters);
-    _setCanMatchEof(node, child.canMatchEof);
   }
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
     final child = node.expression;
     child.accept(this);
-    _addAllCharacters(node);
-    _setCanMatchEof(node, true);
+    SparseBoolList childCharacters;
+    if (child is AnyCharacterExpression) {
+      childCharacters = child.startCharacters;
+    } else if (child is CharacterClassExpression) {
+      childCharacters = child.startCharacters;
+    } else if (child is LiteralExpression) {
+      final text = child.text;
+      if (text.length == 1) {
+        final rune = text.runes.first;
+        childCharacters = SparseBoolList();
+        final group = GroupedRangeList(rune, rune, true);
+        childCharacters.addGroup(group);
+      }
+    }
+
+    if (childCharacters != null) {
+      final startCharacters = SparseBoolList();
+      for (final group in Expression.allChararctersWithEof.groups) {
+        startCharacters.addGroup(group);
+      }
+
+      for (final range in childCharacters.groups) {
+        final group = GroupedRangeList(range.start, range.end, false);
+        startCharacters.setGroup(group);
+      }
+
+      _addCharacters(node, startCharacters);
+    } else {
+      _addAllCharactersWithEof(node);
+    }
   }
 
   @override
@@ -90,15 +115,13 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final child = node.expression;
     child.accept(this);
     _addCharacters(node, child.startCharacters);
-    _setCanMatchEof(node, child.canMatchEof);
   }
 
   @override
   void visitOptional(OptionalExpression node) {
     final child = node.expression;
     child.accept(this);
-    _addAllCharacters(node);
-    _setCanMatchEof(node, true);
+    _addCharacters(node, child.startCharacters);
   }
 
   @override
@@ -109,7 +132,6 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
       final child = expressions[i];
       child.accept(this);
       _addCharacters(node, child.startCharacters);
-      _setCanMatchEof(node, child.canMatchEof);
     }
   }
 
@@ -132,7 +154,6 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
 
     for (final child in affected) {
       _addCharacters(node, child.startCharacters);
-      _setCanMatchEof(node, child.canMatchEof);
     }
   }
 
@@ -141,7 +162,6 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final rule = node.expression.rule;
     final child = rule.expression;
     _addCharacters(node, child.startCharacters);
-    _setCanMatchEof(node, child.canMatchEof);
   }
 
   @override
@@ -149,19 +169,17 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final rule = node.expression.rule;
     final child = rule.expression;
     _addCharacters(node, child.startCharacters);
-    _setCanMatchEof(node, child.canMatchEof);
   }
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
     final child = node.expression;
     child.accept(this);
-    _addAllCharacters(node);
-    _setCanMatchEof(node, true);
+    _addCharacters(node, child.startCharacters);
   }
 
-  void _addAllCharacters(Expression node) {
-    _addCharacters(node, Expression.allChararcters);
+  void _addAllCharactersWithEof(Expression node) {
+    _addCharacters(node, Expression.allChararctersWithEof);
   }
 
   void _addCharacters(Expression node, SparseBoolList characters) {
@@ -175,15 +193,6 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
           final newGroup = GroupedRangeList(start, end, true);
           startCharacters.addGroup(newGroup);
         }
-      }
-    }
-  }
-
-  void _setCanMatchEof(Expression node, bool canMatchEof) {
-    if (canMatchEof) {
-      if (node.canMatchEof != canMatchEof) {
-        node.canMatchEof = canMatchEof;
-        _hasModifications = true;
       }
     }
   }

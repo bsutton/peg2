@@ -1,20 +1,27 @@
 part of '../../expressions.dart';
 
 abstract class Expression {
-  static final SparseBoolList allChararcters = SparseBoolList()
-    ..addGroup(GroupedRangeList<bool>(0, 0x10ffff, true));
+  static const int eof = maxUnicode + 1;
 
-  bool canMatchEof = false;
+  static const int maxUnicode = 0x10ffff;
+
+  static final SparseBoolList allChararcters = SparseBoolList()
+    ..addGroup(GroupedRangeList<bool>(0, maxUnicode, true))
+    ..freeze();
+
+  static final SparseBoolList allChararctersWithEof = SparseBoolList()
+    ..addGroup(GroupedRangeList<bool>(0, eof, true))
+    ..freeze();
+
+  //bool canMatchEof = false;
 
   int id;
 
-  int index;
-
-  bool isSilentMode = false;
+  int index;  
 
   bool isLast = false;
 
-  bool isOptional = false;
+  bool isOptional = false;  
 
   bool isProductive = false;
 

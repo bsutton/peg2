@@ -1,3 +1,9 @@
+## 0.1.29
+
+- Improved performance of the generated parser with the enabled prediction mode (`--predict`)
+- Minor changes (corrections) in some algorithms of analyzers and generators
+- Fixed incorrect usage (bug) of `ActiobGenerator`
+
 ## 0.1.28
 
 - Added a new (experimental) feature `finite automaton`, for better grammar analysis

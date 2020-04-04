@@ -3,15 +3,15 @@ part of '../../grammar.dart';
 class Grammar {
   final errors = <String>[];
 
-  int expressionCount;
+  Map<int, Expression> expressionMap;
 
   final String globals;
-
-  Map<String, ProductionRule> mapOfRules;
 
   final String members;
 
   List<ProductionRule> rules;
+
+  Map<String, ProductionRule> ruleMap;
 
   ProductionRule start;
 
@@ -27,7 +27,7 @@ class Grammar {
     }
 
     final duplicates = <String>{};
-    mapOfRules = <String, ProductionRule>{};
+    ruleMap = <String, ProductionRule>{};
     this.rules = <ProductionRule>[];
     var id = 0;
     for (var rule in rules) {
@@ -38,11 +38,11 @@ class Grammar {
       rule.id = id++;
       this.rules.add(rule);
       final name = rule.name;
-      if (mapOfRules.containsKey(name)) {
+      if (ruleMap.containsKey(name)) {
         duplicates.add(name);
       }
 
-      mapOfRules[rule.name] = rule;
+      ruleMap[rule.name] = rule;
     }
 
     for (final name in duplicates) {

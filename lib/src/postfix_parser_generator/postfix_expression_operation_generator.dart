@@ -201,12 +201,11 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
         final ranges = stateCharacters[i];
         startCharacters = ranges;
         final rangesOperationGenerator = RangesOperationGenerator();
-        rangesOperationGenerator.generateConditional(block, c, ranges, false,
-            (block) {
+        rangesOperationGenerator.generateConditional(block, c, ranges, (block) {
           for (final index in state) {
             final choice = choices[index];
-            final sequence = expressions[index];
-            canMatchEof = sequence.canMatchEof;
+            //final sequence = expressions[index];
+            //canMatchEof = sequence.canMatchEof;
             //SequenceExpression firstOptionalSequence;
             final canUseSuccessCheck = false;
             for (var i = choice.length - 1; i >= 0; i--) {
@@ -482,7 +481,14 @@ class PostfixExpressionOperationGenerator extends ExpressionOperationGenerator
         if (hasAction) {
           addIfVar(block, m.success, (block) {
             final actionGenerator = ActionGenerator();
-            actionGenerator.generate(block, node, result1, variables);
+            var actionBlock = block;
+            // Need sorround in separate block?
+            if (block.operations.isNotEmpty) {
+              actionBlock = BlockOperation();
+              addOp(block, actionBlock);
+            }
+
+            actionGenerator.generate(actionBlock, node, result1, variables);
           });
         } else {
           if (variables.isEmpty) {

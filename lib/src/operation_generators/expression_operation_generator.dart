@@ -44,7 +44,7 @@ abstract class ExpressionOperationGenerator
 
     final rangesOperationGenerator = RangesOperationGenerator();
     rangesOperationGenerator.generateConditional(
-        block, m.c, ranges, false, onSuccess, onFail);
+        block, m.c, ranges, onSuccess, onFail);
   }
 
   @override
@@ -120,7 +120,7 @@ abstract class ExpressionOperationGenerator
 
         final rangesOperationGenerator = RangesOperationGenerator();
         rangesOperationGenerator.generateConditional(
-            block, m.c, ranges, false, onSuccess, onFail);
+            block, m.c, ranges, onSuccess, onFail);
       } else {
         final elements = <ConstantOperation>[];
         for (final group in ranges.groups) {
@@ -177,7 +177,7 @@ abstract class ExpressionOperationGenerator
 
         final rangesOperationGenerator = RangesOperationGenerator();
         rangesOperationGenerator.generateConditional(
-            block, m.c, ranges, false, onSuccess, onFail);
+            block, m.c, ranges, onSuccess, onFail);
       } else if (runes.length > 1) {
         final rune = runes.first;
         result1 = va.newVar(block, 'String', null);
@@ -197,7 +197,7 @@ abstract class ExpressionOperationGenerator
 
         final rangesOperationGenerator = RangesOperationGenerator();
         rangesOperationGenerator.generateConditional(
-            block, m.c, ranges, false, onSuccess, onFail);
+            block, m.c, ranges, onSuccess, onFail);
       } else {
         result1 = va.newVar(block, 'final', constOp(''));
         addAssign(block, varOp(m.success), constOp(true));

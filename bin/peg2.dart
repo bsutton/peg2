@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
-import 'package:lists/lists.dart';
 import 'package:path/path.dart' as _path;
 import 'package:peg2/expressions.dart';
 import 'package:peg2/finite_automaton.dart';
@@ -144,34 +143,41 @@ void _analyzeAndOptimizeGrammar(Grammar grammar, ParserGeneratorOptions options,
     return;
   }
 
-//final String Function(State<dynamic, dynamic>) _label = null;
-  //final label = _label1;
   final start = grammar.start;
+  // ignore: unused_local_variable
+  final _label = _labelState0;
   final expressionToEnfaConverter = ExpressionToEnfaConverter();
-  final enfa0 = expressionToEnfaConverter.convert(start.expression, _separate0);
-  //final enfa1 = expressionToEnfaConverter.convert(start.expression, _separate1);
+  final enfa0 = expressionToEnfaConverter.convert(start.expression);
+  final expressionToTokenizedEnfaConverter =
+      ExpressionToTokenizedEnfaConverter();
+  final enfa1 = expressionToTokenizedEnfaConverter.convert(start.expression);
   final enfaToNfaConverter = ENfaToNfaConverter();
   final nfa0 = enfaToNfaConverter.convert(enfa0);
-  //final nfa1 = enfaToNfaConverter.convert(enfa1);
+  final nfa1 = enfaToNfaConverter.convert(enfa1);
   final nfaToDfaConverter = NfaToDfaConverter();
   final dfa0 = nfaToDfaConverter.convert(nfa0);
-  //final dfa1 = nfaToDfaConverter.convert(nfa1);
+  // ignore: unused_local_variable
+  final dfa1 = nfaToDfaConverter.convert(nfa1);
 
-  /*
+  // ignore: unused_local_variable
+  final detailizer1 = _DotDetailizerForTokens(grammar);
+
+  // ignore: unused_local_variable
   final faToDotConverter = FaToDotConverter();
-  final enfaDot0 = faToDotConverter.convert(enfa0, true, label);
-  final enfaDot1 = faToDotConverter.convert(enfa1, true, label);
-  final nfaDot0 = faToDotConverter.convert(nfa0, false, label);
-  final nfaDot1 = faToDotConverter.convert(nfa1, false, label);
-  final dfaDot0 = faToDotConverter.convert(dfa0, false, label);
-  final dfaDot1 = faToDotConverter.convert(dfa1, false, label);
-  File('enfa0.dot').writeAsStringSync(enfaDot0);
-  File('enfa1.dot').writeAsStringSync(enfaDot1);
-  File('nfa0.dot').writeAsStringSync(nfaDot0);
-  File('nfa1.dot').writeAsStringSync(nfaDot1);
-  File('dfa0.dot').writeAsStringSync(dfaDot0);
+  //final enfaDot0 = faToDotConverter.convert(enfa0, true, labelState: _label);
+  //final enfaDot1 = faToDotConverter.convert(enfa1, true, labelState: _label);
+  //final nfaDot0 = faToDotConverter.convert(nfa0, false, labelState: _label);
+  //final nfaDot1 = faToDotConverter.convert(nfa1, false, labelState: _label);
+  //final dfaDot0 = faToDotConverter.convert(dfa0, false, labelState: _label);
+  final dfaDot1 = faToDotConverter.convert(dfa1, false,
+      labelState: detailizer1.labelState,
+      rangeToString: detailizer1.rangeToString);
+  //File('enfa0.dot').writeAsStringSync(enfaDot0);
+  //File('enfa1.dot').writeAsStringSync(enfaDot1);
+  //File('nfa0.dot').writeAsStringSync(nfaDot0);
+  //File('nfa1.dot').writeAsStringSync(nfaDot1);
+  //File('dfa0.dot').writeAsStringSync(dfaDot0);
   File('dfa1.dot').writeAsStringSync(dfaDot1);
-  */
 
   final grammarFaAnalyzer = GrammarFaAnalyzer();
   grammarFaAnalyzer.analyze(options, dfa0, errors, warnings);
@@ -180,7 +186,7 @@ void _analyzeAndOptimizeGrammar(Grammar grammar, ParserGeneratorOptions options,
 }
 
 // ignore: unused_element
-String _label0(State<dynamic, dynamic> state) {
+String _labelState0(State<dynamic, dynamic> state) {
   String write(Iterable<Expression> expressions) {
     final list = <String>[];
     for (final expression in expressions) {
@@ -232,7 +238,7 @@ String _label0(State<dynamic, dynamic> state) {
 }
 
 // ignore: unused_element
-String _label1(State<dynamic, dynamic> state) {
+String _labelState1(State<dynamic, dynamic> state) {
   final sb = StringBuffer();
   if (state.isFinal) {
     sb.write('V');
@@ -278,30 +284,73 @@ void _printGrammar(Grammar grammar) {
 }
 
 // ignore: unused_element
-void _separate0(SymbolExpression node, EnfaState prev, EnfaState next) {
-  // Epsilon move
-  prev.states.add(next);
-}
+class _DotDetailizerForTokens<S extends State<dynamic, dynamic>> {
+  Map<int, Expression> _expressionMap;
 
-// ignore: unused_element
-void _separate1(SymbolExpression node, EnfaState prev, EnfaState next) {
-  final list = SparseBoolList();
-  final marker = 0x110000 + node.id;
-  final range = GroupedRangeList(marker, marker, true);
-  list.addGroup(range);
-  final transitions = prev.transitions;
-  for (final group in transitions.getAllSpace(range)) {
-    var key = group.key;
-    key ??= [];
-    if (!key.contains(next)) {
-      key.add(next);
+  final int _magicNumber = ExpressionToTokenizedEnfaConverter.magicNumber;
+
+  _DotDetailizerForTokens(Grammar grammar) {
+    _expressionMap = grammar.expressionMap;
+  }
+
+  String labelState(State<dynamic, dynamic> state) {
+    final sb = StringBuffer();
+    sb.write(state.id);
+    sb.write('\\n');
+    final starts = state.starts
+        .where((e) => e is OrderedChoiceExpression && e.parent == null)
+        .map((e) => e.rule);
+    if (starts.isNotEmpty) {
+      sb.write('starts: ');
+      sb.write(starts.join(', '));
+      sb.write('\\n');
     }
 
-    if (group.key == null) {
-      final start = group.start;
-      final end = group.end;
-      final newGroup = GroupedRangeList(start, end, key);
-      transitions.addGroup(newGroup);
+    final active = state.active
+        .where((e) => e is OrderedChoiceExpression && e.parent == null)
+        .map((e) => e.rule);
+    if (active.isNotEmpty) {
+      sb.write('active: ');
+      sb.write(active.join(', '));
+      sb.write('\\n');
     }
+
+    final ends = state.ends
+        .where((e) => e is OrderedChoiceExpression && e.parent == null)
+        .map((e) => e.rule);
+    if (ends.isNotEmpty) {
+      sb.write('ends: ');
+      sb.write(ends.join(', '));
+      sb.write('\\n');
+    }
+
+    return sb.toString();
+  }
+
+  String rangeToString(int start, int end) {
+    final sb = StringBuffer();
+    Expression expression;
+    int id;
+    if (start >= _magicNumber) {
+      id = start - _magicNumber;
+      expression = _expressionMap[id];
+      sb.write('return from ');
+    } else {
+      expression = _expressionMap[start];
+    }
+
+    if (expression is SymbolExpression) {
+      sb.write(expression.expression.rule);
+    } else {
+      sb.write(expression);
+    }
+
+    if (id != null) {
+      sb.write(' (');
+      sb.write(id);
+      sb.write(')');
+    }
+
+    return sb.toString();
   }
 }

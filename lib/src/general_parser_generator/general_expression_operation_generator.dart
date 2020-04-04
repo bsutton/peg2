@@ -102,7 +102,14 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
         if (hasAction) {
           onSuccess = (block) {
             final actionGenerator = ActionGenerator();
-            actionGenerator.generate(block, node, result1, variables);
+            var actionBlock = block;
+            // Need sorround in separate block?
+            if (block.operations.isNotEmpty) {
+              actionBlock = BlockOperation();
+              addOp(block, actionBlock);
+            }
+
+            actionGenerator.generate(actionBlock, node, result1, variables);
           };
         } else {
           if (variables.isEmpty) {
@@ -293,7 +300,13 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       if (rule.kind == ProductionRuleKind.subterminal ||
           rule.kind == ProductionRuleKind.terminal) {
         if (startCharacters.groups.length < 10) {
-          predict = true;
+          if (!node.isOptional) {
+            predict = true;
+          } else {
+            if (!node.isProductive) {
+              predict = true;
+            }
+          }
         }
       }
     }
@@ -325,8 +338,8 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
     Variable result1;
     if (predict) {
       void onSuccess(BlockOperation block) {
-        result1 = generate(block);
-        addAssign(block, varOp(result), varOp(result));
+        result = generate(block);
+        addAssign(block, varOp(result1), varOp(result));
       }
 
       void onFail(BlockOperation block) {
@@ -347,11 +360,11 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       }
 
       final c = va.newVar(block, 'final', varOp(m.c));
-      final rangesOperationGenerator = RangesOperationGenerator();
-      rangesOperationGenerator.generateConditional(
-          block, c, startCharacters, node.canMatchEof, onSuccess, onFail);
       final returnType = node.returnType;
       result1 = va.newVar(block, returnType, null);
+      final rangesOperationGenerator = RangesOperationGenerator();
+      rangesOperationGenerator.generateConditional(
+          block, c, startCharacters, onSuccess, onFail);
     } else {
       result1 = generate(block);
     }

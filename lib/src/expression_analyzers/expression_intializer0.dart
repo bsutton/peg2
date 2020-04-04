@@ -30,8 +30,6 @@ class ExpressionInitializer0 extends ExpressionVisitor {
       final expression = rule.expression;
       expression.accept(this);
     }
-
-    grammar.expressionCount = _expressionId;
   }
 
   @override
@@ -61,13 +59,7 @@ class ExpressionInitializer0 extends ExpressionVisitor {
 
   @override
   void visitNonterminal(NonterminalExpression node) {
-    _initializeNode(node);
-    final rule = _rules[node.name];
-    if (rule == null) {
-      throw StateError('Production rule not found: ${node.name}');
-    }
-
-    node.expression = rule.expression;
+    _initializeSymbol(node);
   }
 
   @override
@@ -107,24 +99,12 @@ class ExpressionInitializer0 extends ExpressionVisitor {
 
   @override
   void visitSubterminal(SubterminalExpression node) {
-    _initializeNode(node);
-    final rule = _rules[node.name];
-    if (rule == null) {
-      throw StateError('Production rule not found: ${node.name}');
-    }
-
-    node.expression = rule.expression;
+    _initializeSymbol(node);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    _initializeNode(node);
-    final rule = _rules[node.name];
-    if (rule == null) {
-      throw StateError('Production rule not found: ${node.name}');
-    }
-
-    node.expression = rule.expression;
+    _initializeSymbol(node);
   }
 
   @override
@@ -149,5 +129,16 @@ class ExpressionInitializer0 extends ExpressionVisitor {
     _level++;
     node.visitChildren(this);
     _level = level;
+  }
+
+  void _initializeSymbol(SymbolExpression node) {
+    _initializeNode(node);
+    final rule = _rules[node.name];
+    if (rule == null) {
+      throw StateError('Production rule not found: ${node.name}');
+    }
+
+    final expression = rule.expression;
+    node.expression = expression;
   }
 }
