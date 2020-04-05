@@ -17,11 +17,11 @@ abstract class Expression {
 
   int id;
 
-  int index;  
+  int index;
 
   bool isLast = false;
 
-  bool isOptional = false;  
+  bool isOptional = false;
 
   bool isProductive = false;
 

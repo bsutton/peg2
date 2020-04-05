@@ -229,6 +229,14 @@ void _fail(List<String> expected) {
   }
 }
 
+void _failAt(int pos, List<String> expected) {
+  _success = false;
+  _failure = _pos;
+  if (_error <= _failure) {
+    _fail(expected);
+  }
+}
+
 int _matchChar(int c) {
   int result;
   if (c == _c) {    

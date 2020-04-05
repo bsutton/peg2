@@ -72,6 +72,15 @@ class VariableUsageOptimizer with OperationUtils {
       final rightVariable0 = right0.variable;
       for (var j = i + 1; j < operations.length; j++) {
         final next = operations[j];
+        final stat = stats.getStat(next);
+        if (stat.hasInvocations) {
+          break;
+        }
+
+        if (stat.getWriteCount(rightVariable0) > 0) {
+          break;
+        }
+
         final parameter1 = getOp<ParameterOperation>(next);
         if (parameter1 == null) {
           break;

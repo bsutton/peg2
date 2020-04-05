@@ -11,6 +11,8 @@ class ParserClassMembers {
 
   final fail = Variable('_fail', true);
 
+  final failAt = Variable('_failAt', true);
+
   final failure = Variable('_failure', true);
 
   final matchAny = Variable('_matchAny', true);

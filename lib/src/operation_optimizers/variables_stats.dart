@@ -1,6 +1,8 @@
 part of '../../operation_optimizers.dart';
 
 class VariablesStat {
+  bool hasInvocations = false;
+
   final Operation parent;
 
   Map<Variable, int> readings = {};
@@ -31,6 +33,14 @@ class VariablesStat {
     var count = writings[variable];
     count ??= 0;
     return count;
+  }
+
+  void markHasInvocations() {
+    hasInvocations = true;
+    final parentStat = _getParentStat();
+    if (parentStat != null) {
+      parentStat.markHasInvocations();
+    }
   }
 
   void setReadCount(Variable variable, int count) {

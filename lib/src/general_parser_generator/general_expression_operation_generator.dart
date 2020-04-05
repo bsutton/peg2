@@ -346,7 +346,22 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
         if (rule.expression.isSuccessful) {
           addAssign(block, varOp(m.success), constOp(true));
         } else {
-          addAssign(block, varOp(m.success), constOp(false));
+          final terminals = node.startTerminals.map((e) => e.name);
+          final elements = terminals.map(constOp).toList();
+          final list = listOp('const', elements);
+          final params = [varOp(m.pos), list];
+          final fail = callOp(varOp(m.failAt), params);
+          addOp(block, fail);
+
+          //addAssign(block, varOp(m.success), constOp(false));
+          //addAssign(block, varOp(m.failure), varOp(m.pos));
+          //final test = lteOp(varOp(m.error), varOp(m.failure));
+          //addIf(block, test, (block) {
+          //  final params = [listOp('const', [])];
+          //  final fail = callOp(varOp(m.fail), params);
+          //  addOp(block, fail);
+          //});
+
           //if (rule.kind == ProductionRuleKind.terminal) {
           //  final test = notOp(varOp(m.silence));
           //  addIf(b, test, (b) {

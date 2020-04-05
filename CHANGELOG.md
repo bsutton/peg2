@@ -1,8 +1,12 @@
+## 0.1.30
+
+- Fixed a bug in prediction mode, added error handling in case of predicting rule call bypass
+
 ## 0.1.29
 
 - Improved performance of the generated parser with the enabled prediction mode (`--predict`)
 - Minor changes (corrections) in some algorithms of analyzers and generators
-- Fixed incorrect usage (bug) of `ActiobGenerator`
+- Fixed incorrect usage (bug) of `ActionGenerator`
 
 ## 0.1.28
 

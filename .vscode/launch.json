@@ -38,9 +38,9 @@
             "args": [
                 //"--inline-all",
                 "--predict",
-                "--no-optimize-code",
+                //"--no-optimize-code",
                 "--memoize",
-                "--optimize-size",
+                //"--optimize-size",
                 //"--parser=postfix",
                 //"example/example.peg",
                 //"example/example.dart"
