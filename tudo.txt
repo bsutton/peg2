@@ -7,9 +7,8 @@ implement analyzer warning when repetition child isSucessful (infinite loop)
 improve error message formatter (for Unicode)
 does not generate unused global parser methods
 make some classes private?
-optimize internal check if repetitions cannot be non productive (ro reduce generated code)
 inplement malformed terminals reporting
-rework isProductive from `bool` to { always, never, sometimes }???
 add parenthesis to unary operator printer
 improve variable usage optimizer
 need make corrections to character class `toString()`
+!!!generate grammar members

@@ -24,7 +24,7 @@
                 //"--inline-all",
                 "--memoize",
                 //"--no-optimize-code",
-                "--optimize-size",
+                //"--optimize-size",
                 "--predict",
                 "example/example.peg",
                 "example/example.dart"
@@ -44,7 +44,7 @@
                 //"--parser=postfix",
                 //"example/example.peg",
                 //"example/example.dart"
-                "example/a.peg"
+                "example/query.peg"
             ]
         },
         {

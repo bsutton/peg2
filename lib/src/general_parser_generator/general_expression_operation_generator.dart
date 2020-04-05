@@ -28,14 +28,15 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
     void callMemoize() {
       final test = varOp(memoize);
       addIf(block, test, (block) {
-        final memoize =
-            callOp(varOp(m.memoize), [constOp(id), varOp(pos), varOp(result)]);
+        final memoize = callOp(varOp(m.memoize),
+            [constOp(id), varOp(pos), varOp(productive), varOp(result)]);
         addOp(block, memoize);
       });
     }
 
     if (willMemoize) {
-      final memoized = callOp(varOp(m.memoized), [constOp(id)]);
+      final memoized =
+          callOp(varOp(m.memoized), [constOp(id), varOp(productive)]);
       final testMemoized = landOp(varOp(memoize), memoized);
       if (isOnTop) {
         addIf(block, testMemoized, (block) {
@@ -69,7 +70,6 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
     final hasAction = node.actionIndex != null;
     final variables = <Expression, Variable>{};
     final returnType = node.returnType;
-    final isProductive1 = isProductive;
     final result1 = va.newVar(block, returnType, null);
     final c = va.newVar(block, 'final', varOp(m.c));
     final pos = va.newVar(block, 'final', varOp(m.pos));
@@ -83,7 +83,6 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       }
 
       final child = expressions[index];
-      isProductive = child.isProductive;
       visitChild(child, block);
       results[child] = result;
       if (child.variable != null) {
@@ -124,7 +123,7 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
               addAssign(block, varOp(result1), varOp(variable));
             };
           } else {
-            if (node.isProductive) {
+            if (node.productiveness != Productiveness.never) {
               onSuccess = (block) {
                 addIfVar(block, m.success, (block) {
                   final list =
@@ -158,7 +157,6 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
     }
 
     plunge(block, 0);
-    isProductive = isProductive1;
     result = result1;
   }
 
@@ -303,7 +301,7 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
           if (!node.isOptional) {
             predict = true;
           } else {
-            if (!node.isProductive) {
+            if (node.productiveness == Productiveness.never) {
               predict = true;
             }
           }
@@ -322,10 +320,16 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
         final ruleName = productionRuleNameGenerator.generate(rule);
         final name = Variable(ruleName, true);
         Operation productive1;
-        if (isProductive) {
-          productive1 = isProductive ? varOp(productive) : constOp(false);
-        } else {
-          productive1 = constOp(false);
+        switch (node.productiveness) {
+          case Productiveness.always:
+            productive1 = constOp(true);
+            break;
+          case Productiveness.auto:
+            productive1 = varOp(productive);
+            break;
+          case Productiveness.never:
+            productive1 = constOp(false);
+            break;
         }
 
         final call = callOp(varOp(name), [constOp(node.memoize), productive1]);

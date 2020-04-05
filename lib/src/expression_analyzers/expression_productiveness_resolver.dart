@@ -12,7 +12,9 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
       for (var rule in rules) {
         final expression = rule.expression;
         if (rule == start) {
-          _setIsProductive(expression, true);
+          _setProductiveness(expression, Productiveness.always);
+        } else {
+          _setProductiveness(expression, Productiveness.auto);
         }
 
         expression.accept(this);
@@ -22,6 +24,7 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
 
   @override
   void visitAndPredicate(AndPredicateExpression node) {
+    _setProductiveness(node.expression, node.productiveness);
     node.visitChildren(this);
   }
 
@@ -32,6 +35,7 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
 
   @override
   void visitCapture(CaptureExpression node) {
+    _setProductiveness(node.expression, node.productiveness);
     node.visitChildren(this);
   }
 
@@ -47,38 +51,29 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
 
   @override
   void visitNonterminal(NonterminalExpression node) {
-    final expression = node.expression;
-    _setIsProductive(expression, node.isProductive);
     node.visitChildren(this);
   }
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
+    _setProductiveness(node.expression, node.productiveness);
     node.visitChildren(this);
   }
 
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
-    final child = node.expression;
-    _setIsProductive(child, node.isProductive);
+    _setProductiveness(node.expression, node.productiveness);
     node.visitChildren(this);
   }
 
   @override
   void visitOptional(OptionalExpression node) {
-    final child = node.expression;
-    _setIsProductive(child, node.isProductive);
+    _setProductiveness(node.expression, node.productiveness);
     node.visitChildren(this);
   }
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
-    final expressions = node.expressions;
-    for (var i = 0; i < expressions.length; i++) {
-      final child = expressions[i];
-      _setIsProductive(child, node.isProductive);
-    }
-
     node.visitChildren(this);
   }
 
@@ -87,23 +82,22 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
     final expressions = node.expressions;
     final varCount = expressions.where((e) => e.variable != null).length;
     final hasAction = node.actionIndex != null;
-    final isProductive = node.isProductive;
     for (var i = 0; i < expressions.length; i++) {
       final child = expressions[i];
       if (hasAction) {
-        if (i == 0 && varCount == 0) {
-          child.isProductive = true;
+        if (child.variable != null) {
+          _setProductiveness(child, Productiveness.always);
         } else {
-          if (child.variable != null) {
-            child.isProductive = true;
-          }
+          _setProductiveness(child, Productiveness.never);
         }
       } else {
         if (i == 0 && varCount == 0) {
-          _setIsProductive(child, isProductive);
+          _setProductiveness(child, Productiveness.auto);
         } else {
           if (child.variable != null) {
-            _setIsProductive(child, isProductive);
+            _setProductiveness(child, Productiveness.auto);
+          } else {
+            _setProductiveness(child, Productiveness.never);
           }
         }
       }
@@ -114,31 +108,24 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
 
   @override
   void visitSubterminal(SubterminalExpression node) {
-    final expression = node.expression;
-    _setIsProductive(expression, node.isProductive);
     node.visitChildren(this);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    final expression = node.expression;
-    _setIsProductive(expression, node.isProductive);
     node.visitChildren(this);
   }
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
-    final expression = node.expression;
-    _setIsProductive(expression, node.isProductive);
+    _setProductiveness(node.expression, node.productiveness);
     node.visitChildren(this);
   }
 
-  void _setIsProductive(Expression node, bool isProductive) {
-    if (!node.isProductive) {
-      if (node.isProductive != isProductive) {
-        node.isProductive = isProductive;
-        _hasModifications = true;
-      }
+  void _setProductiveness(Expression node, Productiveness productiveness) {
+    if (node.productiveness != productiveness) {
+      node.productiveness = productiveness;
+      _hasModifications = true;
     }
   }
 }

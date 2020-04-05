@@ -4,16 +4,15 @@ abstract class ParserGenerator {
   static const _classes = '''  
 class _Memo {
   final int id;
-
   final int pos;
-
+  final bool productive;
   final result;
-
   final bool success;
 
   _Memo({
     this.id,
     this.pos,
+    this.productive,
     this.result,
     this.success,
   });  

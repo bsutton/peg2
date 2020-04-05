@@ -28,8 +28,13 @@ abstract class ExpressionOperationGenerator
     final ranges = Expression.allChararcters;
     void onSuccess(BlockOperation block) {
       addAssign(block, varOp(m.success), constOp(true));
-      if (isProductive) {
-        addAssign(block, varOp(result), varOp(m.c));
+      switch (node.productiveness) {
+        case Productiveness.always:
+        case Productiveness.auto:
+          addAssign(block, varOp(result), varOp(m.c));
+          break;
+        case Productiveness.never:
+          break;
       }
 
       final nextCharGenerator = NextCharGenerator();
@@ -56,16 +61,26 @@ abstract class ExpressionOperationGenerator
     addAssign(block, varOp(productive), constOp(false));
     final child = node.expression;
     visitChild(child, block);
-    if (isProductive) {
-      addIfVar(block, m.success, (block) {
-        final substring = Variable('substring');
-        final call = mbrCallOp(
-            varOp(m.text), varOp(substring), [varOp(start), varOp(m.pos)]);
-        addAssign(block, varOp(result1), call);
-      });
+    restoreVariables(session);
+
+    void produce(BlockOperation block) {
+      final substring = Variable('substring');
+      final call = mbrCallOp(
+          varOp(m.text), varOp(substring), [varOp(start), varOp(m.pos)]);
+      addAssign(block, varOp(result1), call);
     }
 
-    restoreVariables(session);
+    switch (node.productiveness) {
+      case Productiveness.always:
+        produce(block);
+        break;
+      case Productiveness.auto:
+        addIfVar(block, productive, produce);
+        break;
+      case Productiveness.never:
+        break;
+    }
+
     result = result1;
   }
 
@@ -104,8 +119,13 @@ abstract class ExpressionOperationGenerator
 
         void onSuccess(BlockOperation block) {
           addAssign(block, varOp(m.success), constOp(true));
-          if (isProductive) {
-            addAssign(block, varOp(result1), varOp(m.c));
+          switch (node.productiveness) {
+            case Productiveness.always:
+            case Productiveness.auto:
+              addAssign(block, varOp(result1), varOp(m.c));
+              break;
+            case Productiveness.never:
+              break;
           }
 
           final nextCharGenerator = NextCharGenerator();
@@ -161,8 +181,13 @@ abstract class ExpressionOperationGenerator
 
         void onSuccess(BlockOperation block) {
           addAssign(block, varOp(m.success), constOp(true));
-          if (isProductive) {
-            addAssign(block, varOp(result1), constOp(text));
+          switch (node.productiveness) {
+            case Productiveness.always:
+            case Productiveness.auto:
+              addAssign(block, varOp(result1), constOp(text));
+              break;
+            case Productiveness.never:
+              break;
           }
 
           final nextCharGenerator = NextCharGenerator();
@@ -228,12 +253,20 @@ abstract class ExpressionOperationGenerator
   void visitOneOrMore(OneOrMoreExpression node) {
     final returnType = node.returnType;
     final result1 = va.newVar(block, returnType, null);
-    if (isProductive) {
-      addIfVar(block, productive, (block) {
-        addAssign(block, varOp(result1), listOp(null, []));
-      });
-    } else {
-      // Do nothing
+
+    void produce(BlockOperation block) {
+      addAssign(block, varOp(result1), listOp(null, []));
+    }
+
+    switch (node.productiveness) {
+      case Productiveness.always:
+        produce(block);
+        break;
+      case Productiveness.auto:
+        addIfVar(block, productive, produce);
+        break;
+      case Productiveness.never:
+        break;
     }
 
     final passed = va.newVar(block, 'var', constOp(false));
@@ -249,13 +282,20 @@ abstract class ExpressionOperationGenerator
         addBreak(block);
       });
 
-      if (isProductive) {
-        addIfVar(block, productive, (block) {
-          final add = Variable('add');
-          addMbrCall(block, varOp(result1), varOp(add), [varOp(result)]);
-        });
-      } else {
-        // Do nothing
+      void produce(BlockOperation block) {
+        final add = Variable('add');
+        addMbrCall(block, varOp(result1), varOp(add), [varOp(result)]);
+      }
+
+      switch (node.productiveness) {
+        case Productiveness.always:
+          produce(block);
+          break;
+        case Productiveness.auto:
+          addIfVar(block, productive, produce);
+          break;
+        case Productiveness.never:
+          break;
       }
 
       addAssign(block, varOp(passed), constOp(true));
@@ -283,12 +323,20 @@ abstract class ExpressionOperationGenerator
   void visitZeroOrMore(ZeroOrMoreExpression node) {
     final returnType = node.returnType;
     final result1 = va.newVar(block, returnType, null);
-    if (isProductive) {
-      addIfVar(block, productive, (block) {
-        addAssign(block, varOp(result1), listOp(null, []));
-      });
-    } else {
-      // Do nothing
+
+    void produce(BlockOperation block) {
+      addAssign(block, varOp(result1), listOp(null, []));
+    }
+
+    switch (node.productiveness) {
+      case Productiveness.always:
+        produce(block);
+        break;
+      case Productiveness.auto:
+        addIfVar(block, productive, produce);
+        break;
+      case Productiveness.never:
+        break;
     }
 
     addLoop(block, (block) {
@@ -298,13 +346,21 @@ abstract class ExpressionOperationGenerator
         addAssign(block, varOp(m.success), constOp(true));
         addBreak(block);
       });
-      if (isProductive) {
-        addIfVar(block, productive, (block) {
-          final add = Variable('add');
-          addMbrCall(block, varOp(result1), varOp(add), [varOp(result)]);
-        });
-      } else {
-        // Do nothing
+
+      void produce(BlockOperation block) {
+        final add = Variable('add');
+        addMbrCall(block, varOp(result1), varOp(add), [varOp(result)]);
+      }
+
+      switch (node.productiveness) {
+        case Productiveness.always:
+          produce(block);
+          break;
+        case Productiveness.auto:
+          addIfVar(block, productive, produce);
+          break;
+        case Productiveness.never:
+          break;
       }
     });
 

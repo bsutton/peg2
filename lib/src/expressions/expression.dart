@@ -23,13 +23,13 @@ abstract class Expression {
 
   bool isOptional = false;
 
-  bool isProductive = false;
-
   bool isSuccessful = false;
 
   int level;
 
   Expression parent;
+
+  Productiveness productiveness = Productiveness.always;
 
   String returnType = 'dynamic';
 
@@ -49,3 +49,5 @@ abstract class Expression {
     //
   }
 }
+
+enum Productiveness { always, auto, never }

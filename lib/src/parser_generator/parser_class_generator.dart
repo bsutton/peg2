@@ -297,12 +297,12 @@ String _matchString(String text) {
   return result;
 }
 
-bool _memoized(int id) {
+bool _memoized(int id, bool productive) {
   final memos = _memos[_pos];
   if (memos != null) {
     for (var i = 0; i < memos.length; i++) {
       final memo = memos[i];
-      if (memo.id == id) {
+      if (memo.id == id && memo.productive == productive) {
         _pos = memo.pos;
         _mresult = memo.result;
         _success = memo.success;
@@ -315,7 +315,7 @@ bool _memoized(int id) {
   return false;
 }
 
-void _memoize(int id, int pos, result) {
+void _memoize(int id, int pos, bool productive, result) {
   var memos = _memos[pos];
   if (memos == null) {
     memos = [];
@@ -325,6 +325,7 @@ void _memoize(int id, int pos, result) {
   final memo = _Memo(
     id: id,
     pos: _pos,
+    productive: productive,
     result: result,
     success: _success,
   );
@@ -382,8 +383,16 @@ List<int> _toRunes(String source) {
     var methods = _methods;
     methods = methods.replaceFirst('{{START}}', '$name(false, true)');
     //methods = methods.replaceAll('{{EXPR_COUNT}}', '${grammar.expressionCount}');
+
     final lineSplitter = LineSplitter();
     final lines = lineSplitter.convert(methods);
     builder.addAll(lines);
+
+    if (grammar.members != null) {
+      final members = grammar.members;
+      final lines = lineSplitter.convert(members);
+      builder.addAll(lines);
+      builder.add('');
+    }
   }
 }

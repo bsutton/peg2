@@ -1,3 +1,7 @@
+## 0.1.31
+
+- Fixed bugs in `productiveness analysis` of expressions
+
 ## 0.1.30
 
 - Fixed a bug in prediction mode, added error handling in case of predicting rule call bypass
