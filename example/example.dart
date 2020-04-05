@@ -231,6 +231,14 @@ class ExampleParser {
     }
   }
 
+  void _failAt(int pos, List<String> expected) {
+    _success = false;
+    _failure = _pos;
+    if (_error <= _failure) {
+      _fail(expected);
+    }
+  }
+
   int _matchChar(int c) {
     int result;
     if (c == _c) {
@@ -380,7 +388,7 @@ class ExampleParser {
       if ($14 == 1114112) {
         _parse_end_of_file(false, false);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'end of file\'']);
       }
       if (_success) {
         $6 = $13;
@@ -427,7 +435,7 @@ class ExampleParser {
         final $15 = _parse_false(false, $1);
         $14 = $15;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'false\'']);
       }
       if (_success) {
         $10 = $14;
@@ -441,7 +449,7 @@ class ExampleParser {
         final $21 = _parse_null(false, $1);
         $20 = $21;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'null\'']);
       }
       if (_success) {
         $16 = $20;
@@ -455,7 +463,7 @@ class ExampleParser {
         final $27 = _parse_true(false, $1);
         $26 = $27;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'true\'']);
       }
       if (_success) {
         $22 = $26;
@@ -476,7 +484,7 @@ class ExampleParser {
         final $37 = _parse_number(false, $1);
         $36 = $37;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'number\'']);
       }
       if (_success) {
         $32 = $36;
@@ -490,7 +498,7 @@ class ExampleParser {
         final $43 = _parse_string(true, $1);
         $42 = $43;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'string\'']);
       }
       if (_success) {
         $38 = $42;
@@ -524,7 +532,7 @@ class ExampleParser {
     if ($4 == 91) {
       _parse_$LeftSquareBracket(false, false);
     } else {
-      _success = false;
+      _failAt(_pos, const ['\'[\'']);
     }
     if (_success) {
       final $12 = _parseValues(false, $1);
@@ -533,7 +541,7 @@ class ExampleParser {
       if ($14 == 93) {
         _parse_$RightSquareBracket(false, false);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\']\'']);
       }
       if (_success) {
         final v = $13;
@@ -571,7 +579,7 @@ class ExampleParser {
         if ($13 == 44) {
           _parse_$Comma(true, false);
         } else {
-          _success = false;
+          _failAt(_pos, const ['\',\'']);
         }
         if (_success) {
           final $21 = _parseValue(false, $1);
@@ -625,7 +633,7 @@ class ExampleParser {
     if ($4 == 123) {
       _parse_$LeftBrace(false, false);
     } else {
-      _success = false;
+      _failAt(_pos, const ['\'{\'']);
     }
     if (_success) {
       final $12 = _parseMembers(false, $1);
@@ -634,7 +642,7 @@ class ExampleParser {
       if ($14 == 125) {
         _parse_$RightBrace(false, false);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'}\'']);
       }
       if (_success) {
         final m = $13;
@@ -672,7 +680,7 @@ class ExampleParser {
         if ($13 == 44) {
           _parse_$Comma(true, false);
         } else {
-          _success = false;
+          _failAt(_pos, const ['\',\'']);
         }
         if (_success) {
           final $21 = _parseMember(false, $1);
@@ -720,14 +728,14 @@ class ExampleParser {
       final $11 = _parse_string(true, $1);
       $10 = $11;
     } else {
-      _success = false;
+      _failAt(_pos, const ['\'string\'']);
     }
     if (_success) {
       final $12 = _c;
       if ($12 == 58) {
         _parse_$Colon(false, false);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\':\'']);
       }
       if (_success) {
         final $15 = _parseValue(true, $1);
@@ -897,7 +905,7 @@ class ExampleParser {
           final $14 = _parse$$char(false, $1);
           $13 = $14;
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (!_success) {
           _success = true;
@@ -944,9 +952,9 @@ class ExampleParser {
     String $10;
     final $12 = $1;
     $1 = false;
-    final $14 = _pos;
-    final $15 = _c;
     _matchChar(45);
+    final $24 = _pos;
+    final $25 = _c;
     var $27 = _pos;
     for (;;) {
       _matchChar(48);
@@ -974,8 +982,8 @@ class ExampleParser {
       if (_success) {
         break;
       }
-      _c = $15;
-      _pos = $14;
+      _c = $25;
+      _pos = $24;
       _failure = $27;
       break;
     }
@@ -1198,7 +1206,7 @@ class ExampleParser {
           final $12 = _parse$$escaped(false, $1);
           $11 = $12;
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (_success) {
           $6 = $11;
@@ -1222,7 +1230,7 @@ class ExampleParser {
         final $18 = _parse$$unescaped(false, $1);
         $17 = $18;
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       if (_success) {
         $13 = $17;
@@ -1328,7 +1336,7 @@ class ExampleParser {
           final $44 = _parse$$hexdig4(false, $1);
           $43 = $44;
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (_success) {
           $38 = $43;
@@ -1358,7 +1366,7 @@ class ExampleParser {
       final $11 = _parse$$hexdig(false, $1);
       $10 = $11;
     } else {
-      _success = false;
+      _failAt(_pos, const []);
     }
     if (_success) {
       final $12 = _c;
@@ -1369,7 +1377,7 @@ class ExampleParser {
         final $14 = _parse$$hexdig(false, $1);
         $13 = $14;
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       if (_success) {
         final $15 = _c;
@@ -1380,7 +1388,7 @@ class ExampleParser {
           final $17 = _parse$$hexdig(false, $1);
           $16 = $17;
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (_success) {
           final $18 = _c;
@@ -1391,7 +1399,7 @@ class ExampleParser {
             final $20 = _parse$$hexdig(false, $1);
             $19 = $20;
           } else {
-            _success = false;
+            _failAt(_pos, const []);
           }
           if (_success) {
             final a = $10;

@@ -260,6 +260,14 @@ class Peg2Parser {
     }
   }
 
+  void _failAt(int pos, List<String> expected) {
+    _success = false;
+    _failure = _pos;
+    if (_error <= _failure) {
+      _fail(expected);
+    }
+  }
+
   int _matchChar(int c) {
     int result;
     if (c == _c) {
@@ -409,7 +417,7 @@ class Peg2Parser {
       final $15 = _parse_globals(false, $1);
       $14 = $15;
     } else {
-      _success = false;
+      _failAt(_pos, const ['\'globals\'']);
     }
     final $16 = $14;
     final $17 = _c;
@@ -418,7 +426,7 @@ class Peg2Parser {
       final $19 = _parse_members(false, $1);
       $18 = $19;
     } else {
-      _success = false;
+      _failAt(_pos, const ['\'members\'']);
     }
     final $20 = $18;
     List<ProductionRule> $21;
@@ -445,7 +453,7 @@ class Peg2Parser {
       if ($24 == 1114112) {
         _parse_end_of_file(false, false);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'end of file\'']);
       }
       if (_success) {
         final g = $16;
@@ -528,14 +536,14 @@ class Peg2Parser {
           final $12 = _parse_non_terminal_name(true, $1);
           $11 = $12;
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'non terminal name\'']);
         }
         if (_success) {
           final $13 = _c;
           if ($13 == 61) {
             _parse_$EqualSign(true, false);
           } else {
-            _success = false;
+            _failAt(_pos, const ['\'=\'']);
           }
           if (_success) {
             final $16 = _parseNonterminalExpression(true, $1);
@@ -544,7 +552,7 @@ class Peg2Parser {
               if ($17 == 59) {
                 _parse_$Semicolon(false, false);
               } else {
-                _success = false;
+                _failAt(_pos, const ['\';\'']);
               }
               if (_success) {
                 final t = $9;
@@ -576,14 +584,14 @@ class Peg2Parser {
         final $25 = _parse_non_terminal_name(true, $1);
         $24 = $25;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'non terminal name\'']);
       }
       if (_success) {
         final $26 = _c;
         if ($26 == 61) {
           _parse_$EqualSign(true, false);
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'=\'']);
         }
         if (_success) {
           final $29 = _parseNonterminalExpression(true, $1);
@@ -592,7 +600,7 @@ class Peg2Parser {
             if ($30 == 59) {
               _parse_$Semicolon(false, false);
             } else {
-              _success = false;
+              _failAt(_pos, const ['\';\'']);
             }
             if (_success) {
               final n = $24;
@@ -648,7 +656,7 @@ class Peg2Parser {
         if ($13 == 47) {
           _parse_$Slash(true, false);
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'/\'']);
         }
         if (_success) {
           final $21 = _parseNonterminalSequence(false, $1);
@@ -719,7 +727,7 @@ class Peg2Parser {
         final $14 = _parse_action(false, $1);
         $13 = $14;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'action\'']);
       }
       final $15 = $13;
       _success = true;
@@ -748,7 +756,7 @@ class Peg2Parser {
       final $11 = _parse_semantic_value(false, $1);
       $10 = $11;
     } else {
-      _success = false;
+      _failAt(_pos, const ['\'semantic value\'']);
     }
     final $12 = $10;
     String $13;
@@ -761,7 +769,7 @@ class Peg2Parser {
         final $22 = _parse_$Ampersand(false, $1);
         $21 = $22;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'&\'']);
       }
       if (_success) {
         $17 = $21;
@@ -775,7 +783,7 @@ class Peg2Parser {
         final $28 = _parse_$ExclamationMark(false, $1);
         $27 = $28;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'!\'']);
       }
       if (_success) {
         $23 = $27;
@@ -820,7 +828,7 @@ class Peg2Parser {
           final $19 = _parse_$QuestionMark(false, $1);
           $18 = $19;
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'?\'']);
         }
         if (_success) {
           $14 = $18;
@@ -834,7 +842,7 @@ class Peg2Parser {
           final $25 = _parse_$Asterisk(false, $1);
           $24 = $25;
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'*\'']);
         }
         if (_success) {
           $20 = $24;
@@ -848,7 +856,7 @@ class Peg2Parser {
           final $31 = _parse_$PlusSign(false, $1);
           $30 = $31;
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'+\'']);
         }
         if (_success) {
           $26 = $30;
@@ -889,7 +897,7 @@ class Peg2Parser {
         final $11 = _parse_non_terminal_name(true, $1);
         $10 = $11;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'non terminal name\'']);
       }
       if (_success) {
         final n = $10;
@@ -908,7 +916,7 @@ class Peg2Parser {
         final $17 = _parse_terminal_name(true, $1);
         $16 = $17;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'terminal name\'']);
       }
       if (_success) {
         final n = $16;
@@ -926,7 +934,7 @@ class Peg2Parser {
       if ($19 == 40) {
         _parse_$LeftParenthesis(true, false);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'(\'']);
       }
       if (_success) {
         final $24 = _parseNonterminalExpression(true, $1);
@@ -935,7 +943,7 @@ class Peg2Parser {
           if ($25 == 41) {
             _parse_$RightParenthesis(false, false);
           } else {
-            _success = false;
+            _failAt(_pos, const ['\')\'']);
           }
           if (_success) {
             $18 = $24;
@@ -976,14 +984,14 @@ class Peg2Parser {
           final $12 = _parse_terminal_name(true, $1);
           $11 = $12;
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'terminal name\'']);
         }
         if (_success) {
           final $13 = _c;
           if ($13 == 61) {
             _parse_$EqualSign(true, false);
           } else {
-            _success = false;
+            _failAt(_pos, const ['\'=\'']);
           }
           if (_success) {
             final $16 = _parseExpression(true, $1);
@@ -992,7 +1000,7 @@ class Peg2Parser {
               if ($17 == 59) {
                 _parse_$Semicolon(false, false);
               } else {
-                _success = false;
+                _failAt(_pos, const ['\';\'']);
               }
               if (_success) {
                 final t = $9;
@@ -1024,14 +1032,14 @@ class Peg2Parser {
         final $25 = _parse_terminal_name(true, $1);
         $24 = $25;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'terminal name\'']);
       }
       if (_success) {
         final $26 = _c;
         if ($26 == 61) {
           _parse_$EqualSign(true, false);
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'=\'']);
         }
         if (_success) {
           final $29 = _parseExpression(true, $1);
@@ -1040,7 +1048,7 @@ class Peg2Parser {
             if ($30 == 59) {
               _parse_$Semicolon(false, false);
             } else {
-              _success = false;
+              _failAt(_pos, const ['\';\'']);
             }
             if (_success) {
               final n = $24;
@@ -1092,7 +1100,7 @@ class Peg2Parser {
         if ($13 == 47) {
           _parse_$Slash(true, false);
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'/\'']);
         }
         if (_success) {
           final $21 = _parseSequence(false, $1);
@@ -1170,7 +1178,7 @@ class Peg2Parser {
         final $14 = _parse_action(false, $1);
         $13 = $14;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'action\'']);
       }
       final $15 = $13;
       _success = true;
@@ -1206,7 +1214,7 @@ class Peg2Parser {
       final $11 = _parse_semantic_value(false, $1);
       $10 = $11;
     } else {
-      _success = false;
+      _failAt(_pos, const ['\'semantic value\'']);
     }
     final $12 = $10;
     String $13;
@@ -1219,7 +1227,7 @@ class Peg2Parser {
         final $22 = _parse_$Ampersand(false, $1);
         $21 = $22;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'&\'']);
       }
       if (_success) {
         $17 = $21;
@@ -1233,7 +1241,7 @@ class Peg2Parser {
         final $28 = _parse_$ExclamationMark(false, $1);
         $27 = $28;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'!\'']);
       }
       if (_success) {
         $23 = $27;
@@ -1285,7 +1293,7 @@ class Peg2Parser {
           final $19 = _parse_$QuestionMark(false, $1);
           $18 = $19;
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'?\'']);
         }
         if (_success) {
           $14 = $18;
@@ -1299,7 +1307,7 @@ class Peg2Parser {
           final $25 = _parse_$Asterisk(false, $1);
           $24 = $25;
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'*\'']);
         }
         if (_success) {
           $20 = $24;
@@ -1313,7 +1321,7 @@ class Peg2Parser {
           final $31 = _parse_$PlusSign(false, $1);
           $30 = $31;
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'+\'']);
         }
         if (_success) {
           $26 = $30;
@@ -1361,7 +1369,7 @@ class Peg2Parser {
         final $11 = _parse_sub_terminal_name(true, $1);
         $10 = $11;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'sub terminal name\'']);
       }
       if (_success) {
         final n = $10;
@@ -1379,7 +1387,7 @@ class Peg2Parser {
       if ($13 == 40) {
         _parse_$LeftParenthesis(true, false);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'(\'']);
       }
       if (_success) {
         final $18 = _parseExpression(true, $1);
@@ -1388,7 +1396,7 @@ class Peg2Parser {
           if ($19 == 41) {
             _parse_$RightParenthesis(false, false);
           } else {
-            _success = false;
+            _failAt(_pos, const ['\')\'']);
           }
           if (_success) {
             $12 = $18;
@@ -1412,7 +1420,7 @@ class Peg2Parser {
         final $27 = _parse_literal(false, $1);
         $26 = $27;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'literal\'']);
       }
       if (_success) {
         $22 = $26;
@@ -1426,7 +1434,7 @@ class Peg2Parser {
         final $33 = _parse_character_class(false, $1);
         $32 = $33;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'character class\'']);
       }
       if (_success) {
         $28 = $32;
@@ -1438,7 +1446,7 @@ class Peg2Parser {
       if ($35 == 46) {
         _parse_$Period(true, $1);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'.\'']);
       }
       if (_success) {
         Expression $$;
@@ -1455,7 +1463,7 @@ class Peg2Parser {
       if ($41 == 60) {
         _parse_$LessThanSign(true, false);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'<\'']);
       }
       if (_success) {
         final $46 = _parseExpression(true, $1);
@@ -1464,7 +1472,7 @@ class Peg2Parser {
           if ($47 == 62) {
             _parse_$GreaterThanSign(false, false);
           } else {
-            _success = false;
+            _failAt(_pos, const ['\'>\'']);
           }
           if (_success) {
             final e = $46;
@@ -1515,14 +1523,14 @@ class Peg2Parser {
           final $12 = _parse_sub_terminal_name(true, $1);
           $11 = $12;
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'sub terminal name\'']);
         }
         if (_success) {
           final $13 = _c;
           if ($13 == 61) {
             _parse_$EqualSign(true, false);
           } else {
-            _success = false;
+            _failAt(_pos, const ['\'=\'']);
           }
           if (_success) {
             final $16 = _parseExpression(true, $1);
@@ -1531,7 +1539,7 @@ class Peg2Parser {
               if ($17 == 59) {
                 _parse_$Semicolon(false, false);
               } else {
-                _success = false;
+                _failAt(_pos, const ['\';\'']);
               }
               if (_success) {
                 final t = $9;
@@ -1563,14 +1571,14 @@ class Peg2Parser {
         final $25 = _parse_sub_terminal_name(true, $1);
         $24 = $25;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'sub terminal name\'']);
       }
       if (_success) {
         final $26 = _c;
         if ($26 == 61) {
           _parse_$EqualSign(true, false);
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'=\'']);
         }
         if (_success) {
           final $29 = _parseExpression(true, $1);
@@ -1579,7 +1587,7 @@ class Peg2Parser {
             if ($30 == 59) {
               _parse_$Semicolon(false, false);
             } else {
-              _success = false;
+              _failAt(_pos, const ['\';\'']);
             }
             if (_success) {
               final n = $24;
@@ -1630,7 +1638,7 @@ class Peg2Parser {
       if ($12 == 60) {
         _parse_$LessThanSign(true, false);
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'<\'']);
       }
       if (_success) {
         final $20 = _parseTypeArguments(false, $1);
@@ -1639,7 +1647,7 @@ class Peg2Parser {
           if ($21 == 62) {
             _parse_$GreaterThanSign(false, false);
           } else {
-            _success = false;
+            _failAt(_pos, const ['\'>\'']);
           }
           if (_success) {
             $14 = $20;
@@ -1687,14 +1695,14 @@ class Peg2Parser {
         final $11 = _parse_library_prefix(false, $1);
         $10 = $11;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'library prefix\'']);
       }
       if (_success) {
         final $12 = _c;
         if ($12 == 46) {
           _parse_$Period(true, false);
         } else {
-          _success = false;
+          _failAt(_pos, const ['\'.\'']);
         }
         if (_success) {
           final $15 = _c;
@@ -1703,7 +1711,7 @@ class Peg2Parser {
             final $17 = _parse_type_name(false, $1);
             $16 = $17;
           } else {
-            _success = false;
+            _failAt(_pos, const ['\'type name\'']);
           }
           if (_success) {
             final p = $10;
@@ -1731,7 +1739,7 @@ class Peg2Parser {
         final $23 = _parse_type_name(false, $1);
         $22 = $23;
       } else {
-        _success = false;
+        _failAt(_pos, const ['\'type name\'']);
       }
       if (_success) {
         $18 = $22;
@@ -1764,7 +1772,7 @@ class Peg2Parser {
         if ($13 == 44) {
           _parse_$Comma(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const ['\',\'']);
         }
         if (_success) {
           final $21 = _parseType(false, $1);
@@ -1815,7 +1823,7 @@ class Peg2Parser {
       final $12 = _parse$$IDENTIFIER(true, $1);
       $11 = $12;
     } else {
-      _success = false;
+      _failAt(_pos, const []);
     }
     if (_success) {
       final $13 = _c;
@@ -1873,7 +1881,7 @@ class Peg2Parser {
           if ($40 >= 32 && $40 <= 38 || $40 >= 40 && $40 <= 126) {
             _parse$$TERMINAL_CHAR(false, false);
           } else {
-            _success = false;
+            _failAt(_pos, const []);
           }
           if (!_success) {
             _c = $26;
@@ -1936,7 +1944,7 @@ class Peg2Parser {
       if ($22 >= 65 && $22 <= 90 || $22 >= 97 && $22 <= 122) {
         _parse$$IDENTIFIER(true, false);
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       if (!_success) {
         _c = $15;
@@ -1976,7 +1984,7 @@ class Peg2Parser {
       final $12 = _parse$$IDENTIFIER(true, $1);
       $11 = $12;
     } else {
-      _success = false;
+      _failAt(_pos, const []);
     }
     if (_success) {
       _matchString(':');
@@ -2005,7 +2013,7 @@ class Peg2Parser {
     if ($15 >= 65 && $15 <= 90 || $15 >= 97 && $15 <= 122) {
       _parse$$IDENTIFIER(true, false);
     } else {
-      _success = false;
+      _failAt(_pos, const []);
     }
     if (_success) {
       _matchChar(63);
@@ -2038,12 +2046,12 @@ class Peg2Parser {
     String $10;
     final $12 = $1;
     $1 = false;
-    final $15 = _c;
     _matchChar(95);
-    if ($15 >= 65 && $15 <= 90 || $15 >= 97 && $15 <= 122) {
+    final $23 = _c;
+    if ($23 >= 65 && $23 <= 90 || $23 >= 97 && $23 <= 122) {
       _parse$$IDENTIFIER(true, false);
     } else {
-      _success = false;
+      _failAt(_pos, const []);
     }
     if (_success) {
       $10 = _text.substring($3, _pos);
@@ -2095,7 +2103,7 @@ class Peg2Parser {
         if ($23 >= 0 && $23 <= 124 || $23 >= 126 && $23 <= 1114112) {
           _parse$$ACTION_BODY(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (!_success) {
           _success = true;
@@ -2185,7 +2193,7 @@ class Peg2Parser {
             final $31 = _parse$$RANGE(false, $1);
             $30 = $31;
           } else {
-            _success = false;
+            _failAt(_pos, const []);
           }
           if (_success) {
             $18 = $30;
@@ -2334,7 +2342,7 @@ class Peg2Parser {
         if ($23 >= 0 && $23 <= 1114112) {
           _parse$$GLOBALS_BODY(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (!_success) {
           _success = true;
@@ -2447,7 +2455,7 @@ class Peg2Parser {
             final $30 = _parse$$LITERAL_CHAR(false, $1);
             $29 = $30;
           } else {
-            _success = false;
+            _failAt(_pos, const []);
           }
           if (_success) {
             $17 = $29;
@@ -2508,7 +2516,7 @@ class Peg2Parser {
         if ($23 >= 0 && $23 <= 124 || $23 >= 126 && $23 <= 1114112) {
           _parse$$ACTION_BODY(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (!_success) {
           _success = true;
@@ -2757,7 +2765,7 @@ class Peg2Parser {
           if ($11 >= 0 && $11 <= 124 || $11 >= 126 && $11 <= 1114112) {
             _parse$$ACTION_BODY(false, false);
           } else {
-            _success = false;
+            _failAt(_pos, const []);
           }
           if (!_success) {
             _success = true;
@@ -2838,7 +2846,7 @@ class Peg2Parser {
         if ($24 == 10 || $24 == 13) {
           _parse$$EOL(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         _success = !_success;
         _c = $13;
@@ -2869,7 +2877,7 @@ class Peg2Parser {
       if ($29 == 10 || $29 == 13) {
         _parse$$EOL(false, false);
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       _success = true;
       $6 = $9;
@@ -2997,7 +3005,7 @@ class Peg2Parser {
     if ($14 >= 65 && $14 <= 90 || $14 >= 97 && $14 <= 122) {
       _parse$$IDENT_START(true, false);
     } else {
-      _success = false;
+      _failAt(_pos, const []);
     }
     if (_success) {
       for (;;) {
@@ -3008,7 +3016,7 @@ class Peg2Parser {
             $23 >= 97 && $23 <= 122) {
           _parse$$IDENT_CONT(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (!_success) {
           _success = true;
@@ -3040,7 +3048,7 @@ class Peg2Parser {
         final $11 = _parse$$IDENT_START(true, false);
         $10 = $11;
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       if (_success) {
         $6 = $10;
@@ -3115,7 +3123,7 @@ class Peg2Parser {
         final $17 = _parse$$HEX_NUMBER(false, $1);
         $16 = $17;
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       if (_success) {
         $12 = $16;
@@ -3150,7 +3158,7 @@ class Peg2Parser {
         if ($35 == 10 || $35 == 13) {
           _parse$$EOL(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         _success = !_success;
         _c = $29;
@@ -3202,7 +3210,7 @@ class Peg2Parser {
         final $11 = _parse$$RANGE_CHAR(true, $1);
         $10 = $11;
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       if (_success) {
         _matchString('-');
@@ -3213,7 +3221,7 @@ class Peg2Parser {
             final $15 = _parse$$RANGE_CHAR(false, $1);
             $14 = $15;
           } else {
-            _success = false;
+            _failAt(_pos, const []);
           }
           if (_success) {
             final s = $10;
@@ -3241,7 +3249,7 @@ class Peg2Parser {
         final $21 = _parse$$RANGE_CHAR(true, $1);
         $20 = $21;
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       if (_success) {
         final c = $20;
@@ -3298,7 +3306,7 @@ class Peg2Parser {
         final $17 = _parse$$HEX_NUMBER(false, $1);
         $16 = $17;
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       if (_success) {
         $12 = $16;
@@ -3334,7 +3342,7 @@ class Peg2Parser {
         if ($36 == 10 || $36 == 13) {
           _parse$$EOL(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         _success = !_success;
         _c = $30;
@@ -3394,7 +3402,7 @@ class Peg2Parser {
         final $16 = _parse$$EOL(false, false);
         $15 = $16;
       } else {
-        _success = false;
+        _failAt(_pos, const []);
       }
       if (_success) {
         $11 = $15;
@@ -3414,7 +3422,7 @@ class Peg2Parser {
         if ($15 >= 9 && $15 <= 10 || $15 == 13 || $15 == 32) {
           _parse$$SPACE(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (_success) {
           break;
@@ -3423,7 +3431,7 @@ class Peg2Parser {
         if ($21 == 35) {
           _parse$$COMMENT(false, false);
         } else {
-          _success = false;
+          _failAt(_pos, const []);
         }
         if (_success) {
           break;
