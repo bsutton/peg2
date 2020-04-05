@@ -573,26 +573,30 @@ class ExampleParser {
       for (;;) {
         dynamic $11;
         final $12 = _pos;
-        final $13 = _c;
-        dynamic $15;
-        if ($13 == 44) {
+        final $15 = $1;
+        $1 = true;
+        dynamic $16;
+        final $17 = _c;
+        final $18 = _pos;
+        if ($17 == 44) {
           _parse_$Comma(true, false);
         } else {
           _failAt(_pos, const ['\',\'']);
         }
         if (_success) {
-          final $21 = _parseValue(false, $1);
+          final $22 = _parseValue(false, $1);
           if (_success) {
-            $15 = $21;
+            $16 = $22;
           } else {
-            _c = $13;
-            _pos = $12;
+            _c = $17;
+            _pos = $18;
           }
         }
-        $11 = $15;
+        $11 = $16;
         if (!_success && _error == $12) {
           _fail(const ['\',\'']);
         }
+        $1 = $15;
         if (!_success) {
           _success = true;
           break;
@@ -670,26 +674,30 @@ class ExampleParser {
       for (;;) {
         MapEntry<String, dynamic> $11;
         final $12 = _pos;
-        final $13 = _c;
-        MapEntry<String, dynamic> $15;
-        if ($13 == 44) {
+        final $15 = $1;
+        $1 = true;
+        MapEntry<String, dynamic> $16;
+        final $17 = _c;
+        final $18 = _pos;
+        if ($17 == 44) {
           _parse_$Comma(true, false);
         } else {
           _failAt(_pos, const ['\',\'']);
         }
         if (_success) {
-          final $21 = _parseMember(false, $1);
+          final $22 = _parseMember(false, $1);
           if (_success) {
-            $15 = $21;
+            $16 = $22;
           } else {
-            _c = $13;
-            _pos = $12;
+            _c = $17;
+            _pos = $18;
           }
         }
-        $11 = $15;
+        $11 = $16;
         if (!_success && _error == $12) {
           _fail(const ['\',\'']);
         }
+        $1 = $15;
         if (!_success) {
           _success = true;
           break;
@@ -960,6 +968,8 @@ class ExampleParser {
     String $10;
     final $12 = $1;
     $1 = false;
+    final $18 = $1;
+    $1 = true;
     if (_c == 45) {
       _success = true;
       _c = _input[++_pos];
@@ -967,9 +977,11 @@ class ExampleParser {
       _success = false;
       _failure = _pos;
     }
-    final $24 = _pos;
-    final $25 = _c;
-    var $27 = _pos;
+    final $25 = _pos;
+    final $26 = _c;
+    var $28 = _pos;
+    final $29 = $1;
+    $1 = false;
     for (;;) {
       if (_c == 48) {
         _success = true;
@@ -978,8 +990,8 @@ class ExampleParser {
         _success = false;
         _failure = _pos;
       }
-      if ($27 < _failure) {
-        $27 = _failure;
+      if ($28 < _failure) {
+        $28 = _failure;
       }
       if (_success) {
         break;
@@ -1006,20 +1018,23 @@ class ExampleParser {
           }
         }
       }
-      if ($27 < _failure) {
-        $27 = _failure;
+      if ($28 < _failure) {
+        $28 = _failure;
       }
       if (_success) {
         break;
       }
-      _c = $25;
-      _pos = $24;
-      _failure = $27;
+      _c = $26;
+      _pos = $25;
+      _failure = $28;
       break;
     }
+    $1 = $29;
     if (_success) {
-      final $39 = _pos;
-      final $40 = _c;
+      final $45 = $1;
+      $1 = false;
+      final $47 = _c;
+      final $48 = _pos;
       if (_c == 46) {
         _success = true;
         _c = _input[++_pos];
@@ -1028,7 +1043,7 @@ class ExampleParser {
         _failure = _pos;
       }
       if (_success) {
-        var $48 = false;
+        var $51 = false;
         for (;;) {
           if (_c >= 48 && _c <= 57) {
             _success = true;
@@ -1038,18 +1053,21 @@ class ExampleParser {
             _failure = _pos;
           }
           if (!_success) {
-            _success = $48;
+            _success = $51;
             break;
           }
-          $48 = true;
+          $51 = true;
         }
         if (!_success) {
-          _c = $40;
-          _pos = $39;
+          _c = $47;
+          _pos = $48;
         }
       }
-      final $52 = _pos;
-      final $53 = _c;
+      $1 = $45;
+      final $59 = $1;
+      $1 = false;
+      final $61 = _c;
+      final $62 = _pos;
       if (_c == 69 || _c == 101) {
         _success = true;
         _c = _input[++_pos];
@@ -1065,7 +1083,7 @@ class ExampleParser {
           _success = false;
           _failure = _pos;
         }
-        var $63 = false;
+        var $67 = false;
         for (;;) {
           if (_c >= 48 && _c <= 57) {
             _success = true;
@@ -1075,23 +1093,25 @@ class ExampleParser {
             _failure = _pos;
           }
           if (!_success) {
-            _success = $63;
+            _success = $67;
             break;
           }
-          $63 = true;
+          $67 = true;
         }
         if (!_success) {
-          _c = $53;
-          _pos = $52;
+          _c = $61;
+          _pos = $62;
         }
       }
+      $1 = $59;
       _success = true;
     }
+    $1 = $18;
     $1 = $12;
     $10 = _text.substring($3, _pos);
     if (_success) {
-      final $66 = _c;
-      if ($66 >= 9 && $66 <= 10 || $66 == 13 || $66 == 32) {
+      final $70 = _c;
+      if ($70 >= 9 && $70 <= 10 || $70 == 13 || $70 == 32) {
         _parse$$spacing(false, false);
       } else {
         _success = true;
