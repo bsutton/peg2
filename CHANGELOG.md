@@ -1,3 +1,7 @@
+## 0.1.32
+
+- Minor corrections in the implementation of the propagation of the flag `productiveness` and in using this flag
+
 ## 0.1.31
 
 - Fixed bugs in `productiveness analysis` of expressions

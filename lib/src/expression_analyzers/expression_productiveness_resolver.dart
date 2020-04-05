@@ -4,19 +4,13 @@ class ExpressionProductivenessResolver extends ExpressionVisitor {
   bool _hasModifications;
 
   void resolve(Grammar grammar) {
-    final start = grammar.start;
     final rules = grammar.rules;
     _hasModifications = true;
     while (_hasModifications) {
       _hasModifications = false;
       for (var rule in rules) {
         final expression = rule.expression;
-        if (rule == start) {
-          _setProductiveness(expression, Productiveness.always);
-        } else {
-          _setProductiveness(expression, Productiveness.auto);
-        }
-
+        _setProductiveness(expression, Productiveness.auto);
         expression.accept(this);
       }
     }

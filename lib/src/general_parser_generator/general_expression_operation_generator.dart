@@ -184,6 +184,20 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       failure = va.newVar(block, 'var', varOp(m.pos));
     }
 
+    final session = getSession();
+    switch (node.productiveness) {
+      case Productiveness.always:
+        saveVariable(session, productive);
+        addAssign(block, varOp(productive), constOp(true));
+        break;
+      case Productiveness.auto:
+        break;
+      case Productiveness.never:
+        saveVariable(session, productive);
+        addAssign(block, varOp(productive), constOp(false));
+        break;
+    }
+
     //final ifNotSuccess = BlockOperation();
     if (expressions.length > 1) {
       addLoop(block, (block) {
@@ -285,6 +299,17 @@ class GeneralExpressionOperationGenerator extends ExpressionOperationGenerator {
       addOp(b, end);
     }
     */
+
+    switch (node.productiveness) {
+      case Productiveness.always:
+        restoreVariables(session);
+        break;
+      case Productiveness.auto:
+        break;
+      case Productiveness.never:
+        restoreVariables(session);
+        break;
+    }
 
     result = result1;
   }
