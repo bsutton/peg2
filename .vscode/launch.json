@@ -44,7 +44,8 @@
                 //"--parser=postfix",
                 //"example/example.peg",
                 //"example/example.dart"
-                "example/query.peg"
+                //"example/query.peg"
+                "example/a.peg"
             ]
         },
         {

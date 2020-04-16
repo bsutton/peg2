@@ -40,25 +40,6 @@ class GrammarFaAnalyzer {
     }
   }
 
-  // TODO: remove?
-  // ignore: unused_element
-  T _geFirst<T>(Expression expression) {
-    var parent = expression.parent;
-    while (true) {
-      if (parent == null) {
-        break;
-      }
-
-      if (parent is T) {
-        return parent as T;
-      }
-
-      parent = parent.parent;
-    }
-
-    return null;
-  }
-
   T _getUpper<T>(Expression expression) {
     var parent = expression.parent;
     T last;
@@ -88,16 +69,6 @@ class GrammarFaAnalyzer {
     }
 
     return lastCount == count;
-  }
-
-  // TODO: remove?
-  // ignore: unused_element
-  bool _isEqual(Expression e1, Expression e2) {
-    if (e1 == null && e2 == null) {
-      return false;
-    }
-
-    return e1 == e2;
   }
 
   bool _isLast(Expression expression) {

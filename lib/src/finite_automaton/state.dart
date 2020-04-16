@@ -6,9 +6,11 @@ abstract class State<TSelf extends State<TSelf, TState>,
 
   final ends = <Expression>{};
 
-  final int id;
+  int id;
 
   bool isFinal = false;
+
+  final Map<Expression, List<GroupedRangeList<TSelf>>> movements = {};
 
   final starts = <Expression>{};
 

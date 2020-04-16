@@ -11,4 +11,4 @@ inplement malformed terminals reporting
 add parenthesis to unary operator printer
 improve variable usage optimizer
 need make corrections to character class `toString()`
-!!!generate grammar members
+add build support (add builder, add generator)

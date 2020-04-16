@@ -292,8 +292,7 @@ List<int> @RANGE =
   ;
 
 int @RANGE_CHAR =
-
-    "\\" c:[nrt\]\\] { $$ = _escape(c); }
+  "\\" c:[nrt\]\\] { $$ = _escape(c); }
   / @HEX_NUMBER
   / ![\\\]] !@EOL c:.
   ;

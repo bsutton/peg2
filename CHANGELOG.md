@@ -1,3 +1,10 @@
+## 0.1.33
+
+- Reworked `ExpressionToEnfaConverter`
+- Fixed bugs in `ExpressionToEnfaConverter`
+- Fixed bugs in `EnfaToNfaConverter`
+- Fixed bugs in `NfaToDfaConverter`
+
 ## 0.1.32
 
 - Minor corrections in the implementation of the propagation of the flag `productiveness` and in using this flag

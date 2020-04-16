@@ -3,7 +3,7 @@ part of '../../expression_analyzers.dart';
 class ExpressionInitializer0 extends ExpressionVisitor {
   int _actionIndex;
 
-  int _expressionId;
+  int _id;
 
   int _level;
 
@@ -23,7 +23,7 @@ class ExpressionInitializer0 extends ExpressionVisitor {
     }
 
     _actionIndex = 0;
-    _expressionId = 0;
+    _id = 0;
     for (var rule in rules) {
       _level = 0;
       _rule = rule;
@@ -79,12 +79,6 @@ class ExpressionInitializer0 extends ExpressionVisitor {
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
-    _initializeNode(node);
-  }
-
-  @override
-  void visitSequence(SequenceExpression node) {
-    _initializeNode(node);
     final expressions = node.expressions;
     final length = expressions.length;
     for (var i = 0; i < length; i++) {
@@ -92,6 +86,21 @@ class ExpressionInitializer0 extends ExpressionVisitor {
       child.index = i;
     }
 
+    _initializeNode(node);
+  }
+
+  @override
+  void visitSequence(SequenceExpression node) {
+    _assignId(node);
+    final expressions = node.expressions;
+    final length = expressions.length;
+    for (var i = 0; i < length; i++) {
+      final child = expressions[i];
+      child.index = i;
+      _assignId(child);
+    }
+
+    _initializeNode(node);
     if (node.actionSource != null) {
       node.actionIndex = _actionIndex++;
     }
@@ -112,6 +121,10 @@ class ExpressionInitializer0 extends ExpressionVisitor {
     _initializeNode(node);
   }
 
+  void _assignId(Expression node) {
+    node.id ??= _id++;
+  }
+
   void _initializeNode(Expression node) {
     if (node is SingleExpression) {
       final child = node.expression;
@@ -121,9 +134,9 @@ class ExpressionInitializer0 extends ExpressionVisitor {
       last.isLast = true;
     }
 
-    node.index = 0;
+    node.index ??= 0;
     node.rule = _rule;
-    node.id = _expressionId++;
+    _assignId(node);
     node.level = _level;
     final level = _level;
     _level++;

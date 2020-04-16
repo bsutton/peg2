@@ -17,20 +17,43 @@ class NfaToDfaConverter {
     final result = _addNewState({nfa});
     while (_pending.isNotEmpty) {
       final state = _getNext();
+
+      // Movements
+      // final movementsFromNfaStates =
+      //     <Expression, List<GroupedRangeList<NfaState>>>{};
+      // for (final nfaState in state.states) {
+      //   final nfaStateMovements = nfaState.movements;
+      //   for (final expression in nfaStateMovements.keys) {
+      //     var dest = movementsFromNfaStates[expression];
+      //     if (dest == null) {
+      //       dest = [];
+      //       movementsFromNfaStates[expression] = dest;
+      //     }
+
+      //     final src = nfaStateMovements[expression];
+      //     dest.addAll(src);
+      //   }
+      // }
+
+      //final stateMovements = state.movements;
       final stateTransitions = state.transitions;
       final nfaStates = SparseList<Set<NfaState>>();
       for (final nfaState in state.states) {
         for (final group in nfaState.transitions.groups) {
           for (final src in nfaStates.getAllSpace(group)) {
             var key = src.key;
-            key ??= {};
-            key.addAll(group.key);
-            if (src.key == null) {
-              final start = src.start;
-              final end = src.end;
-              final dest = GroupedRangeList(start, end, key);
-              nfaStates.addGroup(dest);
+            if (key == null) {
+              key = {};
+              key.addAll(group.key);
+            } else {
+              key = key.toSet();
+              key.addAll(group.key);
             }
+
+            final start = src.start;
+            final end = src.end;
+            final dest = GroupedRangeList(start, end, key);
+            nfaStates.addGroup(dest);
           }
         }
       }
@@ -43,9 +66,35 @@ class NfaToDfaConverter {
         final transition =
             GroupedRangeList<List<DfaState>>(start, end, [newState]);
         stateTransitions.addGroup(transition);
+
+        // Movements
+        // for (final expression in movementsFromNfaStates.keys) {
+        //   final movements = movementsFromNfaStates[expression];
+        //   if (movements != null) {
+        //     for (final movement in movements) {
+        //       if (newState.states.contains(movement.key)) {
+        //         final intersection = movement.intersection(group);
+        //         if (intersection != null) {
+        //           final start = intersection.start;
+        //           final end = intersection.end;
+        //           final expressionMovement =
+        //               GroupedRangeList(start, end, newState);
+        //           var expressionMovements = stateMovements[expression];
+        //           if (expressionMovements == null) {
+        //             expressionMovements = [];
+        //             stateMovements[expression] = expressionMovements;
+        //           }
+
+        //           expressionMovements.add(expressionMovement);
+        //         }
+        //       }
+        //     }
+        //   }
+        // }
       }
     }
 
+    _free(result, {});
     return result;
   }
 
@@ -84,6 +133,25 @@ class NfaToDfaConverter {
     _dfaStates.add(result);
     _pending.add(result);
     return result;
+  }
+
+  void _free(DfaState state, Set<DfaState> processed) {
+    if (!processed.add(state)) {
+      return;
+    }
+
+    for (final state in state.states) {
+      state.starts.clear();
+      state.active.clear();
+      state.ends.clear();
+    }
+
+    for (final group in state.transitions.groups) {
+      final states = group.key;
+      for (final state in states) {
+        _free(state, processed);
+      }
+    }
   }
 
   DfaState _getNext() {

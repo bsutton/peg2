@@ -163,11 +163,11 @@ void _analyzeAndOptimizeGrammar(Grammar grammar, ParserGeneratorOptions options,
 
   // ignore: unused_local_variable
   //final faToDotConverter = FaToDotConverter();
-  //final enfaDot0 = faToDotConverter.convert(enfa0, true, labelState: _label);
+  //final enfaDot0 = faToDotConverter.convert(enfa0, true, labelState: _labelState0);
   //final enfaDot1 = faToDotConverter.convert(enfa1, true, labelState: _label);
-  //final nfaDot0 = faToDotConverter.convert(nfa0, false, labelState: _label);
+  //final nfaDot0 = faToDotConverter.convert(nfa0, false, labelState: _labelState1);
   //final nfaDot1 = faToDotConverter.convert(nfa1, false, labelState: _label);
-  //final dfaDot0 = faToDotConverter.convert(dfa0, false, labelState: _label);
+  //final dfaDot0 = faToDotConverter.convert(dfa0, false, labelState: _labelState1);
   //final dfaDot1 = faToDotConverter.convert(dfa1, false,
   //    labelState: detailizer1.labelState,
   //    rangeToString: detailizer1.rangeToString);
@@ -177,7 +177,6 @@ void _analyzeAndOptimizeGrammar(Grammar grammar, ParserGeneratorOptions options,
   //File('nfa1.dot').writeAsStringSync(nfaDot1);
   //File('dfa0.dot').writeAsStringSync(dfaDot0);
   //File('dfa1.dot').writeAsStringSync(dfaDot1);
-
   final grammarFaAnalyzer = GrammarFaAnalyzer();
   grammarFaAnalyzer.analyze(options, dfa0, errors, warnings);
   //final memoizationRequestsOptimizer = MemoizationRequestsOptimizer();
@@ -244,12 +243,87 @@ String _labelState1(State<dynamic, dynamic> state) {
   }
 
   sb.write(state.id);
-  sb.write(r'\n');
-  for (final active in state.starts) {
-    if (active is OrderedChoiceExpression && active.parent == null) {
-      sb.write(active.rule.name);
+  sb.write('\\n');
+  final ruleStarts = state.starts
+      .where((e) => e is OrderedChoiceExpression && e.parent == null);
+  if (ruleStarts.isNotEmpty) {
+    sb.write('Starts:\\n');
+    for (final item in ruleStarts) {
+      sb.write(item.rule.name);
       sb.write(r'\n');
     }
+  }
+
+  final ruleActive = state.active
+      .where((e) => e is OrderedChoiceExpression && e.parent == null);
+  if (ruleActive.isNotEmpty) {
+    sb.write('active:\\n');
+    for (final item in ruleActive) {
+      sb.write(item.rule.name);
+      sb.write(r'\n');
+    }
+  }
+
+  final ruleEnds =
+      state.ends.where((e) => e is OrderedChoiceExpression && e.parent == null);
+  if (ruleEnds.isNotEmpty) {
+    sb.write('Ends:\\n');
+    for (final item in ruleEnds) {
+      sb.write(item.rule.name);
+      sb.write(r'\n');
+    }
+  }
+
+  return sb.toString();
+}
+
+// ignore: unused_element
+String _labelState2<T extends Expression>(State<dynamic, dynamic> state) {
+  String write(Iterable<Expression> expressions) {
+    final list = <String>[];
+    for (final expression in expressions.whereType<T>()) {
+      final sb = StringBuffer();
+      sb.write('[');
+      sb.write(expression.rule.name);
+      sb.write('(');
+      sb.write(expression.runtimeType.toString().substring(0, 3));
+      sb.write(' ');
+      sb.write(expression.id);
+      sb.write(') ');
+      var str = expression.toString();
+      str = str.replaceAll(r'\', r'\\');
+      str = str.replaceAll('"', r'\"');
+      sb.write(str);
+      sb.write(']');
+      list.add(sb.toString());
+    }
+
+    return list.join(', ');
+  }
+
+  final sb = StringBuffer();
+  if (state.isFinal) {
+    sb.write('V');
+  }
+
+  sb.write(state.id);
+  sb.write(r'\n');
+  if (state.starts.isNotEmpty) {
+    sb.write('starts: ');
+    sb.write(write(state.starts));
+    sb.write(r'\n');
+  }
+
+  if (state.active.isNotEmpty) {
+    sb.write('active: ');
+    sb.write(write(state.active));
+    sb.write(r'\n');
+  }
+
+  if (state.ends.isNotEmpty) {
+    sb.write('ends: ');
+    sb.write(write(state.ends));
+    sb.write(r'\n');
   }
 
   return sb.toString();
@@ -280,76 +354,4 @@ void _printGrammar(Grammar grammar) {
   }
 
   print(sb);
-}
-
-// ignore: unused_element
-class _DotDetailizerForTokens<S extends State<dynamic, dynamic>> {
-  Map<int, Expression> _expressionMap;
-
-  final int _magicNumber = ExpressionToTokenizedEnfaConverter.magicNumber;
-
-  _DotDetailizerForTokens(Grammar grammar) {
-    _expressionMap = grammar.expressionMap;
-  }
-
-  String labelState(State<dynamic, dynamic> state) {
-    final sb = StringBuffer();
-    sb.write(state.id);
-    sb.write('\\n');
-    final starts = state.starts
-        .where((e) => e is OrderedChoiceExpression && e.parent == null)
-        .map((e) => e.rule);
-    if (starts.isNotEmpty) {
-      sb.write('starts: ');
-      sb.write(starts.join(', '));
-      sb.write('\\n');
-    }
-
-    final active = state.active
-        .where((e) => e is OrderedChoiceExpression && e.parent == null)
-        .map((e) => e.rule);
-    if (active.isNotEmpty) {
-      sb.write('active: ');
-      sb.write(active.join(', '));
-      sb.write('\\n');
-    }
-
-    final ends = state.ends
-        .where((e) => e is OrderedChoiceExpression && e.parent == null)
-        .map((e) => e.rule);
-    if (ends.isNotEmpty) {
-      sb.write('ends: ');
-      sb.write(ends.join(', '));
-      sb.write('\\n');
-    }
-
-    return sb.toString();
-  }
-
-  String rangeToString(int start, int end) {
-    final sb = StringBuffer();
-    Expression expression;
-    int id;
-    if (start >= _magicNumber) {
-      id = start - _magicNumber;
-      expression = _expressionMap[id];
-      sb.write('return from ');
-    } else {
-      expression = _expressionMap[start];
-    }
-
-    if (expression is SymbolExpression) {
-      sb.write(expression.expression.rule);
-    } else {
-      sb.write(expression);
-    }
-
-    if (id != null) {
-      sb.write(' (');
-      sb.write(id);
-      sb.write(')');
-    }
-
-    return sb.toString();
-  }
 }
