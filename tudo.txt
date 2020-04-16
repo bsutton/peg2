@@ -12,3 +12,4 @@ add parenthesis to unary operator printer
 improve variable usage optimizer
 need make corrections to character class `toString()`
 add build support (add builder, add generator)
+add literal choice generator
