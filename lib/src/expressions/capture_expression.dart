@@ -4,8 +4,8 @@ class CaptureExpression extends SingleExpression {
   CaptureExpression(Expression expression) : super(expression);
 
   @override
-  void accept(ExpressionVisitor visitor) {
-    visitor.visitCapture(this);
+  T accept<T>(ExpressionVisitor<T> visitor) {
+    return visitor.visitCapture(this);
   }
 
   @override

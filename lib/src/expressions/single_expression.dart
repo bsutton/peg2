@@ -12,7 +12,7 @@ abstract class SingleExpression extends Expression {
   }
 
   @override
-  void visitChildren(ExpressionVisitor visitor) {
-    expression.accept(visitor);
+  T accept<T>(ExpressionVisitor<T> visitor) {
+    return expression.accept(visitor);
   }
 }

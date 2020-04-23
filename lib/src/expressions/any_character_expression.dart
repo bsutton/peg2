@@ -2,8 +2,8 @@ part of '../../expressions.dart';
 
 class AnyCharacterExpression extends Expression {
   @override
-  void accept(ExpressionVisitor visitor) {
-    visitor.visitAnyCharacter(this);
+  T accept<T>(ExpressionVisitor<T> visitor) {
+    return visitor.visitAnyCharacter(this);
   }
 
   @override

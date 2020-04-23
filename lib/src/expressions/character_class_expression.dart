@@ -45,8 +45,8 @@ class CharacterClassExpression extends Expression {
   }
 
   @override
-  void accept(ExpressionVisitor visitor) {
-    visitor.visitCharacterClass(this);
+  T accept<T>(ExpressionVisitor<T> visitor) {
+    return visitor.visitCharacterClass(this);
   }
 
   @override

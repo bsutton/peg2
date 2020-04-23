@@ -7,7 +7,7 @@ class AndPredicateExpression extends PrefixExpression {
   String get prefix => '&';
 
   @override
-  void accept(ExpressionVisitor visitor) {
-    visitor.visitAndPredicate(this);
+  T accept<T>(ExpressionVisitor<T> visitor) {
+    return visitor.visitAndPredicate(this);
   }
 }

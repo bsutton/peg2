@@ -28,7 +28,7 @@ abstract class MultipleExpression<E extends Expression> extends Expression {
   }
 
   @override
-  void visitChildren(ExpressionVisitor visitor) {
+  void visitChildren<T>(ExpressionVisitor<T> visitor) {
     for (var expression in expressions) {
       expression.accept(visitor);
     }

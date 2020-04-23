@@ -43,9 +43,9 @@ abstract class Expression {
 
   bool used;
 
-  void accept(ExpressionVisitor visitor);
+  T accept<T>(ExpressionVisitor<T> visitor);
 
-  void visitChildren(ExpressionVisitor visitor) {
+  void visitChildren<T>(ExpressionVisitor<T> visitor) {
     //
   }
 }

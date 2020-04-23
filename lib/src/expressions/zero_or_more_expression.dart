@@ -7,7 +7,7 @@ class ZeroOrMoreExpression extends SuffixExpression {
   String get suffix => '*';
 
   @override
-  void accept(ExpressionVisitor visitor) {
-    visitor.visitZeroOrMore(this);
+  T accept<T>(ExpressionVisitor<T> visitor) {
+    return visitor.visitZeroOrMore(this);
   }
 }
