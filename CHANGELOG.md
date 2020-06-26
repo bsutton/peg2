@@ -1,3 +1,7 @@
+## 0.1.34
+
+- Development was discontinued due to a lack of interest from users
+
 ## 0.1.33
 
 - Reworked `ExpressionToEnfaConverter`

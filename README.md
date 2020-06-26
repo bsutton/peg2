@@ -1,6 +1,8 @@
 peg2
 =======
 
+**Development was discontinued due to a lack of interest from users.**
+
 PEG+ (Parsing expression grammar) parser source code generator, command line tool.
 
 Version 0.1.34
