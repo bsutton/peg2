@@ -1,3 +1,7 @@
+## 0.1.35
+
+- Fixed bug in `SingleExpression`
+
 ## 0.1.34
 
 - Development was discontinued due to a lack of interest from users

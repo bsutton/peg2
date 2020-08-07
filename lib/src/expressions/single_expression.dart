@@ -15,4 +15,9 @@ abstract class SingleExpression extends Expression {
   T accept<T>(ExpressionVisitor<T> visitor) {
     return expression.accept(visitor);
   }
+
+  @override
+  void visitChildren<T>(ExpressionVisitor<T> visitor) {
+    expression.accept(visitor);
+  }
 }
