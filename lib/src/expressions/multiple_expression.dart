@@ -1,18 +1,13 @@
 part of '../../expressions.dart';
 
 abstract class MultipleExpression<E extends Expression> extends Expression {
-  List<E> expressions;
+  final List<E> expressions = [];
 
-  MultipleExpression(List<E> expressions) {
-    if (expressions == null) {
-      throw ArgumentError.notNull('expressions');
-    }
-
+  MultipleExpression(List<E?> expressions) {
     if (expressions.isEmpty) {
       throw ArgumentError('expressions');
     }
 
-    this.expressions = [];
     for (var expression in expressions) {
       if (expression == null) {
         throw ArgumentError('expressions');

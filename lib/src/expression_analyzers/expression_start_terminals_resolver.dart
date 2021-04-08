@@ -1,13 +1,9 @@
 part of '../../expression_analyzers.dart';
 
 class ExpressionStartTerminalsResolver extends SimpleExpressionVisitor {
-  bool _hasModifications;
+  bool _hasModifications = false;
 
   void resolve(List<ProductionRule> rules) {
-    if (rules == null) {
-      throw ArgumentError.notNull('rules');
-    }
-
     _hasModifications = true;
     while (_hasModifications) {
       _hasModifications = false;
@@ -62,16 +58,16 @@ class ExpressionStartTerminalsResolver extends SimpleExpressionVisitor {
 
   @override
   void visitNonterminal(NonterminalExpression node) {
-    final child = node.expression;
+    final child = node.expression!;
     _addTerminals(node, child.startTerminals);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    final child = node.expression;
-    final rule = child.rule;
+    final child = node.expression!;
+    final rule = child.rule!;
     _addTerminals(node, [rule]);
-    _addTerminals(node.expression, [rule]);
+    _addTerminals(node.expression!, [rule]);
   }
 
   void _addTerminals(Expression node, Iterable<ProductionRule> terminals) {

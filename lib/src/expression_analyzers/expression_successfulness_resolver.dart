@@ -1,7 +1,7 @@
 part of '../../expression_analyzers.dart';
 
 class ExpressionSuccessfulnessResolver extends ExpressionVisitor {
-  bool _hasModifications;
+  bool _hasModifications = false;
 
   void resolve(Grammar grammar) {
     final rules = grammar.rules;
@@ -45,7 +45,7 @@ class ExpressionSuccessfulnessResolver extends ExpressionVisitor {
   @override
   void visitNonterminal(NonterminalExpression node) {
     node.visitChildren(this);
-    final expression = node.expression;
+    final expression = node.expression!;
     _setIsSuccessful(node, expression.isSuccessful);
   }
 
@@ -109,14 +109,14 @@ class ExpressionSuccessfulnessResolver extends ExpressionVisitor {
   @override
   void visitSubterminal(SubterminalExpression node) {
     node.visitChildren(this);
-    final expression = node.expression;
+    final expression = node.expression!;
     _setIsSuccessful(node, expression.isSuccessful);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
     node.visitChildren(this);
-    final expression = node.expression;
+    final expression = node.expression!;
     _setIsSuccessful(node, expression.isSuccessful);
   }
 

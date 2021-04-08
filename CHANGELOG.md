@@ -1,3 +1,8 @@
+## 0.2.0
+
+- Non-nullable implementation (legacy code is not supported)
+- Now the generated code is less optimized to reduce size (now it looks more like handwritten and more readable and classic)
+
 ## 0.1.35
 
 - Fixed bug in `SingleExpression`

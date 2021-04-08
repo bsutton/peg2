@@ -4,9 +4,9 @@ class SequenceExpression extends MultipleExpression<Expression> {
   SequenceExpression(List<Expression> expressions, this.actionSource)
       : super(expressions);
 
-  int actionIndex;
+  int? actionIndex;
 
-  String actionSource;
+  String? actionSource;
 
   String get separator => ' ';
 

@@ -1,7 +1,7 @@
 part of '../../grammar_analyzers.dart';
 
 class InvocationsResolver extends SimpleExpressionVisitor {
-  bool _hasModifications;
+  bool _hasModifications = false;
 
   void resolve(Grammar grammar) {
     _hasModifications = true;
@@ -58,8 +58,8 @@ class InvocationsResolver extends SimpleExpressionVisitor {
 
   void _visit(SymbolExpression node) {
     final caller = node;
-    final callerRule = node.rule;
-    final calleeRule = node.expression.rule;
+    final callerRule = node.rule!;
+    final calleeRule = node.expression!.rule!;
     _addCallers(calleeRule, [caller], true);
     _addCallees(callerRule, [calleeRule], true);
     _addCallers(calleeRule, callerRule.allCallers, false);

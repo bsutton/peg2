@@ -1,32 +1,10 @@
+// @dart = 2.10
 part of '../../parser_generator.dart';
 
 class ParserGeneratorOptions {
-  bool inlineNonterminals = false;
-
-  bool inlineSubterminals = false;
-
-  bool inlineTerminals = false;
-
-  bool memoize = false;
+  bool memoize;
 
   String name;
 
-  bool optimizeCode = true;
-
-  bool optimizeSize = false;
-
-  String parserType = 'general';
-
-  bool predict = false;
-
-  bool isPostfix() {
-    switch (parserType) {
-      case 'general':
-        return false;
-      case 'postfix':
-        return true;
-    }
-
-    throw StateError('Unknown parser type: $parserType');
-  }
+  ParserGeneratorOptions({this.memoize = false, @required this.name});
 }

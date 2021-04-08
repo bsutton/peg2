@@ -1,13 +1,9 @@
 part of '../../expression_analyzers.dart';
 
 class ExpressionStartCharactersResolver extends ExpressionVisitor {
-  bool _hasModifications;
+  bool _hasModifications = false;
 
   void resolve(List<ProductionRule> rules) {
-    if (rules == null) {
-      throw ArgumentError.notNull('rules');
-    }
-
     _hasModifications = true;
     while (_hasModifications) {
       _hasModifications = false;
@@ -69,7 +65,7 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
 
   @override
   void visitNonterminal(NonterminalExpression node) {
-    final rule = node.expression.rule;
+    final rule = node.expression!.rule!;
     final child = rule.expression;
     _addCharacters(node, child.startCharacters);
   }
@@ -78,7 +74,7 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
   void visitNotPredicate(NotPredicateExpression node) {
     final child = node.expression;
     child.accept(this);
-    SparseBoolList childCharacters;
+    SparseBoolList? childCharacters;
     if (child is AnyCharacterExpression) {
       childCharacters = child.startCharacters;
     } else if (child is CharacterClassExpression) {
@@ -159,14 +155,14 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
 
   @override
   void visitSubterminal(SubterminalExpression node) {
-    final rule = node.expression.rule;
+    final rule = node.expression!.rule!;
     final child = rule.expression;
     _addCharacters(node, child.startCharacters);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    final rule = node.expression.rule;
+    final rule = node.expression!.rule!;
     final child = rule.expression;
     _addCharacters(node, child.startCharacters);
   }
@@ -186,7 +182,7 @@ class ExpressionStartCharactersResolver extends ExpressionVisitor {
     final startCharacters = node.startCharacters;
     for (final range in characters.groups) {
       for (final group in startCharacters.getAllSpace(range)) {
-        if (!group.key) {
+        if (!group.key!) {
           _hasModifications = true;
           final start = group.start;
           final end = group.end;

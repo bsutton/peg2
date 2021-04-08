@@ -3,11 +3,7 @@ part of '../../expressions.dart';
 class LiteralExpression extends Expression {
   final String text;
 
-  LiteralExpression(this.text) {
-    if (text == null) {
-      throw ArgumentError.notNull('text');
-    }
-  }
+  LiteralExpression(this.text);
 
   @override
   T accept<T>(ExpressionVisitor<T> visitor) {

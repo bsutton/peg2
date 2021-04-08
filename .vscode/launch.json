@@ -7,11 +7,6 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                //"--inline-all",
-                "--memoize",
-                //"--no-optimize-code",
-                "--optimize-size",
-                "--predict",
                 "bin/peg2.peg"
             ]
         },
@@ -21,11 +16,6 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                //"--inline-all",
-                "--memoize",
-                //"--no-optimize-code",
-                //"--optimize-size",
-                "--predict",
                 "example/example.peg",
                 "example/example.dart"
             ]
@@ -36,15 +26,6 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                //"--inline-all",
-                "--predict",
-                //"--no-optimize-code",
-                "--memoize",
-                //"--optimize-size",
-                //"--parser=postfix",
-                //"example/example.peg",
-                //"example/example.dart"
-                //"example/query.peg"
                 "example/a.peg"
             ]
         },

@@ -2,7 +2,7 @@ part of '../../utils.dart';
 
 class Utils {
   static String expr2Str(Expression expression) {
-    return '${expression.runtimeType.toString().substring(0, 3)}${expression.id}: ${expression}';
+    return '${expression.runtimeType.toString().substring(0, 3)}${expression.id}: $expression';
   }
 
   static String range2Str(RangeList range) {

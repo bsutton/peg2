@@ -1,13 +1,9 @@
 part of '../../grammar_analyzers.dart';
 
 class MemoizationRequestsOptimizer extends SimpleExpressionVisitor {
-  bool _hasModifications;
+  bool _hasModifications = false;
 
   void optimize(List<ProductionRule> rules) {
-    if (rules == null) {
-      throw ArgumentError.notNull('rules');
-    }
-
     _hasModifications = true;
     while (_hasModifications) {
       _hasModifications = false;
@@ -44,8 +40,8 @@ class MemoizationRequestsOptimizer extends SimpleExpressionVisitor {
 
   void _visitSymbol(SymbolExpression node) {
     if (node.memoize) {
-      final owner = node.rule;
-      final rule = node.expression.rule;
+      final owner = node.rule!;
+      final rule = node.expression!.rule!;
       final memoizationRequests = owner.memoizationRequests;
       if (memoizationRequests.isNotEmpty && owner != rule) {
         _setMemoize(node, false);

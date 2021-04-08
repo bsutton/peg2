@@ -1,13 +1,9 @@
 part of '../../expressions.dart';
 
 class CharacterClassExpression extends Expression {
-  SparseBoolList ranges;
+  late final SparseBoolList ranges;
 
   CharacterClassExpression(List<List<int>> ranges) {
-    if (ranges == null) {
-      throw ArgumentError.notNull('ranges');
-    }
-
     if (ranges.isEmpty) {
       throw ArgumentError('List of ranges should not be empty');
     }

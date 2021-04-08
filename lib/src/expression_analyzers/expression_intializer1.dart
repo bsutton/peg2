@@ -5,20 +5,13 @@ class ExpressionInitializer1 {
     final rules = grammar.rules;
     final optionalExpressionResolver = OptionalExpressionResolver();
     optionalExpressionResolver.resolve(rules);
-
-    final expressionProductivenessResolver = ExpressionProductivenessResolver();
-    expressionProductivenessResolver.resolve(grammar);
-
     final expressionStartCharactersResolver =
         ExpressionStartCharactersResolver();
     expressionStartCharactersResolver.resolve(rules);
-
     final expressionStartTerminalsResolver = ExpressionStartTerminalsResolver();
     expressionStartTerminalsResolver.resolve(rules);
-
     final expressionSuccessfulnessResolver = ExpressionSuccessfulnessResolver();
     expressionSuccessfulnessResolver.resolve(grammar);
-
     final expressionReturnTypeResolver = ExpressionReturnTypeResolver();
     expressionReturnTypeResolver.resolve(rules);
   }

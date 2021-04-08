@@ -1,23 +1,21 @@
 part of '../../expression_analyzers.dart';
 
 class ExpressionInitializer0 extends ExpressionVisitor {
-  int _actionIndex;
+  int _actionIndex = 0;
 
-  int _id;
+  Expression? _current;
 
-  int _level;
+  int _id = 0;
 
-  ProductionRule _rule;
+  int _level = 0;
 
-  Map<String, ProductionRule> _rules;
+  late ProductionRule _rule;
+
+  final Map<String, ProductionRule> _rules = {};
 
   void initialize(Grammar grammar) {
-    if (grammar == null) {
-      throw ArgumentError.notNull('grammar');
-    }
-
+    _rules.clear();
     final rules = grammar.rules;
-    _rules = <String, ProductionRule>{};
     for (var rule in rules) {
       _rules[rule.name] = rule;
     }
@@ -26,6 +24,7 @@ class ExpressionInitializer0 extends ExpressionVisitor {
     _id = 0;
     for (var rule in rules) {
       _level = 0;
+      _current = null;
       _rule = rule;
       final expression = rule.expression;
       expression.accept(this);
@@ -126,6 +125,9 @@ class ExpressionInitializer0 extends ExpressionVisitor {
   }
 
   void _initializeNode(Expression node) {
+    final current = _current;
+    node.parent = current;
+    _current = node;
     if (node is SingleExpression) {
       final child = node.expression;
       child.isLast = true;
@@ -142,6 +144,7 @@ class ExpressionInitializer0 extends ExpressionVisitor {
     _level++;
     node.visitChildren(this);
     _level = level;
+    _current = current;
   }
 
   void _initializeSymbol(SymbolExpression node) {

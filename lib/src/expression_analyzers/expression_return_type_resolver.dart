@@ -1,7 +1,7 @@
 part of '../../expression_analyzers.dart';
 
 class ExpressionReturnTypeResolver extends ExpressionVisitor {
-  bool _hasModifications;
+  bool _hasModifications = false;
 
   void resolve(List<ProductionRule> rules) {
     _hasModifications = true;
@@ -52,7 +52,7 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor {
   @override
   void visitNonterminal(NonterminalExpression node) {
     node.visitChildren(this);
-    final rule = node.expression.rule;
+    final rule = _getRule(node.expression!.rule!);
     final returnType = rule.returnType;
     if (returnType == null) {
       final child = rule.expression;
@@ -79,7 +79,7 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor {
   void visitOptional(OptionalExpression node) {
     node.visitChildren(this);
     final child = node.expression;
-    _setReturnType(node, child.returnType);
+    _setReturnType(node, child.returnType + '?');
   }
 
   @override
@@ -146,7 +146,7 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor {
   @override
   void visitSubterminal(SubterminalExpression node) {
     node.visitChildren(this);
-    final rule = node.expression.rule;
+    final rule = _getRule(node.expression!.rule!);
     final returnType = rule.returnType;
     if (returnType == null) {
       final child = rule.expression;
@@ -159,7 +159,7 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor {
   @override
   void visitTerminal(TerminalExpression node) {
     node.visitChildren(this);
-    final rule = node.expression.rule;
+    final rule = _getRule(node.expression!.rule!);
     final returnType = rule.returnType;
     if (returnType == null) {
       final child = rule.expression;
@@ -182,6 +182,14 @@ class ExpressionReturnTypeResolver extends ExpressionVisitor {
     }
 
     return 'List<$returnType>';
+  }
+
+  ProductionRule _getRule(ProductionRule? rule) {
+    if (rule != null) {
+      return rule;
+    }
+
+    throw ArgumentError.notNull('rule');
   }
 
   void _setReturnType(Expression node, String returnType) {

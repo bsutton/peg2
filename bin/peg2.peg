@@ -17,7 +17,7 @@ int _escape(int c) {
   return c;
 }
 
-Expression _prefix(String prefix, Expression expression, String variable) {
+Expression _prefix(String? prefix, Expression expression, String? variable) {
   switch (prefix) {
     case '&':
      expression = AndPredicateExpression(expression);
@@ -31,7 +31,7 @@ Expression _prefix(String prefix, Expression expression, String variable) {
   return expression;
 }
 
-Expression _suffix(String suffix, Expression expression) {
+Expression _suffix(String? suffix, Expression expression) {
   switch (suffix) {
     case '?':
       return OptionalExpression(expression);

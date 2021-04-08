@@ -1,4 +1,5 @@
-part of '../../general_parser_generator.dart';
+// @dart = 2.10
+part of '../../parser_generator.dart';
 
 class ProductionRuleNameGenerator {
   String generate(ProductionRule rule) {
@@ -13,7 +14,7 @@ class ProductionRuleNameGenerator {
         name = '\$\$' + name.substring(1);
     }
 
-    final result = '_parse$name';
+    final result = 'parse$name';
     return result;
   }
 

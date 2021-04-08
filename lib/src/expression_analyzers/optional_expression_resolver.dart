@@ -1,13 +1,9 @@
 part of '../../expression_analyzers.dart';
 
 class OptionalExpressionResolver extends ExpressionVisitor {
-  bool _hasModifications;
+  bool _hasModifications = false;
 
   void resolve(List<ProductionRule> rules) {
-    if (rules == null) {
-      throw ArgumentError.notNull('rules');
-    }
-
     _hasModifications = true;
     while (_hasModifications) {
       _hasModifications = false;
@@ -48,7 +44,7 @@ class OptionalExpressionResolver extends ExpressionVisitor {
 
   @override
   void visitNonterminal(NonterminalExpression node) {
-    final child = node.expression;
+    final child = node.expression!;
     _setIsOptional(node, child.isOptional);
   }
 
@@ -101,13 +97,13 @@ class OptionalExpressionResolver extends ExpressionVisitor {
 
   @override
   void visitSubterminal(SubterminalExpression node) {
-    final child = node.expression;
+    final child = node.expression!;
     _setIsOptional(node, child.isOptional);
   }
 
   @override
   void visitTerminal(TerminalExpression node) {
-    final child = node.expression;
+    final child = node.expression!;
     _setIsOptional(node, child.isOptional);
   }
 

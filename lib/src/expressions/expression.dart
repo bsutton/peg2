@@ -13,11 +13,9 @@ abstract class Expression {
     ..addGroup(GroupedRangeList<bool>(0, eof, true))
     ..freeze();
 
-  //bool canMatchEof = false;
+  int? id;
 
-  int id;
-
-  int index;
+  int? index;
 
   bool isLast = false;
 
@@ -25,29 +23,49 @@ abstract class Expression {
 
   bool isSuccessful = false;
 
-  int level;
+  int? level;
 
-  Expression parent;
-
-  Productiveness productiveness = Productiveness.always;
+  Expression? parent;
 
   String returnType = 'dynamic';
 
-  ProductionRule rule;
+  ProductionRule? rule;
 
   final SparseBoolList startCharacters = SparseBoolList();
 
   final Set<ProductionRule> startTerminals = {};
 
-  String variable;
+  String? variable;
 
-  bool used;
+  bool used = false;
 
   T accept<T>(ExpressionVisitor<T> visitor);
+
+  String nullCheckedValue(String value) {
+    if (returnType == 'dynamic') {
+      return value;
+    }
+
+    if (returnType == 'dynamic!') {
+      return value;
+    }
+
+    if (isOptional) {
+      return value;
+    }
+
+    if (this is OneOrMoreExpression) {
+      return value;
+    }
+
+    if (this is ZeroOrMoreExpression) {
+      return value;
+    }
+
+    return '$value!';
+  }
 
   void visitChildren<T>(ExpressionVisitor<T> visitor) {
     //
   }
 }
-
-enum Productiveness { always, auto, never }

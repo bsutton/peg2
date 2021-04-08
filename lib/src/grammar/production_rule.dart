@@ -11,31 +11,19 @@ class ProductionRule {
 
   final OrderedChoiceExpression expression;
 
-  bool isStartingRule;
+  bool? isStartingRule;
 
   final ProductionRuleKind kind;
 
-  int id;
+  int? id;
 
-  Set<SymbolExpression> memoizationRequests = {};
+  final Set<SymbolExpression> memoizationRequests = {};
 
   final String name;
 
-  String returnType;
+  String? returnType;
 
-  ProductionRule(this.name, this.kind, this.expression, this.returnType) {
-    if (name == null) {
-      throw ArgumentError.notNull('name');
-    }
-
-    if (kind == null) {
-      throw ArgumentError.notNull('kind');
-    }
-
-    if (expression == null) {
-      throw ArgumentError.notNull('expression');
-    }
-  }
+  ProductionRule(this.name, this.kind, this.expression, this.returnType);
 
   @override
   String toString() {

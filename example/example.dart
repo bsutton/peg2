@@ -2,1769 +2,1231 @@
 // https://pub.dev/packages/peg2
 
 void main() {
+  final text = '''
+{"rocket": "🚀 flies to the stars"}
+''';
+
   final parser = ExampleParser();
-  final result = parser.parse(_text);
-  if (parser.error != null) {
-    throw parser.error;
+  final result = parser.parse(text);
+  if (!parser.ok) {
+    throw parser.error!;
   }
 
   print(result);
 }
 
-final _text = '''
-{"rocket": "🚀 flies to the stars"}
-''';
-
 class ExampleParser {
-  static const _eof = 0x110000;
+  static const int _eof = 1114112;
 
-  FormatException error;
+  FormatException? error;
 
-  int _c;
+  int _failStart = -1;
 
-  int _error;
+  List _failures = [];
 
-  List<String> _expected;
+  bool ok = false;
 
-  int _failure;
+  int _ch = 0;
 
-  List<int> _input;
+  int _failPos = -1;
 
-  List<List<_Memo>> _memos;
+  int _pos = 0;
 
-  var _mresult;
+  String _source = '';
 
-  int _pos;
-
-  bool _predicate;
-
-  dynamic _result;
-
-  bool _success;
-
-  String _text;
-
-  dynamic parse(String text) {
-    if (text == null) {
-      throw ArgumentError.notNull('text');
-    }
-    _text = text;
-    _input = _toRunes(text);
+  dynamic? parse(String source) {
+    _source = source;
     _reset();
-    final result = _parseJson(false, true);
-    _buildError();
-    _expected = null;
-    _input = null;
+    final result = parseJson();
+    if (!ok) {
+      _buildError();
+    }
+
     return result;
+  }
+
+  dynamic? parseJson() {
+    dynamic? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    dynamic? $3;
+    parse_leading_spaces();
+    ok = true;
+    final $4 = parseValue();
+    if (ok) {
+      parse_end_of_file();
+      if (ok) {
+        $3 = $4;
+      }
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+    }
+    return $0;
+  }
+
+  dynamic? parseValue() {
+    dynamic? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      List? $3;
+      final $4 = parseArray();
+      if (ok) {
+        $3 = $4;
+      }
+      if (ok) {
+        $0 = $3;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      dynamic? $5;
+      final $6 = parse_false();
+      if (ok) {
+        $5 = $6;
+      }
+      if (ok) {
+        $0 = $5;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      dynamic? $7;
+      final $8 = parse_null();
+      if (ok) {
+        $7 = $8;
+      }
+      if (ok) {
+        $0 = $7;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      dynamic? $9;
+      final $10 = parse_true();
+      if (ok) {
+        $9 = $10;
+      }
+      if (ok) {
+        $0 = $9;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      Map<String, dynamic>? $11;
+      final $12 = parseObject();
+      if (ok) {
+        $11 = $12;
+      }
+      if (ok) {
+        $0 = $11;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      num? $13;
+      final $14 = parse_number();
+      if (ok) {
+        $13 = $14;
+      }
+      if (ok) {
+        $0 = $13;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      String? $15;
+      final $16 = parse_string();
+      if (ok) {
+        $15 = $16;
+      }
+      if (ok) {
+        $0 = $15;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      break;
+    }
+    return $0;
+  }
+
+  List? parseArray() {
+    List? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    List? $3;
+    parse_$LeftSquareBracket();
+    if (ok) {
+      final $5 = parseValues();
+      final $4 = $5;
+      ok = true;
+      parse_$RightSquareBracket();
+      if (ok) {
+        final v = $4;
+        late List $$;
+        $$ = v ?? [];
+        $3 = $$;
+      }
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+    }
+    return $0;
+  }
+
+  List? parseValues() {
+    List? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    List? $3;
+    final $4 = parseValue();
+    if (ok) {
+      final $5 = [];
+      while (true) {
+        dynamic? $6;
+        final $7 = _ch;
+        final $8 = _pos;
+        dynamic? $9;
+        parse_$Comma();
+        if (ok) {
+          final $10 = parseValue();
+          if (ok) {
+            $9 = $10;
+          }
+        }
+        if (ok) {
+          $6 = $9;
+        } else {
+          _pos = $8;
+          _ch = $7;
+          break;
+        }
+        $5.add($6);
+      }
+      ok = true;
+      final v = $4;
+      final n = $5;
+      late List $$;
+      $$ = [v, ...n];
+      $3 = $$;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+    }
+    return $0;
+  }
+
+  Map<String, dynamic>? parseObject() {
+    Map<String, dynamic>? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    Map<String, dynamic>? $3;
+    parse_$LeftBrace();
+    if (ok) {
+      final $5 = parseMembers();
+      final $4 = $5;
+      ok = true;
+      parse_$RightBrace();
+      if (ok) {
+        final m = $4;
+        late Map<String, dynamic> $$;
+        $$ = <String, dynamic>{}..addEntries(m ?? []);
+        $3 = $$;
+      }
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+    }
+    return $0;
+  }
+
+  List<MapEntry<String, dynamic>>? parseMembers() {
+    List<MapEntry<String, dynamic>>? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    List<MapEntry<String, dynamic>>? $3;
+    final $4 = parseMember();
+    if (ok) {
+      final $5 = <MapEntry<String, dynamic>>[];
+      while (true) {
+        MapEntry<String, dynamic>? $6;
+        final $7 = _ch;
+        final $8 = _pos;
+        MapEntry<String, dynamic>? $9;
+        parse_$Comma();
+        if (ok) {
+          final $10 = parseMember();
+          if (ok) {
+            $9 = $10;
+          }
+        }
+        if (ok) {
+          $6 = $9;
+        } else {
+          _pos = $8;
+          _ch = $7;
+          break;
+        }
+        $5.add($6!);
+      }
+      ok = true;
+      final m = $4!;
+      final n = $5;
+      late List<MapEntry<String, dynamic>> $$;
+      $$ = [m, ...n];
+      $3 = $$;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+    }
+    return $0;
+  }
+
+  MapEntry<String, dynamic>? parseMember() {
+    MapEntry<String, dynamic>? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    MapEntry<String, dynamic>? $3;
+    final $4 = parse_string();
+    if (ok) {
+      parse_$Colon();
+      if (ok) {
+        final $5 = parseValue();
+        if (ok) {
+          final k = $4!;
+          final v = $5;
+          late MapEntry<String, dynamic> $$;
+          $$ = MapEntry(k, v);
+          $3 = $$;
+        }
+      }
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+    }
+    return $0;
+  }
+
+  dynamic? parse_end_of_file() {
+    _failPos = -1;
+    dynamic? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    dynamic? $3;
+    final $5 = _ch;
+    final $6 = _pos;
+    _matchAny();
+    final $4 = null;
+    _ch = $5;
+    _pos = $6;
+    ok = !ok;
+    if (ok) {
+      $3 = $4;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'end of file\'');
+    }
+    return $0;
+  }
+
+  dynamic? parse_false() {
+    _failPos = -1;
+    dynamic? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    dynamic? $3;
+    _matchString('false');
+    if (ok) {
+      parse$$spacing();
+      var $$;
+      $$ = false;
+      $3 = $$;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'false\'');
+    }
+    return $0;
+  }
+
+  List<int>? parse_leading_spaces() {
+    _failPos = -1;
+    List<int>? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    List<int>? $3;
+    final $4 = parse$$spacing();
+    $3 = $4;
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'leading spaces\'');
+    }
+    return $0;
+  }
+
+  dynamic? parse_null() {
+    _failPos = -1;
+    dynamic? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    dynamic? $3;
+    _matchString('null');
+    if (ok) {
+      parse$$spacing();
+      var $$;
+      $$ = null;
+      $3 = $$;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'null\'');
+    }
+    return $0;
+  }
+
+  dynamic? parse_true() {
+    _failPos = -1;
+    dynamic? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    dynamic? $3;
+    _matchString('true');
+    if (ok) {
+      parse$$spacing();
+      var $$;
+      $$ = true;
+      $3 = $$;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'true\'');
+    }
+    return $0;
+  }
+
+  String? parse_string() {
+    _failPos = -1;
+    String? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    String? $3;
+    _matchChar(34, '"');
+    if (ok) {
+      final $4 = <int>[];
+      while (true) {
+        final $5 = parse$$char();
+        if (!ok) {
+          break;
+        }
+        $4.add($5!);
+      }
+      ok = true;
+      _matchChar(34, '"');
+      if (ok) {
+        parse$$spacing();
+        final c = $4;
+        late String $$;
+        $$ = String.fromCharCodes(c);
+        $3 = $$;
+      }
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'string\'');
+    }
+    return $0;
+  }
+
+  num? parse_number() {
+    _failPos = -1;
+    num? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    num? $3;
+    String? $4;
+    final $5 = _pos;
+    final $6 = _ch;
+    final $7 = _pos;
+    _matchChar(45, 45);
+    ok = true;
+    final $8 = _ch;
+    final $9 = _pos;
+    while (true) {
+      _matchChar(48, 48);
+      if (ok) {
+        break;
+      }
+      _pos = $9;
+      _ch = $8;
+      const $10 = [49, 57];
+      _matchRange($10);
+      if (ok) {
+        while (true) {
+          const $11 = [48, 57];
+          _matchRange($11);
+          if (!ok) {
+            break;
+          }
+        }
+        ok = true;
+      }
+      if (ok) {
+        break;
+      }
+      _pos = $9;
+      _ch = $8;
+      break;
+    }
+    if (ok) {
+      final $12 = _ch;
+      final $13 = _pos;
+      _matchChar(46, 46);
+      if (ok) {
+        var $14 = 0;
+        while (true) {
+          const $15 = [48, 57];
+          _matchRange($15);
+          if (!ok) {
+            break;
+          }
+          $14++;
+        }
+        ok = $14 != 0;
+      }
+      if (!ok) {
+        _pos = $13;
+        _ch = $12;
+      }
+      ok = true;
+      final $16 = _ch;
+      final $17 = _pos;
+      const $18 = [69, 69, 101, 101];
+      _matchRange($18);
+      if (ok) {
+        const $19 = [43, 43, 45, 45];
+        _matchRange($19);
+        ok = true;
+        var $20 = 0;
+        while (true) {
+          const $21 = [48, 57];
+          _matchRange($21);
+          if (!ok) {
+            break;
+          }
+          $20++;
+        }
+        ok = $20 != 0;
+      }
+      if (!ok) {
+        _pos = $17;
+        _ch = $16;
+      }
+      ok = true;
+    }
+    if (!ok) {
+      _pos = $7;
+      _ch = $6;
+    }
+    if (ok) {
+      $4 = _source.substring($5, _pos);
+    }
+    if (ok) {
+      parse$$spacing();
+      final n = $4!;
+      late num $$;
+      $$ = num.parse(n);
+      $3 = $$;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'number\'');
+    }
+    return $0;
+  }
+
+  String? parse_$LeftBrace() {
+    _failPos = -1;
+    String? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    String? $3;
+    final $4 = _matchChar(123, '{');
+    if (ok) {
+      parse$$spacing();
+      $3 = $4;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'{\'');
+    }
+    return $0;
+  }
+
+  String? parse_$RightBrace() {
+    _failPos = -1;
+    String? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    String? $3;
+    final $4 = _matchChar(125, '}');
+    if (ok) {
+      parse$$spacing();
+      $3 = $4;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'}\'');
+    }
+    return $0;
+  }
+
+  String? parse_$LeftSquareBracket() {
+    _failPos = -1;
+    String? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    String? $3;
+    final $4 = _matchChar(91, '[');
+    if (ok) {
+      parse$$spacing();
+      $3 = $4;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\'[\'');
+    }
+    return $0;
+  }
+
+  String? parse_$RightSquareBracket() {
+    _failPos = -1;
+    String? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    String? $3;
+    final $4 = _matchChar(93, ']');
+    if (ok) {
+      parse$$spacing();
+      $3 = $4;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\']\'');
+    }
+    return $0;
+  }
+
+  String? parse_$Comma() {
+    _failPos = -1;
+    String? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    String? $3;
+    final $4 = _matchChar(44, ',');
+    if (ok) {
+      parse$$spacing();
+      $3 = $4;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\',\'');
+    }
+    return $0;
+  }
+
+  String? parse_$Colon() {
+    _failPos = -1;
+    String? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    String? $3;
+    final $4 = _matchChar(58, ':');
+    if (ok) {
+      parse$$spacing();
+      $3 = $4;
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+      _fail('\':\'');
+    }
+    return $0;
+  }
+
+  int? parse$$char() {
+    int? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      int? $3;
+      _matchChar(92, 92);
+      if (ok) {
+        final $4 = parse$$escaped();
+        if (ok) {
+          $3 = $4;
+        }
+      }
+      if (ok) {
+        $0 = $3;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $5;
+      final $6 = parse$$unescaped();
+      if (ok) {
+        $5 = $6;
+      }
+      if (ok) {
+        $0 = $5;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      break;
+    }
+    return $0;
+  }
+
+  int? parse$$escaped() {
+    int? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      int? $3;
+      final $4 = _matchChar(34, 34);
+      if (ok) {
+        $3 = $4;
+      }
+      if (ok) {
+        $0 = $3;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $5;
+      final $6 = _matchChar(92, 92);
+      if (ok) {
+        $5 = $6;
+      }
+      if (ok) {
+        $0 = $5;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $7;
+      final $8 = _matchChar(47, 47);
+      if (ok) {
+        $7 = $8;
+      }
+      if (ok) {
+        $0 = $7;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $9;
+      _matchChar(98, 98);
+      if (ok) {
+        late int $$;
+        $$ = 0x8;
+        $9 = $$;
+      }
+      if (ok) {
+        $0 = $9;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $10;
+      _matchChar(102, 102);
+      if (ok) {
+        late int $$;
+        $$ = 0xC;
+        $10 = $$;
+      }
+      if (ok) {
+        $0 = $10;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $11;
+      _matchChar(110, 110);
+      if (ok) {
+        late int $$;
+        $$ = 0xA;
+        $11 = $$;
+      }
+      if (ok) {
+        $0 = $11;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $12;
+      _matchChar(114, 114);
+      if (ok) {
+        late int $$;
+        $$ = 0xD;
+        $12 = $$;
+      }
+      if (ok) {
+        $0 = $12;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $13;
+      _matchChar(116, 116);
+      if (ok) {
+        late int $$;
+        $$ = 0x9;
+        $13 = $$;
+      }
+      if (ok) {
+        $0 = $13;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $14;
+      _matchChar(117, 117);
+      if (ok) {
+        final $15 = parse$$hexdig4();
+        if (ok) {
+          $14 = $15;
+        }
+      }
+      if (ok) {
+        $0 = $14;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      break;
+    }
+    return $0;
+  }
+
+  int? parse$$hexdig4() {
+    int? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    int? $3;
+    final $4 = parse$$hexdig();
+    if (ok) {
+      final $5 = parse$$hexdig();
+      if (ok) {
+        final $6 = parse$$hexdig();
+        if (ok) {
+          final $7 = parse$$hexdig();
+          if (ok) {
+            final a = $4!;
+            final b = $5!;
+            final c = $6!;
+            final d = $7!;
+            late int $$;
+            $$ = a * 0xfff + b * 0xff + c * 0xf + d;
+            $3 = $$;
+          }
+        }
+      }
+    }
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+    }
+    return $0;
+  }
+
+  int? parse$$hexdig() {
+    int? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      int? $3;
+      const $5 = [97, 102];
+      final $4 = _matchRange($5);
+      if (ok) {
+        final v = $4!;
+        late int $$;
+        $$ = v - 97;
+        $3 = $$;
+      }
+      if (ok) {
+        $0 = $3;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $6;
+      const $8 = [65, 70];
+      final $7 = _matchRange($8);
+      if (ok) {
+        final v = $7!;
+        late int $$;
+        $$ = v - 65;
+        $6 = $$;
+      }
+      if (ok) {
+        $0 = $6;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $9;
+      const $11 = [48, 57];
+      final $10 = _matchRange($11);
+      if (ok) {
+        final v = $10!;
+        late int $$;
+        $$ = v - 48;
+        $9 = $$;
+      }
+      if (ok) {
+        $0 = $9;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      break;
+    }
+    return $0;
+  }
+
+  int? parse$$unescaped() {
+    int? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      int? $3;
+      const $5 = [32, 33];
+      final $4 = _matchRange($5);
+      if (ok) {
+        $3 = $4;
+      }
+      if (ok) {
+        $0 = $3;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $6;
+      const $8 = [35, 91];
+      final $7 = _matchRange($8);
+      if (ok) {
+        $6 = $7;
+      }
+      if (ok) {
+        $0 = $6;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      int? $9;
+      const $11 = [93, 1114111];
+      final $10 = _matchRange($11);
+      if (ok) {
+        $9 = $10;
+      }
+      if (ok) {
+        $0 = $9;
+        break;
+      }
+      _pos = $2;
+      _ch = $1;
+      break;
+    }
+    return $0;
+  }
+
+  List<int>? parse$$spacing() {
+    List<int>? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    List<int>? $3;
+    final $4 = <int>[];
+    while (true) {
+      const $6 = [9, 10, 13, 13, 32, 32];
+      final $5 = _matchRange($6);
+      if (!ok) {
+        break;
+      }
+      $4.add($5!);
+    }
+    ok = true;
+    $3 = $4;
+    if (ok) {
+      $0 = $3;
+    } else {
+      _pos = $2;
+      _ch = $1;
+    }
+    return $0;
   }
 
   void _buildError() {
-    if (_success) {
-      error = null;
+    final names = <String>[];
+    final ends = <int>[];
+    var failEnd = 0;
+    for (var i = 0; i < _failures.length; i += 2) {
+      final name = _failures[i] as String;
+      var end = _failures[i + 1] as int;
+      if (end == -1) {
+        end = _failStart;
+      }
+
+      if (failEnd < end) {
+        failEnd = end;
+      }
+
+      names.add(name);
+      ends.add(end);
+    }
+
+    final temp = <String>[];
+    for (var i = 0; i < names.length; i++) {
+      if (ends[i] == failEnd) {
+        temp.add(names[i]);
+      }
+    }
+
+    final expected = temp.toSet().toList();
+    expected.sort();
+    final sink = StringBuffer();
+    if (_failStart == failEnd) {
+      if (failEnd < _source.length) {
+        sink.write('Unexpected character ');
+        final ch = _getChar(_failStart);
+        if (ch >= 32 && ch < 126) {
+          sink.write('\'');
+          sink.write(String.fromCharCode(ch));
+          sink.write('\'');
+        } else {
+          sink.write('(');
+          sink.write(ch);
+          sink.write(')');
+        }
+      } else {
+        sink.write('Unexpected end of input');
+      }
+
+      if (expected.isNotEmpty) {
+        sink.write(', expected: ');
+        sink.write(expected.join(', '));
+      }
+    } else {
+      sink.write('Unterminated ');
+      if (expected.isEmpty) {
+        sink.write('unknown token');
+      } else if (expected.length == 1) {
+        sink.write('token ');
+        sink.write(expected[0]);
+      } else {
+        sink.write('tokens ');
+        sink.write(expected.join(', '));
+      }
+    }
+
+    error = FormatException(sink.toString(), _source, _failStart);
+  }
+
+  void _fail(String name) {
+    if (_pos < _failStart) {
       return;
     }
 
-    String escape(int c) {
-      switch (c) {
-        case 10:
-          return r'\n';
-        case 13:
-          return r'\r';
-        case 09:
-          return r'\t';
-        case _eof:
-          return 'end of file';
-      }
-      return String.fromCharCode(c);
+    if (_failStart < _pos) {
+      _failStart = _pos;
+      _failures = [];
     }
 
-    String getc(int position) {
-      if (position < _text.length) {
-        return "'${escape(_input[position])}'";
-      }
-      return 'end of file';
-    }
+    _failures.add(name);
+    _failures.add(_failPos);
+  }
 
-    String report(String message, String source, int start) {
-      if (start < 0 || start > source.length) {
-        start = null;
-      }
-
-      final sb = StringBuffer();
-      sb.write(message);
-      var line = 0;
-      var col = 0;
-      var lineStart = 0;
-      var started = false;
-      if (start != null) {
-        for (var i = 0; i < source.length; i++) {
-          final c = source.codeUnitAt(i);
-          if (!started) {
-            started = true;
-            lineStart = i;
-            line++;
-            col = 1;
+  int _getChar(int pos) {
+    if (pos < _source.length) {
+      var ch = _source.codeUnitAt(pos);
+      if (ch >= 0xD800 && ch <= 0xDBFF) {
+        if (pos + 1 < _source.length) {
+          final ch2 = _source.codeUnitAt(pos + 1);
+          if (ch2 >= 0xDC00 && ch2 <= 0xDFFF) {
+            ch = ((ch - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
           } else {
-            col++;
+            throw FormatException('Unpaired high surrogate', _source, pos);
           }
-          if (c == 10) {
-            started = false;
-          }
-          if (start == i) {
-            break;
-          }
+        } else {
+          throw FormatException('The source has been exhausted', _source, pos);
         }
-      }
-
-      if (start == null) {
-        sb.writeln('.');
-      } else if (line == 0 || start == source.length) {
-        sb.write(' (at offset ');
-        sb.write(start);
-        sb.writeln('):');
       } else {
-        sb.write(' (at line ');
-        sb.write(line);
-        sb.write(', column ');
-        sb.write(col);
-        sb.writeln('):');
-      }
-
-      List<int> escape(int c) {
-        switch (c) {
-          case 9:
-            return [92, 116];
-          case 10:
-            return [92, 110];
-          case 13:
-            return [92, 114];
-          default:
-            return [c];
+        if (ch >= 0xDC00 && ch <= 0xDFFF) {
+          throw FormatException(
+              'UTF-16 surrogate values are illegal in UTF-32', _source, pos);
         }
       }
 
-      const max = 70;
-      if (start != null) {
-        final c1 = <int>[];
-        final c2 = <int>[];
-        final half = max ~/ 2;
-        var cr = false;
-        for (var i = start; i >= lineStart && c1.length < half; i--) {
-          if (i == source.length) {
-            c2.insert(0, 94);
-          } else {
-            final c = source.codeUnitAt(i);
-            final escaped = escape(c);
-            c1.insertAll(0, escaped);
-            if (c == 10) {
-              cr = true;
-            }
+      return ch;
+    }
 
-            final r = i == start ? 94 : 32;
-            for (var k = 0; k < escaped.length; k++) {
-              c2.insert(0, r);
-            }
-          }
-        }
+    return _eof;
+  }
 
-        for (var i = start + 1;
-            i < source.length && c1.length < max && !cr;
-            i++) {
-          final c = source.codeUnitAt(i);
-          final escaped = escape(c);
-          c1.addAll(escaped);
-          if (c == 10) {
-            break;
-          }
-        }
-
-        final text1 = String.fromCharCodes(c1);
-        final text2 = String.fromCharCodes(c2);
-        sb.writeln(text1);
-        sb.writeln(text2);
+  int? _matchAny() {
+    if (_ch == _eof) {
+      if (_failPos < _pos) {
+        _failPos = _pos;
       }
 
-      return sb.toString();
+      ok = false;
+      return null;
     }
 
-    final temp = _expected.toList();
-    temp.sort((e1, e2) => e1.compareTo(e2));
-    final expected = temp.toSet();
-    final hasMalformed = false;
-    if (expected.isNotEmpty) {
-      if (!hasMalformed) {
-        final sb = StringBuffer();
-        sb.write('Expected ');
-        sb.write(expected.join(', '));
-        sb.write(' but found ');
-        sb.write(getc(_error));
-        final title = sb.toString();
-        final message = report(title, _text, _error);
-        error = FormatException(message);
-      } else {
-        final reason = _error == _text.length ? 'Unterminated' : 'Malformed';
-        final sb = StringBuffer();
-        sb.write(reason);
-        sb.write(' ');
-        sb.write(expected.join(', '));
-        final title = sb.toString();
-        final message = report(title, _text, _error);
-        error = FormatException(message);
+    final ch = _ch;
+    _pos += _ch <= 0xffff ? 1 : 2;
+    _ch = _getChar(_pos);
+    ok = true;
+    return ch;
+  }
+
+  T? _matchChar<T>(int ch, T? result) {
+    if (ch != _ch) {
+      if (_failPos < _pos) {
+        _failPos = _pos;
       }
-    } else {
-      final sb = StringBuffer();
-      sb.write('Unexpected character ');
-      sb.write(getc(_error));
-      final title = sb.toString();
-      final message = report(title, _text, _error);
-      error = FormatException(message);
-    }
-  }
 
-  void _fail(List<String> expected) {
-    if (_error < _failure) {
-      _error = _failure;
-      _expected = [];
-    }
-    if (_error == _failure) {
-      _expected.addAll(expected);
-    }
-  }
-
-  void _failAt(int pos, List<String> expected) {
-    _success = false;
-    _failure = _pos;
-    if (_error <= _failure) {
-      _fail(expected);
-    }
-  }
-
-  int _matchChar(int c) {
-    int result;
-    if (c == _c) {
-      _success = true;
-      _c = _input[_pos += _c <= 0xffff ? 1 : 2];
-      result = c;
-    } else {
-      _success = false;
-      _failure = _pos;
+      ok = false;
+      return null;
     }
 
+    _pos += _ch <= 0xffff ? 1 : 2;
+    _ch = _getChar(_pos);
+    ok = true;
     return result;
   }
 
-  int _matchRanges(List<int> ranges) {
-    int result;
-    _success = false;
+  int? _matchRange(List<int> ranges) {
+    // Use binary search
     for (var i = 0; i < ranges.length; i += 2) {
-      if (ranges[i] <= _c) {
-        if (ranges[i + 1] >= _c) {
-          result = _c;
-          _c = _input[_pos += _c <= 0xffff ? 1 : 2];
-          _success = true;
-          break;
+      if (ranges[i] <= _ch) {
+        if (ranges[i + 1] >= _ch) {
+          final ch = _ch;
+          _pos += _ch <= 0xffff ? 1 : 2;
+          _ch = _getChar(_pos);
+          ok = true;
+          return ch;
         }
       } else {
         break;
       }
     }
 
-    if (!_success) {
-      _failure = _pos;
+    ok = false;
+    if (_failPos < _pos) {
+      _failPos = _pos;
     }
 
-    return result;
+    return null;
   }
 
-  String _matchString(String text) {
-    String result;
-    final length = text.length;
-    final rest = _text.length - _pos;
-    final count = length > rest ? rest : length;
-    var pos = _pos;
+  String? _matchString(String text) {
     var i = 0;
-    for (; i < count; i++, pos++) {
-      if (text.codeUnitAt(i) != _text.codeUnitAt(pos)) {
-        break;
-      }
-    }
-
-    if (_success = i == length) {
-      _c = _input[_pos += length];
-      result = text;
-    } else {
-      _failure = _pos + i;
-    }
-
-    return result;
-  }
-
-  bool _memoized(int id, bool productive) {
-    final memos = _memos[_pos];
-    if (memos != null) {
-      for (var i = 0; i < memos.length; i++) {
-        final memo = memos[i];
-        if (memo.id == id && memo.productive == productive) {
-          _pos = memo.pos;
-          _mresult = memo.result;
-          _success = memo.success;
-          _c = _input[_pos];
-          return true;
+    if (_ch == text.codeUnitAt(0)) {
+      i++;
+      if (_pos + text.length <= _source.length) {
+        for (; i < text.length; i++) {
+          if (text.codeUnitAt(i) != _source.codeUnitAt(_pos + i)) {
+            break;
+          }
         }
       }
     }
 
-    return false;
-  }
-
-  void _memoize(int id, int pos, bool productive, result) {
-    var memos = _memos[pos];
-    if (memos == null) {
-      memos = [];
-      _memos[pos] = memos;
+    ok = i == text.length;
+    if (ok) {
+      _pos = _pos + text.length;
+      _ch = _getChar(_pos);
+      return text;
+    } else {
+      final pos = _pos + i;
+      if (_failPos < pos) {
+        _failPos = pos;
+      }
+      return null;
     }
-
-    final memo = _Memo(
-      id: id,
-      pos: _pos,
-      productive: productive,
-      result: result,
-      success: _success,
-    );
-
-    memos.add(memo);
   }
 
   void _reset() {
-    _c = _input[0];
-    _error = 0;
-    _expected = [];
-    _failure = -1;
-    _memos = [];
-    _memos.length = _input.length + 1;
+    error = null;
+    _failPos = 0;
+    _failStart = 0;
+    _failures = [];
     _pos = 0;
-    _predicate = false;
-    _success = false;
-  }
-
-  List<int> _toRunes(String source) {
-    final length = source.length;
-    final result = List<int>(length + 1);
-    for (var pos = 0; pos < length;) {
-      int c;
-      final start = pos;
-      final leading = source.codeUnitAt(pos++);
-      if ((leading & 0xFC00) == 0xD800 && pos < length) {
-        final trailing = source.codeUnitAt(pos);
-        if ((trailing & 0xFC00) == 0xDC00) {
-          c = 0x10000 + ((leading & 0x3FF) << 10) + (trailing & 0x3FF);
-          pos++;
-        } else {
-          c = leading;
-        }
-      } else {
-        c = leading;
-      }
-
-      result[start] = c;
-    }
-
-    result[length] = 0x110000;
-    return result;
-  }
-
-  dynamic _parseJson(bool $0, bool $1) {
-    dynamic $2;
-    final $3 = _pos;
-    final $4 = _c;
-    dynamic $6;
-    if ($4 >= 9 && $4 <= 10 || $4 == 13 || $4 == 32) {
-      _parse_leading_spaces(false, false);
-    } else {
-      _success = true;
-    }
-    final $13 = _parseValue(true, $1);
-    if (_success) {
-      final $14 = _c;
-      if ($14 == 1114112) {
-        _parse_end_of_file(false, false);
-      } else {
-        _failAt(_pos, const ['\'end of file\'']);
-      }
-      if (_success) {
-        $6 = $13;
-      }
-    }
-    if (!_success) {
-      _c = $4;
-      _pos = $3;
-    }
-    $2 = $6;
-    if (!_success && _error == $3) {
-      _fail(const [
-        '\'false\'',
-        '\'null\'',
-        '\'true\'',
-        '\'number\'',
-        '\'string\'',
-        '\'[\'',
-        '\'{\''
-      ]);
-    }
-    return $2;
-  }
-
-  dynamic _parseValue(bool $0, bool $1) {
-    dynamic $2;
-    final $3 = _pos;
-    if ($0 && _memoized(6, $1)) {
-      return _mresult as dynamic;
-    }
-    final $5 = _pos;
-    for (;;) {
-      List $6;
-      final $9 = _parseArray(false, $1);
-      if (_success) {
-        $6 = $9;
-        $2 = $6;
-        break;
-      }
-      dynamic $10;
-      final $11 = _c;
-      dynamic $14;
-      if ($11 == 102) {
-        final $15 = _parse_false(false, $1);
-        $14 = $15;
-      } else {
-        _failAt(_pos, const ['\'false\'']);
-      }
-      if (_success) {
-        $10 = $14;
-        $2 = $10;
-        break;
-      }
-      dynamic $16;
-      final $17 = _c;
-      dynamic $20;
-      if ($17 == 110) {
-        final $21 = _parse_null(false, $1);
-        $20 = $21;
-      } else {
-        _failAt(_pos, const ['\'null\'']);
-      }
-      if (_success) {
-        $16 = $20;
-        $2 = $16;
-        break;
-      }
-      dynamic $22;
-      final $23 = _c;
-      dynamic $26;
-      if ($23 == 116) {
-        final $27 = _parse_true(false, $1);
-        $26 = $27;
-      } else {
-        _failAt(_pos, const ['\'true\'']);
-      }
-      if (_success) {
-        $22 = $26;
-        $2 = $22;
-        break;
-      }
-      Map<String, dynamic> $28;
-      final $31 = _parseObject(false, $1);
-      if (_success) {
-        $28 = $31;
-        $2 = $28;
-        break;
-      }
-      num $32;
-      final $33 = _c;
-      num $36;
-      if ($33 == 45 || $33 >= 48 && $33 <= 57) {
-        final $37 = _parse_number(false, $1);
-        $36 = $37;
-      } else {
-        _failAt(_pos, const ['\'number\'']);
-      }
-      if (_success) {
-        $32 = $36;
-        $2 = $32;
-        break;
-      }
-      String $38;
-      final $39 = _c;
-      String $42;
-      if ($39 == 34) {
-        final $43 = _parse_string(true, $1);
-        $42 = $43;
-      } else {
-        _failAt(_pos, const ['\'string\'']);
-      }
-      if (_success) {
-        $38 = $42;
-        $2 = $38;
-        break;
-      }
-      break;
-    }
-    if (!_success && _error == $5) {
-      _fail(const [
-        '\'false\'',
-        '\'null\'',
-        '\'true\'',
-        '\'number\'',
-        '\'string\'',
-        '\'[\'',
-        '\'{\''
-      ]);
-    }
-    if ($0) {
-      _memoize(6, $3, $1, $2);
-    }
-    return $2;
-  }
-
-  List _parseArray(bool $0, bool $1) {
-    List $2;
-    final $3 = _pos;
-    final $4 = _c;
-    List $6;
-    if ($4 == 91) {
-      _parse_$LeftSquareBracket(false, false);
-    } else {
-      _failAt(_pos, const ['\'[\'']);
-    }
-    if (_success) {
-      final $12 = _parseValues(false, true);
-      final $13 = $12;
-      final $14 = _c;
-      if ($14 == 93) {
-        _parse_$RightSquareBracket(false, false);
-      } else {
-        _failAt(_pos, const ['\']\'']);
-      }
-      if (_success) {
-        final v = $13;
-        List $$;
-        $$ = v ?? [];
-        $6 = $$;
-      }
-      if (!_success) {
-        _c = $4;
-        _pos = $3;
-      }
-    }
-    $2 = $6;
-    if (!_success && _error == $3) {
-      _fail(const ['\'[\'']);
-    }
-    return $2;
-  }
-
-  List _parseValues(bool $0, bool $1) {
-    List $2;
-    final $3 = _pos;
-    List $6;
-    final $9 = _parseValue(true, true);
-    if (_success) {
-      List $10;
-      $10 = [];
-      for (;;) {
-        dynamic $11;
-        final $12 = _pos;
-        final $15 = $1;
-        $1 = true;
-        dynamic $16;
-        final $17 = _c;
-        final $18 = _pos;
-        if ($17 == 44) {
-          _parse_$Comma(true, false);
-        } else {
-          _failAt(_pos, const ['\',\'']);
-        }
-        if (_success) {
-          final $22 = _parseValue(false, $1);
-          if (_success) {
-            $16 = $22;
-          } else {
-            _c = $17;
-            _pos = $18;
-          }
-        }
-        $11 = $16;
-        if (!_success && _error == $12) {
-          _fail(const ['\',\'']);
-        }
-        $1 = $15;
-        if (!_success) {
-          _success = true;
-          break;
-        }
-        $10.add($11);
-      }
-      {
-        final v = $9;
-        final n = $10;
-        List $$;
-        $$ = [v, ...n];
-        $6 = $$;
-      }
-    }
-    $2 = $6;
-    if (!_success && _error == $3) {
-      _fail(const [
-        '\'false\'',
-        '\'null\'',
-        '\'true\'',
-        '\'number\'',
-        '\'string\'',
-        '\'[\'',
-        '\'{\''
-      ]);
-    }
-    return $2;
-  }
-
-  Map<String, dynamic> _parseObject(bool $0, bool $1) {
-    Map<String, dynamic> $2;
-    final $3 = _pos;
-    final $4 = _c;
-    Map<String, dynamic> $6;
-    if ($4 == 123) {
-      _parse_$LeftBrace(false, false);
-    } else {
-      _failAt(_pos, const ['\'{\'']);
-    }
-    if (_success) {
-      final $12 = _parseMembers(false, true);
-      final $13 = $12;
-      final $14 = _c;
-      if ($14 == 125) {
-        _parse_$RightBrace(false, false);
-      } else {
-        _failAt(_pos, const ['\'}\'']);
-      }
-      if (_success) {
-        final m = $13;
-        Map<String, dynamic> $$;
-        $$ = <String, dynamic>{}..addEntries(m ?? []);
-        $6 = $$;
-      }
-      if (!_success) {
-        _c = $4;
-        _pos = $3;
-      }
-    }
-    $2 = $6;
-    if (!_success && _error == $3) {
-      _fail(const ['\'{\'']);
-    }
-    return $2;
-  }
-
-  List<MapEntry<String, dynamic>> _parseMembers(bool $0, bool $1) {
-    List<MapEntry<String, dynamic>> $2;
-    final $3 = _pos;
-    List<MapEntry<String, dynamic>> $6;
-    final $9 = _parseMember(false, true);
-    if (_success) {
-      List<MapEntry<String, dynamic>> $10;
-      $10 = [];
-      for (;;) {
-        MapEntry<String, dynamic> $11;
-        final $12 = _pos;
-        final $15 = $1;
-        $1 = true;
-        MapEntry<String, dynamic> $16;
-        final $17 = _c;
-        final $18 = _pos;
-        if ($17 == 44) {
-          _parse_$Comma(true, false);
-        } else {
-          _failAt(_pos, const ['\',\'']);
-        }
-        if (_success) {
-          final $22 = _parseMember(false, $1);
-          if (_success) {
-            $16 = $22;
-          } else {
-            _c = $17;
-            _pos = $18;
-          }
-        }
-        $11 = $16;
-        if (!_success && _error == $12) {
-          _fail(const ['\',\'']);
-        }
-        $1 = $15;
-        if (!_success) {
-          _success = true;
-          break;
-        }
-        $10.add($11);
-      }
-      {
-        final m = $9;
-        final n = $10;
-        List<MapEntry<String, dynamic>> $$;
-        $$ = [m, ...n];
-        $6 = $$;
-      }
-    }
-    $2 = $6;
-    if (!_success && _error == $3) {
-      _fail(const ['\'string\'']);
-    }
-    return $2;
-  }
-
-  MapEntry<String, dynamic> _parseMember(bool $0, bool $1) {
-    MapEntry<String, dynamic> $2;
-    final $3 = _pos;
-    final $4 = _c;
-    MapEntry<String, dynamic> $6;
-    String $10;
-    if ($4 == 34) {
-      final $11 = _parse_string(true, true);
-      $10 = $11;
-    } else {
-      _failAt(_pos, const ['\'string\'']);
-    }
-    if (_success) {
-      final $12 = _c;
-      if ($12 == 58) {
-        _parse_$Colon(false, false);
-      } else {
-        _failAt(_pos, const ['\':\'']);
-      }
-      if (_success) {
-        final $15 = _parseValue(true, true);
-        if (_success) {
-          final k = $10;
-          final v = $15;
-          MapEntry<String, dynamic> $$;
-          $$ = MapEntry(k, v);
-          $6 = $$;
-        }
-      }
-      if (!_success) {
-        _c = $4;
-        _pos = $3;
-      }
-    }
-    $2 = $6;
-    if (!_success && _error == $3) {
-      _fail(const ['\'string\'']);
-    }
-    return $2;
-  }
-
-  dynamic _parse_end_of_file(bool $0, bool $1) {
-    dynamic $2;
-    final $3 = _pos;
-    final $4 = _c;
-    dynamic $7;
-    final $12 = _error;
-    final $13 = _expected;
-    final $14 = _failure;
-    final $15 = $1;
-    $1 = false;
-    if (_c >= 0 && _c <= 1114111) {
-      _success = true;
-      _c = _input[_pos += _c <= 65535 ? 1 : 2];
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    _success = !_success;
-    _c = $4;
-    _pos = $3;
-    _error = $12;
-    _expected = $13;
-    _failure = $14;
-    $1 = $15;
-    var $17;
-    if (_success) {
-      $7 = $17;
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'end of file\'']);
-    }
-    return $2;
-  }
-
-  dynamic _parse_false(bool $0, bool $1) {
-    dynamic $2;
-    dynamic $7;
-    if (_c == 102) {
-      _matchString('false');
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      final $11 = _c;
-      if ($11 >= 9 && $11 <= 10 || $11 == 13 || $11 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      {
-        dynamic $$;
-        $$ = false;
-        $7 = $$;
-      }
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'false\'']);
-    }
-    return $2;
-  }
-
-  List<int> _parse_leading_spaces(bool $0, bool $1) {
-    List<int> $2;
-    $2 = _parse$$spacing(false, $1);
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'leading spaces\'']);
-    }
-    return $2;
-  }
-
-  dynamic _parse_null(bool $0, bool $1) {
-    dynamic $2;
-    dynamic $7;
-    if (_c == 110) {
-      _matchString('null');
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      final $11 = _c;
-      if ($11 >= 9 && $11 <= 10 || $11 == 13 || $11 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      {
-        dynamic $$;
-        $$ = null;
-        $7 = $$;
-      }
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'null\'']);
-    }
-    return $2;
-  }
-
-  dynamic _parse_true(bool $0, bool $1) {
-    dynamic $2;
-    dynamic $7;
-    if (_c == 116) {
-      _matchString('true');
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      final $11 = _c;
-      if ($11 >= 9 && $11 <= 10 || $11 == 13 || $11 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      {
-        dynamic $$;
-        $$ = true;
-        $7 = $$;
-      }
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'true\'']);
-    }
-    return $2;
-  }
-
-  String _parse_string(bool $0, bool $1) {
-    String $2;
-    final $3 = _pos;
-    if ($0 && _memoized(73, $1)) {
-      return _mresult as String;
-    }
-    final $4 = _c;
-    final $5 = _pos;
-    String $7;
-    if (_c == 34) {
-      _success = true;
-      _c = _input[++_pos];
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      List<int> $11;
-      $11 = [];
-      for (;;) {
-        final $12 = _c;
-        int $13;
-        if ($12 >= 32 && $12 <= 33 || $12 >= 35 && $12 <= 1114111) {
-          final $14 = _parse$$char(false, true);
-          $13 = $14;
-        } else {
-          _failAt(_pos, const []);
-        }
-        if (!_success) {
-          _success = true;
-          break;
-        }
-        $11.add($13);
-      }
-      if (_c == 34) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        final $16 = _c;
-        if ($16 >= 9 && $16 <= 10 || $16 == 13 || $16 == 32) {
-          _parse$$spacing(false, false);
-        } else {
-          _success = true;
-        }
-        {
-          final c = $11;
-          String $$;
-          $$ = String.fromCharCodes(c);
-          $7 = $$;
-        }
-      }
-      if (!_success) {
-        _c = $4;
-        _pos = $5;
-      }
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'string\'']);
-    }
-    if ($0) {
-      _memoize(73, $3, $1, $2);
-    }
-    return $2;
-  }
-
-  num _parse_number(bool $0, bool $1) {
-    num $2;
-    final $3 = _pos;
-    num $7;
-    String $10;
-    final $12 = $1;
-    $1 = false;
-    final $18 = $1;
-    $1 = true;
-    if (_c == 45) {
-      _success = true;
-      _c = _input[++_pos];
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    final $25 = _pos;
-    final $26 = _c;
-    var $28 = _pos;
-    final $29 = $1;
-    $1 = false;
-    for (;;) {
-      if (_c == 48) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if ($28 < _failure) {
-        $28 = _failure;
-      }
-      if (_success) {
-        break;
-      }
-      if (_c >= 49 && _c <= 57) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        for (;;) {
-          if (_c >= 48 && _c <= 57) {
-            _success = true;
-            _c = _input[++_pos];
-          } else {
-            _success = false;
-            _failure = _pos;
-          }
-          if (!_success) {
-            _success = true;
-            break;
-          }
-        }
-      }
-      if ($28 < _failure) {
-        $28 = _failure;
-      }
-      if (_success) {
-        break;
-      }
-      _c = $26;
-      _pos = $25;
-      _failure = $28;
-      break;
-    }
-    $1 = $29;
-    if (_success) {
-      final $45 = $1;
-      $1 = false;
-      final $47 = _c;
-      final $48 = _pos;
-      if (_c == 46) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        var $51 = false;
-        for (;;) {
-          if (_c >= 48 && _c <= 57) {
-            _success = true;
-            _c = _input[++_pos];
-          } else {
-            _success = false;
-            _failure = _pos;
-          }
-          if (!_success) {
-            _success = $51;
-            break;
-          }
-          $51 = true;
-        }
-        if (!_success) {
-          _c = $47;
-          _pos = $48;
-        }
-      }
-      $1 = $45;
-      final $59 = $1;
-      $1 = false;
-      final $61 = _c;
-      final $62 = _pos;
-      if (_c == 69 || _c == 101) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        if (_c == 43 || _c == 45) {
-          _success = true;
-          _c = _input[++_pos];
-        } else {
-          _success = false;
-          _failure = _pos;
-        }
-        var $67 = false;
-        for (;;) {
-          if (_c >= 48 && _c <= 57) {
-            _success = true;
-            _c = _input[++_pos];
-          } else {
-            _success = false;
-            _failure = _pos;
-          }
-          if (!_success) {
-            _success = $67;
-            break;
-          }
-          $67 = true;
-        }
-        if (!_success) {
-          _c = $61;
-          _pos = $62;
-        }
-      }
-      $1 = $59;
-      _success = true;
-    }
-    $1 = $18;
-    $1 = $12;
-    $10 = _text.substring($3, _pos);
-    if (_success) {
-      final $70 = _c;
-      if ($70 >= 9 && $70 <= 10 || $70 == 13 || $70 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      {
-        final n = $10;
-        num $$;
-        $$ = num.parse(n);
-        $7 = $$;
-      }
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'number\'']);
-    }
-    return $2;
-  }
-
-  String _parse_$LeftBrace(bool $0, bool $1) {
-    String $2;
-    String $7;
-    String $10;
-    if (_c == 123) {
-      _success = true;
-      $10 = '{';
-      _c = _input[++_pos];
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      final $11 = _c;
-      if ($11 >= 9 && $11 <= 10 || $11 == 13 || $11 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      $7 = $10;
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'{\'']);
-    }
-    return $2;
-  }
-
-  String _parse_$RightBrace(bool $0, bool $1) {
-    String $2;
-    String $7;
-    String $10;
-    if (_c == 125) {
-      _success = true;
-      $10 = '}';
-      _c = _input[++_pos];
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      final $11 = _c;
-      if ($11 >= 9 && $11 <= 10 || $11 == 13 || $11 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      $7 = $10;
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'}\'']);
-    }
-    return $2;
-  }
-
-  String _parse_$LeftSquareBracket(bool $0, bool $1) {
-    String $2;
-    String $7;
-    String $10;
-    if (_c == 91) {
-      _success = true;
-      $10 = '[';
-      _c = _input[++_pos];
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      final $11 = _c;
-      if ($11 >= 9 && $11 <= 10 || $11 == 13 || $11 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      $7 = $10;
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\'[\'']);
-    }
-    return $2;
-  }
-
-  String _parse_$RightSquareBracket(bool $0, bool $1) {
-    String $2;
-    String $7;
-    String $10;
-    if (_c == 93) {
-      _success = true;
-      $10 = ']';
-      _c = _input[++_pos];
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      final $11 = _c;
-      if ($11 >= 9 && $11 <= 10 || $11 == 13 || $11 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      $7 = $10;
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\']\'']);
-    }
-    return $2;
-  }
-
-  String _parse_$Comma(bool $0, bool $1) {
-    String $2;
-    final $3 = _pos;
-    if ($0 && _memoized(125, $1)) {
-      return _mresult as String;
-    }
-    String $7;
-    String $10;
-    if (_c == 44) {
-      _success = true;
-      $10 = ',';
-      _c = _input[++_pos];
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      final $11 = _c;
-      if ($11 >= 9 && $11 <= 10 || $11 == 13 || $11 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      $7 = $10;
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\',\'']);
-    }
-    if ($0) {
-      _memoize(125, $3, $1, $2);
-    }
-    return $2;
-  }
-
-  String _parse_$Colon(bool $0, bool $1) {
-    String $2;
-    String $7;
-    String $10;
-    if (_c == 58) {
-      _success = true;
-      $10 = ':';
-      _c = _input[++_pos];
-    } else {
-      _success = false;
-      _failure = _pos;
-    }
-    if (_success) {
-      final $11 = _c;
-      if ($11 >= 9 && $11 <= 10 || $11 == 13 || $11 == 32) {
-        _parse$$spacing(false, false);
-      } else {
-        _success = true;
-      }
-      $7 = $10;
-    }
-    $2 = $7;
-    if (!_success && _error <= _failure) {
-      _fail(const ['\':\'']);
-    }
-    return $2;
-  }
-
-  int _parse$$char(bool $0, bool $1) {
-    int $2;
-    final $3 = _pos;
-    final $4 = _c;
-    for (;;) {
-      int $6;
-      final $7 = _c;
-      final $8 = _pos;
-      if (_c == 92) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        final $10 = _c;
-        int $11;
-        if ($10 == 34 ||
-            $10 == 47 ||
-            $10 == 92 ||
-            $10 == 98 ||
-            $10 == 102 ||
-            $10 == 110 ||
-            $10 == 114 ||
-            $10 >= 116 && $10 <= 117) {
-          final $12 = _parse$$escaped(false, $1);
-          $11 = $12;
-        } else {
-          _failAt(_pos, const []);
-        }
-        if (_success) {
-          $6 = $11;
-        } else {
-          _c = $7;
-          _pos = $8;
-        }
-      }
-      if (_success) {
-        $2 = $6;
-        break;
-      }
-      _c = $4;
-      _pos = $3;
-      int $13;
-      final $14 = _c;
-      int $17;
-      if ($14 >= 32 && $14 <= 33 ||
-          $14 >= 35 && $14 <= 91 ||
-          $14 >= 93 && $14 <= 1114111) {
-        final $18 = _parse$$unescaped(false, $1);
-        $17 = $18;
-      } else {
-        _failAt(_pos, const []);
-      }
-      if (_success) {
-        $13 = $17;
-        $2 = $13;
-        break;
-      }
-      break;
-    }
-    return $2;
-  }
-
-  int _parse$$escaped(bool $0, bool $1) {
-    int $2;
-    final $3 = _pos;
-    final $4 = _c;
-    for (;;) {
-      int $6;
-      int $9;
-      if (_c == 34) {
-        _success = true;
-        $9 = _c;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        $6 = $9;
-        $2 = $6;
-        break;
-      }
-      int $10;
-      int $13;
-      if (_c == 92) {
-        _success = true;
-        $13 = _c;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        $10 = $13;
-        $2 = $10;
-        break;
-      }
-      int $14;
-      int $17;
-      if (_c == 47) {
-        _success = true;
-        $17 = _c;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        $14 = $17;
-        $2 = $14;
-        break;
-      }
-      int $18;
-      if (_c == 98) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        int $$;
-        $$ = 0x8;
-        $18 = $$;
-      }
-      if (_success) {
-        $2 = $18;
-        break;
-      }
-      int $22;
-      if (_c == 102) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        int $$;
-        $$ = 0xC;
-        $22 = $$;
-      }
-      if (_success) {
-        $2 = $22;
-        break;
-      }
-      int $26;
-      if (_c == 110) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        int $$;
-        $$ = 0xA;
-        $26 = $$;
-      }
-      if (_success) {
-        $2 = $26;
-        break;
-      }
-      int $30;
-      if (_c == 114) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        int $$;
-        $$ = 0xD;
-        $30 = $$;
-      }
-      if (_success) {
-        $2 = $30;
-        break;
-      }
-      int $34;
-      if (_c == 116) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        int $$;
-        $$ = 0x9;
-        $34 = $$;
-      }
-      if (_success) {
-        $2 = $34;
-        break;
-      }
-      int $38;
-      final $39 = _c;
-      final $40 = _pos;
-      if (_c == 117) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        final $42 = _c;
-        int $43;
-        if ($42 >= 48 && $42 <= 57 ||
-            $42 >= 65 && $42 <= 70 ||
-            $42 >= 97 && $42 <= 102) {
-          final $44 = _parse$$hexdig4(false, $1);
-          $43 = $44;
-        } else {
-          _failAt(_pos, const []);
-        }
-        if (_success) {
-          $38 = $43;
-        } else {
-          _c = $39;
-          _pos = $40;
-        }
-      }
-      if (_success) {
-        $2 = $38;
-        break;
-      }
-      _c = $4;
-      _pos = $3;
-      break;
-    }
-    return $2;
-  }
-
-  int _parse$$hexdig4(bool $0, bool $1) {
-    int $2;
-    final $3 = _pos;
-    final $4 = _c;
-    int $6;
-    int $10;
-    if ($4 >= 48 && $4 <= 57 || $4 >= 65 && $4 <= 70 || $4 >= 97 && $4 <= 102) {
-      final $11 = _parse$$hexdig(false, true);
-      $10 = $11;
-    } else {
-      _failAt(_pos, const []);
-    }
-    if (_success) {
-      final $12 = _c;
-      int $13;
-      if ($12 >= 48 && $12 <= 57 ||
-          $12 >= 65 && $12 <= 70 ||
-          $12 >= 97 && $12 <= 102) {
-        final $14 = _parse$$hexdig(false, true);
-        $13 = $14;
-      } else {
-        _failAt(_pos, const []);
-      }
-      if (_success) {
-        final $15 = _c;
-        int $16;
-        if ($15 >= 48 && $15 <= 57 ||
-            $15 >= 65 && $15 <= 70 ||
-            $15 >= 97 && $15 <= 102) {
-          final $17 = _parse$$hexdig(false, true);
-          $16 = $17;
-        } else {
-          _failAt(_pos, const []);
-        }
-        if (_success) {
-          final $18 = _c;
-          int $19;
-          if ($18 >= 48 && $18 <= 57 ||
-              $18 >= 65 && $18 <= 70 ||
-              $18 >= 97 && $18 <= 102) {
-            final $20 = _parse$$hexdig(false, true);
-            $19 = $20;
-          } else {
-            _failAt(_pos, const []);
-          }
-          if (_success) {
-            final a = $10;
-            final b = $13;
-            final c = $16;
-            final d = $19;
-            int $$;
-            $$ = a * 0xfff + b * 0xff + c * 0xf + d;
-            $6 = $$;
-          }
-        }
-      }
-      if (!_success) {
-        _c = $4;
-        _pos = $3;
-      }
-    }
-    $2 = $6;
-    return $2;
-  }
-
-  int _parse$$hexdig(bool $0, bool $1) {
-    int $2;
-    for (;;) {
-      int $6;
-      if (_c >= 97 && _c <= 102) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        int $$;
-        $$ = $$ - 97;
-        $6 = $$;
-      }
-      if (_success) {
-        $2 = $6;
-        break;
-      }
-      int $10;
-      if (_c >= 65 && _c <= 70) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        int $$;
-        $$ = $$ - 65;
-        $10 = $$;
-      }
-      if (_success) {
-        $2 = $10;
-        break;
-      }
-      int $14;
-      if (_c >= 48 && _c <= 57) {
-        _success = true;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        int $$;
-        $$ = $$ - 48;
-        $14 = $$;
-      }
-      if (_success) {
-        $2 = $14;
-        break;
-      }
-      break;
-    }
-    return $2;
-  }
-
-  int _parse$$unescaped(bool $0, bool $1) {
-    int $2;
-    for (;;) {
-      int $6;
-      int $9;
-      if (_c >= 32 && _c <= 33) {
-        _success = true;
-        $9 = _c;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        $6 = $9;
-        $2 = $6;
-        break;
-      }
-      int $10;
-      int $13;
-      if (_c >= 35 && _c <= 91) {
-        _success = true;
-        $13 = _c;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        $10 = $13;
-        $2 = $10;
-        break;
-      }
-      int $14;
-      int $17;
-      if (_c >= 93 && _c <= 1114111) {
-        _success = true;
-        $17 = _c;
-        _c = _input[_pos += _c <= 65535 ? 1 : 2];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (_success) {
-        $14 = $17;
-        $2 = $14;
-        break;
-      }
-      break;
-    }
-    return $2;
-  }
-
-  List<int> _parse$$spacing(bool $0, bool $1) {
-    List<int> $2;
-    List<int> $9;
-    if ($1) {
-      $9 = [];
-    }
-    for (;;) {
-      int $10;
-      if (_c >= 9 && _c <= 10 || _c == 13 || _c == 32) {
-        _success = true;
-        $10 = _c;
-        _c = _input[++_pos];
-      } else {
-        _success = false;
-        _failure = _pos;
-      }
-      if (!_success) {
-        _success = true;
-        break;
-      }
-      if ($1) {
-        $9.add($10);
-      }
-    }
-    $2 = $9;
-    return $2;
+    _ch = _getChar(0);
+    ok = false;
   }
 }
-
-class _Memo {
-  final int id;
-  final int pos;
-  final bool productive;
-  final result;
-  final bool success;
-
-  _Memo({
-    this.id,
-    this.pos,
-    this.productive,
-    this.result,
-    this.success,
-  });
-}
-
-// ignore_for_file: unused_element
-// ignore_for_file: unused_field
+// ignore: unused_element

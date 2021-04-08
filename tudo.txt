@@ -1,15 +1,14 @@
+EMTPY STRING
+
+
 check duplicare semantic variables
 add binary search for (long) ranges
 add more grammar analyzers
-implement lookup tables (using starting characters of expressions) for the ordered choice expressions to improve the performance by skip unnecessary (heavy) operations
 implement analyzer warning when terminal isSucessful (zero length terminal)
 implement analyzer warning when repetition child isSucessful (infinite loop)
-improve error message formatter (for Unicode)
 does not generate unused global parser methods
-make some classes private?
 inplement malformed terminals reporting
-add parenthesis to unary operator printer
-improve variable usage optimizer
 need make corrections to character class `toString()`
-add build support (add builder, add generator)
-add literal choice generator
+rules with unused results should not return results
+optimize sequence on exit
+add memoization

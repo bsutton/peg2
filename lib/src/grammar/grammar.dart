@@ -3,32 +3,26 @@ part of '../../grammar.dart';
 class Grammar {
   final errors = <String>[];
 
-  Map<int, Expression> expressionMap;
+  final Map<int, Expression> expressionMap = {};
 
-  final String globals;
+  final String? globals;
 
-  final String members;
+  final String? members;
 
-  List<ProductionRule> rules;
+  final List<ProductionRule> rules = [];
 
-  Map<String, ProductionRule> ruleMap;
+  final Map<String, ProductionRule> ruleMap = {};
 
-  ProductionRule start;
+  ProductionRule? start;
 
   final warnings = <String>[];
 
-  Grammar(List<ProductionRule> rules, this.globals, this.members) {
-    if (rules == null) {
-      throw ArgumentError.notNull('rules');
-    }
-
+  Grammar(List<ProductionRule?> rules, this.globals, this.members) {
     if (rules.isEmpty) {
       throw ArgumentError('List of rules should not be empty');
     }
 
     final duplicates = <String>{};
-    ruleMap = <String, ProductionRule>{};
-    this.rules = <ProductionRule>[];
     var id = 0;
     for (var rule in rules) {
       if (rule == null) {
@@ -46,7 +40,7 @@ class Grammar {
     }
 
     for (final name in duplicates) {
-      errors.add('Duplicate rule name: ${name}');
+      errors.add('Duplicate rule name: $name');
     }
 
     _initialize();

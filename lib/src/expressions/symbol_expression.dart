@@ -5,13 +5,9 @@ abstract class SymbolExpression extends Expression {
 
   bool memoize = false;
 
-  OrderedChoiceExpression expression;
+  OrderedChoiceExpression? expression;
 
   SymbolExpression(this.name) {
-    if (name == null) {
-      throw ArgumentError.notNull('name');
-    }
-
     if (name.isEmpty) {
       throw ArgumentError('Name should not be emptry');
     }
