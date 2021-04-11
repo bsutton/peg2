@@ -32,7 +32,7 @@ class ParserGenerator {
   }
 
   void _addHints(List<Spec> specs) {
-    specs.add(Code('// ignore: unused_element'));
+    specs.add(Code('// ignore_for_file: unused_element'));
   }
 
   String _generate() {

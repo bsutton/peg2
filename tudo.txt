@@ -1,6 +1,12 @@
-EMTPY STRING
+NEW:
+optimize code for ordered choice with single optional expression
+implement may not change pos
+implement may not change ch
+reimplement TOKEN 'semantic value'
+warning when optional used on optional
+use bitmask flags in method fail
 
-
+OLD:
 check duplicare semantic variables
 add binary search for (long) ranges
 add more grammar analyzers

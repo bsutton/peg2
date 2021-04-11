@@ -19,11 +19,7 @@ class ParserClassGenerator {
     var failEnd = 0;
     for (var i = 0; i < _failures.length; i += 2) {
       final name = _failures[i] as String;
-      var end = _failures[i + 1] as int;
-      if (end == -1) {
-        end = _failStart;
-      }
-
+      final end = _failures[i + 1] as int;
       if (failEnd < end) {
         failEnd = end;
       }
@@ -154,6 +150,23 @@ class ParserClassGenerator {
 ''';
 
   static const _methodMatchRange = '''
+    if (_ch >= start && _ch <= end) {
+      final ch = _ch;
+      _pos += _ch <= 0xffff ? 1 : 2;
+      _ch = _getChar(_pos);
+      ok = true;
+      return ch;
+    }
+
+    if (_failPos < _pos) {
+      _failPos = _pos;
+    }
+
+    ok = false;
+    return null;
+''';
+
+  static const _methodMatchRanges = '''
     // Use binary search
     for (var i = 0; i < ranges.length; i += 2) {
       if (ranges[i] <= _ch) {
@@ -242,7 +255,7 @@ class ParserClassGenerator {
     b.fields.add(Field((b) {
       b.name = Members.error;
       b.type = refer('FormatException?');
-    }));    
+    }));
 
     b.fields.add(Field((b) {
       b.name = Members.failStart;
@@ -320,15 +333,16 @@ class ParserClassGenerator {
 
   void _addMethodParse(ClassBuilder b, List<Method> methods) {
     final start = grammar.start;
-    final returnType = start.returnType ?? 'dynamic';
-    final returns = refer(returnType + '?');
+    final expression = start.expression;
+    final returnType = start.returnType ?? expression.resultType;
+    final returns = Utils.getNullableType(returnType);
     final parameters = <String, Reference>{};
     parameters['source'] = refer('String');
     final code = <Code>[];
     code <<
         Code(_methodParse.replaceAll(
-            '{{PARSE}}', Utils.getRuleIdentifier(start)));
-    _addMethod(b, methods, 'parse', returns, Block.of(code),
+            '{{PARSE}}', Helper.getRuleIdentifier(start)));
+    _addMethod(b, methods, 'parse', refer(returns), Block.of(code),
         parameters: parameters);
   }
 
@@ -374,6 +388,14 @@ class ParserClassGenerator {
     name = Members.matchRange;
     body = Code(_methodMatchRange);
     parameters = {};
+    parameters['start'] = refer('int');
+    parameters['end'] = refer('int');
+    _addMethod(b, methods, name, returns, body, parameters: parameters);
+
+    returns = refer('int?');
+    name = Members.matchRanges;
+    body = Code(_methodMatchRanges);
+    parameters = {};
     parameters['ranges'] = refer('List<int>');
     _addMethod(b, methods, name, returns, body, parameters: parameters);
 
@@ -392,20 +414,14 @@ class ParserClassGenerator {
 
   void _addRule(ClassBuilder b, List<Method> methods, ProductionRule rule) {
     final method = Method((b) {
+      b.name = Helper.getRuleIdentifier(rule);
       final expression = rule.expression;
-      final returnType = rule.returnType ?? expression.returnType;
-      b.name = Utils.getRuleIdentifier(rule);
-      b.returns = refer(returnType + '?');
+      final returnType = rule.returnType ?? expression.resultType;
+      final returns = Utils.getNullableType(returnType);
+      b.returns = refer(returns);
       final allocator = VariableAllocator('\$');
       final code = <Code>[];
-      if (rule.kind == ProductionRuleKind.terminal) {
-        code << assign(Members.failPos, literal(-1));
-      }
-
       final generator = ExpressionsGenerator(allocator: allocator, code: code);
-      final variable = allocator.alloc();
-      code << declareVariable(refer(returnType + '?'), variable);
-      generator.variable = variable;
       expression.accept(generator);
       b.body = Block.of(code);
     });

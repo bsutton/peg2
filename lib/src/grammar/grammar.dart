@@ -49,7 +49,6 @@ class Grammar {
   void _initialize() {
     final grammarInitializer0 = GrammarInitializer0();
     grammarInitializer0.initialize(this, errors, warnings);
-
     final grammarInitializer1 = GrammarInitializer1();
     grammarInitializer1.initialize(this, errors, warnings);
   }

@@ -1,3 +1,7 @@
+## 0.2.1
+
+- Improvements to code generation algorithms. The generated code is now smaller and faster.
+
 ## 0.2.0
 
 - Non-nullable implementation (legacy code is not supported)

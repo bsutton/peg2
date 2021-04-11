@@ -9,13 +9,16 @@ class GrammarInitializer0 {
     final startingRulesFinder = StartingRulesFinder();
     final startingRules = startingRulesFinder.find(grammar);
     if (startingRules.isEmpty) {
-      grammar.start = grammar.rules.first;
+      final start = grammar.rules.first;
+      grammar.start = start;
     } else if (startingRules.length > 1) {
       final names = startingRules.map((e) => e.name);
       errors.add('Found several starting rules: ${names.join(', ')}');
     } else {
       grammar.start = startingRules.first;
     }
+
+    grammar.start!.expression.resultUsed = true;
 
     final expresionMapInitializer = ExpresionMapInitializer();
     expresionMapInitializer.initialize(grammar);

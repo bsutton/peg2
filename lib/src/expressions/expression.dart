@@ -27,7 +27,9 @@ abstract class Expression {
 
   Expression? parent;
 
-  String returnType = 'dynamic';
+  bool resultUsed = false;
+
+  String resultType = 'dynamic';
 
   ProductionRule? rule;
 
@@ -37,33 +39,7 @@ abstract class Expression {
 
   String? variable;
 
-  bool used = false;
-
   T accept<T>(ExpressionVisitor<T> visitor);
-
-  String nullCheckedValue(String value) {
-    if (returnType == 'dynamic') {
-      return value;
-    }
-
-    if (returnType == 'dynamic!') {
-      return value;
-    }
-
-    if (isOptional) {
-      return value;
-    }
-
-    if (this is OneOrMoreExpression) {
-      return value;
-    }
-
-    if (this is ZeroOrMoreExpression) {
-      return value;
-    }
-
-    return '$value!';
-  }
 
   void visitChildren<T>(ExpressionVisitor<T> visitor) {
     //

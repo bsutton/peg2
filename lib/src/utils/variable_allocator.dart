@@ -1,5 +1,4 @@
-// @dart = 2.10
-part of '../../parser_generator.dart';
+part of '../../utils.dart';
 
 class VariableAllocator {
   final String prefix;

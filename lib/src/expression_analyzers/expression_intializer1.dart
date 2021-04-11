@@ -12,7 +12,9 @@ class ExpressionInitializer1 {
     expressionStartTerminalsResolver.resolve(rules);
     final expressionSuccessfulnessResolver = ExpressionSuccessfulnessResolver();
     expressionSuccessfulnessResolver.resolve(grammar);
-    final expressionReturnTypeResolver = ExpressionReturnTypeResolver();
-    expressionReturnTypeResolver.resolve(rules);
+    final expressionResultTypeResolver = ExpressionResultTypeResolver();
+    expressionResultTypeResolver.resolve(rules);
+    final expressionResultUsageResolver = ExpressionResultUsageResolver();
+    expressionResultUsageResolver.resolve(rules);
   }
 }

@@ -8,54 +8,50 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
 
   final Map<Expression, IfElseGenerator> _tails = {};
 
-  String variable;
+  String _childVariable;
 
   ExpressionsGenerator({@required this.allocator, @required this.code});
 
   @override
   void visitAndPredicate(AndPredicateExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final child = node.expression;
-    final varCh = allocator.alloc();
-    final varPos = allocator.alloc();
-    code << assignFinal(varCh, refer(Members.ch));
-    code << assignFinal(varPos, refer(Members.pos));
+    final storage = <String, String>{};
+    _storeVar(Members.ch, storage, code);
+    _storeVar(Members.pos, storage, code);
+    _storeVar(Members.failPos, storage, code);
+    _storeVar(Members.failStart, storage, code);
+    _storeVar(Members.failures, storage, code);
     _acceptNode(child, code);
-    if (variable$ == null) {
-      //
-    } else {
-      code << assignFinal(variable$, literalNull);
+    if (variable != null) {
+      code << assignFinal(variable, literalNull);
     }
 
-    code << assign(Members.ch, refer(varCh));
-    code << assign(Members.pos, refer(varPos));
-    variable = variable$;
+    _restoreVars(storage, code);
+    _childVariable = variable;
   }
 
   @override
   void visitAnyCharacter(AnyCharacterExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final matchAny = call$(Members.matchAny);
-    if (variable$ == null) {
+    if (variable == null) {
       code << matchAny.statement;
     } else {
-      code << assignFinal(variable$, matchAny);
+      code << assignFinal(variable, matchAny);
     }
 
-    variable = variable$;
+    _childVariable = variable;
   }
 
   @override
   void visitCapture(CaptureExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final child = node.expression;
-    if (variable$ == null) {
+    if (variable == null) {
       _acceptNode(child, code);
     } else {
-      code << declareVariable(refer('String?'), variable$);
+      code << declareVariable(refer('String?'), variable);
       final varStart = allocator.alloc();
       code << assignFinal(varStart, refer(Members.pos));
       _acceptNode(child, code);
@@ -63,57 +59,67 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
           if$(refer(Members.ok), (code) {
             code <<
                 assign(
-                    variable$,
+                    variable,
                     callMethod(Members.source, 'substring',
                         [refer(varStart), refer(Members.pos)]));
           });
     }
 
-    variable = variable$;
+    _childVariable = variable;
   }
 
   @override
   void visitCharacterClass(CharacterClassExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final ranges = <int>[];
     for (final group in node.ranges.groups) {
       ranges.add(group.start);
       ranges.add(group.end);
     }
 
-    if (ranges.length == 2 && ranges[0] == ranges[1]) {
-      final char = ranges[0];
-      final matchChar =
-          call$(Members.matchChar, [literal(char), literal(char)]);
-      if (variable$ == null) {
-        code << matchChar.statement;
+    if (ranges.length == 2) {
+      if (ranges[0] == ranges[1]) {
+        final char = ranges[0];
+        final matchChar =
+            call$(Members.matchChar, [literal(char), literal(char)]);
+        if (variable == null) {
+          code << matchChar.statement;
+        } else {
+          code << assignFinal(variable, matchChar);
+        }
       } else {
-        code << assignFinal(variable$, matchChar);
+        final start = ranges[0];
+        final end = ranges[1];
+        final matchRange =
+            call$(Members.matchRange, [literal(start), literal(end)]);
+        if (variable == null) {
+          code << matchRange.statement;
+        } else {
+          code << assignFinal(variable, matchRange);
+        }
       }
     } else {
       final varRange = allocator.alloc();
       code << assignConst(varRange, literalList(ranges));
-      final matchRange = call$(Members.matchRange, [refer(varRange)]);
-      if (variable$ == null) {
+      final matchRange = call$(Members.matchRanges, [refer(varRange)]);
+      if (variable == null) {
         code << matchRange.statement;
       } else {
-        code << assignFinal(variable$, matchRange);
+        code << assignFinal(variable, matchRange);
       }
     }
 
-    variable = variable$;
+    _childVariable = variable;
   }
 
   @override
   void visitLiteral(LiteralExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final text = node.text;
     if (text.isEmpty) {
-      if (variable$ != null) {
-        declareVariable(refer('String?'), variable$);
-        code << assign(variable$, literalString(''));
+      if (variable != null) {
+        declareVariable(refer('String?'), variable);
+        code << assign(variable, literalString(''));
       }
 
       code << assign(Members.ok, literalTrue);
@@ -121,21 +127,21 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
       final char = text.codeUnitAt(0);
       final matchChar =
           call$(Members.matchChar, [literal(char), literalString(text)]);
-      if (variable$ == null) {
+      if (variable == null) {
         code << matchChar.statement;
       } else {
-        code << assignFinal(variable$, matchChar);
+        code << assignFinal(variable, matchChar);
       }
     } else {
       final matchString = call$(Members.matchString, [literalString(text)]);
-      if (variable$ == null) {
+      if (variable == null) {
         code << matchString.statement;
       } else {
-        code << assignFinal(variable$, matchString);
+        code << assignFinal(variable, matchString);
       }
     }
 
-    variable = variable$;
+    _childVariable = variable;
   }
 
   @override
@@ -145,32 +151,29 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
 
   @override
   void visitNotPredicate(NotPredicateExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final child = node.expression;
-    final varCh = allocator.alloc();
-    final varPos = allocator.alloc();
-    code << assignFinal(varCh, refer(Members.ch));
-    code << assignFinal(varPos, refer(Members.pos));
+    final storage = <String, String>{};
+    _storeVar(Members.ch, storage, code);
+    _storeVar(Members.pos, storage, code);
+    _storeVar(Members.failPos, storage, code);
+    _storeVar(Members.failStart, storage, code);
+    _storeVar(Members.failures, storage, code);
     _acceptNode(child, code);
-    if (variable$ == null) {
-      //
-    } else {
-      code << assignFinal(variable$, literalNull);
+    if (variable != null) {
+      code << assignFinal(variable, literalNull);
     }
 
-    code << assign(Members.ch, refer(varCh));
-    code << assign(Members.pos, refer(varPos));
+    _restoreVars(storage, code);
     code << assign(Members.ok, refer(Members.ok).negate());
-    variable = variable$;
+    _childVariable = variable;
   }
 
   @override
   void visitOneOrMore(OneOrMoreExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final child = node.expression;
-    if (variable$ == null) {
+    if (variable == null) {
       final varCount = allocator.alloc();
       code << assignVar(varCount, literal(0));
       code <<
@@ -186,10 +189,10 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
 
       code << assign(Members.ok, refer(varCount).notEqualTo(literal(0)));
     } else {
-      variable = allocator.alloc();
-      final returnType = child.returnType;
-      final type = _isDynamicType(returnType) ? null : refer(returnType);
-      code << assignFinal(variable$, literalList([], type));
+      final listType = Utils.getNullableType(node.resultType);
+      code << declareVariable(refer(listType), variable);
+      final varList = allocator.alloc();
+      code << assignFinal(varList, literalList([], refer(child.resultType)));
       code <<
           while$(literalTrue, (code) {
             _acceptNode(child, code);
@@ -198,186 +201,93 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
                   code << break$;
                 });
 
-            final element = child.nullCheckedValue(variable);
-            code << callMethod(variable$, 'add', [refer(element)]).statement;
+            final element =
+                Utils.getNullCheckedValue(_childVariable, child.resultType);
+            code << callMethod(varList, 'add', [refer(element)]).statement;
           });
 
-      code << assign(Members.ok, property(variable$, 'isNotEmpty'));
+      code <<
+          if$(property(varList, 'isNotEmpty'), (code) {
+            code << assign(variable, refer(varList));
+            code << assign(Members.ok, literalTrue);
+          });
     }
 
-    variable = variable$;
+    _childVariable = variable;
   }
 
   @override
   void visitOptional(OptionalExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final child = node.expression;
-    if (variable$ == null) {
-      _acceptNode(child, code);
-    } else {
-      variable = allocator.alloc();
-      _acceptNode(child, code);
-      code << assignFinal(variable$, refer(variable));
+    _acceptNode(child, code);
+    if (variable != null) {
+      code << assignFinal(variable, refer(_childVariable));
     }
 
     code << assign(Members.ok, literalTrue);
-    variable = variable$;
+    _childVariable = variable;
   }
 
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final rule = node.rule;
     final level = node.level;
     final expressions = node.expressions;
-    final varCh = allocator.alloc();
-    final varPos = allocator.alloc();
-
     void failure(List<Code> code) {
-      if (level == 0 && rule.kind == ProductionRuleKind.terminal) {
+      if (rule.kind == ProductionRuleKind.terminal &&
+          level == 0 &&
+          !node.isOptional) {
         final arguments = <_cb.Expression>[];
         arguments.add(literalString(rule.name));
         code << call$(Members.fail, arguments).statement;
       }
     }
 
-    void restoreState(List<Code> code) {
-      code << assign(Members.pos, refer(varPos));
-      code << assign(Members.ch, refer(varCh));
+    if (rule.kind == ProductionRuleKind.terminal &&
+        level == 0 &&
+        !node.isOptional) {
+      code << assign(Members.failPos, refer(Members.pos));
     }
 
-    if (variable$ != null && level != 0) {
-      final returnType = node.returnType;
-      code << declareVariable(refer(returnType + '?'), variable$);
+    if (variable != null) {
+      final returnType = Utils.getNullableType(node.resultType);
+      code << declareVariable(refer(returnType), variable);
     }
 
-    code << assignFinal(varCh, refer(Members.ch));
-    code << assignFinal(varPos, refer(Members.pos));
     if (expressions.length > 1) {
-      code <<
-          while$(literalTrue, (code) {
-            for (var i = 0; i < expressions.length; i++) {
-              final child = expressions[i];
-              if (variable$ != null) {
-                variable = allocator.alloc();
-              }
-
-              _acceptNode(child, code);
-
-              code <<
-                  if$(refer(Members.ok), (code) {
-                    if (variable$ != null) {
-                      code << assign(variable$, refer(variable));
-                    }
-
-                    code << break$;
-                  });
-
-              restoreState(code);
-            }
-
-            code << break$;
-          });
-
-      failure(code);
-
-      if (level == 0) {
-        code << refer(variable$).returned.statement;
+      switch (rule.kind) {
+        case ProductionRuleKind.nonterminal:
+          _generateMultipleChoiceNonterminal(node, variable, failure);
+          break;
+        default:
+          _generateMultipleChoiceTerminal(node, variable, failure);
       }
     } else {
-      final tail = _tails[node.parent] ?? IfElseGenerator(refer(Members.ok));
-      final child = expressions[0];
-      if (variable$ != null) {
-        variable = allocator.alloc();
-      }
-
-      _acceptNode(child, code);
-
-      if (variable$ == null) {
-        tail.elseCode((code) {
-          restoreState(code);
-          failure(code);
-        });
-
-        if (_tails[node.parent] == null) {
-          code.addAll(tail.generate());
-        }
-
-        if (level == 0) {
-          code << literalNull.returned.statement;
-        }
-      } else {
-        tail.ifCode((code) {
-          code << assign(variable$, refer(variable));
-        });
-
-        tail.elseCode((code) {
-          restoreState(code);
-          failure(code);
-        });
-
-        if (_tails[node.parent] == null) {
-          code.addAll(tail.generate());
-        }
-
-        if (level == 0) {
-          code << refer(variable$).returned.statement;
-        }
-      }
+      _generateSingleChoice(node, variable, failure);
     }
 
-    variable = variable$;
+    _childVariable = variable;
   }
 
   @override
   void visitSequence(SequenceExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final expressions = node.expressions;
-    final variables = <String>[];
-    final hasAction = node.actionIndex != null;
-    final semantic = expressions.where((e) => e.variable != null);
+    final localVariables = <String>[];
+    final semanticVariables = <String>[];
+    final types = <String>[];
     final code$ = code;
-    if (variable$ != null) {
-      final returnType = node.returnType;
-      code << declareVariable(refer(returnType + '?'), variable$);
-    }
-
-    void allocVariable(Expression expression) {
-      var needAlloc = false;
-      if (hasAction) {
-        if (expression.variable != null) {
-          needAlloc = true;
-        }
-      } else {
-        if (variable$ != null) {
-          if (semantic.isNotEmpty) {
-            if (expression.variable != null) {
-              needAlloc = true;
-            }
-          } else {
-            if (expression.index == 0) {
-              needAlloc = true;
-            }
-          }
-        }
-      }
-
-      if (needAlloc) {
-        variable = allocator.alloc();
-      }
-
-      variables.add(variable);
+    if (variable != null) {
+      final resultType = Utils.getNullableType(node.resultType);
+      code << declareVariable(refer(resultType), variable);
     }
 
     if (expressions.length > 1) {
       var needTest = false;
       for (var i = 0; i < expressions.length; i++) {
-        variable = null;
         final child = expressions[i];
-        allocVariable(child);
         if (needTest) {
           code <<
               if$(refer(Members.ok), (code) {
@@ -388,22 +298,36 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
           _acceptNode(child, code);
         }
 
+        localVariables.add(_childVariable);
+        semanticVariables.add(child.variable);
+        types.add(child.resultType);
         needTest = !child.isOptional;
       }
     } else {
       final child = expressions[0];
-      allocVariable(child);
       _acceptNode(child, code);
+      localVariables.add(_childVariable);
+      semanticVariables.add(child.variable);
+      types.add(child.resultType);
     }
 
-    if (variable$ != null || node.actionIndex != null) {
+    if (variable != null || node.actionIndex != null) {
+      final errors = <String>[];
       void action(List<Code> code) {
         final generator = ActionCodeGenerator(
-            code: code,
-            sequence: node,
-            variable: variable$,
-            variables: variables);
-        generator.generate();
+          code: code,
+          actionSource: node.actionSource,
+          localVariables: localVariables,
+          resultType: node.resultType,
+          semanticVariables: semanticVariables,
+          types: types,
+          variable: variable,
+        );
+        generator.generate(errors);
+        if (errors.isNotEmpty) {
+          final message = 'Error generating result for expression: $node';
+          throw StateError(message);
+        }
       }
 
       if (expressions.last.isOptional) {
@@ -414,7 +338,7 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
     }
 
     code = code$;
-    variable = variable$;
+    _childVariable = variable;
   }
 
   @override
@@ -429,53 +353,255 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
 
   @override
   void visitZeroOrMore(ZeroOrMoreExpression node) {
-    final variable$ = variable;
-    variable = null;
+    final variable = _allocNodeVar(node);
     final child = node.expression;
-    final tail = IfElseGenerator(refer(Members.ok));
+    final tail = _ifElse(refer(Members.ok));
     _tails[node] = tail;
-    if (variable$ == null) {
+    if (variable == null) {
       code <<
           while$(literalTrue, (code) {
             _acceptNode(child, code);
-
             tail.elseCode((code) {
               code << break$;
             });
 
             code.addAll(tail.generate());
           });
+
+      code << assign(Members.ok, literalTrue);
     } else {
-      variable = allocator.alloc();
-      final returnType = child.returnType;
-      final type = _isDynamicType(returnType) ? null : refer(returnType);
-      code << assignFinal(variable$, literalList([], type));
+      final listType = Utils.getNullableType(node.resultType);
+      code << declareVariable(refer(listType), variable);
+      final varList = allocator.alloc();
+      code << assignFinal(varList, literalList([], refer(child.resultType)));
       code <<
           while$(literalTrue, (code) {
             _acceptNode(child, code);
-
             tail.elseCode((code) {
               code << break$;
             });
 
             code.addAll(tail.generate());
+            final element =
+                Utils.getNullCheckedValue(_childVariable, child.resultType);
+            code << callMethod(varList, 'add', [refer(element)]).statement;
+          });
 
-            final element = child.nullCheckedValue(variable);
-            code << callMethod(variable$, 'add', [refer(element)]).statement;
+      //
+      code <<
+          if$(refer(Members.ok).assign(literalTrue), (code) {
+            code << assign(variable, refer(varList));
           });
     }
 
-    code << assign(Members.ok, literalTrue);
-
-    variable = variable$;
+    _childVariable = variable;
   }
 
   void _acceptNode(Expression node, List<Code> code) {
     _runBlock(code, () => node.accept(this));
   }
 
-  bool _isDynamicType(String type) {
-    return type == 'dynamic' || type == 'dynamic?';
+  String _allocNodeVar(Expression node) {
+    if (node.resultUsed) {
+      return allocator.alloc();
+    }
+
+    return null;
+  }
+
+  bool _canSequenceChangePos(SequenceExpression node) {
+    var count = 0;
+    for (final child in node.expressions) {
+      if (child is AndPredicateExpression) {
+        continue;
+      }
+
+      if (child is NotPredicateExpression) {
+        continue;
+      }
+
+      if (++count > 1) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  void _generateMultipleChoiceNonterminal(OrderedChoiceExpression node,
+      String variable, void Function(List<Code>) failure) {
+    final expressions = node.expressions;
+    var needSavePos = false;
+    for (final child in expressions) {
+      if (_canSequenceChangePos(child)) {
+        needSavePos = true;
+        break;
+      }
+    }
+
+    final storage = <String, String>{};
+    _storeVar(Members.ch, storage, code);
+    if (needSavePos) {
+      _storeVar(Members.pos, storage, code);
+    }
+
+    code <<
+        while$(literalTrue, (code) {
+          for (var i = 0; i < expressions.length; i++) {
+            final child = expressions[i];
+            if (variable != null) {
+              _childVariable = allocator.alloc();
+            }
+
+            _acceptNode(child, code);
+
+            code <<
+                if$(refer(Members.ok), (code) {
+                  if (variable != null) {
+                    code << assign(variable, refer(_childVariable));
+                  }
+
+                  code << break$;
+                });
+
+            if (_canSequenceChangePos(child)) {
+              _restoreVars(storage, code);
+            } else {
+              _restoreVar(Members.ch, storage, code);
+            }
+          }
+
+          code << break$;
+        });
+
+    failure(code);
+
+    if (node.level == 0) {
+      code << refer(variable).returned.statement;
+    }
+  }
+
+  void _generateMultipleChoiceTerminal(OrderedChoiceExpression node,
+      String variable, void Function(List<Code>) failure) {
+    final expressions = node.expressions;
+    var needSavePos = false;
+    for (final child in expressions) {
+      if (_canSequenceChangePos(child)) {
+        needSavePos = true;
+        break;
+      }
+    }
+
+    final storage = <String, String>{};
+    _storeVar(Members.ch, storage, code);
+    if (needSavePos) {
+      _storeVar(Members.pos, storage, code);
+    }
+
+    code <<
+        while$(literalTrue, (code) {
+          for (var i = 0; i < expressions.length; i++) {
+            final child = expressions[i];
+            if (variable != null) {
+              _childVariable = allocator.alloc();
+            }
+
+            _acceptNode(child, code);
+
+            code <<
+                if$(refer(Members.ok), (code) {
+                  if (variable != null) {
+                    code << assign(variable, refer(_childVariable));
+                  }
+
+                  code << break$;
+                });
+
+            if (_canSequenceChangePos(child)) {
+              _restoreVars(storage, code);
+            } else {
+              _restoreVar(Members.ch, storage, code);
+            }
+          }
+
+          code << break$;
+        });
+
+    failure(code);
+
+    if (node.level == 0) {
+      code << refer(variable).returned.statement;
+    }
+  }
+
+  void _generateSingleChoice(OrderedChoiceExpression node, String variable,
+      void Function(List<Code>) failure) {
+    final parent = node.parent;
+    final hasParentTail = _tails.containsKey(parent);
+    final tail = _tails[parent] ?? _ifElse(refer(Members.ok));
+    final child = node.expressions[0];
+    final needSavePos = _canSequenceChangePos(child);
+    if (variable != null) {
+      _childVariable = allocator.alloc();
+    }
+
+    final storage = <String, String>{};
+    if (needSavePos) {
+      _storeVar(Members.ch, storage, code);
+      _storeVar(Members.pos, storage, code);
+    }
+
+    _acceptNode(child, code);
+    if (variable == null) {
+      tail.elseCode((code) {
+        _restoreVars(storage, code);
+        failure(code);
+      });
+
+      if (!hasParentTail) {
+        code.addAll(tail.generate());
+      }
+
+      if (node.level == 0) {
+        code << literalNull.returned.statement;
+      }
+    } else {
+      tail.ifCode((code) {
+        code << assign(variable, refer(_childVariable));
+      });
+
+      tail.elseCode((code) {
+        _restoreVars(storage, code);
+        failure(code);
+      });
+
+      if (!hasParentTail) {
+        code.addAll(tail.generate());
+      }
+
+      if (node.level == 0) {
+        code << refer(variable).returned.statement;
+      }
+    }
+  }
+
+  IfElseGenerator _ifElse(_cb.Expression expression) {
+    return IfElseGenerator(expression);
+  }
+
+  void _restoreVar(String name, Map<String, String> storage, List<Code> code) {
+    if (!storage.containsKey(name)) {
+      throw StateError('The variable was not stored: $name');
+    }
+
+    final variable = storage[name];
+    code << assign(name, refer(variable));
+  }
+
+  void _restoreVars(Map<String, String> storage, List<Code> code) {
+    for (final key in storage.keys) {
+      _restoreVar(key, storage, code);
+    }
   }
 
   void _runBlock(List<Code> code, void Function() f) {
@@ -485,18 +611,28 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
     this.code = code$;
   }
 
-  void _visitSymbol(SymbolExpression node) {
-    final variable$ = variable;
-    variable = null;
-    final rule = node.expression.rule;
-    final identifier = Utils.getRuleIdentifier(rule);
-    final invoke = call$(identifier);
-    if (variable$ == null) {
-      code << invoke.statement;
-    } else {
-      code << assignFinal(variable$, invoke);
+  String _storeVar(String name, Map<String, String> storage, List<Code> code) {
+    if (storage.containsKey(name)) {
+      throw StateError('Variable already stored: $name');
     }
 
-    variable = variable$;
+    final variable = allocator.alloc();
+    code << assignFinal(variable, refer(name));
+    storage[name] = variable;
+    return variable;
+  }
+
+  void _visitSymbol(SymbolExpression node) {
+    final variable = _allocNodeVar(node);
+    final rule = node.expression.rule;
+    final identifier = Helper.getRuleIdentifier(rule);
+    final invoke = call$(identifier);
+    if (variable == null) {
+      code << invoke.statement;
+    } else {
+      code << assignFinal(variable, invoke);
+    }
+
+    _childVariable = variable;
   }
 }

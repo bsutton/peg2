@@ -2,67 +2,79 @@
 part of '../../parser_generator.dart';
 
 class ActionCodeGenerator {
+  final String actionSource;
+
   final List<Code> code;
 
-  final SequenceExpression sequence;
+  final List<String> localVariables;
 
-  final String variable;
+  final List<String> semanticVariables;
 
-  final List<String> variables;
+  String resultType;
+
+  final List<String> types;
+
+  String variable;
 
   ActionCodeGenerator(
-      {@required this.code,
-      @required this.sequence,
-      @required this.variable,
-      @required this.variables});
+      {@required this.actionSource,
+      @required this.code,
+      @required this.localVariables,
+      @required this.semanticVariables,
+      @required this.resultType,
+      @required this.types,
+      @required this.variable});
 
-  void generate() {
-    if (sequence.actionIndex != null) {
-      _genearteActionCode();
+  void generate(List<String> errors) {
+    if (actionSource != null) {
+      _genearteActionCode(errors);
     } else {
-      _generateResultCode();
+      _generateResultCode(errors);
     }
   }
 
-  void _error() {
-    final sink = StringBuffer();
-    sink.writeln('Error generating result return code.');
-    sink.write('Expression: $sequence');
-    throw StateError(sink.toString());
-  }
-
-  void _genearteActionCode() {
-    final expressions = sequence.expressions;
-    final sink = StringBuffer();
-    for (var i = 0; i < expressions.length; i++) {
-      final expression = expressions[i];
-      final left = expression.variable;
-      if (left == null) {
+  void _assignSemanticVariables(StringSink sink, List<String> errors) {
+    for (var i = 0; i < semanticVariables.length; i++) {
+      final semanticVariable = semanticVariables[i];
+      if (semanticVariable == null) {
         continue;
       }
 
-      final right = variables[i];
-      if (right == null) {
-        _error();
+      final localVariable = localVariables[i];
+      if (localVariable == null) {
+        errors.add(
+            'No local variable specified for the semantic variable \'$semanticVariable\'');
+        return;
       }
 
+      final type = types[i];
+      if (type == null) {
+        errors.add(
+            'The value type is not specified for the semantic variable \'$semanticVariable\'');
+        return;
+      }
+
+      final value = Utils.getNullCheckedValue(localVariable, type);
       sink.write('final ');
-      sink.write(left);
+      sink.write(semanticVariable);
       sink.write(' = ');
-      sink.write(expression.nullCheckedValue(right));
+      sink.write(value);
       sink.write(';');
     }
+  }
 
-    final returnType = sequence.returnType;
-    if (_isDynamicType(returnType)) {
+  void _genearteActionCode(List<String> errors) {
+    final sink = StringBuffer();
+    _assignSemanticVariables(sink, errors);
+    if (Utils.isDynamicType(resultType)) {
       sink.write('var ');
     } else {
       sink.write('late ');
-      sink.write(sequence.returnType);
+      sink.write(resultType);
     }
 
     sink.write(' \$\$;');
-    sink.write(sequence.actionSource);
+    sink.write(actionSource);
     if (variable != null) {
       sink.write(variable);
       sink.write(' = \$\$;');
@@ -71,61 +83,39 @@ class ActionCodeGenerator {
     code << Code(sink.toString());
   }
 
-  void _generateResultCode() {
+  void _generateResultCode(List<String> errors) {
     if (variable == null) {
-      _error();
+      errors.add('A local variable was not specified to assign the result');
+      return;
     }
 
-    final right = _getDefaultResult();
+    if (semanticVariables.isEmpty) {
+      errors.add('No variables are specified to assign the result');
+      return;
+    }
+
     final sink = StringBuffer();
-    sink.write(variable);
-    sink.write(' = ');
-    sink.write(right);
-    sink.write(';');
-    code << Code(sink.toString());
-  }
-
-  String _getDefaultResult() {
-    final expressions = sequence.expressions;
-    final semantic = expressions.where((e) => e.variable != null).toList();
-    String right;
-    if (expressions.length == 1) {
-      right = variables[0];
-    } else {
-      if (semantic.isEmpty) {
-        right = variables[0];
-      } else if (semantic.length == 1) {
-        final index = semantic[0].index;
-        right = variables[index];
-      } else {
-        final list = <String>[];
-        var success = true;
-        for (var i = 0; i < expressions.length; i++) {
-          final expression = expressions[i];
-          if (expression.variable != null) {
-            final variable = variables[i];
-            if (variable == null) {
-              success = false;
-              break;
-            }
-          }
-        }
-
-        if (success) {
-          right = list.join(', ');
-          right = '[$right]';
-        }
+    _assignSemanticVariables(sink, errors);
+    final values = <String>[];
+    for (var i = 0; i < semanticVariables.length; i++) {
+      final semanticVariable = semanticVariables[i];
+      if (semanticVariable != null) {
+        values.add(semanticVariable);
       }
     }
 
-    if (right == null) {
-      _error();
+    if (values.isEmpty) {
+      final value = localVariables.first;
+      values.add(value);
     }
 
-    return right;
-  }
+    final value =
+        values.length == 1 ? values.first : '[' + values.join(', ') + ']';
 
-  bool _isDynamicType(String type) {
-    return type == 'dynamic' || type == 'dynamic?';
+    sink.write(variable);
+    sink.write(' = ');
+    sink.write(value);
+    sink.write(';');
+    code << Code(sink.toString());
   }
 }

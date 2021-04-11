@@ -22,6 +22,8 @@ class Members {
 
   static const matchRange = '_matchRange';
 
+  static const matchRanges = '_matchRanges';
+
   static const matchString = '_matchString';
 
   static const ok = 'ok';

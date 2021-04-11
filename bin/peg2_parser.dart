@@ -76,42 +76,46 @@ class Peg2Parser {
 
   Grammar? parseGrammar() {
     Grammar? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    Grammar? $3;
+    final $2 = _ch;
+    final $3 = _pos;
+    Grammar? $4;
     parse_leading_spaces();
     ok = true;
-    final $5 = parse_globals();
-    final $4 = $5;
+    final $6 = parse_globals();
+    final $5 = $6;
     ok = true;
-    final $7 = parse_members();
-    final $6 = $7;
+    final $8 = parse_members();
+    final $7 = $8;
     ok = true;
-    final $8 = <ProductionRule>[];
+    List<ProductionRule>? $9;
+    final $10 = <ProductionRule>[];
     while (true) {
-      final $9 = parseDefinition();
+      final $11 = parseDefinition();
       if (!ok) {
         break;
       }
-      $8.add($9!);
+      $10.add($11!);
     }
-    ok = $8.isNotEmpty;
+    if ($10.isNotEmpty) {
+      $9 = $10;
+      ok = true;
+    }
     if (ok) {
       parse_end_of_file();
       if (ok) {
-        final g = $4;
-        final m = $6;
-        final d = $8;
+        final g = $5;
+        final m = $7;
+        final d = $9!;
         late Grammar $$;
         $$ = Grammar(d, g, m);
-        $3 = $$;
+        $4 = $$;
       }
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
@@ -119,7 +123,6 @@ class Peg2Parser {
   ProductionRule? parseDefinition() {
     ProductionRule? $0;
     final $1 = _ch;
-    final $2 = _pos;
     while (true) {
       ProductionRule? $3;
       final $4 = parseNonterminalDefinition();
@@ -130,29 +133,26 @@ class Peg2Parser {
         $0 = $3;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      ProductionRule? $5;
-      final $6 = parseTerminalDefinition();
+      ProductionRule? $6;
+      final $7 = parseTerminalDefinition();
       if (ok) {
-        $5 = $6;
+        $6 = $7;
       }
       if (ok) {
-        $0 = $5;
+        $0 = $6;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      ProductionRule? $7;
-      final $8 = parseSubterminalDefinition();
+      ProductionRule? $9;
+      final $10 = parseSubterminalDefinition();
       if (ok) {
-        $7 = $8;
+        $9 = $10;
       }
       if (ok) {
-        $0 = $7;
+        $0 = $9;
         break;
       }
-      _pos = $2;
       _ch = $1;
       break;
     }
@@ -164,58 +164,58 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      ProductionRule? $3;
-      final $4 = parseType();
+      ProductionRule? $4;
+      final $5 = parseType();
       if (ok) {
-        final $5 = parse_non_terminal_name();
+        final $6 = parse_non_terminal_name();
         if (ok) {
           parse_$EqualSign();
           if (ok) {
-            final $6 = parseNonterminalExpression();
+            final $7 = parseNonterminalExpression();
             if (ok) {
               parse_$Semicolon();
               if (ok) {
-                final t = $4!;
-                final n = $5!;
-                final e = $6!;
+                final t = $5!;
+                final n = $6!;
+                final e = $7!;
                 late ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, t);
-                $3 = $$;
+                $4 = $$;
               }
             }
           }
         }
       }
       if (ok) {
-        $0 = $3;
+        $0 = $4;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      ProductionRule? $7;
-      final $8 = parse_non_terminal_name();
+      _pos = $2;
+      ProductionRule? $9;
+      final $10 = parse_non_terminal_name();
       if (ok) {
         parse_$EqualSign();
         if (ok) {
-          final $9 = parseNonterminalExpression();
+          final $11 = parseNonterminalExpression();
           if (ok) {
             parse_$Semicolon();
             if (ok) {
-              final n = $8!;
-              final e = $9!;
+              final n = $10!;
+              final e = $11!;
               late ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, null);
-              $7 = $$;
+              $9 = $$;
             }
           }
         }
       }
       if (ok) {
-        $0 = $7;
+        $0 = $9;
         break;
       }
-      _pos = $2;
       _ch = $1;
+      _pos = $2;
       break;
     }
     return $0;
@@ -223,197 +223,198 @@ class Peg2Parser {
 
   OrderedChoiceExpression? parseNonterminalExpression() {
     OrderedChoiceExpression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    OrderedChoiceExpression? $3;
-    final $4 = parseNonterminalSequence();
+    final $2 = _ch;
+    final $3 = _pos;
+    OrderedChoiceExpression? $4;
+    final $5 = parseNonterminalSequence();
     if (ok) {
-      final $5 = <SequenceExpression>[];
+      List<SequenceExpression>? $6;
+      final $7 = <SequenceExpression>[];
       while (true) {
-        SequenceExpression? $6;
-        final $7 = _ch;
-        final $8 = _pos;
-        SequenceExpression? $9;
+        SequenceExpression? $8;
+        final $10 = _ch;
+        final $11 = _pos;
+        SequenceExpression? $12;
         parse_$Slash();
         if (ok) {
-          final $10 = parseNonterminalSequence();
+          final $13 = parseNonterminalSequence();
           if (ok) {
-            $9 = $10;
+            final e = $13!;
+            $12 = e;
           }
         }
         if (ok) {
-          $6 = $9;
+          $8 = $12;
         } else {
-          _pos = $8;
-          _ch = $7;
+          _ch = $10;
+          _pos = $11;
           break;
         }
-        $5.add($6!);
+        $7.add($8!);
       }
-      ok = true;
-      final e = $4!;
-      final n = $5;
+      if (ok = true) {
+        $6 = $7;
+      }
+      final e = $5!;
+      final n = $6!;
       late OrderedChoiceExpression $$;
       $$ = OrderedChoiceExpression([e, ...n]);
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
 
   SequenceExpression? parseNonterminalSequence() {
     SequenceExpression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    SequenceExpression? $3;
-    final $4 = <Expression>[];
+    final $2 = _ch;
+    final $3 = _pos;
+    SequenceExpression? $4;
+    List<Expression>? $5;
+    final $6 = <Expression>[];
     while (true) {
-      final $5 = parseNonterminalPrefix();
+      final $7 = parseNonterminalPrefix();
       if (!ok) {
         break;
       }
-      $4.add($5!);
+      $6.add($7!);
     }
-    ok = $4.isNotEmpty;
-    if (ok) {
-      final $7 = parse_action();
-      final $6 = $7;
+    if ($6.isNotEmpty) {
+      $5 = $6;
       ok = true;
-      final e = $4;
-      final a = $6;
+    }
+    if (ok) {
+      final $9 = parse_action();
+      final $8 = $9;
+      ok = true;
+      final e = $5!;
+      final a = $8;
       late SequenceExpression $$;
       $$ = SequenceExpression(e, a);
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
 
   Expression? parseNonterminalPrefix() {
     Expression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    Expression? $3;
-    final $5 = parse_semantic_value();
-    final $4 = $5;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    final $6 = parse_semantic_value();
+    final $5 = $6;
     ok = true;
-    String? $7;
-    final $8 = _ch;
-    final $9 = _pos;
+    String? $8;
+    final $9 = _ch;
     while (true) {
-      String? $10;
-      final $11 = parse_$Ampersand();
+      String? $11;
+      final $12 = parse_$Ampersand();
       if (ok) {
-        $10 = $11;
+        $11 = $12;
       }
       if (ok) {
-        $7 = $10;
+        $8 = $11;
         break;
       }
-      _pos = $9;
-      _ch = $8;
-      String? $12;
-      final $13 = parse_$ExclamationMark();
+      _ch = $9;
+      String? $14;
+      final $15 = parse_$ExclamationMark();
       if (ok) {
-        $12 = $13;
+        $14 = $15;
       }
       if (ok) {
-        $7 = $12;
+        $8 = $14;
         break;
       }
-      _pos = $9;
-      _ch = $8;
+      _ch = $9;
       break;
     }
-    final $6 = $7;
+    final $7 = $8;
     ok = true;
-    final $14 = parseNonterminalSuffix();
+    final $16 = parseNonterminalSuffix();
     if (ok) {
-      final s = $4;
-      final p = $6;
-      final e = $14!;
+      final s = $5;
+      final p = $7;
+      final e = $16!;
       late Expression $$;
       $$ = _prefix(p, e, s);
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
 
   Expression? parseNonterminalSuffix() {
     Expression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    Expression? $3;
-    final $4 = parseNonterminalPrimary();
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    final $5 = parseNonterminalPrimary();
     if (ok) {
-      String? $6;
-      final $7 = _ch;
-      final $8 = _pos;
+      String? $7;
+      final $8 = _ch;
       while (true) {
-        String? $9;
-        final $10 = parse_$QuestionMark();
+        String? $10;
+        final $11 = parse_$QuestionMark();
         if (ok) {
-          $9 = $10;
+          $10 = $11;
         }
         if (ok) {
-          $6 = $9;
+          $7 = $10;
           break;
         }
-        _pos = $8;
-        _ch = $7;
-        String? $11;
-        final $12 = parse_$Asterisk();
-        if (ok) {
-          $11 = $12;
-        }
-        if (ok) {
-          $6 = $11;
-          break;
-        }
-        _pos = $8;
-        _ch = $7;
+        _ch = $8;
         String? $13;
-        final $14 = parse_$PlusSign();
+        final $14 = parse_$Asterisk();
         if (ok) {
           $13 = $14;
         }
         if (ok) {
-          $6 = $13;
+          $7 = $13;
           break;
         }
-        _pos = $8;
-        _ch = $7;
+        _ch = $8;
+        String? $16;
+        final $17 = parse_$PlusSign();
+        if (ok) {
+          $16 = $17;
+        }
+        if (ok) {
+          $7 = $16;
+          break;
+        }
+        _ch = $8;
         break;
       }
-      final $5 = $6;
+      final $6 = $7;
       ok = true;
-      final e = $4!;
-      final s = $5;
+      final e = $5!;
+      final s = $6;
       late Expression $$;
       $$ = _suffix(s, e);
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
@@ -423,51 +424,50 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      Expression? $3;
-      final $4 = parse_non_terminal_name();
+      Expression? $4;
+      final $5 = parse_non_terminal_name();
       if (ok) {
-        final n = $4!;
+        final n = $5!;
         late Expression $$;
         $$ = NonterminalExpression(n);
-        $3 = $$;
+        $4 = $$;
       }
       if (ok) {
-        $0 = $3;
+        $0 = $4;
         break;
       }
-      _pos = $2;
-      _ch = $1;
-      Expression? $5;
-      final $6 = parse_terminal_name();
-      if (ok) {
-        final n = $6!;
-        late Expression $$;
-        $$ = TerminalExpression(n);
-        $5 = $$;
-      }
-      if (ok) {
-        $0 = $5;
-        break;
-      }
-      _pos = $2;
       _ch = $1;
       Expression? $7;
-      parse_$LeftParenthesis();
+      final $8 = parse_terminal_name();
       if (ok) {
-        final $8 = parseNonterminalExpression();
-        if (ok) {
-          parse_$RightParenthesis();
-          if (ok) {
-            $7 = $8;
-          }
-        }
+        final n = $8!;
+        late Expression $$;
+        $$ = TerminalExpression(n);
+        $7 = $$;
       }
       if (ok) {
         $0 = $7;
         break;
       }
-      _pos = $2;
       _ch = $1;
+      Expression? $10;
+      parse_$LeftParenthesis();
+      if (ok) {
+        final $11 = parseNonterminalExpression();
+        if (ok) {
+          parse_$RightParenthesis();
+          if (ok) {
+            final e = $11!;
+            $10 = e;
+          }
+        }
+      }
+      if (ok) {
+        $0 = $10;
+        break;
+      }
+      _ch = $1;
+      _pos = $2;
       break;
     }
     return $0;
@@ -478,58 +478,58 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      ProductionRule? $3;
-      final $4 = parseType();
+      ProductionRule? $4;
+      final $5 = parseType();
       if (ok) {
-        final $5 = parse_terminal_name();
+        final $6 = parse_terminal_name();
         if (ok) {
           parse_$EqualSign();
           if (ok) {
-            final $6 = parseExpression();
+            final $7 = parseExpression();
             if (ok) {
               parse_$Semicolon();
               if (ok) {
-                final t = $4!;
-                final n = $5!;
-                final e = $6!;
+                final t = $5!;
+                final n = $6!;
+                final e = $7!;
                 late ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.terminal, e, t);
-                $3 = $$;
+                $4 = $$;
               }
             }
           }
         }
       }
       if (ok) {
-        $0 = $3;
+        $0 = $4;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      ProductionRule? $7;
-      final $8 = parse_terminal_name();
+      _pos = $2;
+      ProductionRule? $9;
+      final $10 = parse_terminal_name();
       if (ok) {
         parse_$EqualSign();
         if (ok) {
-          final $9 = parseExpression();
+          final $11 = parseExpression();
           if (ok) {
             parse_$Semicolon();
             if (ok) {
-              final n = $8!;
-              final e = $9!;
+              final n = $10!;
+              final e = $11!;
               late ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.terminal, e, null);
-              $7 = $$;
+              $9 = $$;
             }
           }
         }
       }
       if (ok) {
-        $0 = $7;
+        $0 = $9;
         break;
       }
-      _pos = $2;
       _ch = $1;
+      _pos = $2;
       break;
     }
     return $0;
@@ -537,197 +537,198 @@ class Peg2Parser {
 
   OrderedChoiceExpression? parseExpression() {
     OrderedChoiceExpression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    OrderedChoiceExpression? $3;
-    final $4 = parseSequence();
+    final $2 = _ch;
+    final $3 = _pos;
+    OrderedChoiceExpression? $4;
+    final $5 = parseSequence();
     if (ok) {
-      final $5 = <SequenceExpression>[];
+      List<SequenceExpression>? $6;
+      final $7 = <SequenceExpression>[];
       while (true) {
-        SequenceExpression? $6;
-        final $7 = _ch;
-        final $8 = _pos;
-        SequenceExpression? $9;
+        SequenceExpression? $8;
+        final $10 = _ch;
+        final $11 = _pos;
+        SequenceExpression? $12;
         parse_$Slash();
         if (ok) {
-          final $10 = parseSequence();
+          final $13 = parseSequence();
           if (ok) {
-            $9 = $10;
+            final e = $13!;
+            $12 = e;
           }
         }
         if (ok) {
-          $6 = $9;
+          $8 = $12;
         } else {
-          _pos = $8;
-          _ch = $7;
+          _ch = $10;
+          _pos = $11;
           break;
         }
-        $5.add($6!);
+        $7.add($8!);
       }
-      ok = true;
-      final e = $4!;
-      final n = $5;
+      if (ok = true) {
+        $6 = $7;
+      }
+      final e = $5!;
+      final n = $6!;
       late OrderedChoiceExpression $$;
       $$ = OrderedChoiceExpression([e, ...n]);
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
 
   SequenceExpression? parseSequence() {
     SequenceExpression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    SequenceExpression? $3;
-    final $4 = <Expression>[];
+    final $2 = _ch;
+    final $3 = _pos;
+    SequenceExpression? $4;
+    List<Expression>? $5;
+    final $6 = <Expression>[];
     while (true) {
-      final $5 = parsePrefix();
+      final $7 = parsePrefix();
       if (!ok) {
         break;
       }
-      $4.add($5!);
+      $6.add($7!);
     }
-    ok = $4.isNotEmpty;
-    if (ok) {
-      final $7 = parse_action();
-      final $6 = $7;
+    if ($6.isNotEmpty) {
+      $5 = $6;
       ok = true;
-      final e = $4;
-      final a = $6;
+    }
+    if (ok) {
+      final $9 = parse_action();
+      final $8 = $9;
+      ok = true;
+      final e = $5!;
+      final a = $8;
       late SequenceExpression $$;
       $$ = SequenceExpression(e, a);
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
 
   Expression? parsePrefix() {
     Expression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    Expression? $3;
-    final $5 = parse_semantic_value();
-    final $4 = $5;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    final $6 = parse_semantic_value();
+    final $5 = $6;
     ok = true;
-    String? $7;
-    final $8 = _ch;
-    final $9 = _pos;
+    String? $8;
+    final $9 = _ch;
     while (true) {
-      String? $10;
-      final $11 = parse_$Ampersand();
+      String? $11;
+      final $12 = parse_$Ampersand();
       if (ok) {
-        $10 = $11;
+        $11 = $12;
       }
       if (ok) {
-        $7 = $10;
+        $8 = $11;
         break;
       }
-      _pos = $9;
-      _ch = $8;
-      String? $12;
-      final $13 = parse_$ExclamationMark();
+      _ch = $9;
+      String? $14;
+      final $15 = parse_$ExclamationMark();
       if (ok) {
-        $12 = $13;
+        $14 = $15;
       }
       if (ok) {
-        $7 = $12;
+        $8 = $14;
         break;
       }
-      _pos = $9;
-      _ch = $8;
+      _ch = $9;
       break;
     }
-    final $6 = $7;
+    final $7 = $8;
     ok = true;
-    final $14 = parseSuffix();
+    final $16 = parseSuffix();
     if (ok) {
-      final s = $4;
-      final p = $6;
-      final e = $14!;
+      final s = $5;
+      final p = $7;
+      final e = $16!;
       late Expression $$;
       $$ = _prefix(p, e, s);
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
 
   Expression? parseSuffix() {
     Expression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    Expression? $3;
-    final $4 = parsePrimary();
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    final $5 = parsePrimary();
     if (ok) {
-      String? $6;
-      final $7 = _ch;
-      final $8 = _pos;
+      String? $7;
+      final $8 = _ch;
       while (true) {
-        String? $9;
-        final $10 = parse_$QuestionMark();
+        String? $10;
+        final $11 = parse_$QuestionMark();
         if (ok) {
-          $9 = $10;
+          $10 = $11;
         }
         if (ok) {
-          $6 = $9;
+          $7 = $10;
           break;
         }
-        _pos = $8;
-        _ch = $7;
-        String? $11;
-        final $12 = parse_$Asterisk();
-        if (ok) {
-          $11 = $12;
-        }
-        if (ok) {
-          $6 = $11;
-          break;
-        }
-        _pos = $8;
-        _ch = $7;
+        _ch = $8;
         String? $13;
-        final $14 = parse_$PlusSign();
+        final $14 = parse_$Asterisk();
         if (ok) {
           $13 = $14;
         }
         if (ok) {
-          $6 = $13;
+          $7 = $13;
           break;
         }
-        _pos = $8;
-        _ch = $7;
+        _ch = $8;
+        String? $16;
+        final $17 = parse_$PlusSign();
+        if (ok) {
+          $16 = $17;
+        }
+        if (ok) {
+          $7 = $16;
+          break;
+        }
+        _ch = $8;
         break;
       }
-      final $5 = $6;
+      final $6 = $7;
       ok = true;
-      final e = $4!;
-      final s = $5;
+      final e = $5!;
+      final s = $6;
       late Expression $$;
       $$ = _suffix(s, e);
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
@@ -737,92 +738,89 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      Expression? $3;
-      final $4 = parse_sub_terminal_name();
+      Expression? $4;
+      final $5 = parse_sub_terminal_name();
       if (ok) {
-        final n = $4!;
+        final n = $5!;
         late Expression $$;
         $$ = SubterminalExpression(n);
-        $3 = $$;
+        $4 = $$;
       }
       if (ok) {
-        $0 = $3;
+        $0 = $4;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      Expression? $5;
+      Expression? $7;
       parse_$LeftParenthesis();
       if (ok) {
-        final $6 = parseExpression();
+        final $8 = parseExpression();
         if (ok) {
           parse_$RightParenthesis();
           if (ok) {
-            $5 = $6;
+            final e = $8!;
+            $7 = e;
           }
         }
-      }
-      if (ok) {
-        $0 = $5;
-        break;
-      }
-      _pos = $2;
-      _ch = $1;
-      Expression? $7;
-      final $8 = parse_literal();
-      if (ok) {
-        $7 = $8;
       }
       if (ok) {
         $0 = $7;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      Expression? $9;
-      final $10 = parse_character_class();
+      _pos = $2;
+      Expression? $10;
+      final $11 = parse_literal();
       if (ok) {
-        $9 = $10;
+        $10 = $11;
       }
       if (ok) {
-        $0 = $9;
+        $0 = $10;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      Expression? $11;
+      Expression? $13;
+      final $14 = parse_character_class();
+      if (ok) {
+        $13 = $14;
+      }
+      if (ok) {
+        $0 = $13;
+        break;
+      }
+      _ch = $1;
+      Expression? $16;
       parse_$Period();
       if (ok) {
         late Expression $$;
         $$ = AnyCharacterExpression();
-        $11 = $$;
+        $16 = $$;
       }
       if (ok) {
-        $0 = $11;
+        $0 = $16;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      Expression? $12;
+      Expression? $18;
       parse_$LessThanSign();
       if (ok) {
-        final $13 = parseExpression();
+        final $19 = parseExpression();
         if (ok) {
           parse_$GreaterThanSign();
           if (ok) {
-            final e = $13!;
+            final e = $19!;
             late Expression $$;
             $$ = CaptureExpression(e);
-            $12 = $$;
+            $18 = $$;
           }
         }
       }
       if (ok) {
-        $0 = $12;
+        $0 = $18;
         break;
       }
-      _pos = $2;
       _ch = $1;
+      _pos = $2;
       break;
     }
     return $0;
@@ -833,58 +831,58 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      ProductionRule? $3;
-      final $4 = parseType();
+      ProductionRule? $4;
+      final $5 = parseType();
       if (ok) {
-        final $5 = parse_sub_terminal_name();
+        final $6 = parse_sub_terminal_name();
         if (ok) {
           parse_$EqualSign();
           if (ok) {
-            final $6 = parseExpression();
+            final $7 = parseExpression();
             if (ok) {
               parse_$Semicolon();
               if (ok) {
-                final t = $4!;
-                final n = $5!;
-                final e = $6!;
+                final t = $5!;
+                final n = $6!;
+                final e = $7!;
                 late ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, t);
-                $3 = $$;
+                $4 = $$;
               }
             }
           }
         }
       }
       if (ok) {
-        $0 = $3;
+        $0 = $4;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      ProductionRule? $7;
-      final $8 = parse_sub_terminal_name();
+      _pos = $2;
+      ProductionRule? $9;
+      final $10 = parse_sub_terminal_name();
       if (ok) {
         parse_$EqualSign();
         if (ok) {
-          final $9 = parseExpression();
+          final $11 = parseExpression();
           if (ok) {
             parse_$Semicolon();
             if (ok) {
-              final n = $8!;
-              final e = $9!;
+              final n = $10!;
+              final e = $11!;
               late ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, null);
-              $7 = $$;
+              $9 = $$;
             }
           }
         }
       }
       if (ok) {
-        $0 = $7;
+        $0 = $9;
         break;
       }
-      _pos = $2;
       _ch = $1;
+      _pos = $2;
       break;
     }
     return $0;
@@ -892,44 +890,45 @@ class Peg2Parser {
 
   String? parseType() {
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = parseTypeName();
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = parseTypeName();
     if (ok) {
-      List<String>? $6;
-      final $7 = _ch;
-      final $8 = _pos;
-      List<String>? $9;
+      List<String>? $7;
+      final $9 = _ch;
+      final $10 = _pos;
+      List<String>? $11;
       parse_$LessThanSign();
       if (ok) {
-        final $10 = parseTypeArguments();
+        final $12 = parseTypeArguments();
         if (ok) {
           parse_$GreaterThanSign();
           if (ok) {
-            $9 = $10;
+            final a = $12!;
+            $11 = a;
           }
         }
       }
       if (ok) {
-        $6 = $9;
+        $7 = $11;
       } else {
-        _pos = $8;
-        _ch = $7;
+        _ch = $9;
+        _pos = $10;
       }
-      final $5 = $6;
+      final $6 = $7;
       ok = true;
-      final n = $4!;
-      final a = $5;
+      final n = $5!;
+      final a = $6;
       late String $$;
       $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
@@ -939,37 +938,36 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      String? $3;
-      final $4 = parse_library_prefix();
+      String? $4;
+      final $5 = parse_library_prefix();
       if (ok) {
         parse_$Period();
         if (ok) {
-          final $5 = parse_type_name();
+          final $6 = parse_type_name();
           if (ok) {
-            final p = $4!;
-            final n = $5!;
+            final p = $5!;
+            final n = $6!;
             late String $$;
             $$ = '$p.$n';
-            $3 = $$;
+            $4 = $$;
           }
         }
       }
       if (ok) {
-        $0 = $3;
+        $0 = $4;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      String? $6;
-      final $7 = parse_type_name();
+      _pos = $2;
+      String? $8;
+      final $9 = parse_type_name();
       if (ok) {
-        $6 = $7;
+        $8 = $9;
       }
       if (ok) {
-        $0 = $6;
+        $0 = $8;
         break;
       }
-      _pos = $2;
       _ch = $1;
       break;
     }
@@ -978,290 +976,283 @@ class Peg2Parser {
 
   List<String>? parseTypeArguments() {
     List<String>? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    List<String>? $3;
-    final $4 = parseType();
+    final $2 = _ch;
+    final $3 = _pos;
+    List<String>? $4;
+    final $5 = parseType();
     if (ok) {
-      final $5 = <String>[];
+      List<String>? $6;
+      final $7 = <String>[];
       while (true) {
-        String? $6;
-        final $7 = _ch;
-        final $8 = _pos;
-        String? $9;
+        String? $8;
+        final $10 = _ch;
+        final $11 = _pos;
+        String? $12;
         parse_$Comma();
         if (ok) {
-          final $10 = parseType();
+          final $13 = parseType();
           if (ok) {
-            $9 = $10;
+            final t = $13!;
+            $12 = t;
           }
         }
         if (ok) {
-          $6 = $9;
+          $8 = $12;
         } else {
-          _pos = $8;
-          _ch = $7;
+          _ch = $10;
+          _pos = $11;
           break;
         }
-        $5.add($6!);
+        $7.add($8!);
       }
-      ok = true;
-      final t = $4!;
-      final n = $5;
+      if (ok = true) {
+        $6 = $7;
+      }
+      final t = $5!;
+      final n = $6!;
       late List<String> $$;
       $$ = [t, ...n];
-      $3 = $$;
+      $4 = $$;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
 
   String? parse_non_terminal_name() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = parse$$IDENTIFIER();
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = parse$$IDENTIFIER();
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
+      $4 = $5;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'non terminal name\'');
     }
     return $0;
   }
 
   String? parse_terminal_name() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
+    final $2 = _ch;
+    final $3 = _pos;
     String? $4;
-    final $5 = _pos;
-    final $6 = _ch;
-    final $7 = _pos;
+    String? $5;
+    final $6 = _pos;
+    final $7 = _ch;
+    final $8 = _pos;
     _matchChar(39, 39);
     if (ok) {
-      var $8 = 0;
+      var $9 = 0;
       while (true) {
-        final $9 = _ch;
-        final $10 = _pos;
-        final $11 = _ch;
-        final $12 = _pos;
+        final $10 = _ch;
+        final $11 = _pos;
+        final $12 = _failPos;
+        final $13 = _failStart;
+        final $14 = _failures;
         _matchChar(39, 39);
-        _ch = $11;
-        _pos = $12;
+        _ch = $10;
+        _pos = $11;
+        _failPos = $12;
+        _failStart = $13;
+        _failures = $14;
         ok = !ok;
         if (ok) {
           parse$$TERMINAL_CHAR();
         }
         if (!ok) {
-          _pos = $10;
-          _ch = $9;
-        }
-        if (!ok) {
           break;
         }
-        $8++;
+        $9++;
       }
-      ok = $8 != 0;
+      ok = $9 != 0;
       if (ok) {
         _matchChar(39, 39);
       }
     }
     if (!ok) {
-      _pos = $7;
-      _ch = $6;
+      _ch = $7;
+      _pos = $8;
     }
     if (ok) {
-      $4 = _source.substring($5, _pos);
+      $5 = _source.substring($6, _pos);
     }
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
+      $4 = $5;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'terminal name\'');
     }
     return $0;
   }
 
   String? parse_sub_terminal_name() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
+    final $2 = _ch;
+    final $3 = _pos;
     String? $4;
-    final $5 = _pos;
-    final $6 = _ch;
-    final $7 = _pos;
+    String? $5;
+    final $6 = _pos;
+    final $7 = _ch;
+    final $8 = _pos;
     _matchChar(64, 64);
     if (ok) {
       parse$$IDENTIFIER();
     }
     if (!ok) {
-      _pos = $7;
-      _ch = $6;
+      _ch = $7;
+      _pos = $8;
     }
     if (ok) {
-      $4 = _source.substring($5, _pos);
+      $5 = _source.substring($6, _pos);
     }
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
+      $4 = $5;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'sub terminal name\'');
     }
     return $0;
   }
 
   String? parse_semantic_value() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = parse$$IDENTIFIER();
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = parse$$IDENTIFIER();
     if (ok) {
       _matchChar(58, ':');
       if (ok) {
-        $3 = $4;
+        $4 = $5;
       }
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'semantic value\'');
     }
     return $0;
   }
 
   String? parse_type_name() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
+    final $2 = _ch;
+    final $3 = _pos;
     String? $4;
-    final $5 = _pos;
-    final $6 = _ch;
-    final $7 = _pos;
+    String? $5;
+    final $6 = _pos;
+    final $7 = _ch;
+    final $8 = _pos;
     parse$$IDENTIFIER();
     if (ok) {
       _matchChar(63, 63);
       ok = true;
     }
     if (!ok) {
-      _pos = $7;
-      _ch = $6;
+      _ch = $7;
+      _pos = $8;
     }
     if (ok) {
-      $4 = _source.substring($5, _pos);
+      $5 = _source.substring($6, _pos);
     }
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
+      $4 = $5;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'type name\'');
     }
     return $0;
   }
 
   String? parse_library_prefix() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
+    String? $2;
     String? $3;
-    String? $4;
-    final $5 = _pos;
-    final $6 = _ch;
-    final $7 = _pos;
+    final $4 = _pos;
+    final $5 = _ch;
+    final $6 = _pos;
     _matchChar(95, 95);
     ok = true;
     parse$$IDENTIFIER();
     if (!ok) {
-      _pos = $7;
-      _ch = $6;
+      _ch = $5;
+      _pos = $6;
     }
     if (ok) {
-      $4 = _source.substring($5, _pos);
+      $3 = _source.substring($4, _pos);
     }
     if (ok) {
-      $3 = $4;
+      $2 = $3;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $2;
     } else {
-      _pos = $2;
-      _ch = $1;
       _fail('\'library prefix\'');
     }
     return $0;
   }
 
   String? parse_$Semicolon() {
-    _failPos = -1;
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(59, ';');
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(59, ';');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
       _fail('\';\'');
     }
-    return $0;
+    return null;
   }
 
   String? parse_action() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
     _matchChar(123, '{');
     if (ok) {
-      String? $4;
-      final $5 = _pos;
-      final $6 = _ch;
-      final $7 = _pos;
+      String? $5;
+      final $6 = _pos;
       while (true) {
         parse$$ACTION_BODY();
         if (!ok) {
@@ -1269,189 +1260,174 @@ class Peg2Parser {
         }
       }
       ok = true;
-      if (!ok) {
-        _pos = $7;
-        _ch = $6;
-      }
       if (ok) {
-        $4 = _source.substring($5, _pos);
+        $5 = _source.substring($6, _pos);
       }
       _matchChar(125, '}');
       if (ok) {
         parse$$SPACING();
-        $3 = $4;
+        final b = $5!;
+        $4 = b;
       }
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'action\'');
     }
     return $0;
   }
 
   String? parse_$Ampersand() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(38, '&');
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(38, '&');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
+      $4 = $5;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'&\'');
     }
     return $0;
   }
 
   Expression? parse_character_class() {
-    _failPos = -1;
+    _failPos = _pos;
     Expression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    Expression? $3;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
     _matchChar(91, '[');
     if (ok) {
-      final $4 = <List<int>>[];
+      List<List<int>>? $5;
+      final $6 = <List<int>>[];
       while (true) {
-        List<int>? $5;
-        final $6 = _ch;
-        final $7 = _pos;
-        List<int>? $8;
-        final $9 = _ch;
-        final $10 = _pos;
+        List<int>? $7;
+        List<int>? $9;
+        final $10 = _ch;
+        final $11 = _pos;
+        final $12 = _failPos;
+        final $13 = _failStart;
+        final $14 = _failures;
         _matchChar(93, ']');
-        _ch = $9;
-        _pos = $10;
+        _ch = $10;
+        _pos = $11;
+        _failPos = $12;
+        _failStart = $13;
+        _failures = $14;
         ok = !ok;
         if (ok) {
-          final $11 = parse$$RANGE();
+          final $15 = parse$$RANGE();
           if (ok) {
-            $8 = $11;
+            final r = $15!;
+            $9 = r;
           }
         }
         if (ok) {
-          $5 = $8;
-        } else {
-          _pos = $7;
-          _ch = $6;
+          $7 = $9;
         }
         if (!ok) {
           break;
         }
-        $4.add($5!);
+        $6.add($7!);
       }
-      ok = $4.isNotEmpty;
+      if ($6.isNotEmpty) {
+        $5 = $6;
+        ok = true;
+      }
       if (ok) {
         _matchChar(93, ']');
         if (ok) {
           parse$$SPACING();
-          final r = $4;
+          final r = $5!;
           late Expression $$;
           $$ = CharacterClassExpression(r);
-          $3 = $$;
+          $4 = $$;
         }
       }
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'character class\'');
     }
     return $0;
   }
 
   String? parse_$RightParenthesis() {
-    _failPos = -1;
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(41, ')');
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(41, ')');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
       _fail('\')\'');
     }
-    return $0;
+    return null;
   }
 
   String? parse_$Period() {
-    _failPos = -1;
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(46, '.');
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(46, '.');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
       _fail('\'.\'');
     }
-    return $0;
+    return null;
   }
 
-  dynamic? parse_end_of_file() {
-    _failPos = -1;
-    dynamic? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    dynamic? $3;
-    final $5 = _ch;
-    final $6 = _pos;
+  dynamic parse_end_of_file() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    final $2 = _failPos;
+    final $3 = _failStart;
+    final $4 = _failures;
     _matchAny();
-    final $4 = null;
-    _ch = $5;
-    _pos = $6;
+    _ch = $0;
+    _pos = $1;
+    _failPos = $2;
+    _failStart = $3;
+    _failures = $4;
     ok = !ok;
-    if (ok) {
-      $3 = $4;
-    }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
       _fail('\'end of file\'');
     }
-    return $0;
+    return null;
   }
 
   String? parse_globals() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
     _matchString('%{');
     if (ok) {
-      String? $4;
-      final $5 = _pos;
-      final $6 = _ch;
-      final $7 = _pos;
+      String? $5;
+      final $6 = _pos;
       while (true) {
         parse$$GLOBALS_BODY();
         if (!ok) {
@@ -1459,135 +1435,118 @@ class Peg2Parser {
         }
       }
       ok = true;
-      if (!ok) {
-        _pos = $7;
-        _ch = $6;
-      }
       if (ok) {
-        $4 = _source.substring($5, _pos);
+        $5 = _source.substring($6, _pos);
       }
       _matchString('}%');
       if (ok) {
         parse$$SPACING();
-        $3 = $4;
+        final b = $5!;
+        $4 = b;
       }
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'globals\'');
     }
     return $0;
   }
 
   List? parse_leading_spaces() {
-    _failPos = -1;
-    List? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    List? $3;
-    final $4 = parse$$SPACING();
-    $3 = $4;
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
-      _fail('\'leading spaces\'');
-    }
-    return $0;
+    parse$$SPACING();
+    return null;
   }
 
   String? parse_$EqualSign() {
-    _failPos = -1;
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(61, '=');
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(61, '=');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
       _fail('\'=\'');
     }
-    return $0;
+    return null;
   }
 
   Expression? parse_literal() {
-    _failPos = -1;
+    _failPos = _pos;
     Expression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    Expression? $3;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
     _matchChar(34, 34);
     if (ok) {
-      final $4 = <int>[];
+      List<int>? $5;
+      final $6 = <int>[];
       while (true) {
-        int? $5;
-        final $6 = _ch;
-        final $7 = _pos;
-        int? $8;
-        final $9 = _ch;
-        final $10 = _pos;
+        int? $7;
+        int? $9;
+        final $10 = _ch;
+        final $11 = _pos;
+        final $12 = _failPos;
+        final $13 = _failStart;
+        final $14 = _failures;
         _matchChar(34, 34);
-        _ch = $9;
-        _pos = $10;
+        _ch = $10;
+        _pos = $11;
+        _failPos = $12;
+        _failStart = $13;
+        _failures = $14;
         ok = !ok;
         if (ok) {
-          final $11 = parse$$LITERAL_CHAR();
+          final $15 = parse$$LITERAL_CHAR();
           if (ok) {
-            $8 = $11;
+            final c = $15!;
+            $9 = c;
           }
         }
         if (ok) {
-          $5 = $8;
+          $7 = $9;
         } else {
-          _pos = $7;
-          _ch = $6;
           break;
         }
-        $4.add($5!);
+        $6.add($7!);
       }
-      ok = true;
+      if (ok = true) {
+        $5 = $6;
+      }
       _matchChar(34, 34);
       if (ok) {
         parse$$SPACING();
-        final c = $4;
+        final c = $5!;
         late Expression $$;
         $$ = LiteralExpression(String.fromCharCodes(c));
-        $3 = $$;
+        $4 = $$;
       }
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'literal\'');
     }
     return $0;
   }
 
   String? parse_members() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
     _matchChar(123, '{');
     if (ok) {
-      String? $4;
-      final $5 = _pos;
-      final $6 = _ch;
-      final $7 = _pos;
+      String? $5;
+      final $6 = _pos;
       while (true) {
         parse$$ACTION_BODY();
         if (!ok) {
@@ -1595,225 +1554,195 @@ class Peg2Parser {
         }
       }
       ok = true;
-      if (!ok) {
-        _pos = $7;
-        _ch = $6;
-      }
       if (ok) {
-        $4 = _source.substring($5, _pos);
+        $5 = _source.substring($6, _pos);
       }
       _matchChar(125, '}');
       if (ok) {
         parse$$SPACING();
-        $3 = $4;
+        final b = $5!;
+        $4 = b;
       }
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'members\'');
     }
     return $0;
   }
 
   String? parse_$ExclamationMark() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(33, '!');
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(33, '!');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
+      $4 = $5;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'!\'');
     }
     return $0;
   }
 
   String? parse_$LeftParenthesis() {
-    _failPos = -1;
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(40, '(');
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(40, '(');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
       _fail('\'(\'');
     }
-    return $0;
+    return null;
   }
 
   String? parse_$PlusSign() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(43, '+');
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(43, '+');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
+      $4 = $5;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'+\'');
     }
     return $0;
   }
 
   String? parse_$Comma() {
-    _failPos = -1;
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(44, ',');
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(44, ',');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
       _fail('\',\'');
     }
-    return $0;
+    return null;
   }
 
   String? parse_$QuestionMark() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(63, '?');
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(63, '?');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
+      $4 = $5;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'?\'');
     }
     return $0;
   }
 
   String? parse_$Slash() {
-    _failPos = -1;
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(47, '/');
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(47, '/');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
       _fail('\'/\'');
     }
-    return $0;
+    return null;
   }
 
   String? parse_$Asterisk() {
-    _failPos = -1;
+    _failPos = _pos;
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(42, '*');
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(42, '*');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
+      $4 = $5;
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
       _fail('\'*\'');
     }
     return $0;
   }
 
   String? parse_$LessThanSign() {
-    _failPos = -1;
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(60, '<');
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(60, '<');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
       _fail('\'<\'');
     }
-    return $0;
+    return null;
   }
 
   String? parse_$GreaterThanSign() {
-    _failPos = -1;
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(62, '>');
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(62, '>');
     if (ok) {
       parse$$SPACING();
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
       _fail('\'>\'');
     }
-    return $0;
+    return null;
   }
 
-  dynamic? parse$$ACTION_BODY() {
-    dynamic? $0;
-    final $1 = _ch;
-    final $2 = _pos;
+  dynamic parse$$ACTION_BODY() {
+    final $0 = _ch;
+    final $1 = _pos;
     while (true) {
-      String? $3;
-      final $4 = _matchChar(123, '{');
+      _matchChar(123, '{');
       if (ok) {
         while (true) {
           parse$$ACTION_BODY();
@@ -1823,196 +1752,158 @@ class Peg2Parser {
         }
         ok = true;
         _matchChar(125, '}');
-        if (ok) {
-          $3 = $4;
-        }
       }
       if (ok) {
-        $0 = $3;
         break;
       }
-      _pos = $2;
-      _ch = $1;
-      dynamic? $5;
-      final $7 = _ch;
-      final $8 = _pos;
+      _ch = $0;
+      _pos = $1;
+      final $2 = _ch;
+      final $3 = _pos;
+      final $4 = _failPos;
+      final $5 = _failStart;
+      final $6 = _failures;
       _matchChar(125, '}');
-      final $6 = null;
-      _ch = $7;
-      _pos = $8;
+      _ch = $2;
+      _pos = $3;
+      _failPos = $4;
+      _failStart = $5;
+      _failures = $6;
       ok = !ok;
       if (ok) {
         _matchAny();
-        if (ok) {
-          $5 = $6;
-        }
       }
       if (ok) {
-        $0 = $5;
         break;
       }
-      _pos = $2;
-      _ch = $1;
+      _ch = $0;
       break;
     }
-    return $0;
+    return null;
   }
 
   String? parse$$COMMENT() {
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    String? $3;
-    final $4 = _matchChar(35, '#');
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(35, '#');
     if (ok) {
       while (true) {
-        final $5 = _ch;
-        final $6 = _pos;
-        final $7 = _ch;
-        final $8 = _pos;
+        final $2 = _ch;
+        final $3 = _pos;
+        final $4 = _failPos;
+        final $5 = _failStart;
+        final $6 = _failures;
         parse$$EOL();
-        _ch = $7;
-        _pos = $8;
+        _ch = $2;
+        _pos = $3;
+        _failPos = $4;
+        _failStart = $5;
+        _failures = $6;
         ok = !ok;
         if (ok) {
           _matchAny();
         }
         if (!ok) {
-          _pos = $6;
-          _ch = $5;
           break;
         }
       }
       ok = true;
       parse$$EOL();
       ok = true;
-      $3 = $4;
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
     }
-    return $0;
+    return null;
   }
 
-  dynamic? parse$$EOL() {
-    dynamic? $0;
-    final $1 = _ch;
-    final $2 = _pos;
+  dynamic parse$$EOL() {
+    final $0 = _ch;
     while (true) {
-      String? $3;
-      final $4 = _matchString('\r\n');
+      _matchString('\r\n');
       if (ok) {
-        $3 = $4;
-      }
-      if (ok) {
-        $0 = $3;
         break;
       }
-      _pos = $2;
-      _ch = $1;
-      int? $5;
-      const $7 = [10, 10, 13, 13];
-      final $6 = _matchRange($7);
+      _ch = $0;
+      const $1 = [10, 10, 13, 13];
+      _matchRanges($1);
       if (ok) {
-        $5 = $6;
-      }
-      if (ok) {
-        $0 = $5;
         break;
       }
-      _pos = $2;
-      _ch = $1;
+      _ch = $0;
       break;
     }
-    return $0;
+    return null;
   }
 
-  dynamic? parse$$GLOBALS_BODY() {
-    dynamic? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    dynamic? $3;
-    final $5 = _ch;
-    final $6 = _pos;
+  dynamic parse$$GLOBALS_BODY() {
+    final $0 = _ch;
+    final $1 = _pos;
+    final $2 = _failPos;
+    final $3 = _failStart;
+    final $4 = _failures;
     _matchString('}%');
-    final $4 = null;
-    _ch = $5;
-    _pos = $6;
+    _ch = $0;
+    _pos = $1;
+    _failPos = $2;
+    _failStart = $3;
+    _failures = $4;
     ok = !ok;
     if (ok) {
       _matchAny();
-      if (ok) {
-        $3 = $4;
-      }
     }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
-    }
-    return $0;
+    return null;
   }
 
   int? parse$$HEX_NUMBER() {
     int? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    int? $3;
+    final $2 = _ch;
+    final $3 = _pos;
+    int? $4;
     _matchChar(92, 92);
     if (ok) {
       _matchChar(117, 'u');
       if (ok) {
-        String? $4;
-        final $5 = _pos;
-        final $6 = _ch;
-        final $7 = _pos;
-        var $8 = 0;
+        String? $5;
+        final $6 = _pos;
+        var $7 = 0;
         while (true) {
-          const $9 = [48, 57, 65, 70, 97, 102];
-          _matchRange($9);
+          const $8 = [48, 57, 65, 70, 97, 102];
+          _matchRanges($8);
           if (!ok) {
             break;
           }
-          $8++;
+          $7++;
         }
-        ok = $8 != 0;
-        if (!ok) {
-          _pos = $7;
-          _ch = $6;
+        ok = $7 != 0;
+        if (ok) {
+          $5 = _source.substring($6, _pos);
         }
         if (ok) {
-          $4 = _source.substring($5, _pos);
-        }
-        if (ok) {
-          final d = $4!;
+          final d = $5!;
           late int $$;
           $$ = int.parse(d, radix: 16);
-          $3 = $$;
+          $4 = $$;
         }
       }
     }
     if (ok) {
-      $0 = $3;
+      $0 = $4;
     } else {
-      _pos = $2;
-      _ch = $1;
+      _ch = $2;
+      _pos = $3;
     }
     return $0;
   }
 
   String? parse$$IDENTIFIER() {
     String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
+    String? $2;
     String? $3;
-    String? $4;
-    final $5 = _pos;
-    final $6 = _ch;
-    final $7 = _pos;
+    final $4 = _pos;
+    final $5 = _ch;
+    final $6 = _pos;
     parse$$IDENT_START();
     if (ok) {
       while (true) {
@@ -2024,74 +1915,44 @@ class Peg2Parser {
       ok = true;
     }
     if (!ok) {
-      _pos = $7;
-      _ch = $6;
+      _ch = $5;
+      _pos = $6;
     }
     if (ok) {
-      $4 = _source.substring($5, _pos);
+      $3 = _source.substring($4, _pos);
     }
     if (ok) {
-      $3 = $4;
+      $2 = $3;
     }
     if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
+      $0 = $2;
     }
     return $0;
   }
 
   int? parse$$IDENT_CONT() {
-    int? $0;
-    final $1 = _ch;
-    final $2 = _pos;
+    final $0 = _ch;
     while (true) {
-      int? $3;
-      final $4 = parse$$IDENT_START();
+      parse$$IDENT_START();
       if (ok) {
-        $3 = $4;
-      }
-      if (ok) {
-        $0 = $3;
         break;
       }
-      _pos = $2;
-      _ch = $1;
-      int? $5;
-      const $7 = [48, 57, 95, 95];
-      final $6 = _matchRange($7);
+      _ch = $0;
+      const $1 = [48, 57, 95, 95];
+      _matchRanges($1);
       if (ok) {
-        $5 = $6;
-      }
-      if (ok) {
-        $0 = $5;
         break;
       }
-      _pos = $2;
-      _ch = $1;
+      _ch = $0;
       break;
     }
-    return $0;
+    return null;
   }
 
   int? parse$$IDENT_START() {
-    int? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    int? $3;
-    const $5 = [65, 90, 97, 122];
-    final $4 = _matchRange($5);
-    if (ok) {
-      $3 = $4;
-    }
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
-    }
-    return $0;
+    const $0 = [65, 90, 97, 122];
+    _matchRanges($0);
+    return null;
   }
 
   int? parse$$LITERAL_CHAR() {
@@ -2099,61 +1960,72 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      int? $3;
+      int? $4;
       _matchChar(92, '\\');
       if (ok) {
-        const $5 = [34, 34, 92, 92, 110, 110, 114, 114, 116, 116];
-        final $4 = _matchRange($5);
+        const $6 = [34, 34, 92, 92, 110, 110, 114, 114, 116, 116];
+        final $5 = _matchRanges($6);
         if (ok) {
-          final c = $4!;
+          final c = $5!;
           late int $$;
           $$ = _escape(c);
-          $3 = $$;
+          $4 = $$;
         }
       }
       if (ok) {
-        $0 = $3;
+        $0 = $4;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      int? $6;
-      final $7 = parse$$HEX_NUMBER();
-      if (ok) {
-        $6 = $7;
-      }
-      if (ok) {
-        $0 = $6;
-        break;
-      }
       _pos = $2;
-      _ch = $1;
       int? $8;
-      final $9 = _ch;
-      final $10 = _pos;
-      _matchChar(92, '\\');
-      _ch = $9;
-      _pos = $10;
-      ok = !ok;
+      final $9 = parse$$HEX_NUMBER();
       if (ok) {
-        final $11 = _ch;
-        final $12 = _pos;
-        parse$$EOL();
-        _ch = $11;
-        _pos = $12;
-        ok = !ok;
-        if (ok) {
-          final $13 = _matchAny();
-          if (ok) {
-            $8 = $13;
-          }
-        }
+        $8 = $9;
       }
       if (ok) {
         $0 = $8;
         break;
       }
-      _pos = $2;
+      _ch = $1;
+      int? $11;
+      final $12 = _ch;
+      final $13 = _pos;
+      final $14 = _failPos;
+      final $15 = _failStart;
+      final $16 = _failures;
+      _matchChar(92, '\\');
+      _ch = $12;
+      _pos = $13;
+      _failPos = $14;
+      _failStart = $15;
+      _failures = $16;
+      ok = !ok;
+      if (ok) {
+        final $17 = _ch;
+        final $18 = _pos;
+        final $19 = _failPos;
+        final $20 = _failStart;
+        final $21 = _failures;
+        parse$$EOL();
+        _ch = $17;
+        _pos = $18;
+        _failPos = $19;
+        _failStart = $20;
+        _failures = $21;
+        ok = !ok;
+        if (ok) {
+          final $22 = _matchAny();
+          if (ok) {
+            final c = $22!;
+            $11 = c;
+          }
+        }
+      }
+      if (ok) {
+        $0 = $11;
+        break;
+      }
       _ch = $1;
       break;
     }
@@ -2165,40 +2037,39 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      List<int>? $3;
-      final $4 = parse$$RANGE_CHAR();
+      List<int>? $4;
+      final $5 = parse$$RANGE_CHAR();
       if (ok) {
         _matchChar(45, '-');
         if (ok) {
-          final $5 = parse$$RANGE_CHAR();
+          final $6 = parse$$RANGE_CHAR();
           if (ok) {
-            final s = $4!;
-            final e = $5!;
+            final s = $5!;
+            final e = $6!;
             late List<int> $$;
             $$ = [s, e];
-            $3 = $$;
+            $4 = $$;
           }
         }
       }
       if (ok) {
-        $0 = $3;
+        $0 = $4;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      List<int>? $6;
-      final $7 = parse$$RANGE_CHAR();
+      _pos = $2;
+      List<int>? $8;
+      final $9 = parse$$RANGE_CHAR();
       if (ok) {
-        final c = $7!;
+        final c = $9!;
         late List<int> $$;
         $$ = [c, c];
-        $6 = $$;
+        $8 = $$;
       }
       if (ok) {
-        $0 = $6;
+        $0 = $8;
         break;
       }
-      _pos = $2;
       _ch = $1;
       break;
     }
@@ -2210,186 +2081,143 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      int? $3;
+      int? $4;
       _matchChar(92, '\\');
       if (ok) {
-        const $5 = [92, 93, 110, 110, 114, 114, 116, 116];
-        final $4 = _matchRange($5);
+        const $6 = [92, 93, 110, 110, 114, 114, 116, 116];
+        final $5 = _matchRanges($6);
         if (ok) {
-          final c = $4!;
+          final c = $5!;
           late int $$;
           $$ = _escape(c);
-          $3 = $$;
+          $4 = $$;
         }
       }
       if (ok) {
-        $0 = $3;
+        $0 = $4;
         break;
       }
-      _pos = $2;
       _ch = $1;
-      int? $6;
-      final $7 = parse$$HEX_NUMBER();
-      if (ok) {
-        $6 = $7;
-      }
-      if (ok) {
-        $0 = $6;
-        break;
-      }
       _pos = $2;
-      _ch = $1;
       int? $8;
-      final $9 = _ch;
-      final $10 = _pos;
-      const $11 = [92, 93];
-      _matchRange($11);
-      _ch = $9;
-      _pos = $10;
-      ok = !ok;
+      final $9 = parse$$HEX_NUMBER();
       if (ok) {
-        final $12 = _ch;
-        final $13 = _pos;
-        parse$$EOL();
-        _ch = $12;
-        _pos = $13;
-        ok = !ok;
-        if (ok) {
-          final $14 = _matchAny();
-          if (ok) {
-            $8 = $14;
-          }
-        }
+        $8 = $9;
       }
       if (ok) {
         $0 = $8;
         break;
       }
-      _pos = $2;
+      _ch = $1;
+      int? $11;
+      final $12 = _ch;
+      final $13 = _pos;
+      final $14 = _failPos;
+      final $15 = _failStart;
+      final $16 = _failures;
+      _matchRange(92, 93);
+      _ch = $12;
+      _pos = $13;
+      _failPos = $14;
+      _failStart = $15;
+      _failures = $16;
+      ok = !ok;
+      if (ok) {
+        final $17 = _ch;
+        final $18 = _pos;
+        final $19 = _failPos;
+        final $20 = _failStart;
+        final $21 = _failures;
+        parse$$EOL();
+        _ch = $17;
+        _pos = $18;
+        _failPos = $19;
+        _failStart = $20;
+        _failures = $21;
+        ok = !ok;
+        if (ok) {
+          final $22 = _matchAny();
+          if (ok) {
+            final c = $22!;
+            $11 = c;
+          }
+        }
+      }
+      if (ok) {
+        $0 = $11;
+        break;
+      }
       _ch = $1;
       break;
     }
     return $0;
   }
 
-  dynamic? parse$$SPACE() {
-    dynamic? $0;
-    final $1 = _ch;
-    final $2 = _pos;
+  dynamic parse$$SPACE() {
+    final $0 = _ch;
     while (true) {
-      int? $3;
-      const $5 = [9, 9, 32, 32];
-      final $4 = _matchRange($5);
+      const $1 = [9, 9, 32, 32];
+      _matchRanges($1);
       if (ok) {
-        $3 = $4;
-      }
-      if (ok) {
-        $0 = $3;
         break;
       }
-      _pos = $2;
-      _ch = $1;
-      dynamic? $6;
-      final $7 = parse$$EOL();
+      _ch = $0;
+      parse$$EOL();
       if (ok) {
-        $6 = $7;
-      }
-      if (ok) {
-        $0 = $6;
         break;
       }
-      _pos = $2;
-      _ch = $1;
+      _ch = $0;
       break;
     }
-    return $0;
+    return null;
   }
 
   List? parse$$SPACING() {
-    List? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    List? $3;
-    final $4 = [];
     while (true) {
-      dynamic? $5;
-      final $6 = _ch;
-      final $7 = _pos;
+      final $0 = _ch;
       while (true) {
-        dynamic? $8;
-        final $9 = parse$$SPACE();
+        parse$$SPACE();
         if (ok) {
-          $8 = $9;
-        }
-        if (ok) {
-          $5 = $8;
           break;
         }
-        _pos = $7;
-        _ch = $6;
-        String? $10;
-        final $11 = parse$$COMMENT();
+        _ch = $0;
+        parse$$COMMENT();
         if (ok) {
-          $10 = $11;
-        }
-        if (ok) {
-          $5 = $10;
           break;
         }
-        _pos = $7;
-        _ch = $6;
+        _ch = $0;
         break;
       }
       if (!ok) {
         break;
       }
-      $4.add($5);
     }
     ok = true;
-    $3 = $4;
-    if (ok) {
-      $0 = $3;
-    } else {
-      _pos = $2;
-      _ch = $1;
-    }
-    return $0;
+    return null;
   }
 
   int? parse$$TERMINAL_CHAR() {
-    int? $0;
-    final $1 = _ch;
-    final $2 = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
     while (true) {
-      int? $3;
       _matchString('//');
       if (ok) {
-        final $4 = _matchChar(39, 39);
-        if (ok) {
-          $3 = $4;
-        }
+        _matchChar(39, 39);
       }
       if (ok) {
-        $0 = $3;
         break;
       }
-      _pos = $2;
-      _ch = $1;
-      int? $5;
-      const $7 = [32, 38, 40, 126];
-      final $6 = _matchRange($7);
+      _ch = $0;
+      _pos = $1;
+      const $2 = [32, 38, 40, 126];
+      _matchRanges($2);
       if (ok) {
-        $5 = $6;
-      }
-      if (ok) {
-        $0 = $5;
         break;
       }
-      _pos = $2;
-      _ch = $1;
+      _ch = $0;
       break;
     }
-    return $0;
+    return null;
   }
 
   void _buildError() {
@@ -2398,11 +2226,7 @@ class Peg2Parser {
     var failEnd = 0;
     for (var i = 0; i < _failures.length; i += 2) {
       final name = _failures[i] as String;
-      var end = _failures[i + 1] as int;
-      if (end == -1) {
-        end = _failStart;
-      }
-
+      final end = _failures[i + 1] as int;
       if (failEnd < end) {
         failEnd = end;
       }
@@ -2532,7 +2356,24 @@ class Peg2Parser {
     return result;
   }
 
-  int? _matchRange(List<int> ranges) {
+  int? _matchRange(int start, int end) {
+    if (_ch >= start && _ch <= end) {
+      final ch = _ch;
+      _pos += _ch <= 0xffff ? 1 : 2;
+      _ch = _getChar(_pos);
+      ok = true;
+      return ch;
+    }
+
+    if (_failPos < _pos) {
+      _failPos = _pos;
+    }
+
+    ok = false;
+    return null;
+  }
+
+  int? _matchRanges(List<int> ranges) {
     // Use binary search
     for (var i = 0; i < ranges.length; i += 2) {
       if (ranges[i] <= _ch) {
@@ -2593,4 +2434,4 @@ class Peg2Parser {
     ok = false;
   }
 }
-// ignore: unused_element
+// ignore_for_file: unused_element
