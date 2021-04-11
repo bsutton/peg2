@@ -2434,4 +2434,5 @@ class Peg2Parser {
     ok = false;
   }
 }
+// ignore_for_file: non_constant_identifier_names
 // ignore_for_file: unused_element
