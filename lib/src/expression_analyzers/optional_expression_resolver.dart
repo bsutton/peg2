@@ -1,6 +1,6 @@
 part of '../../expression_analyzers.dart';
 
-class OptionalExpressionResolver extends ExpressionVisitor {
+class OptionalExpressionResolver extends ExpressionVisitor<void> {
   bool _hasModifications = false;
 
   void resolve(List<ProductionRule> rules) {

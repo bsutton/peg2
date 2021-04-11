@@ -80,7 +80,6 @@ class Peg2Parser {
     final $3 = _pos;
     Grammar? $4;
     _parse_leading_spaces();
-    ok = true;
     final $6 = _parse_globals();
     final $5 = $6;
     ok = true;
@@ -109,11 +108,10 @@ class Peg2Parser {
         late Grammar $$;
         $$ = Grammar(d, g, m);
         $4 = $$;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -128,8 +126,6 @@ class Peg2Parser {
       final $4 = _parseNonterminalDefinition();
       if (ok) {
         $3 = $4;
-      }
-      if (ok) {
         $0 = $3;
         break;
       }
@@ -138,8 +134,6 @@ class Peg2Parser {
       final $7 = _parseTerminalDefinition();
       if (ok) {
         $6 = $7;
-      }
-      if (ok) {
         $0 = $6;
         break;
       }
@@ -148,8 +142,6 @@ class Peg2Parser {
       final $10 = _parseSubterminalDefinition();
       if (ok) {
         $9 = $10;
-      }
-      if (ok) {
         $0 = $9;
         break;
       }
@@ -181,14 +173,12 @@ class Peg2Parser {
                 late ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, t);
                 $4 = $$;
+                $0 = $4;
+                break;
               }
             }
           }
         }
-      }
-      if (ok) {
-        $0 = $4;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -206,13 +196,11 @@ class Peg2Parser {
               late ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, null);
               $9 = $$;
+              $0 = $9;
+              break;
             }
           }
         }
-      }
-      if (ok) {
-        $0 = $9;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -241,13 +229,14 @@ class Peg2Parser {
           if (ok) {
             final e = $13!;
             $12 = e;
+            $8 = $12;
           }
         }
-        if (ok) {
-          $8 = $12;
-        } else {
+        if (!ok) {
           _ch = $10;
           _pos = $11;
+        }
+        if (!ok) {
           break;
         }
         $7.add($8!);
@@ -260,10 +249,9 @@ class Peg2Parser {
       late OrderedChoiceExpression $$;
       $$ = OrderedChoiceExpression([e, ...n]);
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -297,10 +285,9 @@ class Peg2Parser {
       late SequenceExpression $$;
       $$ = SequenceExpression(e, a);
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -322,8 +309,6 @@ class Peg2Parser {
       final $12 = _parse_$Ampersand();
       if (ok) {
         $11 = $12;
-      }
-      if (ok) {
         $8 = $11;
         break;
       }
@@ -332,8 +317,6 @@ class Peg2Parser {
       final $15 = _parse_$ExclamationMark();
       if (ok) {
         $14 = $15;
-      }
-      if (ok) {
         $8 = $14;
         break;
       }
@@ -350,10 +333,9 @@ class Peg2Parser {
       late Expression $$;
       $$ = _prefix(p, e, s);
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -374,8 +356,6 @@ class Peg2Parser {
         final $11 = _parse_$QuestionMark();
         if (ok) {
           $10 = $11;
-        }
-        if (ok) {
           $7 = $10;
           break;
         }
@@ -384,8 +364,6 @@ class Peg2Parser {
         final $14 = _parse_$Asterisk();
         if (ok) {
           $13 = $14;
-        }
-        if (ok) {
           $7 = $13;
           break;
         }
@@ -394,8 +372,6 @@ class Peg2Parser {
         final $17 = _parse_$PlusSign();
         if (ok) {
           $16 = $17;
-        }
-        if (ok) {
           $7 = $16;
           break;
         }
@@ -409,10 +385,9 @@ class Peg2Parser {
       late Expression $$;
       $$ = _suffix(s, e);
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -431,8 +406,6 @@ class Peg2Parser {
         late Expression $$;
         $$ = NonterminalExpression(n);
         $4 = $$;
-      }
-      if (ok) {
         $0 = $4;
         break;
       }
@@ -444,8 +417,6 @@ class Peg2Parser {
         late Expression $$;
         $$ = TerminalExpression(n);
         $7 = $$;
-      }
-      if (ok) {
         $0 = $7;
         break;
       }
@@ -459,12 +430,10 @@ class Peg2Parser {
           if (ok) {
             final e = $11!;
             $10 = e;
+            $0 = $10;
+            break;
           }
         }
-      }
-      if (ok) {
-        $0 = $10;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -495,14 +464,12 @@ class Peg2Parser {
                 late ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.terminal, e, t);
                 $4 = $$;
+                $0 = $4;
+                break;
               }
             }
           }
         }
-      }
-      if (ok) {
-        $0 = $4;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -520,13 +487,11 @@ class Peg2Parser {
               late ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.terminal, e, null);
               $9 = $$;
+              $0 = $9;
+              break;
             }
           }
         }
-      }
-      if (ok) {
-        $0 = $9;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -555,13 +520,14 @@ class Peg2Parser {
           if (ok) {
             final e = $13!;
             $12 = e;
+            $8 = $12;
           }
         }
-        if (ok) {
-          $8 = $12;
-        } else {
+        if (!ok) {
           _ch = $10;
           _pos = $11;
+        }
+        if (!ok) {
           break;
         }
         $7.add($8!);
@@ -574,10 +540,9 @@ class Peg2Parser {
       late OrderedChoiceExpression $$;
       $$ = OrderedChoiceExpression([e, ...n]);
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -611,10 +576,9 @@ class Peg2Parser {
       late SequenceExpression $$;
       $$ = SequenceExpression(e, a);
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -636,8 +600,6 @@ class Peg2Parser {
       final $12 = _parse_$Ampersand();
       if (ok) {
         $11 = $12;
-      }
-      if (ok) {
         $8 = $11;
         break;
       }
@@ -646,8 +608,6 @@ class Peg2Parser {
       final $15 = _parse_$ExclamationMark();
       if (ok) {
         $14 = $15;
-      }
-      if (ok) {
         $8 = $14;
         break;
       }
@@ -664,10 +624,9 @@ class Peg2Parser {
       late Expression $$;
       $$ = _prefix(p, e, s);
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -688,8 +647,6 @@ class Peg2Parser {
         final $11 = _parse_$QuestionMark();
         if (ok) {
           $10 = $11;
-        }
-        if (ok) {
           $7 = $10;
           break;
         }
@@ -698,8 +655,6 @@ class Peg2Parser {
         final $14 = _parse_$Asterisk();
         if (ok) {
           $13 = $14;
-        }
-        if (ok) {
           $7 = $13;
           break;
         }
@@ -708,8 +663,6 @@ class Peg2Parser {
         final $17 = _parse_$PlusSign();
         if (ok) {
           $16 = $17;
-        }
-        if (ok) {
           $7 = $16;
           break;
         }
@@ -723,10 +676,9 @@ class Peg2Parser {
       late Expression $$;
       $$ = _suffix(s, e);
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -745,8 +697,6 @@ class Peg2Parser {
         late Expression $$;
         $$ = SubterminalExpression(n);
         $4 = $$;
-      }
-      if (ok) {
         $0 = $4;
         break;
       }
@@ -760,12 +710,10 @@ class Peg2Parser {
           if (ok) {
             final e = $8!;
             $7 = e;
+            $0 = $7;
+            break;
           }
         }
-      }
-      if (ok) {
-        $0 = $7;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -773,8 +721,6 @@ class Peg2Parser {
       final $11 = _parse_literal();
       if (ok) {
         $10 = $11;
-      }
-      if (ok) {
         $0 = $10;
         break;
       }
@@ -783,8 +729,6 @@ class Peg2Parser {
       final $14 = _parse_character_class();
       if (ok) {
         $13 = $14;
-      }
-      if (ok) {
         $0 = $13;
         break;
       }
@@ -795,8 +739,6 @@ class Peg2Parser {
         late Expression $$;
         $$ = AnyCharacterExpression();
         $16 = $$;
-      }
-      if (ok) {
         $0 = $16;
         break;
       }
@@ -812,12 +754,10 @@ class Peg2Parser {
             late Expression $$;
             $$ = CaptureExpression(e);
             $18 = $$;
+            $0 = $18;
+            break;
           }
         }
-      }
-      if (ok) {
-        $0 = $18;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -848,14 +788,12 @@ class Peg2Parser {
                 late ProductionRule $$;
                 $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, t);
                 $4 = $$;
+                $0 = $4;
+                break;
               }
             }
           }
         }
-      }
-      if (ok) {
-        $0 = $4;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -873,13 +811,11 @@ class Peg2Parser {
               late ProductionRule $$;
               $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, null);
               $9 = $$;
+              $0 = $9;
+              break;
             }
           }
         }
-      }
-      if (ok) {
-        $0 = $9;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -907,12 +843,11 @@ class Peg2Parser {
           if (ok) {
             final a = $12!;
             $11 = a;
+            $7 = $11;
           }
         }
       }
-      if (ok) {
-        $7 = $11;
-      } else {
+      if (!ok) {
         _ch = $9;
         _pos = $10;
       }
@@ -923,10 +858,9 @@ class Peg2Parser {
       late String $$;
       $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -950,12 +884,10 @@ class Peg2Parser {
             late String $$;
             $$ = '$p.$n';
             $4 = $$;
+            $0 = $4;
+            break;
           }
         }
-      }
-      if (ok) {
-        $0 = $4;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -963,8 +895,6 @@ class Peg2Parser {
       final $9 = _parse_type_name();
       if (ok) {
         $8 = $9;
-      }
-      if (ok) {
         $0 = $8;
         break;
       }
@@ -994,13 +924,14 @@ class Peg2Parser {
           if (ok) {
             final t = $13!;
             $12 = t;
+            $8 = $12;
           }
         }
-        if (ok) {
-          $8 = $12;
-        } else {
+        if (!ok) {
           _ch = $10;
           _pos = $11;
+        }
+        if (!ok) {
           break;
         }
         $7.add($8!);
@@ -1013,10 +944,9 @@ class Peg2Parser {
       late List<String> $$;
       $$ = [t, ...n];
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -1033,10 +963,9 @@ class Peg2Parser {
     if (ok) {
       _parse$$SPACING();
       $4 = $5;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'non terminal name\'');
@@ -1073,6 +1002,7 @@ class Peg2Parser {
         if (ok) {
           _parse$$TERMINAL_CHAR();
         }
+
         if (!ok) {
           break;
         }
@@ -1093,10 +1023,9 @@ class Peg2Parser {
     if (ok) {
       _parse$$SPACING();
       $4 = $5;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'terminal name\'');
@@ -1128,10 +1057,9 @@ class Peg2Parser {
     if (ok) {
       _parse$$SPACING();
       $4 = $5;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'sub terminal name\'');
@@ -1150,11 +1078,10 @@ class Peg2Parser {
       _matchChar(58, ':');
       if (ok) {
         $4 = $5;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'semantic value\'');
@@ -1187,10 +1114,9 @@ class Peg2Parser {
     if (ok) {
       _parse$$SPACING();
       $4 = $5;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'type name\'');
@@ -1218,10 +1144,9 @@ class Peg2Parser {
     }
     if (ok) {
       $2 = $3;
-    }
-    if (ok) {
       $0 = $2;
-    } else {
+    }
+    if (!ok) {
       _fail('\'library prefix\'');
     }
     return $0;
@@ -1260,6 +1185,7 @@ class Peg2Parser {
         }
       }
       ok = true;
+
       if (ok) {
         $5 = _source.substring($6, _pos);
       }
@@ -1268,11 +1194,10 @@ class Peg2Parser {
         _parse$$SPACING();
         final b = $5!;
         $4 = b;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'action\'');
@@ -1290,10 +1215,9 @@ class Peg2Parser {
     if (ok) {
       _parse$$SPACING();
       $4 = $5;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'&\'');
@@ -1331,11 +1255,10 @@ class Peg2Parser {
           if (ok) {
             final r = $15!;
             $9 = r;
+            $7 = $9;
           }
         }
-        if (ok) {
-          $7 = $9;
-        }
+
         if (!ok) {
           break;
         }
@@ -1353,12 +1276,11 @@ class Peg2Parser {
           late Expression $$;
           $$ = CharacterClassExpression(r);
           $4 = $$;
+          $0 = $4;
         }
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'character class\'');
@@ -1435,6 +1357,7 @@ class Peg2Parser {
         }
       }
       ok = true;
+
       if (ok) {
         $5 = _source.substring($6, _pos);
       }
@@ -1443,11 +1366,10 @@ class Peg2Parser {
         _parse$$SPACING();
         final b = $5!;
         $4 = b;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'globals\'');
@@ -1457,6 +1379,7 @@ class Peg2Parser {
 
   List? _parse_leading_spaces() {
     _parse$$SPACING();
+
     return null;
   }
 
@@ -1506,11 +1429,11 @@ class Peg2Parser {
           if (ok) {
             final c = $15!;
             $9 = c;
+            $7 = $9;
           }
         }
-        if (ok) {
-          $7 = $9;
-        } else {
+
+        if (!ok) {
           break;
         }
         $6.add($7!);
@@ -1525,11 +1448,10 @@ class Peg2Parser {
         late Expression $$;
         $$ = LiteralExpression(String.fromCharCodes(c));
         $4 = $$;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'literal\'');
@@ -1554,6 +1476,7 @@ class Peg2Parser {
         }
       }
       ok = true;
+
       if (ok) {
         $5 = _source.substring($6, _pos);
       }
@@ -1562,11 +1485,10 @@ class Peg2Parser {
         _parse$$SPACING();
         final b = $5!;
         $4 = b;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'members\'');
@@ -1584,10 +1506,9 @@ class Peg2Parser {
     if (ok) {
       _parse$$SPACING();
       $4 = $5;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'!\'');
@@ -1621,10 +1542,9 @@ class Peg2Parser {
     if (ok) {
       _parse$$SPACING();
       $4 = $5;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'+\'');
@@ -1658,10 +1578,9 @@ class Peg2Parser {
     if (ok) {
       _parse$$SPACING();
       $4 = $5;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'?\'');
@@ -1695,10 +1614,9 @@ class Peg2Parser {
     if (ok) {
       _parse$$SPACING();
       $4 = $5;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'*\'');
@@ -1803,6 +1721,7 @@ class Peg2Parser {
         if (ok) {
           _matchAny();
         }
+
         if (!ok) {
           break;
         }
@@ -1853,6 +1772,7 @@ class Peg2Parser {
     if (ok) {
       _matchAny();
     }
+
     return null;
   }
 
@@ -1877,6 +1797,7 @@ class Peg2Parser {
           $7++;
         }
         ok = $7 != 0;
+
         if (ok) {
           $5 = _source.substring($6, _pos);
         }
@@ -1885,12 +1806,11 @@ class Peg2Parser {
           late int $$;
           $$ = int.parse(d, radix: 16);
           $4 = $$;
+          $0 = $4;
         }
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -1923,10 +1843,9 @@ class Peg2Parser {
     }
     if (ok) {
       $2 = $3;
-    }
-    if (ok) {
       $0 = $2;
     }
+
     return $0;
   }
 
@@ -1952,6 +1871,7 @@ class Peg2Parser {
   int? _parse$$IDENT_START() {
     const $0 = [65, 90, 97, 122];
     _matchRanges($0);
+
     return null;
   }
 
@@ -1970,11 +1890,9 @@ class Peg2Parser {
           late int $$;
           $$ = _escape(c);
           $4 = $$;
+          $0 = $4;
+          break;
         }
-      }
-      if (ok) {
-        $0 = $4;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -1982,8 +1900,6 @@ class Peg2Parser {
       final $9 = _parse$$HEX_NUMBER();
       if (ok) {
         $8 = $9;
-      }
-      if (ok) {
         $0 = $8;
         break;
       }
@@ -2019,12 +1935,10 @@ class Peg2Parser {
           if (ok) {
             final c = $22!;
             $11 = c;
+            $0 = $11;
+            break;
           }
         }
-      }
-      if (ok) {
-        $0 = $11;
-        break;
       }
       _ch = $1;
       break;
@@ -2049,12 +1963,10 @@ class Peg2Parser {
             late List<int> $$;
             $$ = [s, e];
             $4 = $$;
+            $0 = $4;
+            break;
           }
         }
-      }
-      if (ok) {
-        $0 = $4;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -2065,8 +1977,6 @@ class Peg2Parser {
         late List<int> $$;
         $$ = [c, c];
         $8 = $$;
-      }
-      if (ok) {
         $0 = $8;
         break;
       }
@@ -2091,11 +2001,9 @@ class Peg2Parser {
           late int $$;
           $$ = _escape(c);
           $4 = $$;
+          $0 = $4;
+          break;
         }
-      }
-      if (ok) {
-        $0 = $4;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -2103,8 +2011,6 @@ class Peg2Parser {
       final $9 = _parse$$HEX_NUMBER();
       if (ok) {
         $8 = $9;
-      }
-      if (ok) {
         $0 = $8;
         break;
       }
@@ -2140,12 +2046,10 @@ class Peg2Parser {
           if (ok) {
             final c = $22!;
             $11 = c;
+            $0 = $11;
+            break;
           }
         }
-      }
-      if (ok) {
-        $0 = $11;
-        break;
       }
       _ch = $1;
       break;
@@ -2193,6 +2097,7 @@ class Peg2Parser {
       }
     }
     ok = true;
+
     return null;
   }
 

@@ -1,6 +1,6 @@
 part of '../../expression_analyzers.dart';
 
-class ExpressionSuccessfulnessResolver extends ExpressionVisitor {
+class ExpressionSuccessfulnessResolver extends ExpressionVisitor<void> {
   bool _hasModifications = false;
 
   void resolve(Grammar grammar) {

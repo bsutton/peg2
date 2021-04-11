@@ -49,7 +49,7 @@ Expression _suffix(String? suffix, Expression expression) {
 # Nonterminals
 
 Grammar Grammar =
-  'leading spaces'? g:'globals'? m:'members'? d:Definition+ 'end of file' { $$ = Grammar(d, g, m); }
+  'leading spaces' g:'globals'? m:'members'? d:Definition+ 'end of file' { $$ = Grammar(d, g, m); }
   ;
 
 Definition =

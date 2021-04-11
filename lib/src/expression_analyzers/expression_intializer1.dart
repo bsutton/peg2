@@ -16,5 +16,7 @@ class ExpressionInitializer1 {
     expressionResultTypeResolver.resolve(rules);
     final expressionResultUsageResolver = ExpressionResultUsageResolver();
     expressionResultUsageResolver.resolve(rules);
+    final expressionErrorResolver = ExpressionErrorResolver();
+    expressionErrorResolver.resolve(rules);
   }
 }

@@ -1,10 +1,14 @@
+## 0.2.3
+
+- Minor improvements to code generation algorithms
+
 ## 0.2.2
 
 - Fixed minor bug. All parsing methods are now private
 
 ## 0.2.1
 
-- Improvements to code generation algorithms. The generated code is now smaller and faster.
+- Improvements to code generation algorithms. The generated code is now smaller and faster
 
 ## 0.2.0
 

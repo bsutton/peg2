@@ -19,7 +19,7 @@ void main() {
 # Non terminals
 
 Json =
-  'leading spaces'? v:Value 'end of file'
+  'leading spaces' v:Value 'end of file'
   ;
 
 Value =

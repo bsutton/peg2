@@ -1,6 +1,6 @@
 part of '../../expression_analyzers.dart';
 
-class ExpressionResultTypeResolver extends ExpressionVisitor {
+class ExpressionResultTypeResolver extends ExpressionVisitor<void> {
   bool _hasModifications = false;
 
   void resolve(List<ProductionRule> rules) {

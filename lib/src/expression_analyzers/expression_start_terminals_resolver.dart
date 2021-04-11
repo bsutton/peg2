@@ -1,6 +1,6 @@
 part of '../../expression_analyzers.dart';
 
-class ExpressionStartTerminalsResolver extends SimpleExpressionVisitor {
+class ExpressionStartTerminalsResolver extends SimpleExpressionVisitor<void> {
   bool _hasModifications = false;
 
   void resolve(List<ProductionRule> rules) {

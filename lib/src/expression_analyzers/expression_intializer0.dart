@@ -1,6 +1,6 @@
 part of '../../expression_analyzers.dart';
 
-class ExpressionInitializer0 extends ExpressionVisitor {
+class ExpressionInitializer0 extends ExpressionVisitor<void> {
   int _actionIndex = 0;
 
   Expression? _current;

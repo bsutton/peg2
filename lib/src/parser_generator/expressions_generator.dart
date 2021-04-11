@@ -6,7 +6,9 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
 
   List<Code> code;
 
-  final Map<Expression, IfElseGenerator> _tails = {};
+  final Map<Expression, List<Code>> _failBlocks = {};
+
+  final Map<Expression, List<Code>> _successBlocks = {};
 
   String _childVariable;
 
@@ -173,17 +175,17 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
   void visitOneOrMore(OneOrMoreExpression node) {
     final variable = _allocNodeVar(node);
     final child = node.expression;
+    void fail(List<Code> code) {
+      code << break$;
+    }
+
     if (variable == null) {
       final varCount = allocator.alloc();
       code << assignVar(varCount, literal(0));
       code <<
           while$(literalTrue, (code) {
             _acceptNode(child, code);
-            code <<
-                if$(refer(Members.ok).negate(), (code) {
-                  code << break$;
-                });
-
+            _generateEpilogue(node, code, null, fail);
             code << refer(varCount).postOp('++').statement;
           });
 
@@ -196,11 +198,7 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
       code <<
           while$(literalTrue, (code) {
             _acceptNode(child, code);
-            code <<
-                if$(refer(Members.ok).negate(), (code) {
-                  code << break$;
-                });
-
+            _generateEpilogue(node, code, null, fail);
             final element =
                 Utils.getNullCheckedValue(_childVariable, child.resultType);
             code << callMethod(varList, 'add', [refer(element)]).statement;
@@ -332,8 +330,13 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
 
       if (expressions.last.isOptional) {
         action(code);
+        _successBlocks[node] = code;
       } else {
-        code << if$(refer(Members.ok), action);
+        code <<
+            if$(refer(Members.ok), (code) {
+              action(code);
+              _successBlocks[node] = code;
+            });
       }
     }
 
@@ -355,17 +358,18 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
   void visitZeroOrMore(ZeroOrMoreExpression node) {
     final variable = _allocNodeVar(node);
     final child = node.expression;
-    final tail = _ifElse(refer(Members.ok));
-    _tails[node] = tail;
+    void fail(List<Code> code) {
+      code <<
+          if$(refer(Members.ok).negate(), (code) {
+            code << break$;
+          });
+    }
+
     if (variable == null) {
       code <<
           while$(literalTrue, (code) {
             _acceptNode(child, code);
-            tail.elseCode((code) {
-              code << break$;
-            });
-
-            code.addAll(tail.generate());
+            fail(code);
           });
 
       code << assign(Members.ok, literalTrue);
@@ -377,11 +381,7 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
       code <<
           while$(literalTrue, (code) {
             _acceptNode(child, code);
-            tail.elseCode((code) {
-              code << break$;
-            });
-
-            code.addAll(tail.generate());
+            fail(code);
             final element =
                 Utils.getNullCheckedValue(_childVariable, child.resultType);
             code << callMethod(varList, 'add', [refer(element)]).statement;
@@ -428,6 +428,34 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
     return false;
   }
 
+  void _generateEpilogue(Expression node, List<Code> code,
+      Function(List<Code>) success, Function(List<Code>) fail) {
+    final successBlock = _successBlocks[node];
+    final failBlock = _failBlocks[node];
+    if (successBlock != null && success != null) {
+      success(successBlock);
+      success = null;
+    }
+
+    if (failBlock != null && fail != null) {
+      fail(failBlock);
+      fail = null;
+    }
+
+    if (success != null || fail != null) {
+      final ifElse = _ifElse(refer(Members.ok));
+      if (success != null) {
+        ifElse.ifCode(success);
+      }
+
+      if (fail != null) {
+        ifElse.elseCode(fail);
+      }
+
+      code << lazyCode(() => Block.of(ifElse.generate()));
+    }
+  }
+
   void _generateMultipleChoiceNonterminal(OrderedChoiceExpression node,
       String variable, void Function(List<Code>) failure) {
     final expressions = node.expressions;
@@ -454,16 +482,15 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
             }
 
             _acceptNode(child, code);
+            void success(List<Code> code) {
+              if (variable != null) {
+                code << assign(variable, refer(_childVariable));
+              }
 
-            code <<
-                if$(refer(Members.ok), (code) {
-                  if (variable != null) {
-                    code << assign(variable, refer(_childVariable));
-                  }
+              code << break$;
+            }
 
-                  code << break$;
-                });
-
+            _generateEpilogue(child, code, success, null);
             if (_canSequenceChangePos(child)) {
               _restoreVars(storage, code);
             } else {
@@ -507,16 +534,15 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
             }
 
             _acceptNode(child, code);
+            void success(List<Code> code) {
+              if (variable != null) {
+                code << assign(variable, refer(_childVariable));
+              }
 
-            code <<
-                if$(refer(Members.ok), (code) {
-                  if (variable != null) {
-                    code << assign(variable, refer(_childVariable));
-                  }
+              code << break$;
+            }
 
-                  code << break$;
-                });
-
+            _generateEpilogue(child, code, success, null);
             if (_canSequenceChangePos(child)) {
               _restoreVars(storage, code);
             } else {
@@ -536,9 +562,6 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
 
   void _generateSingleChoice(OrderedChoiceExpression node, String variable,
       void Function(List<Code>) failure) {
-    final parent = node.parent;
-    final hasParentTail = _tails.containsKey(parent);
-    final tail = _tails[parent] ?? _ifElse(refer(Members.ok));
     final child = node.expressions[0];
     final needSavePos = _canSequenceChangePos(child);
     if (variable != null) {
@@ -552,34 +575,23 @@ class ExpressionsGenerator extends ExpressionVisitor<void> {
     }
 
     _acceptNode(child, code);
-    if (variable == null) {
-      tail.elseCode((code) {
-        _restoreVars(storage, code);
-        failure(code);
-      });
-
-      if (!hasParentTail) {
-        code.addAll(tail.generate());
-      }
-
-      if (node.level == 0) {
-        code << literalNull.returned.statement;
-      }
-    } else {
-      tail.ifCode((code) {
+    void success(List<Code> code) {
+      if (variable != null) {
         code << assign(variable, refer(_childVariable));
-      });
-
-      tail.elseCode((code) {
-        _restoreVars(storage, code);
-        failure(code);
-      });
-
-      if (!hasParentTail) {
-        code.addAll(tail.generate());
       }
+    }
 
-      if (node.level == 0) {
+    void fail(List<Code> code) {
+      _restoreVars(storage, code);
+      failure(code);
+      _failBlocks[node] = code;
+    }
+
+    _generateEpilogue(child, code, success, fail);
+    if (node.level == 0) {
+      if (variable == null) {
+        code << literalNull.returned.statement;
+      } else {
         code << refer(variable).returned.statement;
       }
     }

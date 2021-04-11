@@ -51,18 +51,16 @@ class ExampleParser {
     final $3 = _pos;
     dynamic $4;
     _parse_leading_spaces();
-    ok = true;
     final $5 = _parseValue();
     if (ok) {
       _parse_end_of_file();
       if (ok) {
         final v = $5;
         $4 = v;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -77,8 +75,6 @@ class ExampleParser {
       final $4 = _parseArray();
       if (ok) {
         $3 = $4;
-      }
-      if (ok) {
         $0 = $3;
         break;
       }
@@ -87,8 +83,6 @@ class ExampleParser {
       final $7 = _parse_false();
       if (ok) {
         $6 = $7;
-      }
-      if (ok) {
         $0 = $6;
         break;
       }
@@ -97,8 +91,6 @@ class ExampleParser {
       final $10 = _parse_null();
       if (ok) {
         $9 = $10;
-      }
-      if (ok) {
         $0 = $9;
         break;
       }
@@ -107,8 +99,6 @@ class ExampleParser {
       final $13 = _parse_true();
       if (ok) {
         $12 = $13;
-      }
-      if (ok) {
         $0 = $12;
         break;
       }
@@ -117,8 +107,6 @@ class ExampleParser {
       final $16 = _parseObject();
       if (ok) {
         $15 = $16;
-      }
-      if (ok) {
         $0 = $15;
         break;
       }
@@ -127,8 +115,6 @@ class ExampleParser {
       final $19 = _parse_number();
       if (ok) {
         $18 = $19;
-      }
-      if (ok) {
         $0 = $18;
         break;
       }
@@ -137,8 +123,6 @@ class ExampleParser {
       final $22 = _parse_string();
       if (ok) {
         $21 = $22;
-      }
-      if (ok) {
         $0 = $21;
         break;
       }
@@ -164,11 +148,10 @@ class ExampleParser {
         late List $$;
         $$ = v ?? [];
         $4 = $$;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -195,13 +178,14 @@ class ExampleParser {
           if (ok) {
             final v = $13;
             $12 = v;
+            $8 = $12;
           }
         }
-        if (ok) {
-          $8 = $12;
-        } else {
+        if (!ok) {
           _ch = $10;
           _pos = $11;
+        }
+        if (!ok) {
           break;
         }
         $7.add($8);
@@ -214,10 +198,9 @@ class ExampleParser {
       late List $$;
       $$ = [v, ...n];
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -240,11 +223,10 @@ class ExampleParser {
         late Map<String, dynamic> $$;
         $$ = <String, dynamic>{}..addEntries(m ?? []);
         $4 = $$;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -271,13 +253,14 @@ class ExampleParser {
           if (ok) {
             final m = $13!;
             $12 = m;
+            $8 = $12;
           }
         }
-        if (ok) {
-          $8 = $12;
-        } else {
+        if (!ok) {
           _ch = $10;
           _pos = $11;
+        }
+        if (!ok) {
           break;
         }
         $7.add($8!);
@@ -290,10 +273,9 @@ class ExampleParser {
       late List<MapEntry<String, dynamic>> $$;
       $$ = [m, ...n];
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -316,12 +298,11 @@ class ExampleParser {
           late MapEntry<String, dynamic> $$;
           $$ = MapEntry(k, v);
           $4 = $$;
+          $0 = $4;
         }
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -360,10 +341,9 @@ class ExampleParser {
       dynamic $$;
       $$ = false;
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'false\'');
@@ -373,6 +353,7 @@ class ExampleParser {
 
   List<int>? _parse_leading_spaces() {
     _parse$$spacing();
+
     return null;
   }
 
@@ -388,10 +369,9 @@ class ExampleParser {
       dynamic $$;
       $$ = null;
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'null\'');
@@ -411,10 +391,9 @@ class ExampleParser {
       dynamic $$;
       $$ = true;
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'true\'');
@@ -449,11 +428,10 @@ class ExampleParser {
         late String $$;
         $$ = String.fromCharCodes(c);
         $4 = $$;
+        $0 = $4;
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'string\'');
@@ -555,10 +533,9 @@ class ExampleParser {
       late num $$;
       $$ = num.parse(n);
       $4 = $$;
-    }
-    if (ok) {
       $0 = $4;
-    } else {
+    }
+    if (!ok) {
       _ch = $2;
       _pos = $3;
       _fail('\'number\'');
@@ -674,11 +651,9 @@ class ExampleParser {
         if (ok) {
           final r = $5!;
           $4 = r;
+          $0 = $4;
+          break;
         }
-      }
-      if (ok) {
-        $0 = $4;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -686,8 +661,6 @@ class ExampleParser {
       final $8 = _parse$$unescaped();
       if (ok) {
         $7 = $8;
-      }
-      if (ok) {
         $0 = $7;
         break;
       }
@@ -706,8 +679,6 @@ class ExampleParser {
       final $5 = _matchChar(34, 34);
       if (ok) {
         $4 = $5;
-      }
-      if (ok) {
         $0 = $4;
         break;
       }
@@ -716,8 +687,6 @@ class ExampleParser {
       final $8 = _matchChar(92, 92);
       if (ok) {
         $7 = $8;
-      }
-      if (ok) {
         $0 = $7;
         break;
       }
@@ -726,8 +695,6 @@ class ExampleParser {
       final $11 = _matchChar(47, 47);
       if (ok) {
         $10 = $11;
-      }
-      if (ok) {
         $0 = $10;
         break;
       }
@@ -738,8 +705,6 @@ class ExampleParser {
         late int $$;
         $$ = 0x8;
         $13 = $$;
-      }
-      if (ok) {
         $0 = $13;
         break;
       }
@@ -750,8 +715,6 @@ class ExampleParser {
         late int $$;
         $$ = 0xC;
         $15 = $$;
-      }
-      if (ok) {
         $0 = $15;
         break;
       }
@@ -762,8 +725,6 @@ class ExampleParser {
         late int $$;
         $$ = 0xA;
         $17 = $$;
-      }
-      if (ok) {
         $0 = $17;
         break;
       }
@@ -774,8 +735,6 @@ class ExampleParser {
         late int $$;
         $$ = 0xD;
         $19 = $$;
-      }
-      if (ok) {
         $0 = $19;
         break;
       }
@@ -786,8 +745,6 @@ class ExampleParser {
         late int $$;
         $$ = 0x9;
         $21 = $$;
-      }
-      if (ok) {
         $0 = $21;
         break;
       }
@@ -799,11 +756,9 @@ class ExampleParser {
         if (ok) {
           final r = $24!;
           $23 = r;
+          $0 = $23;
+          break;
         }
-      }
-      if (ok) {
-        $0 = $23;
-        break;
       }
       _ch = $1;
       _pos = $2;
@@ -832,13 +787,12 @@ class ExampleParser {
             late int $$;
             $$ = a * 0xfff + b * 0xff + c * 0xf + d;
             $4 = $$;
+            $0 = $4;
           }
         }
       }
     }
-    if (ok) {
-      $0 = $4;
-    } else {
+    if (!ok) {
       _ch = $2;
       _pos = $3;
     }
@@ -856,8 +810,6 @@ class ExampleParser {
         late int $$;
         $$ = v - 97;
         $3 = $$;
-      }
-      if (ok) {
         $0 = $3;
         break;
       }
@@ -869,8 +821,6 @@ class ExampleParser {
         late int $$;
         $$ = v - 65;
         $6 = $$;
-      }
-      if (ok) {
         $0 = $6;
         break;
       }
@@ -882,8 +832,6 @@ class ExampleParser {
         late int $$;
         $$ = v - 48;
         $9 = $$;
-      }
-      if (ok) {
         $0 = $9;
         break;
       }
@@ -901,8 +849,6 @@ class ExampleParser {
       final $4 = _matchRange(32, 33);
       if (ok) {
         $3 = $4;
-      }
-      if (ok) {
         $0 = $3;
         break;
       }
@@ -911,8 +857,6 @@ class ExampleParser {
       final $7 = _matchRange(35, 91);
       if (ok) {
         $6 = $7;
-      }
-      if (ok) {
         $0 = $6;
         break;
       }
@@ -921,8 +865,6 @@ class ExampleParser {
       final $10 = _matchRange(93, 1114111);
       if (ok) {
         $9 = $10;
-      }
-      if (ok) {
         $0 = $9;
         break;
       }
@@ -941,6 +883,7 @@ class ExampleParser {
       }
     }
     ok = true;
+
     return null;
   }
 

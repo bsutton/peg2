@@ -1,9 +1,6 @@
 NEW:
 optimize code for ordered choice with single optional expression
-implement may not change pos
-implement may not change ch
 reimplement TOKEN 'semantic value'
-warning when optional used on optional
 use bitmask flags in method fail
 
 OLD:
@@ -11,10 +8,7 @@ check duplicare semantic variables
 add binary search for (long) ranges
 add more grammar analyzers
 implement analyzer warning when terminal isSucessful (zero length terminal)
-implement analyzer warning when repetition child isSucessful (infinite loop)
 does not generate unused global parser methods
-inplement malformed terminals reporting
 need make corrections to character class `toString()`
-rules with unused results should not return results
 optimize sequence on exit
 add memoization

@@ -1,11 +1,11 @@
 peg2
 =======
 
-## Non-nullable implementation. May contain errors, but is already capable of generating itself. 
+# Non-nullable implementation. May contain errors, but is already capable of generating itself.
 
 PEG+ (Parsing expression grammar) parser source code generator, command line tool.
 
-Version 0.2.2
+Version 0.2.3
 
 This is a slightly modified (extended) version of PEG with support for nonterminal, terminal and subterminal symbols and with the support of the expression "Capture".
 
