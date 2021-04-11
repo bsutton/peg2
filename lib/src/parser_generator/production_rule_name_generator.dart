@@ -14,7 +14,7 @@ class ProductionRuleNameGenerator {
         name = '\$\$' + name.substring(1);
     }
 
-    final result = 'parse$name';
+    final result = '_parse$name';
     return result;
   }
 

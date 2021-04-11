@@ -66,7 +66,7 @@ class Peg2Parser {
   Grammar? parse(String source) {
     _source = source;
     _reset();
-    final result = parseGrammar();
+    final result = _parseGrammar();
     if (!ok) {
       _buildError();
     }
@@ -74,23 +74,23 @@ class Peg2Parser {
     return result;
   }
 
-  Grammar? parseGrammar() {
+  Grammar? _parseGrammar() {
     Grammar? $0;
     final $2 = _ch;
     final $3 = _pos;
     Grammar? $4;
-    parse_leading_spaces();
+    _parse_leading_spaces();
     ok = true;
-    final $6 = parse_globals();
+    final $6 = _parse_globals();
     final $5 = $6;
     ok = true;
-    final $8 = parse_members();
+    final $8 = _parse_members();
     final $7 = $8;
     ok = true;
     List<ProductionRule>? $9;
     final $10 = <ProductionRule>[];
     while (true) {
-      final $11 = parseDefinition();
+      final $11 = _parseDefinition();
       if (!ok) {
         break;
       }
@@ -101,7 +101,7 @@ class Peg2Parser {
       ok = true;
     }
     if (ok) {
-      parse_end_of_file();
+      _parse_end_of_file();
       if (ok) {
         final g = $5;
         final m = $7;
@@ -120,12 +120,12 @@ class Peg2Parser {
     return $0;
   }
 
-  ProductionRule? parseDefinition() {
+  ProductionRule? _parseDefinition() {
     ProductionRule? $0;
     final $1 = _ch;
     while (true) {
       ProductionRule? $3;
-      final $4 = parseNonterminalDefinition();
+      final $4 = _parseNonterminalDefinition();
       if (ok) {
         $3 = $4;
       }
@@ -135,7 +135,7 @@ class Peg2Parser {
       }
       _ch = $1;
       ProductionRule? $6;
-      final $7 = parseTerminalDefinition();
+      final $7 = _parseTerminalDefinition();
       if (ok) {
         $6 = $7;
       }
@@ -145,7 +145,7 @@ class Peg2Parser {
       }
       _ch = $1;
       ProductionRule? $9;
-      final $10 = parseSubterminalDefinition();
+      final $10 = _parseSubterminalDefinition();
       if (ok) {
         $9 = $10;
       }
@@ -159,21 +159,21 @@ class Peg2Parser {
     return $0;
   }
 
-  ProductionRule? parseNonterminalDefinition() {
+  ProductionRule? _parseNonterminalDefinition() {
     ProductionRule? $0;
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
       ProductionRule? $4;
-      final $5 = parseType();
+      final $5 = _parseType();
       if (ok) {
-        final $6 = parse_non_terminal_name();
+        final $6 = _parse_non_terminal_name();
         if (ok) {
-          parse_$EqualSign();
+          _parse_$EqualSign();
           if (ok) {
-            final $7 = parseNonterminalExpression();
+            final $7 = _parseNonterminalExpression();
             if (ok) {
-              parse_$Semicolon();
+              _parse_$Semicolon();
               if (ok) {
                 final t = $5!;
                 final n = $6!;
@@ -193,13 +193,13 @@ class Peg2Parser {
       _ch = $1;
       _pos = $2;
       ProductionRule? $9;
-      final $10 = parse_non_terminal_name();
+      final $10 = _parse_non_terminal_name();
       if (ok) {
-        parse_$EqualSign();
+        _parse_$EqualSign();
         if (ok) {
-          final $11 = parseNonterminalExpression();
+          final $11 = _parseNonterminalExpression();
           if (ok) {
-            parse_$Semicolon();
+            _parse_$Semicolon();
             if (ok) {
               final n = $10!;
               final e = $11!;
@@ -221,12 +221,12 @@ class Peg2Parser {
     return $0;
   }
 
-  OrderedChoiceExpression? parseNonterminalExpression() {
+  OrderedChoiceExpression? _parseNonterminalExpression() {
     OrderedChoiceExpression? $0;
     final $2 = _ch;
     final $3 = _pos;
     OrderedChoiceExpression? $4;
-    final $5 = parseNonterminalSequence();
+    final $5 = _parseNonterminalSequence();
     if (ok) {
       List<SequenceExpression>? $6;
       final $7 = <SequenceExpression>[];
@@ -235,9 +235,9 @@ class Peg2Parser {
         final $10 = _ch;
         final $11 = _pos;
         SequenceExpression? $12;
-        parse_$Slash();
+        _parse_$Slash();
         if (ok) {
-          final $13 = parseNonterminalSequence();
+          final $13 = _parseNonterminalSequence();
           if (ok) {
             final e = $13!;
             $12 = e;
@@ -270,7 +270,7 @@ class Peg2Parser {
     return $0;
   }
 
-  SequenceExpression? parseNonterminalSequence() {
+  SequenceExpression? _parseNonterminalSequence() {
     SequenceExpression? $0;
     final $2 = _ch;
     final $3 = _pos;
@@ -278,7 +278,7 @@ class Peg2Parser {
     List<Expression>? $5;
     final $6 = <Expression>[];
     while (true) {
-      final $7 = parseNonterminalPrefix();
+      final $7 = _parseNonterminalPrefix();
       if (!ok) {
         break;
       }
@@ -289,7 +289,7 @@ class Peg2Parser {
       ok = true;
     }
     if (ok) {
-      final $9 = parse_action();
+      final $9 = _parse_action();
       final $8 = $9;
       ok = true;
       final e = $5!;
@@ -307,19 +307,19 @@ class Peg2Parser {
     return $0;
   }
 
-  Expression? parseNonterminalPrefix() {
+  Expression? _parseNonterminalPrefix() {
     Expression? $0;
     final $2 = _ch;
     final $3 = _pos;
     Expression? $4;
-    final $6 = parse_semantic_value();
+    final $6 = _parse_semantic_value();
     final $5 = $6;
     ok = true;
     String? $8;
     final $9 = _ch;
     while (true) {
       String? $11;
-      final $12 = parse_$Ampersand();
+      final $12 = _parse_$Ampersand();
       if (ok) {
         $11 = $12;
       }
@@ -329,7 +329,7 @@ class Peg2Parser {
       }
       _ch = $9;
       String? $14;
-      final $15 = parse_$ExclamationMark();
+      final $15 = _parse_$ExclamationMark();
       if (ok) {
         $14 = $15;
       }
@@ -342,7 +342,7 @@ class Peg2Parser {
     }
     final $7 = $8;
     ok = true;
-    final $16 = parseNonterminalSuffix();
+    final $16 = _parseNonterminalSuffix();
     if (ok) {
       final s = $5;
       final p = $7;
@@ -360,18 +360,18 @@ class Peg2Parser {
     return $0;
   }
 
-  Expression? parseNonterminalSuffix() {
+  Expression? _parseNonterminalSuffix() {
     Expression? $0;
     final $2 = _ch;
     final $3 = _pos;
     Expression? $4;
-    final $5 = parseNonterminalPrimary();
+    final $5 = _parseNonterminalPrimary();
     if (ok) {
       String? $7;
       final $8 = _ch;
       while (true) {
         String? $10;
-        final $11 = parse_$QuestionMark();
+        final $11 = _parse_$QuestionMark();
         if (ok) {
           $10 = $11;
         }
@@ -381,7 +381,7 @@ class Peg2Parser {
         }
         _ch = $8;
         String? $13;
-        final $14 = parse_$Asterisk();
+        final $14 = _parse_$Asterisk();
         if (ok) {
           $13 = $14;
         }
@@ -391,7 +391,7 @@ class Peg2Parser {
         }
         _ch = $8;
         String? $16;
-        final $17 = parse_$PlusSign();
+        final $17 = _parse_$PlusSign();
         if (ok) {
           $16 = $17;
         }
@@ -419,13 +419,13 @@ class Peg2Parser {
     return $0;
   }
 
-  Expression? parseNonterminalPrimary() {
+  Expression? _parseNonterminalPrimary() {
     Expression? $0;
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
       Expression? $4;
-      final $5 = parse_non_terminal_name();
+      final $5 = _parse_non_terminal_name();
       if (ok) {
         final n = $5!;
         late Expression $$;
@@ -438,7 +438,7 @@ class Peg2Parser {
       }
       _ch = $1;
       Expression? $7;
-      final $8 = parse_terminal_name();
+      final $8 = _parse_terminal_name();
       if (ok) {
         final n = $8!;
         late Expression $$;
@@ -451,11 +451,11 @@ class Peg2Parser {
       }
       _ch = $1;
       Expression? $10;
-      parse_$LeftParenthesis();
+      _parse_$LeftParenthesis();
       if (ok) {
-        final $11 = parseNonterminalExpression();
+        final $11 = _parseNonterminalExpression();
         if (ok) {
-          parse_$RightParenthesis();
+          _parse_$RightParenthesis();
           if (ok) {
             final e = $11!;
             $10 = e;
@@ -473,21 +473,21 @@ class Peg2Parser {
     return $0;
   }
 
-  ProductionRule? parseTerminalDefinition() {
+  ProductionRule? _parseTerminalDefinition() {
     ProductionRule? $0;
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
       ProductionRule? $4;
-      final $5 = parseType();
+      final $5 = _parseType();
       if (ok) {
-        final $6 = parse_terminal_name();
+        final $6 = _parse_terminal_name();
         if (ok) {
-          parse_$EqualSign();
+          _parse_$EqualSign();
           if (ok) {
-            final $7 = parseExpression();
+            final $7 = _parseExpression();
             if (ok) {
-              parse_$Semicolon();
+              _parse_$Semicolon();
               if (ok) {
                 final t = $5!;
                 final n = $6!;
@@ -507,13 +507,13 @@ class Peg2Parser {
       _ch = $1;
       _pos = $2;
       ProductionRule? $9;
-      final $10 = parse_terminal_name();
+      final $10 = _parse_terminal_name();
       if (ok) {
-        parse_$EqualSign();
+        _parse_$EqualSign();
         if (ok) {
-          final $11 = parseExpression();
+          final $11 = _parseExpression();
           if (ok) {
-            parse_$Semicolon();
+            _parse_$Semicolon();
             if (ok) {
               final n = $10!;
               final e = $11!;
@@ -535,12 +535,12 @@ class Peg2Parser {
     return $0;
   }
 
-  OrderedChoiceExpression? parseExpression() {
+  OrderedChoiceExpression? _parseExpression() {
     OrderedChoiceExpression? $0;
     final $2 = _ch;
     final $3 = _pos;
     OrderedChoiceExpression? $4;
-    final $5 = parseSequence();
+    final $5 = _parseSequence();
     if (ok) {
       List<SequenceExpression>? $6;
       final $7 = <SequenceExpression>[];
@@ -549,9 +549,9 @@ class Peg2Parser {
         final $10 = _ch;
         final $11 = _pos;
         SequenceExpression? $12;
-        parse_$Slash();
+        _parse_$Slash();
         if (ok) {
-          final $13 = parseSequence();
+          final $13 = _parseSequence();
           if (ok) {
             final e = $13!;
             $12 = e;
@@ -584,7 +584,7 @@ class Peg2Parser {
     return $0;
   }
 
-  SequenceExpression? parseSequence() {
+  SequenceExpression? _parseSequence() {
     SequenceExpression? $0;
     final $2 = _ch;
     final $3 = _pos;
@@ -592,7 +592,7 @@ class Peg2Parser {
     List<Expression>? $5;
     final $6 = <Expression>[];
     while (true) {
-      final $7 = parsePrefix();
+      final $7 = _parsePrefix();
       if (!ok) {
         break;
       }
@@ -603,7 +603,7 @@ class Peg2Parser {
       ok = true;
     }
     if (ok) {
-      final $9 = parse_action();
+      final $9 = _parse_action();
       final $8 = $9;
       ok = true;
       final e = $5!;
@@ -621,19 +621,19 @@ class Peg2Parser {
     return $0;
   }
 
-  Expression? parsePrefix() {
+  Expression? _parsePrefix() {
     Expression? $0;
     final $2 = _ch;
     final $3 = _pos;
     Expression? $4;
-    final $6 = parse_semantic_value();
+    final $6 = _parse_semantic_value();
     final $5 = $6;
     ok = true;
     String? $8;
     final $9 = _ch;
     while (true) {
       String? $11;
-      final $12 = parse_$Ampersand();
+      final $12 = _parse_$Ampersand();
       if (ok) {
         $11 = $12;
       }
@@ -643,7 +643,7 @@ class Peg2Parser {
       }
       _ch = $9;
       String? $14;
-      final $15 = parse_$ExclamationMark();
+      final $15 = _parse_$ExclamationMark();
       if (ok) {
         $14 = $15;
       }
@@ -656,7 +656,7 @@ class Peg2Parser {
     }
     final $7 = $8;
     ok = true;
-    final $16 = parseSuffix();
+    final $16 = _parseSuffix();
     if (ok) {
       final s = $5;
       final p = $7;
@@ -674,18 +674,18 @@ class Peg2Parser {
     return $0;
   }
 
-  Expression? parseSuffix() {
+  Expression? _parseSuffix() {
     Expression? $0;
     final $2 = _ch;
     final $3 = _pos;
     Expression? $4;
-    final $5 = parsePrimary();
+    final $5 = _parsePrimary();
     if (ok) {
       String? $7;
       final $8 = _ch;
       while (true) {
         String? $10;
-        final $11 = parse_$QuestionMark();
+        final $11 = _parse_$QuestionMark();
         if (ok) {
           $10 = $11;
         }
@@ -695,7 +695,7 @@ class Peg2Parser {
         }
         _ch = $8;
         String? $13;
-        final $14 = parse_$Asterisk();
+        final $14 = _parse_$Asterisk();
         if (ok) {
           $13 = $14;
         }
@@ -705,7 +705,7 @@ class Peg2Parser {
         }
         _ch = $8;
         String? $16;
-        final $17 = parse_$PlusSign();
+        final $17 = _parse_$PlusSign();
         if (ok) {
           $16 = $17;
         }
@@ -733,13 +733,13 @@ class Peg2Parser {
     return $0;
   }
 
-  Expression? parsePrimary() {
+  Expression? _parsePrimary() {
     Expression? $0;
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
       Expression? $4;
-      final $5 = parse_sub_terminal_name();
+      final $5 = _parse_sub_terminal_name();
       if (ok) {
         final n = $5!;
         late Expression $$;
@@ -752,11 +752,11 @@ class Peg2Parser {
       }
       _ch = $1;
       Expression? $7;
-      parse_$LeftParenthesis();
+      _parse_$LeftParenthesis();
       if (ok) {
-        final $8 = parseExpression();
+        final $8 = _parseExpression();
         if (ok) {
-          parse_$RightParenthesis();
+          _parse_$RightParenthesis();
           if (ok) {
             final e = $8!;
             $7 = e;
@@ -770,7 +770,7 @@ class Peg2Parser {
       _ch = $1;
       _pos = $2;
       Expression? $10;
-      final $11 = parse_literal();
+      final $11 = _parse_literal();
       if (ok) {
         $10 = $11;
       }
@@ -780,7 +780,7 @@ class Peg2Parser {
       }
       _ch = $1;
       Expression? $13;
-      final $14 = parse_character_class();
+      final $14 = _parse_character_class();
       if (ok) {
         $13 = $14;
       }
@@ -790,7 +790,7 @@ class Peg2Parser {
       }
       _ch = $1;
       Expression? $16;
-      parse_$Period();
+      _parse_$Period();
       if (ok) {
         late Expression $$;
         $$ = AnyCharacterExpression();
@@ -802,11 +802,11 @@ class Peg2Parser {
       }
       _ch = $1;
       Expression? $18;
-      parse_$LessThanSign();
+      _parse_$LessThanSign();
       if (ok) {
-        final $19 = parseExpression();
+        final $19 = _parseExpression();
         if (ok) {
-          parse_$GreaterThanSign();
+          _parse_$GreaterThanSign();
           if (ok) {
             final e = $19!;
             late Expression $$;
@@ -826,21 +826,21 @@ class Peg2Parser {
     return $0;
   }
 
-  ProductionRule? parseSubterminalDefinition() {
+  ProductionRule? _parseSubterminalDefinition() {
     ProductionRule? $0;
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
       ProductionRule? $4;
-      final $5 = parseType();
+      final $5 = _parseType();
       if (ok) {
-        final $6 = parse_sub_terminal_name();
+        final $6 = _parse_sub_terminal_name();
         if (ok) {
-          parse_$EqualSign();
+          _parse_$EqualSign();
           if (ok) {
-            final $7 = parseExpression();
+            final $7 = _parseExpression();
             if (ok) {
-              parse_$Semicolon();
+              _parse_$Semicolon();
               if (ok) {
                 final t = $5!;
                 final n = $6!;
@@ -860,13 +860,13 @@ class Peg2Parser {
       _ch = $1;
       _pos = $2;
       ProductionRule? $9;
-      final $10 = parse_sub_terminal_name();
+      final $10 = _parse_sub_terminal_name();
       if (ok) {
-        parse_$EqualSign();
+        _parse_$EqualSign();
         if (ok) {
-          final $11 = parseExpression();
+          final $11 = _parseExpression();
           if (ok) {
-            parse_$Semicolon();
+            _parse_$Semicolon();
             if (ok) {
               final n = $10!;
               final e = $11!;
@@ -888,22 +888,22 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parseType() {
+  String? _parseType() {
     String? $0;
     final $2 = _ch;
     final $3 = _pos;
     String? $4;
-    final $5 = parseTypeName();
+    final $5 = _parseTypeName();
     if (ok) {
       List<String>? $7;
       final $9 = _ch;
       final $10 = _pos;
       List<String>? $11;
-      parse_$LessThanSign();
+      _parse_$LessThanSign();
       if (ok) {
-        final $12 = parseTypeArguments();
+        final $12 = _parseTypeArguments();
         if (ok) {
-          parse_$GreaterThanSign();
+          _parse_$GreaterThanSign();
           if (ok) {
             final a = $12!;
             $11 = a;
@@ -933,17 +933,17 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parseTypeName() {
+  String? _parseTypeName() {
     String? $0;
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
       String? $4;
-      final $5 = parse_library_prefix();
+      final $5 = _parse_library_prefix();
       if (ok) {
-        parse_$Period();
+        _parse_$Period();
         if (ok) {
-          final $6 = parse_type_name();
+          final $6 = _parse_type_name();
           if (ok) {
             final p = $5!;
             final n = $6!;
@@ -960,7 +960,7 @@ class Peg2Parser {
       _ch = $1;
       _pos = $2;
       String? $8;
-      final $9 = parse_type_name();
+      final $9 = _parse_type_name();
       if (ok) {
         $8 = $9;
       }
@@ -974,12 +974,12 @@ class Peg2Parser {
     return $0;
   }
 
-  List<String>? parseTypeArguments() {
+  List<String>? _parseTypeArguments() {
     List<String>? $0;
     final $2 = _ch;
     final $3 = _pos;
     List<String>? $4;
-    final $5 = parseType();
+    final $5 = _parseType();
     if (ok) {
       List<String>? $6;
       final $7 = <String>[];
@@ -988,9 +988,9 @@ class Peg2Parser {
         final $10 = _ch;
         final $11 = _pos;
         String? $12;
-        parse_$Comma();
+        _parse_$Comma();
         if (ok) {
-          final $13 = parseType();
+          final $13 = _parseType();
           if (ok) {
             final t = $13!;
             $12 = t;
@@ -1023,15 +1023,15 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_non_terminal_name() {
+  String? _parse_non_terminal_name() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
     final $3 = _pos;
     String? $4;
-    final $5 = parse$$IDENTIFIER();
+    final $5 = _parse$$IDENTIFIER();
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
       $4 = $5;
     }
     if (ok) {
@@ -1044,7 +1044,7 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_terminal_name() {
+  String? _parse_terminal_name() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1071,7 +1071,7 @@ class Peg2Parser {
         _failures = $14;
         ok = !ok;
         if (ok) {
-          parse$$TERMINAL_CHAR();
+          _parse$$TERMINAL_CHAR();
         }
         if (!ok) {
           break;
@@ -1091,7 +1091,7 @@ class Peg2Parser {
       $5 = _source.substring($6, _pos);
     }
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
       $4 = $5;
     }
     if (ok) {
@@ -1104,7 +1104,7 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_sub_terminal_name() {
+  String? _parse_sub_terminal_name() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1116,7 +1116,7 @@ class Peg2Parser {
     final $8 = _pos;
     _matchChar(64, 64);
     if (ok) {
-      parse$$IDENTIFIER();
+      _parse$$IDENTIFIER();
     }
     if (!ok) {
       _ch = $7;
@@ -1126,7 +1126,7 @@ class Peg2Parser {
       $5 = _source.substring($6, _pos);
     }
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
       $4 = $5;
     }
     if (ok) {
@@ -1139,13 +1139,13 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_semantic_value() {
+  String? _parse_semantic_value() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
     final $3 = _pos;
     String? $4;
-    final $5 = parse$$IDENTIFIER();
+    final $5 = _parse$$IDENTIFIER();
     if (ok) {
       _matchChar(58, ':');
       if (ok) {
@@ -1162,7 +1162,7 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_type_name() {
+  String? _parse_type_name() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1172,7 +1172,7 @@ class Peg2Parser {
     final $6 = _pos;
     final $7 = _ch;
     final $8 = _pos;
-    parse$$IDENTIFIER();
+    _parse$$IDENTIFIER();
     if (ok) {
       _matchChar(63, 63);
       ok = true;
@@ -1185,7 +1185,7 @@ class Peg2Parser {
       $5 = _source.substring($6, _pos);
     }
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
       $4 = $5;
     }
     if (ok) {
@@ -1198,7 +1198,7 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_library_prefix() {
+  String? _parse_library_prefix() {
     _failPos = _pos;
     String? $0;
     String? $2;
@@ -1208,7 +1208,7 @@ class Peg2Parser {
     final $6 = _pos;
     _matchChar(95, 95);
     ok = true;
-    parse$$IDENTIFIER();
+    _parse$$IDENTIFIER();
     if (!ok) {
       _ch = $5;
       _pos = $6;
@@ -1227,13 +1227,13 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_$Semicolon() {
+  String? _parse_$Semicolon() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(59, ';');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
     }
     if (!ok) {
       _ch = $0;
@@ -1243,7 +1243,7 @@ class Peg2Parser {
     return null;
   }
 
-  String? parse_action() {
+  String? _parse_action() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1254,7 +1254,7 @@ class Peg2Parser {
       String? $5;
       final $6 = _pos;
       while (true) {
-        parse$$ACTION_BODY();
+        _parse$$ACTION_BODY();
         if (!ok) {
           break;
         }
@@ -1265,7 +1265,7 @@ class Peg2Parser {
       }
       _matchChar(125, '}');
       if (ok) {
-        parse$$SPACING();
+        _parse$$SPACING();
         final b = $5!;
         $4 = b;
       }
@@ -1280,7 +1280,7 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_$Ampersand() {
+  String? _parse_$Ampersand() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1288,7 +1288,7 @@ class Peg2Parser {
     String? $4;
     final $5 = _matchChar(38, '&');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
       $4 = $5;
     }
     if (ok) {
@@ -1301,7 +1301,7 @@ class Peg2Parser {
     return $0;
   }
 
-  Expression? parse_character_class() {
+  Expression? _parse_character_class() {
     _failPos = _pos;
     Expression? $0;
     final $2 = _ch;
@@ -1327,7 +1327,7 @@ class Peg2Parser {
         _failures = $14;
         ok = !ok;
         if (ok) {
-          final $15 = parse$$RANGE();
+          final $15 = _parse$$RANGE();
           if (ok) {
             final r = $15!;
             $9 = r;
@@ -1348,7 +1348,7 @@ class Peg2Parser {
       if (ok) {
         _matchChar(93, ']');
         if (ok) {
-          parse$$SPACING();
+          _parse$$SPACING();
           final r = $5!;
           late Expression $$;
           $$ = CharacterClassExpression(r);
@@ -1366,13 +1366,13 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_$RightParenthesis() {
+  String? _parse_$RightParenthesis() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(41, ')');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
     }
     if (!ok) {
       _ch = $0;
@@ -1382,13 +1382,13 @@ class Peg2Parser {
     return null;
   }
 
-  String? parse_$Period() {
+  String? _parse_$Period() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(46, '.');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
     }
     if (!ok) {
       _ch = $0;
@@ -1398,7 +1398,7 @@ class Peg2Parser {
     return null;
   }
 
-  dynamic parse_end_of_file() {
+  dynamic _parse_end_of_file() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
@@ -1418,7 +1418,7 @@ class Peg2Parser {
     return null;
   }
 
-  String? parse_globals() {
+  String? _parse_globals() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1429,7 +1429,7 @@ class Peg2Parser {
       String? $5;
       final $6 = _pos;
       while (true) {
-        parse$$GLOBALS_BODY();
+        _parse$$GLOBALS_BODY();
         if (!ok) {
           break;
         }
@@ -1440,7 +1440,7 @@ class Peg2Parser {
       }
       _matchString('}%');
       if (ok) {
-        parse$$SPACING();
+        _parse$$SPACING();
         final b = $5!;
         $4 = b;
       }
@@ -1455,18 +1455,18 @@ class Peg2Parser {
     return $0;
   }
 
-  List? parse_leading_spaces() {
-    parse$$SPACING();
+  List? _parse_leading_spaces() {
+    _parse$$SPACING();
     return null;
   }
 
-  String? parse_$EqualSign() {
+  String? _parse_$EqualSign() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(61, '=');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
     }
     if (!ok) {
       _ch = $0;
@@ -1476,7 +1476,7 @@ class Peg2Parser {
     return null;
   }
 
-  Expression? parse_literal() {
+  Expression? _parse_literal() {
     _failPos = _pos;
     Expression? $0;
     final $2 = _ch;
@@ -1502,7 +1502,7 @@ class Peg2Parser {
         _failures = $14;
         ok = !ok;
         if (ok) {
-          final $15 = parse$$LITERAL_CHAR();
+          final $15 = _parse$$LITERAL_CHAR();
           if (ok) {
             final c = $15!;
             $9 = c;
@@ -1520,7 +1520,7 @@ class Peg2Parser {
       }
       _matchChar(34, 34);
       if (ok) {
-        parse$$SPACING();
+        _parse$$SPACING();
         final c = $5!;
         late Expression $$;
         $$ = LiteralExpression(String.fromCharCodes(c));
@@ -1537,7 +1537,7 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_members() {
+  String? _parse_members() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1548,7 +1548,7 @@ class Peg2Parser {
       String? $5;
       final $6 = _pos;
       while (true) {
-        parse$$ACTION_BODY();
+        _parse$$ACTION_BODY();
         if (!ok) {
           break;
         }
@@ -1559,7 +1559,7 @@ class Peg2Parser {
       }
       _matchChar(125, '}');
       if (ok) {
-        parse$$SPACING();
+        _parse$$SPACING();
         final b = $5!;
         $4 = b;
       }
@@ -1574,7 +1574,7 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_$ExclamationMark() {
+  String? _parse_$ExclamationMark() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1582,7 +1582,7 @@ class Peg2Parser {
     String? $4;
     final $5 = _matchChar(33, '!');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
       $4 = $5;
     }
     if (ok) {
@@ -1595,13 +1595,13 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_$LeftParenthesis() {
+  String? _parse_$LeftParenthesis() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(40, '(');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
     }
     if (!ok) {
       _ch = $0;
@@ -1611,7 +1611,7 @@ class Peg2Parser {
     return null;
   }
 
-  String? parse_$PlusSign() {
+  String? _parse_$PlusSign() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1619,7 +1619,7 @@ class Peg2Parser {
     String? $4;
     final $5 = _matchChar(43, '+');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
       $4 = $5;
     }
     if (ok) {
@@ -1632,13 +1632,13 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_$Comma() {
+  String? _parse_$Comma() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(44, ',');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
     }
     if (!ok) {
       _ch = $0;
@@ -1648,7 +1648,7 @@ class Peg2Parser {
     return null;
   }
 
-  String? parse_$QuestionMark() {
+  String? _parse_$QuestionMark() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1656,7 +1656,7 @@ class Peg2Parser {
     String? $4;
     final $5 = _matchChar(63, '?');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
       $4 = $5;
     }
     if (ok) {
@@ -1669,13 +1669,13 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_$Slash() {
+  String? _parse_$Slash() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(47, '/');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
     }
     if (!ok) {
       _ch = $0;
@@ -1685,7 +1685,7 @@ class Peg2Parser {
     return null;
   }
 
-  String? parse_$Asterisk() {
+  String? _parse_$Asterisk() {
     _failPos = _pos;
     String? $0;
     final $2 = _ch;
@@ -1693,7 +1693,7 @@ class Peg2Parser {
     String? $4;
     final $5 = _matchChar(42, '*');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
       $4 = $5;
     }
     if (ok) {
@@ -1706,13 +1706,13 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse_$LessThanSign() {
+  String? _parse_$LessThanSign() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(60, '<');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
     }
     if (!ok) {
       _ch = $0;
@@ -1722,13 +1722,13 @@ class Peg2Parser {
     return null;
   }
 
-  String? parse_$GreaterThanSign() {
+  String? _parse_$GreaterThanSign() {
     _failPos = _pos;
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(62, '>');
     if (ok) {
-      parse$$SPACING();
+      _parse$$SPACING();
     }
     if (!ok) {
       _ch = $0;
@@ -1738,14 +1738,14 @@ class Peg2Parser {
     return null;
   }
 
-  dynamic parse$$ACTION_BODY() {
+  dynamic _parse$$ACTION_BODY() {
     final $0 = _ch;
     final $1 = _pos;
     while (true) {
       _matchChar(123, '{');
       if (ok) {
         while (true) {
-          parse$$ACTION_BODY();
+          _parse$$ACTION_BODY();
           if (!ok) {
             break;
           }
@@ -1782,7 +1782,7 @@ class Peg2Parser {
     return null;
   }
 
-  String? parse$$COMMENT() {
+  String? _parse$$COMMENT() {
     final $0 = _ch;
     final $1 = _pos;
     _matchChar(35, '#');
@@ -1793,7 +1793,7 @@ class Peg2Parser {
         final $4 = _failPos;
         final $5 = _failStart;
         final $6 = _failures;
-        parse$$EOL();
+        _parse$$EOL();
         _ch = $2;
         _pos = $3;
         _failPos = $4;
@@ -1808,7 +1808,7 @@ class Peg2Parser {
         }
       }
       ok = true;
-      parse$$EOL();
+      _parse$$EOL();
       ok = true;
     }
     if (!ok) {
@@ -1818,7 +1818,7 @@ class Peg2Parser {
     return null;
   }
 
-  dynamic parse$$EOL() {
+  dynamic _parse$$EOL() {
     final $0 = _ch;
     while (true) {
       _matchString('\r\n');
@@ -1837,7 +1837,7 @@ class Peg2Parser {
     return null;
   }
 
-  dynamic parse$$GLOBALS_BODY() {
+  dynamic _parse$$GLOBALS_BODY() {
     final $0 = _ch;
     final $1 = _pos;
     final $2 = _failPos;
@@ -1856,7 +1856,7 @@ class Peg2Parser {
     return null;
   }
 
-  int? parse$$HEX_NUMBER() {
+  int? _parse$$HEX_NUMBER() {
     int? $0;
     final $2 = _ch;
     final $3 = _pos;
@@ -1897,17 +1897,17 @@ class Peg2Parser {
     return $0;
   }
 
-  String? parse$$IDENTIFIER() {
+  String? _parse$$IDENTIFIER() {
     String? $0;
     String? $2;
     String? $3;
     final $4 = _pos;
     final $5 = _ch;
     final $6 = _pos;
-    parse$$IDENT_START();
+    _parse$$IDENT_START();
     if (ok) {
       while (true) {
-        parse$$IDENT_CONT();
+        _parse$$IDENT_CONT();
         if (!ok) {
           break;
         }
@@ -1930,10 +1930,10 @@ class Peg2Parser {
     return $0;
   }
 
-  int? parse$$IDENT_CONT() {
+  int? _parse$$IDENT_CONT() {
     final $0 = _ch;
     while (true) {
-      parse$$IDENT_START();
+      _parse$$IDENT_START();
       if (ok) {
         break;
       }
@@ -1949,13 +1949,13 @@ class Peg2Parser {
     return null;
   }
 
-  int? parse$$IDENT_START() {
+  int? _parse$$IDENT_START() {
     const $0 = [65, 90, 97, 122];
     _matchRanges($0);
     return null;
   }
 
-  int? parse$$LITERAL_CHAR() {
+  int? _parse$$LITERAL_CHAR() {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
@@ -1979,7 +1979,7 @@ class Peg2Parser {
       _ch = $1;
       _pos = $2;
       int? $8;
-      final $9 = parse$$HEX_NUMBER();
+      final $9 = _parse$$HEX_NUMBER();
       if (ok) {
         $8 = $9;
       }
@@ -2007,7 +2007,7 @@ class Peg2Parser {
         final $19 = _failPos;
         final $20 = _failStart;
         final $21 = _failures;
-        parse$$EOL();
+        _parse$$EOL();
         _ch = $17;
         _pos = $18;
         _failPos = $19;
@@ -2032,17 +2032,17 @@ class Peg2Parser {
     return $0;
   }
 
-  List<int>? parse$$RANGE() {
+  List<int>? _parse$$RANGE() {
     List<int>? $0;
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
       List<int>? $4;
-      final $5 = parse$$RANGE_CHAR();
+      final $5 = _parse$$RANGE_CHAR();
       if (ok) {
         _matchChar(45, '-');
         if (ok) {
-          final $6 = parse$$RANGE_CHAR();
+          final $6 = _parse$$RANGE_CHAR();
           if (ok) {
             final s = $5!;
             final e = $6!;
@@ -2059,7 +2059,7 @@ class Peg2Parser {
       _ch = $1;
       _pos = $2;
       List<int>? $8;
-      final $9 = parse$$RANGE_CHAR();
+      final $9 = _parse$$RANGE_CHAR();
       if (ok) {
         final c = $9!;
         late List<int> $$;
@@ -2076,7 +2076,7 @@ class Peg2Parser {
     return $0;
   }
 
-  int? parse$$RANGE_CHAR() {
+  int? _parse$$RANGE_CHAR() {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
@@ -2100,7 +2100,7 @@ class Peg2Parser {
       _ch = $1;
       _pos = $2;
       int? $8;
-      final $9 = parse$$HEX_NUMBER();
+      final $9 = _parse$$HEX_NUMBER();
       if (ok) {
         $8 = $9;
       }
@@ -2128,7 +2128,7 @@ class Peg2Parser {
         final $19 = _failPos;
         final $20 = _failStart;
         final $21 = _failures;
-        parse$$EOL();
+        _parse$$EOL();
         _ch = $17;
         _pos = $18;
         _failPos = $19;
@@ -2153,7 +2153,7 @@ class Peg2Parser {
     return $0;
   }
 
-  dynamic parse$$SPACE() {
+  dynamic _parse$$SPACE() {
     final $0 = _ch;
     while (true) {
       const $1 = [9, 9, 32, 32];
@@ -2162,7 +2162,7 @@ class Peg2Parser {
         break;
       }
       _ch = $0;
-      parse$$EOL();
+      _parse$$EOL();
       if (ok) {
         break;
       }
@@ -2172,16 +2172,16 @@ class Peg2Parser {
     return null;
   }
 
-  List? parse$$SPACING() {
+  List? _parse$$SPACING() {
     while (true) {
       final $0 = _ch;
       while (true) {
-        parse$$SPACE();
+        _parse$$SPACE();
         if (ok) {
           break;
         }
         _ch = $0;
-        parse$$COMMENT();
+        _parse$$COMMENT();
         if (ok) {
           break;
         }
@@ -2196,7 +2196,7 @@ class Peg2Parser {
     return null;
   }
 
-  int? parse$$TERMINAL_CHAR() {
+  int? _parse$$TERMINAL_CHAR() {
     final $0 = _ch;
     final $1 = _pos;
     while (true) {
