@@ -32,7 +32,10 @@ class ParserGenerator {
   }
 
   void _addHints(List<Spec> specs) {
-    specs.add(Code('// ignore_for_file: unused_element'));
+    final hints = <String>[];
+    hints.add('// ignore_for_file: non_constant_identifier_names');
+    hints.add('// ignore_for_file: unused_element');
+    specs.add(Code(hints.join('\n')));
   }
 
   String _generate() {
