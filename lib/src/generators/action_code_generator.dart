@@ -1,5 +1,5 @@
 // @dart = 2.10
-part of '../../parser_generator.dart';
+part of '../../generators.dart';
 
 class ActionCodeGenerator {
   final String actionSource;

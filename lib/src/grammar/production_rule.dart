@@ -23,7 +23,15 @@ class ProductionRule {
 
   String? returnType;
 
+  int? terminalId;
+
   ProductionRule(this.name, this.kind, this.expression, this.returnType);
+
+  bool get isNonterminal => kind == ProductionRuleKind.nonterminal;
+
+  bool get isSubterminal => kind == ProductionRuleKind.subterminal;
+
+  bool get isTerminal => kind == ProductionRuleKind.terminal;
 
   @override
   String toString() {

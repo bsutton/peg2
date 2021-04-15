@@ -5,7 +5,7 @@ import 'dart:io';
 import 'package:args/args.dart';
 import 'package:path/path.dart' as _path;
 import 'package:peg2/grammar.dart';
-import 'package:peg2/parser_generator.dart';
+import 'package:peg2/general_parser_generator.dart';
 import 'package:strings/strings.dart';
 
 import 'peg2_parser.dart';
@@ -16,9 +16,12 @@ void main(List<String> args) {
       allowed: ['general'],
       defaultsTo: 'general',
       help: 'Type of generated perser');
+  argParser.addFlag('optimize',
+      abbr: 'o', defaultsTo: false, help: 'Optimize the generated code');
   argParser.addFlag('print',
       abbr: 'p', defaultsTo: false, help: 'Print grammar');
   final argResults = argParser.parse(args);
+  final optimize = argResults['optimize'] as bool;
   final printGrammar = argResults['print'] as bool;
   String inputFilename;
   String outputFilename;
@@ -48,8 +51,7 @@ void main(List<String> args) {
     exit(-1);
   }
 
-  final options = ParserGeneratorOptions(name: name);
-
+  final options = ParserGeneratorOptions(name: name, optimize: optimize);
   final grammarText = inputFile.readAsStringSync();
   final parser = Peg2Parser();
   final grammar = parser.parse(grammarText);

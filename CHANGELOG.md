@@ -1,3 +1,7 @@
+## 0.2.4
+
+- Improvements to code generation algorithms
+
 ## 0.2.3
 
 - Minor improvements to code generation algorithms

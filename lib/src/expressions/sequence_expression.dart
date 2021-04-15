@@ -1,12 +1,15 @@
 part of '../../expressions.dart';
 
 class SequenceExpression extends MultipleExpression<Expression> {
-  SequenceExpression(List<Expression> expressions, this.actionSource)
-      : super(expressions);
-
   int? actionIndex;
 
   String? actionSource;
+
+  SequenceExpression(List<Expression> expressions, this.actionSource)
+      : super(expressions);
+
+  @override
+  ExpressionKind get kind => ExpressionKind.sequence;
 
   String get separator => ' ';
 

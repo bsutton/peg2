@@ -24,12 +24,17 @@ class Grammar {
 
     final duplicates = <String>{};
     var id = 0;
+    var terminalId = 0;
     for (var rule in rules) {
       if (rule == null) {
         throw ArgumentError('rules');
       }
 
       rule.id = id++;
+      if (rule.kind == ProductionRuleKind.terminal) {
+        rule.terminalId = terminalId++;
+      }
+
       this.rules.add(rule);
       final name = rule.name;
       if (ruleMap.containsKey(name)) {

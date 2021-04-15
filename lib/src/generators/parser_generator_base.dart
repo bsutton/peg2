@@ -1,22 +1,17 @@
 // @dart = 2.10
-part of '../../parser_generator.dart';
+part of '../../generators.dart';
 
-class ParserGenerator {
+abstract class ParserGeneratorBase {
   final Grammar grammar;
 
   final ParserGeneratorOptions options;
 
-  ParserGenerator(this.grammar, this.options);
+  ParserGeneratorBase(this.grammar, this.options);
+
+  void addClassParser(List<Spec> specs);
 
   String generate() {
     return _generate();
-  }
-
-  void _addClassParser(List<Spec> specs) {
-    final name = options.name + 'Parser';
-    final generator = ParserClassGenerator(name, grammar, options);
-    final spec = generator.generate();
-    specs.add(spec);
   }
 
   void _addComments(List<Spec> specs) {
@@ -42,7 +37,7 @@ class ParserGenerator {
     final specs = <Spec>[];
     _addComments(specs);
     _addGlobals(specs);
-    _addClassParser(specs);
+    addClassParser(specs);
     _addHints(specs);
     final library = Library((b) {
       b.body.addAll(specs);

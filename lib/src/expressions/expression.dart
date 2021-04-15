@@ -39,9 +39,28 @@ abstract class Expression {
 
   String? variable;
 
+  ExpressionKind get kind;
+
   T accept<T>(ExpressionVisitor<T> visitor);
 
   void visitChildren<T>(ExpressionVisitor<T> visitor) {
     //
   }
+}
+
+enum ExpressionKind {
+  andPredicate,
+  anyCharacter,
+  capture,
+  characterClass,
+  literal,
+  nonterminal,
+  notPredicate,
+  oneOrMore,
+  optional,
+  orderedChoice,
+  sequence,
+  subterminal,
+  terminal,
+  zeroOrMore
 }

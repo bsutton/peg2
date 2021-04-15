@@ -5,6 +5,9 @@ class OrderedChoiceExpression extends MultipleExpression<SequenceExpression> {
       : super(expressions);
 
   @override
+  ExpressionKind get kind => ExpressionKind.orderedChoice;
+
+  @override
   T accept<T>(ExpressionVisitor<T> visitor) {
     return visitor.visitOrderedChoice(this);
   }

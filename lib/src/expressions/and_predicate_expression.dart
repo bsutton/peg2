@@ -4,6 +4,9 @@ class AndPredicateExpression extends PrefixExpression {
   AndPredicateExpression(Expression expression) : super(expression);
 
   @override
+  ExpressionKind get kind => ExpressionKind.andPredicate;
+
+  @override
   String get prefix => '&';
 
   @override

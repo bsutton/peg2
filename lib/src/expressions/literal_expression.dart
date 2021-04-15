@@ -6,6 +6,9 @@ class LiteralExpression extends Expression {
   LiteralExpression(this.text);
 
   @override
+  ExpressionKind get kind => ExpressionKind.literal;
+
+  @override
   T accept<T>(ExpressionVisitor<T> visitor) {
     return visitor.visitLiteral(this);
   }

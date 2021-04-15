@@ -5,5 +5,8 @@ class ParserGeneratorOptions {
 
   String name;
 
-  ParserGeneratorOptions({this.memoize = false, required this.name});
+  bool optimize;
+
+  ParserGeneratorOptions(
+      {this.memoize = false, this.optimize = false, required this.name});
 }

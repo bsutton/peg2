@@ -1,7 +1,7 @@
 NEW:
 optimize code for ordered choice with single optional expression
 reimplement TOKEN 'semantic value'
-use bitmask flags in method fail
+
 
 OLD:
 check duplicare semantic variables

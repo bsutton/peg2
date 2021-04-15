@@ -1,5 +1,5 @@
 // @dart = 2.10
-part of '../../parser_generator.dart';
+part of '../../generators.dart';
 
 class Members {
   static const ch = '_ch';
@@ -16,6 +16,8 @@ class Members {
 
   static const failures = '_failures';
 
+  static const length = '_length';
+
   static const matchAny = '_matchAny';
 
   static const matchChar = '_matchChar';
@@ -31,4 +33,8 @@ class Members {
   static const pos = '_pos';
 
   static const source = '_source';
+
+  static const terminals = '_terminals';
+
+  static const unterminated = '_unterminated';
 }

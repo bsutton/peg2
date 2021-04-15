@@ -8,16 +8,16 @@ Code assign(String name, Expression expression) {
   return refer(name).assign(expression).statement;
 }
 
-Code assignConst(String name, Expression expression) {
-  return expression.assignConst(name).statement;
+Code assignConst(String name, Expression expression, [Reference type]) {
+  return expression.assignConst(name, type).statement;
 }
 
-Code assignFinal(String name, Expression expression) {
-  return expression.assignFinal(name).statement;
+Code assignFinal(String name, Expression expression, [Reference type]) {
+  return expression.assignFinal(name, type).statement;
 }
 
-Code assignVar(String name, Expression expression) {
-  return expression.assignVar(name).statement;
+Code assignVar(String name, Expression expression, [Reference type]) {
+  return expression.assignVar(name, type).statement;
 }
 
 Expression call$(String name,

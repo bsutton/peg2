@@ -47,11 +47,37 @@ Expression _suffix(String? suffix, Expression expression) {
 class Peg2Parser {
   static const int _eof = 1114112;
 
+  static const List<String> _terminals = [
+    '\'non terminal name\'',
+    '\'terminal name\'',
+    '\'sub terminal name\'',
+    '\'semantic value\'',
+    '\'type name\'',
+    '\'library prefix\'',
+    '\';\'',
+    '\'action\'',
+    '\'&\'',
+    '\'character class\'',
+    '\')\'',
+    '\'.\'',
+    '\'end of file\'',
+    '\'globals\'',
+    '\'leading spaces\'',
+    '\'=\'',
+    '\'literal\'',
+    '\'members\'',
+    '\'!\'',
+    '\'(\'',
+    '\'+\'',
+    '\',\'',
+    '\'?\'',
+    '\'/\'',
+    '\'*\'',
+    '\'<\'',
+    '\'>\''
+  ];
+
   FormatException? error;
-
-  int _failStart = -1;
-
-  List _failures = [];
 
   bool ok = false;
 
@@ -59,9 +85,17 @@ class Peg2Parser {
 
   int _failPos = -1;
 
+  int _failStart = -1;
+
+  int _failures0 = 0;
+
+  int _length = 0;
+
   int _pos = 0;
 
   String _source = '';
+
+  String? _unterminated;
 
   Grammar? parse(String source) {
     _source = source;
@@ -74,1586 +108,206 @@ class Peg2Parser {
     return result;
   }
 
-  Grammar? _parseGrammar() {
-    Grammar? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    Grammar? $4;
-    _parse_leading_spaces();
-    final $6 = _parse_globals();
-    final $5 = $6;
-    ok = true;
-    final $8 = _parse_members();
-    final $7 = $8;
-    ok = true;
-    List<ProductionRule>? $9;
-    final $10 = <ProductionRule>[];
-    while (true) {
-      final $11 = _parseDefinition();
-      if (!ok) {
-        break;
-      }
-      $10.add($11!);
-    }
-    if ($10.isNotEmpty) {
-      $9 = $10;
-      ok = true;
-    }
-    if (ok) {
-      _parse_end_of_file();
-      if (ok) {
-        final g = $5;
-        final m = $7;
-        final d = $9!;
-        late Grammar $$;
-        $$ = Grammar(d, g, m);
-        $4 = $$;
-        $0 = $4;
-      }
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
-  }
+  void _buildError() {
+    final sink = StringBuffer();
+    sink.write('Syntax error, ');
+    if (_unterminated != null) {
+      sink.write('unterminated ');
+      sink.write(_unterminated);
+    } else {
+      final names = <String>[];
+      final flags = <int>[];
+      flags.add(_failures0);
+      for (var i = 0, id = 0; i < flags.length; i++) {
+        final flag = flags[i];
+        for (var j = 0; j < 32; j++) {
+          final mask = 1 << j;
+          if (flag & mask != 0) {
+            final name = _terminals[id];
+            names.add(name);
+          }
 
-  ProductionRule? _parseDefinition() {
-    ProductionRule? $0;
-    final $1 = _ch;
-    while (true) {
-      ProductionRule? $3;
-      final $4 = _parseNonterminalDefinition();
-      if (ok) {
-        $3 = $4;
-        $0 = $3;
-        break;
+          id++;
+        }
       }
-      _ch = $1;
-      ProductionRule? $6;
-      final $7 = _parseTerminalDefinition();
-      if (ok) {
-        $6 = $7;
-        $0 = $6;
-        break;
-      }
-      _ch = $1;
-      ProductionRule? $9;
-      final $10 = _parseSubterminalDefinition();
-      if (ok) {
-        $9 = $10;
-        $0 = $9;
-        break;
-      }
-      _ch = $1;
-      break;
-    }
-    return $0;
-  }
 
-  ProductionRule? _parseNonterminalDefinition() {
-    ProductionRule? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    while (true) {
-      ProductionRule? $4;
-      final $5 = _parseType();
-      if (ok) {
-        final $6 = _parse_non_terminal_name();
-        if (ok) {
-          _parse_$EqualSign();
-          if (ok) {
-            final $7 = _parseNonterminalExpression();
-            if (ok) {
-              _parse_$Semicolon();
-              if (ok) {
-                final t = $5!;
-                final n = $6!;
-                final e = $7!;
-                late ProductionRule $$;
-                $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, t);
-                $4 = $$;
-                $0 = $4;
-                break;
-              }
-            }
+      names.sort();
+      if (names.isEmpty) {
+        if (_failStart == _length) {
+          sink.write('unexpected end of input');
+        } else {
+          sink.write('unexpected charcater ');
+          final ch = _getChar(_failStart);
+          if (ch >= 32 && ch < 126) {
+            sink.write('\'');
+            sink.write(String.fromCharCode(ch));
+            sink.write('\'');
+          } else {
+            sink.write('(');
+            sink.write(ch);
+            sink.write(')');
           }
         }
+      } else {
+        sink.write('expected ');
+        sink.write(names.join(', '));
       }
-      _ch = $1;
-      _pos = $2;
-      ProductionRule? $9;
-      final $10 = _parse_non_terminal_name();
-      if (ok) {
-        _parse_$EqualSign();
-        if (ok) {
-          final $11 = _parseNonterminalExpression();
-          if (ok) {
-            _parse_$Semicolon();
-            if (ok) {
-              final n = $10!;
-              final e = $11!;
-              late ProductionRule $$;
-              $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, null);
-              $9 = $$;
-              $0 = $9;
-              break;
-            }
+    }
+
+    error = FormatException(sink.toString(), _source, _failStart);
+  }
+
+  @pragma('vm:prefer-inline')
+  bool _fail(String name) {
+    if (_failStart > _pos) {
+      return false;
+    }
+
+    if (_failStart < _pos) {
+      _failStart = _pos;
+      _unterminated = null;
+      _failures0 = 0;
+    }
+
+    if (_failPos == _length) {
+      _unterminated = name;
+    }
+
+    return true;
+  }
+
+  @pragma('vm:prefer-inline')
+  int _getChar(int pos) {
+    if (pos < _source.length) {
+      var ch = _source.codeUnitAt(pos);
+      if (ch >= 0xD800 && ch <= 0xDBFF) {
+        if (pos + 1 < _source.length) {
+          final ch2 = _source.codeUnitAt(pos + 1);
+          if (ch2 >= 0xDC00 && ch2 <= 0xDFFF) {
+            ch = ((ch - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
+          } else {
+            throw FormatException('Unpaired high surrogate', _source, pos);
           }
+        } else {
+          throw FormatException('The source has been exhausted', _source, pos);
+        }
+      } else {
+        if (ch >= 0xDC00 && ch <= 0xDFFF) {
+          throw FormatException(
+              'UTF-16 surrogate values are illegal in UTF-32', _source, pos);
         }
       }
-      _ch = $1;
-      _pos = $2;
-      break;
+
+      return ch;
     }
-    return $0;
+
+    return _eof;
   }
 
-  OrderedChoiceExpression? _parseNonterminalExpression() {
-    OrderedChoiceExpression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    OrderedChoiceExpression? $4;
-    final $5 = _parseNonterminalSequence();
-    if (ok) {
-      List<SequenceExpression>? $6;
-      final $7 = <SequenceExpression>[];
-      while (true) {
-        SequenceExpression? $8;
-        final $10 = _ch;
-        final $11 = _pos;
-        SequenceExpression? $12;
-        _parse_$Slash();
-        if (ok) {
-          final $13 = _parseNonterminalSequence();
-          if (ok) {
-            final e = $13!;
-            $12 = e;
-            $8 = $12;
-          }
-        }
-        if (!ok) {
-          _ch = $10;
-          _pos = $11;
-        }
-        if (!ok) {
-          break;
-        }
-        $7.add($8!);
+  @pragma('vm:prefer-inline')
+  int? _matchAny() {
+    if (_ch == _eof) {
+      if (_failPos < _pos) {
+        _failPos = _pos;
       }
-      if (ok = true) {
-        $6 = $7;
-      }
-      final e = $5!;
-      final n = $6!;
-      late OrderedChoiceExpression $$;
-      $$ = OrderedChoiceExpression([e, ...n]);
-      $4 = $$;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
-  }
 
-  SequenceExpression? _parseNonterminalSequence() {
-    SequenceExpression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    SequenceExpression? $4;
-    List<Expression>? $5;
-    final $6 = <Expression>[];
-    while (true) {
-      final $7 = _parseNonterminalPrefix();
-      if (!ok) {
-        break;
-      }
-      $6.add($7!);
+      ok = false;
+      return null;
     }
-    if ($6.isNotEmpty) {
-      $5 = $6;
-      ok = true;
-    }
-    if (ok) {
-      final $9 = _parse_action();
-      final $8 = $9;
-      ok = true;
-      final e = $5!;
-      final a = $8;
-      late SequenceExpression $$;
-      $$ = SequenceExpression(e, a);
-      $4 = $$;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
-  }
 
-  Expression? _parseNonterminalPrefix() {
-    Expression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    Expression? $4;
-    final $6 = _parse_semantic_value();
-    final $5 = $6;
+    final ch = _ch;
+    _pos += _ch <= 0xffff ? 1 : 2;
+    _ch = _getChar(_pos);
     ok = true;
-    String? $8;
-    final $9 = _ch;
-    while (true) {
-      String? $11;
-      final $12 = _parse_$Ampersand();
-      if (ok) {
-        $11 = $12;
-        $8 = $11;
-        break;
+    return ch;
+  }
+
+  @pragma('vm:prefer-inline')
+  T? _matchChar<T>(int ch, T? result) {
+    if (ch != _ch) {
+      if (_failPos < _pos) {
+        _failPos = _pos;
       }
-      _ch = $9;
-      String? $14;
-      final $15 = _parse_$ExclamationMark();
-      if (ok) {
-        $14 = $15;
-        $8 = $14;
-        break;
-      }
-      _ch = $9;
-      break;
+
+      ok = false;
+      return null;
     }
-    final $7 = $8;
+
+    _pos += _ch <= 0xffff ? 1 : 2;
+    _ch = _getChar(_pos);
     ok = true;
-    final $16 = _parseNonterminalSuffix();
-    if (ok) {
-      final s = $5;
-      final p = $7;
-      final e = $16!;
-      late Expression $$;
-      $$ = _prefix(p, e, s);
-      $4 = $$;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
+    return result;
   }
 
-  Expression? _parseNonterminalSuffix() {
-    Expression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    Expression? $4;
-    final $5 = _parseNonterminalPrimary();
-    if (ok) {
-      String? $7;
-      final $8 = _ch;
-      while (true) {
-        String? $10;
-        final $11 = _parse_$QuestionMark();
-        if (ok) {
-          $10 = $11;
-          $7 = $10;
-          break;
-        }
-        _ch = $8;
-        String? $13;
-        final $14 = _parse_$Asterisk();
-        if (ok) {
-          $13 = $14;
-          $7 = $13;
-          break;
-        }
-        _ch = $8;
-        String? $16;
-        final $17 = _parse_$PlusSign();
-        if (ok) {
-          $16 = $17;
-          $7 = $16;
-          break;
-        }
-        _ch = $8;
-        break;
-      }
-      final $6 = $7;
+  @pragma('vm:prefer-inline')
+  int? _matchRange(int start, int end) {
+    if (_ch >= start && _ch <= end) {
+      final ch = _ch;
+      _pos += _ch <= 0xffff ? 1 : 2;
+      _ch = _getChar(_pos);
       ok = true;
-      final e = $5!;
-      final s = $6;
-      late Expression $$;
-      $$ = _suffix(s, e);
-      $4 = $$;
-      $0 = $4;
+      return ch;
     }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
+
+    if (_failPos < _pos) {
+      _failPos = _pos;
     }
-    return $0;
+
+    ok = false;
+    return null;
   }
 
-  Expression? _parseNonterminalPrimary() {
-    Expression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    while (true) {
-      Expression? $4;
-      final $5 = _parse_non_terminal_name();
-      if (ok) {
-        final n = $5!;
-        late Expression $$;
-        $$ = NonterminalExpression(n);
-        $4 = $$;
-        $0 = $4;
+  @pragma('vm:prefer-inline')
+  int? _matchRanges(List<int> ranges) {
+    // Use binary search
+    for (var i = 0; i < ranges.length; i += 2) {
+      if (ranges[i] <= _ch) {
+        if (ranges[i + 1] >= _ch) {
+          final ch = _ch;
+          _pos += _ch <= 0xffff ? 1 : 2;
+          _ch = _getChar(_pos);
+          ok = true;
+          return ch;
+        }
+      } else {
         break;
       }
-      _ch = $1;
-      Expression? $7;
-      final $8 = _parse_terminal_name();
-      if (ok) {
-        final n = $8!;
-        late Expression $$;
-        $$ = TerminalExpression(n);
-        $7 = $$;
-        $0 = $7;
-        break;
-      }
-      _ch = $1;
-      Expression? $10;
-      _parse_$LeftParenthesis();
-      if (ok) {
-        final $11 = _parseNonterminalExpression();
-        if (ok) {
-          _parse_$RightParenthesis();
-          if (ok) {
-            final e = $11!;
-            $10 = e;
-            $0 = $10;
+    }
+
+    ok = false;
+    if (_failPos < _pos) {
+      _failPos = _pos;
+    }
+
+    return null;
+  }
+
+  @pragma('vm:prefer-inline')
+  String? _matchString(String text) {
+    var i = 0;
+    if (_ch == text.codeUnitAt(0)) {
+      i++;
+      if (_pos + text.length <= _source.length) {
+        for (; i < text.length; i++) {
+          if (text.codeUnitAt(i) != _source.codeUnitAt(_pos + i)) {
             break;
           }
         }
       }
-      _ch = $1;
-      _pos = $2;
-      break;
     }
-    return $0;
-  }
 
-  ProductionRule? _parseTerminalDefinition() {
-    ProductionRule? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    while (true) {
-      ProductionRule? $4;
-      final $5 = _parseType();
-      if (ok) {
-        final $6 = _parse_terminal_name();
-        if (ok) {
-          _parse_$EqualSign();
-          if (ok) {
-            final $7 = _parseExpression();
-            if (ok) {
-              _parse_$Semicolon();
-              if (ok) {
-                final t = $5!;
-                final n = $6!;
-                final e = $7!;
-                late ProductionRule $$;
-                $$ = ProductionRule(n, ProductionRuleKind.terminal, e, t);
-                $4 = $$;
-                $0 = $4;
-                break;
-              }
-            }
-          }
-        }
-      }
-      _ch = $1;
-      _pos = $2;
-      ProductionRule? $9;
-      final $10 = _parse_terminal_name();
-      if (ok) {
-        _parse_$EqualSign();
-        if (ok) {
-          final $11 = _parseExpression();
-          if (ok) {
-            _parse_$Semicolon();
-            if (ok) {
-              final n = $10!;
-              final e = $11!;
-              late ProductionRule $$;
-              $$ = ProductionRule(n, ProductionRuleKind.terminal, e, null);
-              $9 = $$;
-              $0 = $9;
-              break;
-            }
-          }
-        }
-      }
-      _ch = $1;
-      _pos = $2;
-      break;
-    }
-    return $0;
-  }
-
-  OrderedChoiceExpression? _parseExpression() {
-    OrderedChoiceExpression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    OrderedChoiceExpression? $4;
-    final $5 = _parseSequence();
+    ok = i == text.length;
     if (ok) {
-      List<SequenceExpression>? $6;
-      final $7 = <SequenceExpression>[];
-      while (true) {
-        SequenceExpression? $8;
-        final $10 = _ch;
-        final $11 = _pos;
-        SequenceExpression? $12;
-        _parse_$Slash();
-        if (ok) {
-          final $13 = _parseSequence();
-          if (ok) {
-            final e = $13!;
-            $12 = e;
-            $8 = $12;
-          }
-        }
-        if (!ok) {
-          _ch = $10;
-          _pos = $11;
-        }
-        if (!ok) {
-          break;
-        }
-        $7.add($8!);
+      _pos = _pos + text.length;
+      _ch = _getChar(_pos);
+      return text;
+    } else {
+      final pos = _pos + i;
+      if (_failPos < pos) {
+        _failPos = pos;
       }
-      if (ok = true) {
-        $6 = $7;
-      }
-      final e = $5!;
-      final n = $6!;
-      late OrderedChoiceExpression $$;
-      $$ = OrderedChoiceExpression([e, ...n]);
-      $4 = $$;
-      $0 = $4;
+      return null;
     }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
-  }
-
-  SequenceExpression? _parseSequence() {
-    SequenceExpression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    SequenceExpression? $4;
-    List<Expression>? $5;
-    final $6 = <Expression>[];
-    while (true) {
-      final $7 = _parsePrefix();
-      if (!ok) {
-        break;
-      }
-      $6.add($7!);
-    }
-    if ($6.isNotEmpty) {
-      $5 = $6;
-      ok = true;
-    }
-    if (ok) {
-      final $9 = _parse_action();
-      final $8 = $9;
-      ok = true;
-      final e = $5!;
-      final a = $8;
-      late SequenceExpression $$;
-      $$ = SequenceExpression(e, a);
-      $4 = $$;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
-  }
-
-  Expression? _parsePrefix() {
-    Expression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    Expression? $4;
-    final $6 = _parse_semantic_value();
-    final $5 = $6;
-    ok = true;
-    String? $8;
-    final $9 = _ch;
-    while (true) {
-      String? $11;
-      final $12 = _parse_$Ampersand();
-      if (ok) {
-        $11 = $12;
-        $8 = $11;
-        break;
-      }
-      _ch = $9;
-      String? $14;
-      final $15 = _parse_$ExclamationMark();
-      if (ok) {
-        $14 = $15;
-        $8 = $14;
-        break;
-      }
-      _ch = $9;
-      break;
-    }
-    final $7 = $8;
-    ok = true;
-    final $16 = _parseSuffix();
-    if (ok) {
-      final s = $5;
-      final p = $7;
-      final e = $16!;
-      late Expression $$;
-      $$ = _prefix(p, e, s);
-      $4 = $$;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
-  }
-
-  Expression? _parseSuffix() {
-    Expression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    Expression? $4;
-    final $5 = _parsePrimary();
-    if (ok) {
-      String? $7;
-      final $8 = _ch;
-      while (true) {
-        String? $10;
-        final $11 = _parse_$QuestionMark();
-        if (ok) {
-          $10 = $11;
-          $7 = $10;
-          break;
-        }
-        _ch = $8;
-        String? $13;
-        final $14 = _parse_$Asterisk();
-        if (ok) {
-          $13 = $14;
-          $7 = $13;
-          break;
-        }
-        _ch = $8;
-        String? $16;
-        final $17 = _parse_$PlusSign();
-        if (ok) {
-          $16 = $17;
-          $7 = $16;
-          break;
-        }
-        _ch = $8;
-        break;
-      }
-      final $6 = $7;
-      ok = true;
-      final e = $5!;
-      final s = $6;
-      late Expression $$;
-      $$ = _suffix(s, e);
-      $4 = $$;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
-  }
-
-  Expression? _parsePrimary() {
-    Expression? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    while (true) {
-      Expression? $4;
-      final $5 = _parse_sub_terminal_name();
-      if (ok) {
-        final n = $5!;
-        late Expression $$;
-        $$ = SubterminalExpression(n);
-        $4 = $$;
-        $0 = $4;
-        break;
-      }
-      _ch = $1;
-      Expression? $7;
-      _parse_$LeftParenthesis();
-      if (ok) {
-        final $8 = _parseExpression();
-        if (ok) {
-          _parse_$RightParenthesis();
-          if (ok) {
-            final e = $8!;
-            $7 = e;
-            $0 = $7;
-            break;
-          }
-        }
-      }
-      _ch = $1;
-      _pos = $2;
-      Expression? $10;
-      final $11 = _parse_literal();
-      if (ok) {
-        $10 = $11;
-        $0 = $10;
-        break;
-      }
-      _ch = $1;
-      Expression? $13;
-      final $14 = _parse_character_class();
-      if (ok) {
-        $13 = $14;
-        $0 = $13;
-        break;
-      }
-      _ch = $1;
-      Expression? $16;
-      _parse_$Period();
-      if (ok) {
-        late Expression $$;
-        $$ = AnyCharacterExpression();
-        $16 = $$;
-        $0 = $16;
-        break;
-      }
-      _ch = $1;
-      Expression? $18;
-      _parse_$LessThanSign();
-      if (ok) {
-        final $19 = _parseExpression();
-        if (ok) {
-          _parse_$GreaterThanSign();
-          if (ok) {
-            final e = $19!;
-            late Expression $$;
-            $$ = CaptureExpression(e);
-            $18 = $$;
-            $0 = $18;
-            break;
-          }
-        }
-      }
-      _ch = $1;
-      _pos = $2;
-      break;
-    }
-    return $0;
-  }
-
-  ProductionRule? _parseSubterminalDefinition() {
-    ProductionRule? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    while (true) {
-      ProductionRule? $4;
-      final $5 = _parseType();
-      if (ok) {
-        final $6 = _parse_sub_terminal_name();
-        if (ok) {
-          _parse_$EqualSign();
-          if (ok) {
-            final $7 = _parseExpression();
-            if (ok) {
-              _parse_$Semicolon();
-              if (ok) {
-                final t = $5!;
-                final n = $6!;
-                final e = $7!;
-                late ProductionRule $$;
-                $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, t);
-                $4 = $$;
-                $0 = $4;
-                break;
-              }
-            }
-          }
-        }
-      }
-      _ch = $1;
-      _pos = $2;
-      ProductionRule? $9;
-      final $10 = _parse_sub_terminal_name();
-      if (ok) {
-        _parse_$EqualSign();
-        if (ok) {
-          final $11 = _parseExpression();
-          if (ok) {
-            _parse_$Semicolon();
-            if (ok) {
-              final n = $10!;
-              final e = $11!;
-              late ProductionRule $$;
-              $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, null);
-              $9 = $$;
-              $0 = $9;
-              break;
-            }
-          }
-        }
-      }
-      _ch = $1;
-      _pos = $2;
-      break;
-    }
-    return $0;
-  }
-
-  String? _parseType() {
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    final $5 = _parseTypeName();
-    if (ok) {
-      List<String>? $7;
-      final $9 = _ch;
-      final $10 = _pos;
-      List<String>? $11;
-      _parse_$LessThanSign();
-      if (ok) {
-        final $12 = _parseTypeArguments();
-        if (ok) {
-          _parse_$GreaterThanSign();
-          if (ok) {
-            final a = $12!;
-            $11 = a;
-            $7 = $11;
-          }
-        }
-      }
-      if (!ok) {
-        _ch = $9;
-        _pos = $10;
-      }
-      final $6 = $7;
-      ok = true;
-      final n = $5!;
-      final a = $6;
-      late String $$;
-      $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
-      $4 = $$;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
-  }
-
-  String? _parseTypeName() {
-    String? $0;
-    final $1 = _ch;
-    final $2 = _pos;
-    while (true) {
-      String? $4;
-      final $5 = _parse_library_prefix();
-      if (ok) {
-        _parse_$Period();
-        if (ok) {
-          final $6 = _parse_type_name();
-          if (ok) {
-            final p = $5!;
-            final n = $6!;
-            late String $$;
-            $$ = '$p.$n';
-            $4 = $$;
-            $0 = $4;
-            break;
-          }
-        }
-      }
-      _ch = $1;
-      _pos = $2;
-      String? $8;
-      final $9 = _parse_type_name();
-      if (ok) {
-        $8 = $9;
-        $0 = $8;
-        break;
-      }
-      _ch = $1;
-      break;
-    }
-    return $0;
-  }
-
-  List<String>? _parseTypeArguments() {
-    List<String>? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    List<String>? $4;
-    final $5 = _parseType();
-    if (ok) {
-      List<String>? $6;
-      final $7 = <String>[];
-      while (true) {
-        String? $8;
-        final $10 = _ch;
-        final $11 = _pos;
-        String? $12;
-        _parse_$Comma();
-        if (ok) {
-          final $13 = _parseType();
-          if (ok) {
-            final t = $13!;
-            $12 = t;
-            $8 = $12;
-          }
-        }
-        if (!ok) {
-          _ch = $10;
-          _pos = $11;
-        }
-        if (!ok) {
-          break;
-        }
-        $7.add($8!);
-      }
-      if (ok = true) {
-        $6 = $7;
-      }
-      final t = $5!;
-      final n = $6!;
-      late List<String> $$;
-      $$ = [t, ...n];
-      $4 = $$;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-    }
-    return $0;
-  }
-
-  String? _parse_non_terminal_name() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    final $5 = _parse$$IDENTIFIER();
-    if (ok) {
-      _parse$$SPACING();
-      $4 = $5;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'non terminal name\'');
-    }
-    return $0;
-  }
-
-  String? _parse_terminal_name() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    String? $5;
-    final $6 = _pos;
-    final $7 = _ch;
-    final $8 = _pos;
-    _matchChar(39, 39);
-    if (ok) {
-      var $9 = 0;
-      while (true) {
-        final $10 = _ch;
-        final $11 = _pos;
-        final $12 = _failPos;
-        final $13 = _failStart;
-        final $14 = _failures;
-        _matchChar(39, 39);
-        _ch = $10;
-        _pos = $11;
-        _failPos = $12;
-        _failStart = $13;
-        _failures = $14;
-        ok = !ok;
-        if (ok) {
-          _parse$$TERMINAL_CHAR();
-        }
-
-        if (!ok) {
-          break;
-        }
-        $9++;
-      }
-      ok = $9 != 0;
-      if (ok) {
-        _matchChar(39, 39);
-      }
-    }
-    if (!ok) {
-      _ch = $7;
-      _pos = $8;
-    }
-    if (ok) {
-      $5 = _source.substring($6, _pos);
-    }
-    if (ok) {
-      _parse$$SPACING();
-      $4 = $5;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'terminal name\'');
-    }
-    return $0;
-  }
-
-  String? _parse_sub_terminal_name() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    String? $5;
-    final $6 = _pos;
-    final $7 = _ch;
-    final $8 = _pos;
-    _matchChar(64, 64);
-    if (ok) {
-      _parse$$IDENTIFIER();
-    }
-    if (!ok) {
-      _ch = $7;
-      _pos = $8;
-    }
-    if (ok) {
-      $5 = _source.substring($6, _pos);
-    }
-    if (ok) {
-      _parse$$SPACING();
-      $4 = $5;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'sub terminal name\'');
-    }
-    return $0;
-  }
-
-  String? _parse_semantic_value() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    final $5 = _parse$$IDENTIFIER();
-    if (ok) {
-      _matchChar(58, ':');
-      if (ok) {
-        $4 = $5;
-        $0 = $4;
-      }
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'semantic value\'');
-    }
-    return $0;
-  }
-
-  String? _parse_type_name() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    String? $5;
-    final $6 = _pos;
-    final $7 = _ch;
-    final $8 = _pos;
-    _parse$$IDENTIFIER();
-    if (ok) {
-      _matchChar(63, 63);
-      ok = true;
-    }
-    if (!ok) {
-      _ch = $7;
-      _pos = $8;
-    }
-    if (ok) {
-      $5 = _source.substring($6, _pos);
-    }
-    if (ok) {
-      _parse$$SPACING();
-      $4 = $5;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'type name\'');
-    }
-    return $0;
-  }
-
-  String? _parse_library_prefix() {
-    _failPos = _pos;
-    String? $0;
-    String? $2;
-    String? $3;
-    final $4 = _pos;
-    final $5 = _ch;
-    final $6 = _pos;
-    _matchChar(95, 95);
-    ok = true;
-    _parse$$IDENTIFIER();
-    if (!ok) {
-      _ch = $5;
-      _pos = $6;
-    }
-    if (ok) {
-      $3 = _source.substring($4, _pos);
-    }
-    if (ok) {
-      $2 = $3;
-      $0 = $2;
-    }
-    if (!ok) {
-      _fail('\'library prefix\'');
-    }
-    return $0;
-  }
-
-  String? _parse_$Semicolon() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    _matchChar(59, ';');
-    if (ok) {
-      _parse$$SPACING();
-    }
-    if (!ok) {
-      _ch = $0;
-      _pos = $1;
-      _fail('\';\'');
-    }
-    return null;
-  }
-
-  String? _parse_action() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    _matchChar(123, '{');
-    if (ok) {
-      String? $5;
-      final $6 = _pos;
-      while (true) {
-        _parse$$ACTION_BODY();
-        if (!ok) {
-          break;
-        }
-      }
-      ok = true;
-
-      if (ok) {
-        $5 = _source.substring($6, _pos);
-      }
-      _matchChar(125, '}');
-      if (ok) {
-        _parse$$SPACING();
-        final b = $5!;
-        $4 = b;
-        $0 = $4;
-      }
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'action\'');
-    }
-    return $0;
-  }
-
-  String? _parse_$Ampersand() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    final $5 = _matchChar(38, '&');
-    if (ok) {
-      _parse$$SPACING();
-      $4 = $5;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'&\'');
-    }
-    return $0;
-  }
-
-  Expression? _parse_character_class() {
-    _failPos = _pos;
-    Expression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    Expression? $4;
-    _matchChar(91, '[');
-    if (ok) {
-      List<List<int>>? $5;
-      final $6 = <List<int>>[];
-      while (true) {
-        List<int>? $7;
-        List<int>? $9;
-        final $10 = _ch;
-        final $11 = _pos;
-        final $12 = _failPos;
-        final $13 = _failStart;
-        final $14 = _failures;
-        _matchChar(93, ']');
-        _ch = $10;
-        _pos = $11;
-        _failPos = $12;
-        _failStart = $13;
-        _failures = $14;
-        ok = !ok;
-        if (ok) {
-          final $15 = _parse$$RANGE();
-          if (ok) {
-            final r = $15!;
-            $9 = r;
-            $7 = $9;
-          }
-        }
-
-        if (!ok) {
-          break;
-        }
-        $6.add($7!);
-      }
-      if ($6.isNotEmpty) {
-        $5 = $6;
-        ok = true;
-      }
-      if (ok) {
-        _matchChar(93, ']');
-        if (ok) {
-          _parse$$SPACING();
-          final r = $5!;
-          late Expression $$;
-          $$ = CharacterClassExpression(r);
-          $4 = $$;
-          $0 = $4;
-        }
-      }
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'character class\'');
-    }
-    return $0;
-  }
-
-  String? _parse_$RightParenthesis() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    _matchChar(41, ')');
-    if (ok) {
-      _parse$$SPACING();
-    }
-    if (!ok) {
-      _ch = $0;
-      _pos = $1;
-      _fail('\')\'');
-    }
-    return null;
-  }
-
-  String? _parse_$Period() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    _matchChar(46, '.');
-    if (ok) {
-      _parse$$SPACING();
-    }
-    if (!ok) {
-      _ch = $0;
-      _pos = $1;
-      _fail('\'.\'');
-    }
-    return null;
-  }
-
-  dynamic _parse_end_of_file() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    final $2 = _failPos;
-    final $3 = _failStart;
-    final $4 = _failures;
-    _matchAny();
-    _ch = $0;
-    _pos = $1;
-    _failPos = $2;
-    _failStart = $3;
-    _failures = $4;
-    ok = !ok;
-    if (!ok) {
-      _fail('\'end of file\'');
-    }
-    return null;
-  }
-
-  String? _parse_globals() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    _matchString('%{');
-    if (ok) {
-      String? $5;
-      final $6 = _pos;
-      while (true) {
-        _parse$$GLOBALS_BODY();
-        if (!ok) {
-          break;
-        }
-      }
-      ok = true;
-
-      if (ok) {
-        $5 = _source.substring($6, _pos);
-      }
-      _matchString('}%');
-      if (ok) {
-        _parse$$SPACING();
-        final b = $5!;
-        $4 = b;
-        $0 = $4;
-      }
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'globals\'');
-    }
-    return $0;
-  }
-
-  List? _parse_leading_spaces() {
-    _parse$$SPACING();
-
-    return null;
-  }
-
-  String? _parse_$EqualSign() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    _matchChar(61, '=');
-    if (ok) {
-      _parse$$SPACING();
-    }
-    if (!ok) {
-      _ch = $0;
-      _pos = $1;
-      _fail('\'=\'');
-    }
-    return null;
-  }
-
-  Expression? _parse_literal() {
-    _failPos = _pos;
-    Expression? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    Expression? $4;
-    _matchChar(34, 34);
-    if (ok) {
-      List<int>? $5;
-      final $6 = <int>[];
-      while (true) {
-        int? $7;
-        int? $9;
-        final $10 = _ch;
-        final $11 = _pos;
-        final $12 = _failPos;
-        final $13 = _failStart;
-        final $14 = _failures;
-        _matchChar(34, 34);
-        _ch = $10;
-        _pos = $11;
-        _failPos = $12;
-        _failStart = $13;
-        _failures = $14;
-        ok = !ok;
-        if (ok) {
-          final $15 = _parse$$LITERAL_CHAR();
-          if (ok) {
-            final c = $15!;
-            $9 = c;
-            $7 = $9;
-          }
-        }
-
-        if (!ok) {
-          break;
-        }
-        $6.add($7!);
-      }
-      if (ok = true) {
-        $5 = $6;
-      }
-      _matchChar(34, 34);
-      if (ok) {
-        _parse$$SPACING();
-        final c = $5!;
-        late Expression $$;
-        $$ = LiteralExpression(String.fromCharCodes(c));
-        $4 = $$;
-        $0 = $4;
-      }
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'literal\'');
-    }
-    return $0;
-  }
-
-  String? _parse_members() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    _matchChar(123, '{');
-    if (ok) {
-      String? $5;
-      final $6 = _pos;
-      while (true) {
-        _parse$$ACTION_BODY();
-        if (!ok) {
-          break;
-        }
-      }
-      ok = true;
-
-      if (ok) {
-        $5 = _source.substring($6, _pos);
-      }
-      _matchChar(125, '}');
-      if (ok) {
-        _parse$$SPACING();
-        final b = $5!;
-        $4 = b;
-        $0 = $4;
-      }
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'members\'');
-    }
-    return $0;
-  }
-
-  String? _parse_$ExclamationMark() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    final $5 = _matchChar(33, '!');
-    if (ok) {
-      _parse$$SPACING();
-      $4 = $5;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'!\'');
-    }
-    return $0;
-  }
-
-  String? _parse_$LeftParenthesis() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    _matchChar(40, '(');
-    if (ok) {
-      _parse$$SPACING();
-    }
-    if (!ok) {
-      _ch = $0;
-      _pos = $1;
-      _fail('\'(\'');
-    }
-    return null;
-  }
-
-  String? _parse_$PlusSign() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    final $5 = _matchChar(43, '+');
-    if (ok) {
-      _parse$$SPACING();
-      $4 = $5;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'+\'');
-    }
-    return $0;
-  }
-
-  String? _parse_$Comma() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    _matchChar(44, ',');
-    if (ok) {
-      _parse$$SPACING();
-    }
-    if (!ok) {
-      _ch = $0;
-      _pos = $1;
-      _fail('\',\'');
-    }
-    return null;
-  }
-
-  String? _parse_$QuestionMark() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    final $5 = _matchChar(63, '?');
-    if (ok) {
-      _parse$$SPACING();
-      $4 = $5;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'?\'');
-    }
-    return $0;
-  }
-
-  String? _parse_$Slash() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    _matchChar(47, '/');
-    if (ok) {
-      _parse$$SPACING();
-    }
-    if (!ok) {
-      _ch = $0;
-      _pos = $1;
-      _fail('\'/\'');
-    }
-    return null;
-  }
-
-  String? _parse_$Asterisk() {
-    _failPos = _pos;
-    String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    String? $4;
-    final $5 = _matchChar(42, '*');
-    if (ok) {
-      _parse$$SPACING();
-      $4 = $5;
-      $0 = $4;
-    }
-    if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      _fail('\'*\'');
-    }
-    return $0;
-  }
-
-  String? _parse_$LessThanSign() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    _matchChar(60, '<');
-    if (ok) {
-      _parse$$SPACING();
-    }
-    if (!ok) {
-      _ch = $0;
-      _pos = $1;
-      _fail('\'<\'');
-    }
-    return null;
-  }
-
-  String? _parse_$GreaterThanSign() {
-    _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    _matchChar(62, '>');
-    if (ok) {
-      _parse$$SPACING();
-    }
-    if (!ok) {
-      _ch = $0;
-      _pos = $1;
-      _fail('\'>\'');
-    }
-    return null;
   }
 
   dynamic _parse$$ACTION_BODY() {
@@ -1680,13 +334,13 @@ class Peg2Parser {
       final $3 = _pos;
       final $4 = _failPos;
       final $5 = _failStart;
-      final $6 = _failures;
+      final $6 = _failures0;
       _matchChar(125, '}');
       _ch = $2;
       _pos = $3;
       _failPos = $4;
       _failStart = $5;
-      _failures = $6;
+      _failures0 = $6;
       ok = !ok;
       if (ok) {
         _matchAny();
@@ -1700,6 +354,7 @@ class Peg2Parser {
     return null;
   }
 
+  @pragma('vm:prefer-inline')
   String? _parse$$COMMENT() {
     final $0 = _ch;
     final $1 = _pos;
@@ -1710,13 +365,13 @@ class Peg2Parser {
         final $3 = _pos;
         final $4 = _failPos;
         final $5 = _failStart;
-        final $6 = _failures;
+        final $6 = _failures0;
         _parse$$EOL();
         _ch = $2;
         _pos = $3;
         _failPos = $4;
         _failStart = $5;
-        _failures = $6;
+        _failures0 = $6;
         ok = !ok;
         if (ok) {
           _matchAny();
@@ -1756,18 +411,19 @@ class Peg2Parser {
     return null;
   }
 
+  @pragma('vm:prefer-inline')
   dynamic _parse$$GLOBALS_BODY() {
     final $0 = _ch;
     final $1 = _pos;
     final $2 = _failPos;
     final $3 = _failStart;
-    final $4 = _failures;
+    final $4 = _failures0;
     _matchString('}%');
     _ch = $0;
     _pos = $1;
     _failPos = $2;
     _failStart = $3;
-    _failures = $4;
+    _failures0 = $4;
     ok = !ok;
     if (ok) {
       _matchAny();
@@ -1849,6 +505,7 @@ class Peg2Parser {
     return $0;
   }
 
+  @pragma('vm:prefer-inline')
   int? _parse$$IDENT_CONT() {
     final $0 = _ch;
     while (true) {
@@ -1875,67 +532,68 @@ class Peg2Parser {
     return null;
   }
 
+  @pragma('vm:prefer-inline')
   int? _parse$$LITERAL_CHAR() {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      int? $4;
+      int? $3;
       _matchChar(92, '\\');
       if (ok) {
-        const $6 = [34, 34, 92, 92, 110, 110, 114, 114, 116, 116];
-        final $5 = _matchRanges($6);
+        const $5 = [34, 34, 92, 92, 110, 110, 114, 114, 116, 116];
+        final $4 = _matchRanges($5);
         if (ok) {
-          final c = $5!;
+          final c = $4!;
           late int $$;
           $$ = _escape(c);
-          $4 = $$;
-          $0 = $4;
+          $3 = $$;
+          $0 = $3;
           break;
         }
       }
       _ch = $1;
       _pos = $2;
-      int? $8;
-      final $9 = _parse$$HEX_NUMBER();
+      int? $6;
+      final $7 = _parse$$HEX_NUMBER();
       if (ok) {
-        $8 = $9;
-        $0 = $8;
+        $6 = $7;
+        $0 = $6;
         break;
       }
       _ch = $1;
-      int? $11;
-      final $12 = _ch;
-      final $13 = _pos;
-      final $14 = _failPos;
-      final $15 = _failStart;
-      final $16 = _failures;
+      int? $8;
+      final $9 = _ch;
+      final $10 = _pos;
+      final $11 = _failPos;
+      final $12 = _failStart;
+      final $13 = _failures0;
       _matchChar(92, '\\');
-      _ch = $12;
-      _pos = $13;
-      _failPos = $14;
-      _failStart = $15;
-      _failures = $16;
+      _ch = $9;
+      _pos = $10;
+      _failPos = $11;
+      _failStart = $12;
+      _failures0 = $13;
       ok = !ok;
       if (ok) {
-        final $17 = _ch;
-        final $18 = _pos;
-        final $19 = _failPos;
-        final $20 = _failStart;
-        final $21 = _failures;
+        final $14 = _ch;
+        final $15 = _pos;
+        final $16 = _failPos;
+        final $17 = _failStart;
+        final $18 = _failures0;
         _parse$$EOL();
-        _ch = $17;
-        _pos = $18;
-        _failPos = $19;
-        _failStart = $20;
-        _failures = $21;
+        _ch = $14;
+        _pos = $15;
+        _failPos = $16;
+        _failStart = $17;
+        _failures0 = $18;
         ok = !ok;
         if (ok) {
-          final $22 = _matchAny();
+          final $19 = _matchAny();
           if (ok) {
-            final c = $22!;
-            $11 = c;
-            $0 = $11;
+            final c = $19!;
+            $8 = c;
+            $0 = $8;
             break;
           }
         }
@@ -1946,38 +604,39 @@ class Peg2Parser {
     return $0;
   }
 
+  @pragma('vm:prefer-inline')
   List<int>? _parse$$RANGE() {
     List<int>? $0;
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      List<int>? $4;
-      final $5 = _parse$$RANGE_CHAR();
+      List<int>? $3;
+      final $4 = _parse$$RANGE_CHAR();
       if (ok) {
         _matchChar(45, '-');
         if (ok) {
-          final $6 = _parse$$RANGE_CHAR();
+          final $5 = _parse$$RANGE_CHAR();
           if (ok) {
-            final s = $5!;
-            final e = $6!;
+            final s = $4!;
+            final e = $5!;
             late List<int> $$;
             $$ = [s, e];
-            $4 = $$;
-            $0 = $4;
+            $3 = $$;
+            $0 = $3;
             break;
           }
         }
       }
       _ch = $1;
       _pos = $2;
-      List<int>? $8;
-      final $9 = _parse$$RANGE_CHAR();
+      List<int>? $6;
+      final $7 = _parse$$RANGE_CHAR();
       if (ok) {
-        final c = $9!;
+        final c = $7!;
         late List<int> $$;
         $$ = [c, c];
-        $8 = $$;
-        $0 = $8;
+        $6 = $$;
+        $0 = $6;
         break;
       }
       _ch = $1;
@@ -1991,62 +650,62 @@ class Peg2Parser {
     final $1 = _ch;
     final $2 = _pos;
     while (true) {
-      int? $4;
+      int? $3;
       _matchChar(92, '\\');
       if (ok) {
-        const $6 = [92, 93, 110, 110, 114, 114, 116, 116];
-        final $5 = _matchRanges($6);
+        const $5 = [92, 93, 110, 110, 114, 114, 116, 116];
+        final $4 = _matchRanges($5);
         if (ok) {
-          final c = $5!;
+          final c = $4!;
           late int $$;
           $$ = _escape(c);
-          $4 = $$;
-          $0 = $4;
+          $3 = $$;
+          $0 = $3;
           break;
         }
       }
       _ch = $1;
       _pos = $2;
-      int? $8;
-      final $9 = _parse$$HEX_NUMBER();
+      int? $6;
+      final $7 = _parse$$HEX_NUMBER();
       if (ok) {
-        $8 = $9;
-        $0 = $8;
+        $6 = $7;
+        $0 = $6;
         break;
       }
       _ch = $1;
-      int? $11;
-      final $12 = _ch;
-      final $13 = _pos;
-      final $14 = _failPos;
-      final $15 = _failStart;
-      final $16 = _failures;
+      int? $8;
+      final $9 = _ch;
+      final $10 = _pos;
+      final $11 = _failPos;
+      final $12 = _failStart;
+      final $13 = _failures0;
       _matchRange(92, 93);
-      _ch = $12;
-      _pos = $13;
-      _failPos = $14;
-      _failStart = $15;
-      _failures = $16;
+      _ch = $9;
+      _pos = $10;
+      _failPos = $11;
+      _failStart = $12;
+      _failures0 = $13;
       ok = !ok;
       if (ok) {
-        final $17 = _ch;
-        final $18 = _pos;
-        final $19 = _failPos;
-        final $20 = _failStart;
-        final $21 = _failures;
+        final $14 = _ch;
+        final $15 = _pos;
+        final $16 = _failPos;
+        final $17 = _failStart;
+        final $18 = _failures0;
         _parse$$EOL();
-        _ch = $17;
-        _pos = $18;
-        _failPos = $19;
-        _failStart = $20;
-        _failures = $21;
+        _ch = $14;
+        _pos = $15;
+        _failPos = $16;
+        _failStart = $17;
+        _failures0 = $18;
         ok = !ok;
         if (ok) {
-          final $22 = _matchAny();
+          final $19 = _matchAny();
           if (ok) {
-            final c = $22!;
-            $11 = c;
-            $0 = $11;
+            final c = $19!;
+            $8 = c;
+            $0 = $8;
             break;
           }
         }
@@ -2057,6 +716,7 @@ class Peg2Parser {
     return $0;
   }
 
+  @pragma('vm:prefer-inline')
   dynamic _parse$$SPACE() {
     final $0 = _ch;
     while (true) {
@@ -2101,6 +761,7 @@ class Peg2Parser {
     return null;
   }
 
+  @pragma('vm:prefer-inline')
   int? _parse$$TERMINAL_CHAR() {
     final $0 = _ch;
     final $1 = _pos;
@@ -2125,216 +786,1669 @@ class Peg2Parser {
     return null;
   }
 
-  void _buildError() {
-    final names = <String>[];
-    final ends = <int>[];
-    var failEnd = 0;
-    for (var i = 0; i < _failures.length; i += 2) {
-      final name = _failures[i] as String;
-      final end = _failures[i + 1] as int;
-      if (failEnd < end) {
-        failEnd = end;
-      }
-
-      names.add(name);
-      ends.add(end);
-    }
-
-    final temp = <String>[];
-    for (var i = 0; i < names.length; i++) {
-      if (ends[i] == failEnd) {
-        temp.add(names[i]);
-      }
-    }
-
-    final expected = temp.toSet().toList();
-    expected.sort();
-    final sink = StringBuffer();
-    if (_failStart == failEnd) {
-      if (failEnd < _source.length) {
-        sink.write('Unexpected character ');
-        final ch = _getChar(_failStart);
-        if (ch >= 32 && ch < 126) {
-          sink.write('\'');
-          sink.write(String.fromCharCode(ch));
-          sink.write('\'');
-        } else {
-          sink.write('(');
-          sink.write(ch);
-          sink.write(')');
-        }
-      } else {
-        sink.write('Unexpected end of input');
-      }
-
-      if (expected.isNotEmpty) {
-        sink.write(', expected: ');
-        sink.write(expected.join(', '));
-      }
-    } else {
-      sink.write('Unterminated ');
-      if (expected.isEmpty) {
-        sink.write('unknown token');
-      } else if (expected.length == 1) {
-        sink.write('token ');
-        sink.write(expected[0]);
-      } else {
-        sink.write('tokens ');
-        sink.write(expected.join(', '));
-      }
-    }
-
-    error = FormatException(sink.toString(), _source, _failStart);
-  }
-
-  void _fail(String name) {
-    if (_pos < _failStart) {
-      return;
-    }
-
-    if (_failStart < _pos) {
-      _failStart = _pos;
-      _failures = [];
-    }
-
-    _failures.add(name);
-    _failures.add(_failPos);
-  }
-
-  int _getChar(int pos) {
-    if (pos < _source.length) {
-      var ch = _source.codeUnitAt(pos);
-      if (ch >= 0xD800 && ch <= 0xDBFF) {
-        if (pos + 1 < _source.length) {
-          final ch2 = _source.codeUnitAt(pos + 1);
-          if (ch2 >= 0xDC00 && ch2 <= 0xDFFF) {
-            ch = ((ch - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
-          } else {
-            throw FormatException('Unpaired high surrogate', _source, pos);
-          }
-        } else {
-          throw FormatException('The source has been exhausted', _source, pos);
-        }
-      } else {
-        if (ch >= 0xDC00 && ch <= 0xDFFF) {
-          throw FormatException(
-              'UTF-16 surrogate values are illegal in UTF-32', _source, pos);
-        }
-      }
-
-      return ch;
-    }
-
-    return _eof;
-  }
-
-  int? _matchAny() {
-    if (_ch == _eof) {
-      if (_failPos < _pos) {
-        _failPos = _pos;
-      }
-
-      ok = false;
-      return null;
-    }
-
-    final ch = _ch;
-    _pos += _ch <= 0xffff ? 1 : 2;
-    _ch = _getChar(_pos);
-    ok = true;
-    return ch;
-  }
-
-  T? _matchChar<T>(int ch, T? result) {
-    if (ch != _ch) {
-      if (_failPos < _pos) {
-        _failPos = _pos;
-      }
-
-      ok = false;
-      return null;
-    }
-
-    _pos += _ch <= 0xffff ? 1 : 2;
-    _ch = _getChar(_pos);
-    ok = true;
-    return result;
-  }
-
-  int? _matchRange(int start, int end) {
-    if (_ch >= start && _ch <= end) {
-      final ch = _ch;
-      _pos += _ch <= 0xffff ? 1 : 2;
-      _ch = _getChar(_pos);
-      ok = true;
-      return ch;
-    }
-
-    if (_failPos < _pos) {
-      _failPos = _pos;
-    }
-
-    ok = false;
-    return null;
-  }
-
-  int? _matchRanges(List<int> ranges) {
-    // Use binary search
-    for (var i = 0; i < ranges.length; i += 2) {
-      if (ranges[i] <= _ch) {
-        if (ranges[i + 1] >= _ch) {
-          final ch = _ch;
-          _pos += _ch <= 0xffff ? 1 : 2;
-          _ch = _getChar(_pos);
-          ok = true;
-          return ch;
-        }
-      } else {
+  @pragma('vm:prefer-inline')
+  ProductionRule? _parseDefinition() {
+    ProductionRule? $0;
+    final $1 = _ch;
+    while (true) {
+      ProductionRule? $2;
+      final $3 = _parseNonterminalDefinition();
+      if (ok) {
+        $2 = $3;
+        $0 = $2;
         break;
       }
+      _ch = $1;
+      ProductionRule? $4;
+      final $5 = _parseTerminalDefinition();
+      if (ok) {
+        $4 = $5;
+        $0 = $4;
+        break;
+      }
+      _ch = $1;
+      ProductionRule? $6;
+      final $7 = _parseSubterminalDefinition();
+      if (ok) {
+        $6 = $7;
+        $0 = $6;
+        break;
+      }
+      _ch = $1;
+      break;
     }
-
-    ok = false;
-    if (_failPos < _pos) {
-      _failPos = _pos;
-    }
-
-    return null;
+    return $0;
   }
 
-  String? _matchString(String text) {
-    var i = 0;
-    if (_ch == text.codeUnitAt(0)) {
-      i++;
-      if (_pos + text.length <= _source.length) {
-        for (; i < text.length; i++) {
-          if (text.codeUnitAt(i) != _source.codeUnitAt(_pos + i)) {
+  OrderedChoiceExpression? _parseExpression() {
+    OrderedChoiceExpression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    OrderedChoiceExpression? $4;
+    final $5 = _parseSequence();
+    if (ok) {
+      List<SequenceExpression>? $6;
+      final $7 = <SequenceExpression>[];
+      while (true) {
+        SequenceExpression? $8;
+        final $10 = _ch;
+        final $11 = _pos;
+        SequenceExpression? $12;
+        _parse_$Slash();
+        if (ok) {
+          final $13 = _parseSequence();
+          if (ok) {
+            final e = $13!;
+            $12 = e;
+            $8 = $12;
+          }
+        }
+        if (!ok) {
+          _ch = $10;
+          _pos = $11;
+        }
+        if (!ok) {
+          break;
+        }
+        $7.add($8!);
+      }
+      if (ok = true) {
+        $6 = $7;
+      }
+      final e = $5!;
+      final n = $6!;
+      late OrderedChoiceExpression $$;
+      $$ = OrderedChoiceExpression([e, ...n]);
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  Grammar? _parseGrammar() {
+    Grammar? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    Grammar? $4;
+    _parse_leading_spaces();
+    final $6 = _parse_globals();
+    final $5 = $6;
+    ok = true;
+    final $8 = _parse_members();
+    final $7 = $8;
+    ok = true;
+    List<ProductionRule>? $9;
+    final $10 = <ProductionRule>[];
+    while (true) {
+      final $11 = _parseDefinition();
+      if (!ok) {
+        break;
+      }
+      $10.add($11!);
+    }
+    if ($10.isNotEmpty) {
+      $9 = $10;
+      ok = true;
+    }
+    if (ok) {
+      _parse_end_of_file();
+      if (ok) {
+        final g = $5;
+        final m = $7;
+        final d = $9!;
+        late Grammar $$;
+        $$ = Grammar(d, g, m);
+        $4 = $$;
+        $0 = $4;
+      }
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  ProductionRule? _parseNonterminalDefinition() {
+    ProductionRule? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      ProductionRule? $3;
+      final $4 = _parseType();
+      if (ok) {
+        final $5 = _parse_non_terminal_name();
+        if (ok) {
+          _parse_$EqualSign();
+          if (ok) {
+            final $6 = _parseNonterminalExpression();
+            if (ok) {
+              _parse_$Semicolon();
+              if (ok) {
+                final t = $4!;
+                final n = $5!;
+                final e = $6!;
+                late ProductionRule $$;
+                $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, t);
+                $3 = $$;
+                $0 = $3;
+                break;
+              }
+            }
+          }
+        }
+      }
+      _ch = $1;
+      _pos = $2;
+      ProductionRule? $7;
+      final $8 = _parse_non_terminal_name();
+      if (ok) {
+        _parse_$EqualSign();
+        if (ok) {
+          final $9 = _parseNonterminalExpression();
+          if (ok) {
+            _parse_$Semicolon();
+            if (ok) {
+              final n = $8!;
+              final e = $9!;
+              late ProductionRule $$;
+              $$ = ProductionRule(n, ProductionRuleKind.nonterminal, e, null);
+              $7 = $$;
+              $0 = $7;
+              break;
+            }
+          }
+        }
+      }
+      _ch = $1;
+      _pos = $2;
+      break;
+    }
+    return $0;
+  }
+
+  OrderedChoiceExpression? _parseNonterminalExpression() {
+    OrderedChoiceExpression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    OrderedChoiceExpression? $4;
+    final $5 = _parseNonterminalSequence();
+    if (ok) {
+      List<SequenceExpression>? $6;
+      final $7 = <SequenceExpression>[];
+      while (true) {
+        SequenceExpression? $8;
+        final $10 = _ch;
+        final $11 = _pos;
+        SequenceExpression? $12;
+        _parse_$Slash();
+        if (ok) {
+          final $13 = _parseNonterminalSequence();
+          if (ok) {
+            final e = $13!;
+            $12 = e;
+            $8 = $12;
+          }
+        }
+        if (!ok) {
+          _ch = $10;
+          _pos = $11;
+        }
+        if (!ok) {
+          break;
+        }
+        $7.add($8!);
+      }
+      if (ok = true) {
+        $6 = $7;
+      }
+      final e = $5!;
+      final n = $6!;
+      late OrderedChoiceExpression $$;
+      $$ = OrderedChoiceExpression([e, ...n]);
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  Expression? _parseNonterminalPrefix() {
+    Expression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    final $6 = _parse_semantic_value();
+    final $5 = $6;
+    ok = true;
+    String? $8;
+    final $9 = _ch;
+    while (true) {
+      String? $10;
+      final $11 = _parse_$Ampersand();
+      if (ok) {
+        $10 = $11;
+        $8 = $10;
+        break;
+      }
+      _ch = $9;
+      String? $12;
+      final $13 = _parse_$ExclamationMark();
+      if (ok) {
+        $12 = $13;
+        $8 = $12;
+        break;
+      }
+      _ch = $9;
+      break;
+    }
+    final $7 = $8;
+    ok = true;
+    final $14 = _parseNonterminalSuffix();
+    if (ok) {
+      final s = $5;
+      final p = $7;
+      final e = $14!;
+      late Expression $$;
+      $$ = _prefix(p, e, s);
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  Expression? _parseNonterminalPrimary() {
+    Expression? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      Expression? $3;
+      final $4 = _parse_non_terminal_name();
+      if (ok) {
+        final n = $4!;
+        late Expression $$;
+        $$ = NonterminalExpression(n);
+        $3 = $$;
+        $0 = $3;
+        break;
+      }
+      _ch = $1;
+      Expression? $5;
+      final $6 = _parse_terminal_name();
+      if (ok) {
+        final n = $6!;
+        late Expression $$;
+        $$ = TerminalExpression(n);
+        $5 = $$;
+        $0 = $5;
+        break;
+      }
+      _ch = $1;
+      Expression? $7;
+      _parse_$LeftParenthesis();
+      if (ok) {
+        final $8 = _parseNonterminalExpression();
+        if (ok) {
+          _parse_$RightParenthesis();
+          if (ok) {
+            final e = $8!;
+            $7 = e;
+            $0 = $7;
             break;
           }
         }
       }
+      _ch = $1;
+      _pos = $2;
+      break;
     }
+    return $0;
+  }
 
-    ok = i == text.length;
-    if (ok) {
-      _pos = _pos + text.length;
-      _ch = _getChar(_pos);
-      return text;
-    } else {
-      final pos = _pos + i;
-      if (_failPos < pos) {
-        _failPos = pos;
+  SequenceExpression? _parseNonterminalSequence() {
+    SequenceExpression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    SequenceExpression? $4;
+    List<Expression>? $5;
+    final $6 = <Expression>[];
+    while (true) {
+      final $7 = _parseNonterminalPrefix();
+      if (!ok) {
+        break;
       }
-      return null;
+      $6.add($7!);
     }
+    if ($6.isNotEmpty) {
+      $5 = $6;
+      ok = true;
+    }
+    if (ok) {
+      final $9 = _parse_action();
+      final $8 = $9;
+      ok = true;
+      final e = $5!;
+      final a = $8;
+      late SequenceExpression $$;
+      $$ = SequenceExpression(e, a);
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  Expression? _parseNonterminalSuffix() {
+    Expression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    final $5 = _parseNonterminalPrimary();
+    if (ok) {
+      String? $7;
+      final $8 = _ch;
+      while (true) {
+        String? $9;
+        final $10 = _parse_$QuestionMark();
+        if (ok) {
+          $9 = $10;
+          $7 = $9;
+          break;
+        }
+        _ch = $8;
+        String? $11;
+        final $12 = _parse_$Asterisk();
+        if (ok) {
+          $11 = $12;
+          $7 = $11;
+          break;
+        }
+        _ch = $8;
+        String? $13;
+        final $14 = _parse_$PlusSign();
+        if (ok) {
+          $13 = $14;
+          $7 = $13;
+          break;
+        }
+        _ch = $8;
+        break;
+      }
+      final $6 = $7;
+      ok = true;
+      final e = $5!;
+      final s = $6;
+      late Expression $$;
+      $$ = _suffix(s, e);
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  Expression? _parsePrefix() {
+    Expression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    final $6 = _parse_semantic_value();
+    final $5 = $6;
+    ok = true;
+    String? $8;
+    final $9 = _ch;
+    while (true) {
+      String? $10;
+      final $11 = _parse_$Ampersand();
+      if (ok) {
+        $10 = $11;
+        $8 = $10;
+        break;
+      }
+      _ch = $9;
+      String? $12;
+      final $13 = _parse_$ExclamationMark();
+      if (ok) {
+        $12 = $13;
+        $8 = $12;
+        break;
+      }
+      _ch = $9;
+      break;
+    }
+    final $7 = $8;
+    ok = true;
+    final $14 = _parseSuffix();
+    if (ok) {
+      final s = $5;
+      final p = $7;
+      final e = $14!;
+      late Expression $$;
+      $$ = _prefix(p, e, s);
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  Expression? _parsePrimary() {
+    Expression? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      Expression? $3;
+      final $4 = _parse_sub_terminal_name();
+      if (ok) {
+        final n = $4!;
+        late Expression $$;
+        $$ = SubterminalExpression(n);
+        $3 = $$;
+        $0 = $3;
+        break;
+      }
+      _ch = $1;
+      Expression? $5;
+      _parse_$LeftParenthesis();
+      if (ok) {
+        final $6 = _parseExpression();
+        if (ok) {
+          _parse_$RightParenthesis();
+          if (ok) {
+            final e = $6!;
+            $5 = e;
+            $0 = $5;
+            break;
+          }
+        }
+      }
+      _ch = $1;
+      _pos = $2;
+      Expression? $7;
+      final $8 = _parse_literal();
+      if (ok) {
+        $7 = $8;
+        $0 = $7;
+        break;
+      }
+      _ch = $1;
+      Expression? $9;
+      final $10 = _parse_character_class();
+      if (ok) {
+        $9 = $10;
+        $0 = $9;
+        break;
+      }
+      _ch = $1;
+      Expression? $11;
+      _parse_$Period();
+      if (ok) {
+        late Expression $$;
+        $$ = AnyCharacterExpression();
+        $11 = $$;
+        $0 = $11;
+        break;
+      }
+      _ch = $1;
+      Expression? $12;
+      _parse_$LessThanSign();
+      if (ok) {
+        final $13 = _parseExpression();
+        if (ok) {
+          _parse_$GreaterThanSign();
+          if (ok) {
+            final e = $13!;
+            late Expression $$;
+            $$ = CaptureExpression(e);
+            $12 = $$;
+            $0 = $12;
+            break;
+          }
+        }
+      }
+      _ch = $1;
+      _pos = $2;
+      break;
+    }
+    return $0;
+  }
+
+  SequenceExpression? _parseSequence() {
+    SequenceExpression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    SequenceExpression? $4;
+    List<Expression>? $5;
+    final $6 = <Expression>[];
+    while (true) {
+      final $7 = _parsePrefix();
+      if (!ok) {
+        break;
+      }
+      $6.add($7!);
+    }
+    if ($6.isNotEmpty) {
+      $5 = $6;
+      ok = true;
+    }
+    if (ok) {
+      final $9 = _parse_action();
+      final $8 = $9;
+      ok = true;
+      final e = $5!;
+      final a = $8;
+      late SequenceExpression $$;
+      $$ = SequenceExpression(e, a);
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  ProductionRule? _parseSubterminalDefinition() {
+    ProductionRule? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      ProductionRule? $3;
+      final $4 = _parseType();
+      if (ok) {
+        final $5 = _parse_sub_terminal_name();
+        if (ok) {
+          _parse_$EqualSign();
+          if (ok) {
+            final $6 = _parseExpression();
+            if (ok) {
+              _parse_$Semicolon();
+              if (ok) {
+                final t = $4!;
+                final n = $5!;
+                final e = $6!;
+                late ProductionRule $$;
+                $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, t);
+                $3 = $$;
+                $0 = $3;
+                break;
+              }
+            }
+          }
+        }
+      }
+      _ch = $1;
+      _pos = $2;
+      ProductionRule? $7;
+      final $8 = _parse_sub_terminal_name();
+      if (ok) {
+        _parse_$EqualSign();
+        if (ok) {
+          final $9 = _parseExpression();
+          if (ok) {
+            _parse_$Semicolon();
+            if (ok) {
+              final n = $8!;
+              final e = $9!;
+              late ProductionRule $$;
+              $$ = ProductionRule(n, ProductionRuleKind.subterminal, e, null);
+              $7 = $$;
+              $0 = $7;
+              break;
+            }
+          }
+        }
+      }
+      _ch = $1;
+      _pos = $2;
+      break;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  Expression? _parseSuffix() {
+    Expression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    final $5 = _parsePrimary();
+    if (ok) {
+      String? $7;
+      final $8 = _ch;
+      while (true) {
+        String? $9;
+        final $10 = _parse_$QuestionMark();
+        if (ok) {
+          $9 = $10;
+          $7 = $9;
+          break;
+        }
+        _ch = $8;
+        String? $11;
+        final $12 = _parse_$Asterisk();
+        if (ok) {
+          $11 = $12;
+          $7 = $11;
+          break;
+        }
+        _ch = $8;
+        String? $13;
+        final $14 = _parse_$PlusSign();
+        if (ok) {
+          $13 = $14;
+          $7 = $13;
+          break;
+        }
+        _ch = $8;
+        break;
+      }
+      final $6 = $7;
+      ok = true;
+      final e = $5!;
+      final s = $6;
+      late Expression $$;
+      $$ = _suffix(s, e);
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  ProductionRule? _parseTerminalDefinition() {
+    ProductionRule? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      ProductionRule? $3;
+      final $4 = _parseType();
+      if (ok) {
+        final $5 = _parse_terminal_name();
+        if (ok) {
+          _parse_$EqualSign();
+          if (ok) {
+            final $6 = _parseExpression();
+            if (ok) {
+              _parse_$Semicolon();
+              if (ok) {
+                final t = $4!;
+                final n = $5!;
+                final e = $6!;
+                late ProductionRule $$;
+                $$ = ProductionRule(n, ProductionRuleKind.terminal, e, t);
+                $3 = $$;
+                $0 = $3;
+                break;
+              }
+            }
+          }
+        }
+      }
+      _ch = $1;
+      _pos = $2;
+      ProductionRule? $7;
+      final $8 = _parse_terminal_name();
+      if (ok) {
+        _parse_$EqualSign();
+        if (ok) {
+          final $9 = _parseExpression();
+          if (ok) {
+            _parse_$Semicolon();
+            if (ok) {
+              final n = $8!;
+              final e = $9!;
+              late ProductionRule $$;
+              $$ = ProductionRule(n, ProductionRuleKind.terminal, e, null);
+              $7 = $$;
+              $0 = $7;
+              break;
+            }
+          }
+        }
+      }
+      _ch = $1;
+      _pos = $2;
+      break;
+    }
+    return $0;
+  }
+
+  String? _parseType() {
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _parseTypeName();
+    if (ok) {
+      List<String>? $7;
+      final $9 = _ch;
+      final $10 = _pos;
+      List<String>? $11;
+      _parse_$LessThanSign();
+      if (ok) {
+        final $12 = _parseTypeArguments();
+        if (ok) {
+          _parse_$GreaterThanSign();
+          if (ok) {
+            final a = $12!;
+            $11 = a;
+            $7 = $11;
+          }
+        }
+      }
+      if (!ok) {
+        _ch = $9;
+        _pos = $10;
+      }
+      final $6 = $7;
+      ok = true;
+      final n = $5!;
+      final a = $6;
+      late String $$;
+      $$ = n + (a == null ? '' : '<' + a.join(', ') + '>');
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  List<String>? _parseTypeArguments() {
+    List<String>? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    List<String>? $4;
+    final $5 = _parseType();
+    if (ok) {
+      List<String>? $6;
+      final $7 = <String>[];
+      while (true) {
+        String? $8;
+        final $10 = _ch;
+        final $11 = _pos;
+        String? $12;
+        _parse_$Comma();
+        if (ok) {
+          final $13 = _parseType();
+          if (ok) {
+            final t = $13!;
+            $12 = t;
+            $8 = $12;
+          }
+        }
+        if (!ok) {
+          _ch = $10;
+          _pos = $11;
+        }
+        if (!ok) {
+          break;
+        }
+        $7.add($8!);
+      }
+      if (ok = true) {
+        $6 = $7;
+      }
+      final t = $5!;
+      final n = $6!;
+      late List<String> $$;
+      $$ = [t, ...n];
+      $4 = $$;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  String? _parseTypeName() {
+    String? $0;
+    final $1 = _ch;
+    final $2 = _pos;
+    while (true) {
+      String? $3;
+      final $4 = _parse_library_prefix();
+      if (ok) {
+        _parse_$Period();
+        if (ok) {
+          final $5 = _parse_type_name();
+          if (ok) {
+            final p = $4!;
+            final n = $5!;
+            late String $$;
+            $$ = '$p.$n';
+            $3 = $$;
+            $0 = $3;
+            break;
+          }
+        }
+      }
+      _ch = $1;
+      _pos = $2;
+      String? $6;
+      final $7 = _parse_type_name();
+      if (ok) {
+        $6 = $7;
+        $0 = $6;
+        break;
+      }
+      _ch = $1;
+      break;
+    }
+    return $0;
+  }
+
+  String? _parse_$Ampersand() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(38, '&');
+    if (ok) {
+      _parse$$SPACING();
+      $4 = $5;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'&\'')) {
+        _failures0 |= 0x100;
+      }
+    }
+    return $0;
+  }
+
+  String? _parse_$Asterisk() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(42, '*');
+    if (ok) {
+      _parse$$SPACING();
+      $4 = $5;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'*\'')) {
+        _failures0 |= 0x1000000;
+      }
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  String? _parse_$Comma() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(44, ',');
+    if (ok) {
+      _parse$$SPACING();
+    }
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
+      if (_fail('\',\'')) {
+        _failures0 |= 0x200000;
+      }
+    }
+    return null;
+  }
+
+  String? _parse_$EqualSign() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(61, '=');
+    if (ok) {
+      _parse$$SPACING();
+    }
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
+      if (_fail('\'=\'')) {
+        _failures0 |= 0x8000;
+      }
+    }
+    return null;
+  }
+
+  String? _parse_$ExclamationMark() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(33, '!');
+    if (ok) {
+      _parse$$SPACING();
+      $4 = $5;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'!\'')) {
+        _failures0 |= 0x40000;
+      }
+    }
+    return $0;
+  }
+
+  String? _parse_$GreaterThanSign() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(62, '>');
+    if (ok) {
+      _parse$$SPACING();
+    }
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
+      if (_fail('\'>\'')) {
+        _failures0 |= 0x4000000;
+      }
+    }
+    return null;
+  }
+
+  String? _parse_$LeftParenthesis() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(40, '(');
+    if (ok) {
+      _parse$$SPACING();
+    }
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
+      if (_fail('\'(\'')) {
+        _failures0 |= 0x80000;
+      }
+    }
+    return null;
+  }
+
+  String? _parse_$LessThanSign() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(60, '<');
+    if (ok) {
+      _parse$$SPACING();
+    }
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
+      if (_fail('\'<\'')) {
+        _failures0 |= 0x2000000;
+      }
+    }
+    return null;
+  }
+
+  String? _parse_$Period() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(46, '.');
+    if (ok) {
+      _parse$$SPACING();
+    }
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
+      if (_fail('\'.\'')) {
+        _failures0 |= 0x800;
+      }
+    }
+    return null;
+  }
+
+  String? _parse_$PlusSign() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(43, '+');
+    if (ok) {
+      _parse$$SPACING();
+      $4 = $5;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'+\'')) {
+        _failures0 |= 0x100000;
+      }
+    }
+    return $0;
+  }
+
+  String? _parse_$QuestionMark() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _matchChar(63, '?');
+    if (ok) {
+      _parse$$SPACING();
+      $4 = $5;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'?\'')) {
+        _failures0 |= 0x400000;
+      }
+    }
+    return $0;
+  }
+
+  String? _parse_$RightParenthesis() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(41, ')');
+    if (ok) {
+      _parse$$SPACING();
+    }
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
+      if (_fail('\')\'')) {
+        _failures0 |= 0x400;
+      }
+    }
+    return null;
+  }
+
+  String? _parse_$Semicolon() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(59, ';');
+    if (ok) {
+      _parse$$SPACING();
+    }
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
+      if (_fail('\';\'')) {
+        _failures0 |= 0x40;
+      }
+    }
+    return null;
+  }
+
+  String? _parse_$Slash() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    _matchChar(47, '/');
+    if (ok) {
+      _parse$$SPACING();
+    }
+    if (!ok) {
+      _ch = $0;
+      _pos = $1;
+      if (_fail('\'/\'')) {
+        _failures0 |= 0x800000;
+      }
+    }
+    return null;
+  }
+
+  String? _parse_action() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    _matchChar(123, '{');
+    if (ok) {
+      String? $5;
+      final $6 = _pos;
+      while (true) {
+        _parse$$ACTION_BODY();
+        if (!ok) {
+          break;
+        }
+      }
+      ok = true;
+
+      if (ok) {
+        $5 = _source.substring($6, _pos);
+      }
+      _matchChar(125, '}');
+      if (ok) {
+        _parse$$SPACING();
+        final b = $5!;
+        $4 = b;
+        $0 = $4;
+      }
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'action\'')) {
+        _failures0 |= 0x80;
+      }
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  Expression? _parse_character_class() {
+    _failPos = _pos;
+    Expression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    _matchChar(91, '[');
+    if (ok) {
+      List<List<int>>? $5;
+      final $6 = <List<int>>[];
+      while (true) {
+        List<int>? $7;
+        List<int>? $9;
+        final $10 = _ch;
+        final $11 = _pos;
+        final $12 = _failPos;
+        final $13 = _failStart;
+        final $14 = _failures0;
+        _matchChar(93, ']');
+        _ch = $10;
+        _pos = $11;
+        _failPos = $12;
+        _failStart = $13;
+        _failures0 = $14;
+        ok = !ok;
+        if (ok) {
+          final $15 = _parse$$RANGE();
+          if (ok) {
+            final r = $15!;
+            $9 = r;
+            $7 = $9;
+          }
+        }
+
+        if (!ok) {
+          break;
+        }
+        $6.add($7!);
+      }
+      if ($6.isNotEmpty) {
+        $5 = $6;
+        ok = true;
+      }
+      if (ok) {
+        _matchChar(93, ']');
+        if (ok) {
+          _parse$$SPACING();
+          final r = $5!;
+          late Expression $$;
+          $$ = CharacterClassExpression(r);
+          $4 = $$;
+          $0 = $4;
+        }
+      }
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'character class\'')) {
+        _failures0 |= 0x200;
+      }
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  dynamic _parse_end_of_file() {
+    _failPos = _pos;
+    final $0 = _ch;
+    final $1 = _pos;
+    final $2 = _failPos;
+    final $3 = _failStart;
+    final $4 = _failures0;
+    _matchAny();
+    _ch = $0;
+    _pos = $1;
+    _failPos = $2;
+    _failStart = $3;
+    _failures0 = $4;
+    ok = !ok;
+    if (!ok) {
+      if (_fail('\'end of file\'')) {
+        _failures0 |= 0x1000;
+      }
+    }
+    return null;
+  }
+
+  @pragma('vm:prefer-inline')
+  String? _parse_globals() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    _matchString('%{');
+    if (ok) {
+      String? $5;
+      final $6 = _pos;
+      while (true) {
+        _parse$$GLOBALS_BODY();
+        if (!ok) {
+          break;
+        }
+      }
+      ok = true;
+
+      if (ok) {
+        $5 = _source.substring($6, _pos);
+      }
+      _matchString('}%');
+      if (ok) {
+        _parse$$SPACING();
+        final b = $5!;
+        $4 = b;
+        $0 = $4;
+      }
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'globals\'')) {
+        _failures0 |= 0x2000;
+      }
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  List? _parse_leading_spaces() {
+    _parse$$SPACING();
+
+    return null;
+  }
+
+  @pragma('vm:prefer-inline')
+  String? _parse_library_prefix() {
+    _failPos = _pos;
+    String? $0;
+    String? $2;
+    String? $3;
+    final $4 = _pos;
+    final $5 = _ch;
+    final $6 = _pos;
+    _matchChar(95, 95);
+    ok = true;
+    _parse$$IDENTIFIER();
+    if (!ok) {
+      _ch = $5;
+      _pos = $6;
+    }
+    if (ok) {
+      $3 = _source.substring($4, _pos);
+    }
+    if (ok) {
+      $2 = $3;
+      $0 = $2;
+    }
+    if (!ok) {
+      if (_fail('\'library prefix\'')) {
+        _failures0 |= 0x20;
+      }
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  Expression? _parse_literal() {
+    _failPos = _pos;
+    Expression? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    Expression? $4;
+    _matchChar(34, 34);
+    if (ok) {
+      List<int>? $5;
+      final $6 = <int>[];
+      while (true) {
+        int? $7;
+        int? $9;
+        final $10 = _ch;
+        final $11 = _pos;
+        final $12 = _failPos;
+        final $13 = _failStart;
+        final $14 = _failures0;
+        _matchChar(34, 34);
+        _ch = $10;
+        _pos = $11;
+        _failPos = $12;
+        _failStart = $13;
+        _failures0 = $14;
+        ok = !ok;
+        if (ok) {
+          final $15 = _parse$$LITERAL_CHAR();
+          if (ok) {
+            final c = $15!;
+            $9 = c;
+            $7 = $9;
+          }
+        }
+
+        if (!ok) {
+          break;
+        }
+        $6.add($7!);
+      }
+      if (ok = true) {
+        $5 = $6;
+      }
+      _matchChar(34, 34);
+      if (ok) {
+        _parse$$SPACING();
+        final c = $5!;
+        late Expression $$;
+        $$ = LiteralExpression(String.fromCharCodes(c));
+        $4 = $$;
+        $0 = $4;
+      }
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'literal\'')) {
+        _failures0 |= 0x10000;
+      }
+    }
+    return $0;
+  }
+
+  @pragma('vm:prefer-inline')
+  String? _parse_members() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    _matchChar(123, '{');
+    if (ok) {
+      String? $5;
+      final $6 = _pos;
+      while (true) {
+        _parse$$ACTION_BODY();
+        if (!ok) {
+          break;
+        }
+      }
+      ok = true;
+
+      if (ok) {
+        $5 = _source.substring($6, _pos);
+      }
+      _matchChar(125, '}');
+      if (ok) {
+        _parse$$SPACING();
+        final b = $5!;
+        $4 = b;
+        $0 = $4;
+      }
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'members\'')) {
+        _failures0 |= 0x20000;
+      }
+    }
+    return $0;
+  }
+
+  String? _parse_non_terminal_name() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _parse$$IDENTIFIER();
+    if (ok) {
+      _parse$$SPACING();
+      $4 = $5;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'non terminal name\'')) {
+        _failures0 |= 0x1;
+      }
+    }
+    return $0;
+  }
+
+  String? _parse_semantic_value() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    final $5 = _parse$$IDENTIFIER();
+    if (ok) {
+      _matchChar(58, ':');
+      if (ok) {
+        $4 = $5;
+        $0 = $4;
+      }
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'semantic value\'')) {
+        _failures0 |= 0x8;
+      }
+    }
+    return $0;
+  }
+
+  String? _parse_sub_terminal_name() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    String? $5;
+    final $6 = _pos;
+    final $7 = _ch;
+    final $8 = _pos;
+    _matchChar(64, 64);
+    if (ok) {
+      _parse$$IDENTIFIER();
+    }
+    if (!ok) {
+      _ch = $7;
+      _pos = $8;
+    }
+    if (ok) {
+      $5 = _source.substring($6, _pos);
+    }
+    if (ok) {
+      _parse$$SPACING();
+      $4 = $5;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'sub terminal name\'')) {
+        _failures0 |= 0x4;
+      }
+    }
+    return $0;
+  }
+
+  String? _parse_terminal_name() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    String? $5;
+    final $6 = _pos;
+    final $7 = _ch;
+    final $8 = _pos;
+    _matchChar(39, 39);
+    if (ok) {
+      var $9 = 0;
+      while (true) {
+        final $10 = _ch;
+        final $11 = _pos;
+        final $12 = _failPos;
+        final $13 = _failStart;
+        final $14 = _failures0;
+        _matchChar(39, 39);
+        _ch = $10;
+        _pos = $11;
+        _failPos = $12;
+        _failStart = $13;
+        _failures0 = $14;
+        ok = !ok;
+        if (ok) {
+          _parse$$TERMINAL_CHAR();
+        }
+
+        if (!ok) {
+          break;
+        }
+        $9++;
+      }
+      ok = $9 != 0;
+      if (ok) {
+        _matchChar(39, 39);
+      }
+    }
+    if (!ok) {
+      _ch = $7;
+      _pos = $8;
+    }
+    if (ok) {
+      $5 = _source.substring($6, _pos);
+    }
+    if (ok) {
+      _parse$$SPACING();
+      $4 = $5;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'terminal name\'')) {
+        _failures0 |= 0x2;
+      }
+    }
+    return $0;
+  }
+
+  String? _parse_type_name() {
+    _failPos = _pos;
+    String? $0;
+    final $2 = _ch;
+    final $3 = _pos;
+    String? $4;
+    String? $5;
+    final $6 = _pos;
+    final $7 = _ch;
+    final $8 = _pos;
+    _parse$$IDENTIFIER();
+    if (ok) {
+      _matchChar(63, 63);
+      ok = true;
+    }
+    if (!ok) {
+      _ch = $7;
+      _pos = $8;
+    }
+    if (ok) {
+      $5 = _source.substring($6, _pos);
+    }
+    if (ok) {
+      _parse$$SPACING();
+      $4 = $5;
+      $0 = $4;
+    }
+    if (!ok) {
+      _ch = $2;
+      _pos = $3;
+      if (_fail('\'type name\'')) {
+        _failures0 |= 0x10;
+      }
+    }
+    return $0;
   }
 
   void _reset() {
     error = null;
     _failPos = 0;
     _failStart = 0;
-    _failures = [];
+    _failures0 = 0;
+    _length = _source.length;
     _pos = 0;
+    _unterminated = null;
     _ch = _getChar(0);
     ok = false;
   }

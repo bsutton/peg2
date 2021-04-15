@@ -1,14 +1,13 @@
 part of '../../expressions.dart';
 
 class CharacterClassExpression extends Expression {
-  late final SparseBoolList ranges;
+  final SparseBoolList ranges = SparseBoolList();
 
   CharacterClassExpression(List<List<int>> ranges) {
     if (ranges.isEmpty) {
       throw ArgumentError('List of ranges should not be empty');
     }
 
-    final list = SparseBoolList();
     for (final range in ranges) {
       final start = range[0];
       final end = range[1];
@@ -33,12 +32,14 @@ class CharacterClassExpression extends Expression {
       }
 
       final group = GroupedRangeList(start, end, true);
-      list.addGroup(group);
+      this.ranges.addGroup(group);
     }
 
-    list.freeze();
-    this.ranges = list;
+    this.ranges.freeze();
   }
+
+  @override
+  ExpressionKind get kind => ExpressionKind.characterClass;
 
   @override
   T accept<T>(ExpressionVisitor<T> visitor) {

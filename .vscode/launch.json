@@ -36,5 +36,13 @@
             "type": "dart",
             "args": []
         }
+        ,
+        {
+            "name": "tool",
+            "program": "tool/test.dart",
+            "request": "launch",
+            "type": "dart",
+            "args": []
+        }
     ]
 }
