@@ -1,10 +1,10 @@
 part of '../../expressions.dart';
 
 class AndPredicateExpression extends PrefixExpression {
-  AndPredicateExpression(Expression expression) : super(expression);
-
   @override
-  ExpressionKind get kind => ExpressionKind.andPredicate;
+  final ExpressionKind kind = ExpressionKind.andPredicate;
+
+  AndPredicateExpression(Expression expression) : super(expression);
 
   @override
   String get prefix => '&';

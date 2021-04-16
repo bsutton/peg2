@@ -1,10 +1,10 @@
 part of '../../expressions.dart';
 
 class NotPredicateExpression extends PrefixExpression {
-  NotPredicateExpression(Expression expression) : super(expression);
-
   @override
-  ExpressionKind get kind => ExpressionKind.notPredicate;
+  final ExpressionKind kind = ExpressionKind.notPredicate;
+
+  NotPredicateExpression(Expression expression) : super(expression);
 
   @override
   String get prefix => '!';

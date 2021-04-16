@@ -129,24 +129,6 @@ abstract class ExpressionsGeneratorBase extends ExpressionVisitor<void> {
     return null;
   }
 
-  bool canSequenceChangePos(SequenceExpression node) {
-    var count = 0;
-    for (final child in node.expressions) {
-      switch (child.kind) {
-        case ExpressionKind.andPredicate:
-        case ExpressionKind.notPredicate:
-          continue;
-        default:
-      }
-
-      if (++count > 1) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   void generateEpilogue(Expression node, List<Code> code,
       Function(List<Code>) success, Function(List<Code>) fail) {
     final successBlock = successBlocks[node];
@@ -241,6 +223,156 @@ abstract class ExpressionsGeneratorBase extends ExpressionVisitor<void> {
             });
       }
     }
+  }
+
+  bool needSaveChForExpression(Expression node, Set<Expression> processed) {
+    if (!processed.add(node)) {
+      return true;
+    }
+
+    switch (node.kind) {
+      case ExpressionKind.andPredicate:
+      case ExpressionKind.anyCharacter:
+      case ExpressionKind.characterClass:
+      case ExpressionKind.notPredicate:
+        return false;
+      case ExpressionKind.literal:
+        final literal = node as LiteralExpression;
+        return literal.text.length > 1;
+      case ExpressionKind.capture:
+      case ExpressionKind.optional:
+        final single = node as SingleExpression;
+        return needSaveChForExpression(single.expression, processed);
+      case ExpressionKind.oneOrMore:
+      case ExpressionKind.zeroOrMore:
+        return true;
+      case ExpressionKind.nonterminal:
+      case ExpressionKind.subterminal:
+      case ExpressionKind.terminal:
+        final symbol = node as SymbolExpression;
+        return needSaveChForExpression(symbol.expression, processed);
+      case ExpressionKind.orderedChoice:
+        final choice = node as SequenceExpression;
+        final expressions = choice.expressions;
+        for (final expression in expressions) {
+          if (needSaveChForExpression(expression, processed)) {
+            return true;
+          }
+        }
+
+        return false;
+      case ExpressionKind.sequence:
+        final sequence = node as SequenceExpression;
+        final expressions = sequence.expressions;
+        var count = 0;
+        for (final expression in expressions) {
+          switch (expression.kind) {
+            case ExpressionKind.andPredicate:
+            case ExpressionKind.notPredicate:
+              continue;
+            default:
+          }
+
+          if (needSaveChForExpression(expression, processed)) {
+            return true;
+          }
+
+          if (count++ > 0) {
+            return true;
+          }
+        }
+
+        return false;
+    }
+
+    return true;
+  }
+
+  bool willExpressionChangeCharOnFailure(
+      Expression node, Set<Expression> processed) {
+    if (!processed.add(node)) {
+      return true;
+    }
+
+    switch (node.kind) {
+      case ExpressionKind.andPredicate:
+      case ExpressionKind.anyCharacter:
+      case ExpressionKind.characterClass:
+      case ExpressionKind.literal:
+      case ExpressionKind.notPredicate:
+        return false;
+      case ExpressionKind.capture:
+      case ExpressionKind.optional:
+      case ExpressionKind.oneOrMore:
+      case ExpressionKind.zeroOrMore:
+        final single = node as SingleExpression;
+        return willExpressionChangeCharOnFailure(single.expression, processed);
+      case ExpressionKind.nonterminal:
+      case ExpressionKind.subterminal:
+      case ExpressionKind.terminal:
+        final symbol = node as SymbolExpression;
+        return willExpressionChangeCharOnFailure(symbol.expression, processed);
+      case ExpressionKind.orderedChoice:
+        final choice = node as OrderedChoiceExpression;
+        final expressions = choice.expressions;
+        for (final expression in expressions) {
+          if (willExpressionChangeCharOnFailure(expression, processed)) {
+            return true;
+          }
+        }
+
+        return false;
+      case ExpressionKind.sequence:
+        final sequence = node as SequenceExpression;
+        final expressions = sequence.expressions;
+        var count = 0;
+        for (final expression in expressions) {
+          switch (expression.kind) {
+            case ExpressionKind.andPredicate:
+            case ExpressionKind.notPredicate:
+              continue;
+            default:
+          }
+
+          if (count++ > 0) {
+            return true;
+          }
+
+          if (willExpressionChangeCharOnFailure(expression, processed)) {
+            return true;
+          }
+        }
+
+        return false;
+    }
+
+    return true;
+  }
+
+  bool willSequenceChangePosOnFailure(SequenceExpression node) {
+    var count = 0;
+    for (final child in node.expressions) {
+      switch (child.kind) {
+        case ExpressionKind.andPredicate:
+        case ExpressionKind.notPredicate:
+          continue;
+        default:
+      }
+
+      if (child.isOptional) {
+        if (count == 0) {
+          count++;
+        }
+
+        continue;
+      }
+
+      if (count++ > 0) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   void runBlock(List<Code> code, void Function() f) {
@@ -450,75 +582,6 @@ abstract class ExpressionsGeneratorBase extends ExpressionVisitor<void> {
     }
 
     childVariable = variable;
-  }
-
-  void computeTransitions(List<SequenceExpression> sequences,
-      List<List<int>> states, List<SparseBoolList> stateCharacters) {
-    final statesAndCharacters = SparseList<List<int>>();
-    for (var i = 0; i < sequences.length; i++) {
-      final sequence = sequences[i];
-      for (final src in sequence.startCharacters.getGroups()) {
-        final allSpace = statesAndCharacters.getAllSpace(src);
-        for (final dest in allSpace) {
-          var key = dest.key;
-          if (key == null) {
-            key = [i];
-          } else {
-            key.add(i);
-          }
-
-          final group = GroupedRangeList<List<int>>(dest.start, dest.end, key);
-          statesAndCharacters.addGroup(group);
-        }
-      }
-    }
-
-    int addState(List<int> choiceIndexes) {
-      for (var i = 0; i < states.length; i++) {
-        final state = states[i];
-        if (choiceIndexes.length == state.length) {
-          var found = true;
-          for (var j = 0; j < choiceIndexes.length; j++) {
-            if (choiceIndexes[j] != state[j]) {
-              found = false;
-              break;
-            }
-          }
-
-          if (found) {
-            return i;
-          }
-        }
-      }
-
-      states.add(choiceIndexes.toList());
-      return states.length - 1;
-    }
-
-    final map = <int, List<GroupedRangeList<List<int>>>>{};
-    for (final group in statesAndCharacters.groups) {
-      final key = group.key;
-      final i = addState(key);
-      var value = map[i];
-      if (value == null) {
-        value = [];
-        map[i] = value;
-      }
-
-      value.add(group);
-    }
-
-    stateCharacters.length = states.length;
-    for (var i = 0; i < states.length; i++) {
-      final groups = map[i];
-      final list = SparseBoolList();
-      for (final src in groups) {
-        final dest = GroupedRangeList<bool>(src.start, src.end, true);
-        list.addGroup(dest);
-      }
-
-      stateCharacters[i] = list;
-    }
   }
 
   void _visitPrefix(PrefixExpression node) {

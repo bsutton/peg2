@@ -1,10 +1,10 @@
 part of '../../expressions.dart';
 
 class CaptureExpression extends SingleExpression {
-  CaptureExpression(Expression expression) : super(expression);
-
   @override
-  ExpressionKind get kind => ExpressionKind.capture;
+  final ExpressionKind kind = ExpressionKind.capture;
+
+  CaptureExpression(Expression expression) : super(expression);
 
   @override
   T accept<T>(ExpressionVisitor<T> visitor) {

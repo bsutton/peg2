@@ -1,10 +1,10 @@
 part of '../../expressions.dart';
 
 class OptionalExpression extends SuffixExpression {
-  OptionalExpression(Expression expression) : super(expression);
-
   @override
-  ExpressionKind get kind => ExpressionKind.optional;
+  final ExpressionKind kind = ExpressionKind.optional;
+
+  OptionalExpression(Expression expression) : super(expression);
 
   @override
   String get suffix => '?';

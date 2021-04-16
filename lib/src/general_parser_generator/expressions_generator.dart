@@ -2,6 +2,8 @@
 part of '../../general_parser_generator.dart';
 
 class ExpressionsGenerator extends ExpressionsGeneratorBase {
+  String choiceVariable;
+
   ExpressionsGenerator(
       {@required VariableAllocator allocator,
       @required List<Code> code,
@@ -18,6 +20,7 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
   @override
   void visitOrderedChoice(OrderedChoiceExpression node) {
     final variable = allocNodeVar(node);
+    choiceVariable = variable;
     final rule = node.rule;
     final level = node.level;
     final expressions = node.expressions;
@@ -65,17 +68,12 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
 
   @override
   void visitSequence(SequenceExpression node) {
-    final variable = allocNodeVar(node);
+    final variable = choiceVariable;
     final startCharacters = node.startCharacters;
     final localVariables = <String>[];
     final semanticVariables = <String>[];
     final types = <String>[];
     final code$ = code;
-    if (variable != null) {
-      final resultType = Utils.getNullableType(node.resultType);
-      code << declareVariable(refer(resultType), variable);
-    }
-
     void generate() {
       generateSequence(node, variable, 0,
           localVariables: localVariables,
@@ -126,7 +124,7 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
     final expressions = node.expressions;
     var needSavePos = false;
     for (final child in expressions) {
-      if (canSequenceChangePos(child)) {
+      if (willSequenceChangePosOnFailure(child)) {
         needSavePos = true;
         break;
       }
@@ -144,15 +142,11 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
             final child = expressions[i];
             acceptNode(child, code);
             void success(List<Code> code) {
-              if (variable != null) {
-                code << assign(variable, refer(childVariable));
-              }
-
               code << break$;
             }
 
             generateEpilogue(child, code, success, null);
-            if (canSequenceChangePos(child)) {
+            if (willSequenceChangePosOnFailure(child)) {
               addRestoreVars(code, storage);
             } else {
               addRestoreVar(code, Members.ch, storage);
@@ -171,17 +165,21 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
   void _generateOrderedChoiceTerminal(OrderedChoiceExpression node,
       String variable, void Function(List<Code>) failure) {
     final expressions = node.expressions;
-    var needSavePos = false;
+    final charChanges = <bool>[];
+    final posChanges = <bool>[];
     for (final child in expressions) {
-      if (canSequenceChangePos(child)) {
-        needSavePos = true;
-        break;
-      }
+      final willChangeChar = willExpressionChangeCharOnFailure(child, {});
+      final willChangePos = willSequenceChangePosOnFailure(child);
+      charChanges.add(willChangeChar);
+      posChanges.add(willChangePos);
     }
 
     final storage = <String, String>{};
-    addStoreVar(code, Members.ch, storage);
-    if (needSavePos) {
+    if (charChanges.where((e) => e).isNotEmpty) {
+      addStoreVar(code, Members.ch, storage);
+    }
+
+    if (posChanges.where((e) => e).isNotEmpty) {
       addStoreVar(code, Members.pos, storage);
     }
 
@@ -191,18 +189,16 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
             final child = expressions[i];
             acceptNode(child, code);
             void success(List<Code> code) {
-              if (variable != null) {
-                code << assign(variable, refer(childVariable));
-              }
-
               code << break$;
             }
 
             generateEpilogue(child, code, success, null);
-            if (canSequenceChangePos(child)) {
-              addRestoreVars(code, storage);
-            } else {
+            if (charChanges[i]) {
               addRestoreVar(code, Members.ch, storage);
+            }
+
+            if (posChanges[i]) {
+              addRestoreVar(code, Members.pos, storage);
             }
           }
 
@@ -218,7 +214,7 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
   void _generateOrderedChoiceWithOneElement(OrderedChoiceExpression node,
       String variable, void Function(List<Code>) failure) {
     final child = node.expressions[0];
-    final needSavePos = canSequenceChangePos(child);
+    final needSavePos = willSequenceChangePosOnFailure(child);
     if (variable != null) {
       childVariable = allocator.alloc();
     }
@@ -230,19 +226,13 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
     }
 
     acceptNode(child, code);
-    void success(List<Code> code) {
-      if (variable != null) {
-        code << assign(variable, refer(childVariable));
-      }
-    }
-
     void fail(List<Code> code) {
       addRestoreVars(code, storage);
       failure(code);
       failBlocks[node] = code;
     }
 
-    generateEpilogue(child, code, success, fail);
+    generateEpilogue(child, code, null, fail);
     if (node.level == 0) {
       if (variable == null) {
         code << literalNull.returned.statement;

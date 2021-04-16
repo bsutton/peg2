@@ -1,10 +1,10 @@
 part of '../../expressions.dart';
 
 class ZeroOrMoreExpression extends SuffixExpression {
-  ZeroOrMoreExpression(Expression expression) : super(expression);
-
   @override
-  ExpressionKind get kind => ExpressionKind.zeroOrMore;
+  final ExpressionKind kind = ExpressionKind.zeroOrMore;
+
+  ZeroOrMoreExpression(Expression expression) : super(expression);
 
   @override
   String get suffix => '*';

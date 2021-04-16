@@ -5,11 +5,11 @@ class SequenceExpression extends MultipleExpression<Expression> {
 
   String? actionSource;
 
+  @override
+  final ExpressionKind kind = ExpressionKind.sequence;
+
   SequenceExpression(List<Expression> expressions, this.actionSource)
       : super(expressions);
-
-  @override
-  ExpressionKind get kind => ExpressionKind.sequence;
 
   String get separator => ' ';
 

@@ -3,10 +3,10 @@ part of '../../expressions.dart';
 class LiteralExpression extends Expression {
   final String text;
 
-  LiteralExpression(this.text);
-
   @override
-  ExpressionKind get kind => ExpressionKind.literal;
+  final ExpressionKind kind = ExpressionKind.literal;
+
+  LiteralExpression(this.text);
 
   @override
   T accept<T>(ExpressionVisitor<T> visitor) {

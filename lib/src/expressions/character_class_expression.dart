@@ -3,6 +3,9 @@ part of '../../expressions.dart';
 class CharacterClassExpression extends Expression {
   final SparseBoolList ranges = SparseBoolList();
 
+  @override
+  final ExpressionKind kind = ExpressionKind.characterClass;
+
   CharacterClassExpression(List<List<int>> ranges) {
     if (ranges.isEmpty) {
       throw ArgumentError('List of ranges should not be empty');
@@ -37,9 +40,6 @@ class CharacterClassExpression extends Expression {
 
     this.ranges.freeze();
   }
-
-  @override
-  ExpressionKind get kind => ExpressionKind.characterClass;
 
   @override
   T accept<T>(ExpressionVisitor<T> visitor) {

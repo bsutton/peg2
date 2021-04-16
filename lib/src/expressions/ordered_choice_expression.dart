@@ -1,11 +1,11 @@
 part of '../../expressions.dart';
 
 class OrderedChoiceExpression extends MultipleExpression<SequenceExpression> {
+  @override
+  final ExpressionKind kind = ExpressionKind.orderedChoice;
+
   OrderedChoiceExpression(List<SequenceExpression> expressions)
       : super(expressions);
-
-  @override
-  ExpressionKind get kind => ExpressionKind.orderedChoice;
 
   @override
   T accept<T>(ExpressionVisitor<T> visitor) {

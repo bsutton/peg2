@@ -1,10 +1,10 @@
 part of '../../expressions.dart';
 
 class TerminalExpression extends SymbolExpression {
-  TerminalExpression(String name) : super(name);
-
   @override
-  ExpressionKind get kind => ExpressionKind.terminal;
+  final ExpressionKind kind = ExpressionKind.terminal;
+
+  TerminalExpression(String name) : super(name);
 
   @override
   T accept<T>(ExpressionVisitor<T> visitor) {

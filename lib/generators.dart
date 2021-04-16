@@ -5,7 +5,6 @@ import 'package:code_builder/code_builder.dart'
     hide literalString, Expression, ExpressionVisitor, LiteralExpression;
 import 'package:code_builder/code_builder.dart' as _cb;
 import 'package:dart_style/dart_style.dart';
-import 'package:lists/lists.dart';
 import 'package:meta/meta.dart' hide literal;
 import 'package:peg2/expressions.dart';
 import 'package:peg2/utils.dart';
