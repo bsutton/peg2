@@ -52,15 +52,9 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
     }
 
     if (expressions.length > 1) {
-      switch (rule.kind) {
-        case ProductionRuleKind.nonterminal:
-          _generateOrderedChoiceNonterminal(node, variable, failure);
-          break;
-        default:
-          _generateOrderedChoiceTerminal(node, variable, failure);
-      }
+      _generateOrderedChoice(node, variable, failure);
     } else {
-      _generateOrderedChoiceWithOneElement(node, variable, failure);
+      _generateOrderedChoiceSingle(node, variable, failure);
     }
 
     childVariable = variable;
@@ -119,51 +113,8 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
     childVariable = variable;
   }
 
-  void _generateOrderedChoiceNonterminal(OrderedChoiceExpression node,
-      String variable, void Function(List<Code>) failure) {
-    final expressions = node.expressions;
-    var needSavePos = false;
-    for (final child in expressions) {
-      if (willSequenceChangePosOnFailure(child)) {
-        needSavePos = true;
-        break;
-      }
-    }
-
-    final storage = <String, String>{};
-    addStoreVar(code, Members.ch, storage);
-    if (needSavePos) {
-      addStoreVar(code, Members.pos, storage);
-    }
-
-    code <<
-        while$(literalTrue, (code) {
-          for (var i = 0; i < expressions.length; i++) {
-            final child = expressions[i];
-            acceptNode(child, code);
-            void success(List<Code> code) {
-              code << break$;
-            }
-
-            generateEpilogue(child, code, success, null);
-            if (willSequenceChangePosOnFailure(child)) {
-              addRestoreVars(code, storage);
-            } else {
-              addRestoreVar(code, Members.ch, storage);
-            }
-          }
-
-          code << break$;
-        });
-
-    failure(code);
-    if (node.level == 0) {
-      code << refer(variable).returned.statement;
-    }
-  }
-
-  void _generateOrderedChoiceTerminal(OrderedChoiceExpression node,
-      String variable, void Function(List<Code>) failure) {
+  void _generateOrderedChoice(OrderedChoiceExpression node, String variable,
+      void Function(List<Code>) failure) {
     final expressions = node.expressions;
     final charChanges = <bool>[];
     final posChanges = <bool>[];
@@ -183,45 +134,70 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
       addStoreVar(code, Members.pos, storage);
     }
 
-    code <<
-        while$(literalTrue, (code) {
-          for (var i = 0; i < expressions.length; i++) {
-            final child = expressions[i];
-            acceptNode(child, code);
-            void success(List<Code> code) {
-              code << break$;
+    final level = node.level;
+    final canReturn = level == 0;
+    void block(List<Code> code) {
+      for (var i = 0; i < expressions.length; i++) {
+        final child = expressions[i];
+        acceptNode(child, code);
+        void success(List<Code> code) {
+          if (canReturn) {
+            if (variable == null) {
+              code << literalNull.returned.statement;
+            } else {
+              code << refer(variable).returned.statement;
             }
-
-            generateEpilogue(child, code, success, null);
-            if (charChanges[i]) {
-              addRestoreVar(code, Members.ch, storage);
-            }
-
-            if (posChanges[i]) {
-              addRestoreVar(code, Members.pos, storage);
-            }
+          } else {
+            code << break$;
           }
+        }
 
-          code << break$;
-        });
+        generateEpilogue(child, code, success, null);
+        if (charChanges[i]) {
+          addRestoreVar(code, Members.ch, storage);
+        }
+
+        if (posChanges[i]) {
+          addRestoreVar(code, Members.pos, storage);
+        }
+      }
+
+      if (!canReturn) {
+        code << break$;
+      }
+    }
+
+    if (canReturn) {
+      block(code);
+    } else {
+      code << while$(literalTrue, block);
+    }
 
     failure(code);
     if (node.level == 0) {
-      code << refer(variable).returned.statement;
+      if (variable == null) {
+        code << literalNull.returned.statement;
+      } else {
+        code << refer(variable).returned.statement;
+      }
     }
   }
 
-  void _generateOrderedChoiceWithOneElement(OrderedChoiceExpression node,
+  void _generateOrderedChoiceSingle(OrderedChoiceExpression node,
       String variable, void Function(List<Code>) failure) {
     final child = node.expressions[0];
     final needSavePos = willSequenceChangePosOnFailure(child);
+    final needSaveChar = willExpressionChangeCharOnFailure(child, {});
     if (variable != null) {
       childVariable = allocator.alloc();
     }
 
     final storage = <String, String>{};
-    if (needSavePos) {
+    if (needSaveChar) {
       addStoreVar(code, Members.ch, storage);
+    }
+
+    if (needSavePos) {
       addStoreVar(code, Members.pos, storage);
     }
 

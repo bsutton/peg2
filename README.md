@@ -5,7 +5,7 @@ peg2
 
 PEG+ (Parsing expression grammar) parser source code generator, command line tool.
 
-Version 0.2.5
+Version 0.2.6
 
 This is a slightly modified (extended) version of PEG with support for nonterminal, terminal and subterminal symbols and with the support of the expression "Capture".
 

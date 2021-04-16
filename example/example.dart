@@ -272,24 +272,21 @@ class ExampleParser {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
-    while (true) {
-      _matchChar(92, 92);
+    _matchChar(92, 92);
+    if (ok) {
+      final $3 = _parse$$escaped();
       if (ok) {
-        final $3 = _parse$$escaped();
-        if (ok) {
-          final r = $3!;
-          $0 = r;
-          break;
-        }
+        final r = $3!;
+        $0 = r;
+        return $0;
       }
-      _ch = $1;
-      _pos = $2;
-      final $4 = _parse$$unescaped();
-      if (ok) {
-        $0 = $4;
-        break;
-      }
-      break;
+    }
+    _ch = $1;
+    _pos = $2;
+    final $4 = _parse$$unescaped();
+    if (ok) {
+      $0 = $4;
+      return $0;
     }
     return $0;
   }
@@ -299,101 +296,95 @@ class ExampleParser {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
-    while (true) {
-      final $3 = _matchChar(34, 34);
-      if (ok) {
-        $0 = $3;
-        break;
-      }
-      final $4 = _matchChar(92, 92);
-      if (ok) {
-        $0 = $4;
-        break;
-      }
-      final $5 = _matchChar(47, 47);
-      if (ok) {
-        $0 = $5;
-        break;
-      }
-      _matchChar(98, 98);
-      if (ok) {
-        late int $$;
-        $$ = 0x8;
-        $0 = $$;
-        break;
-      }
-      _matchChar(102, 102);
-      if (ok) {
-        late int $$;
-        $$ = 0xC;
-        $0 = $$;
-        break;
-      }
-      _matchChar(110, 110);
-      if (ok) {
-        late int $$;
-        $$ = 0xA;
-        $0 = $$;
-        break;
-      }
-      _matchChar(114, 114);
-      if (ok) {
-        late int $$;
-        $$ = 0xD;
-        $0 = $$;
-        break;
-      }
-      _matchChar(116, 116);
-      if (ok) {
-        late int $$;
-        $$ = 0x9;
-        $0 = $$;
-        break;
-      }
-      _matchChar(117, 117);
-      if (ok) {
-        final $6 = _parse$$hexdig4();
-        if (ok) {
-          final r = $6!;
-          $0 = r;
-          break;
-        }
-      }
-      _ch = $1;
-      _pos = $2;
-      break;
+    final $3 = _matchChar(34, 34);
+    if (ok) {
+      $0 = $3;
+      return $0;
     }
+    final $4 = _matchChar(92, 92);
+    if (ok) {
+      $0 = $4;
+      return $0;
+    }
+    final $5 = _matchChar(47, 47);
+    if (ok) {
+      $0 = $5;
+      return $0;
+    }
+    _matchChar(98, 98);
+    if (ok) {
+      late int $$;
+      $$ = 0x8;
+      $0 = $$;
+      return $0;
+    }
+    _matchChar(102, 102);
+    if (ok) {
+      late int $$;
+      $$ = 0xC;
+      $0 = $$;
+      return $0;
+    }
+    _matchChar(110, 110);
+    if (ok) {
+      late int $$;
+      $$ = 0xA;
+      $0 = $$;
+      return $0;
+    }
+    _matchChar(114, 114);
+    if (ok) {
+      late int $$;
+      $$ = 0xD;
+      $0 = $$;
+      return $0;
+    }
+    _matchChar(116, 116);
+    if (ok) {
+      late int $$;
+      $$ = 0x9;
+      $0 = $$;
+      return $0;
+    }
+    _matchChar(117, 117);
+    if (ok) {
+      final $6 = _parse$$hexdig4();
+      if (ok) {
+        final r = $6!;
+        $0 = r;
+        return $0;
+      }
+    }
+    _ch = $1;
+    _pos = $2;
     return $0;
   }
 
   int? _parse$$hexdig() {
     int? $0;
-    while (true) {
-      final $1 = _matchRange(97, 102);
-      if (ok) {
-        final v = $1!;
-        late int $$;
-        $$ = v - 97;
-        $0 = $$;
-        break;
-      }
-      final $2 = _matchRange(65, 70);
-      if (ok) {
-        final v = $2!;
-        late int $$;
-        $$ = v - 65;
-        $0 = $$;
-        break;
-      }
-      final $3 = _matchRange(48, 57);
-      if (ok) {
-        final v = $3!;
-        late int $$;
-        $$ = v - 48;
-        $0 = $$;
-        break;
-      }
-      break;
+    final $1 = _matchRange(97, 102);
+    if (ok) {
+      final v = $1!;
+      late int $$;
+      $$ = v - 97;
+      $0 = $$;
+      return $0;
+    }
+    final $2 = _matchRange(65, 70);
+    if (ok) {
+      final v = $2!;
+      late int $$;
+      $$ = v - 65;
+      $0 = $$;
+      return $0;
+    }
+    final $3 = _matchRange(48, 57);
+    if (ok) {
+      final v = $3!;
+      late int $$;
+      $$ = v - 48;
+      $0 = $$;
+      return $0;
     }
     return $0;
   }
@@ -445,23 +436,20 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   int? _parse$$unescaped() {
     int? $0;
-    while (true) {
-      final $1 = _matchRange(32, 33);
-      if (ok) {
-        $0 = $1;
-        break;
-      }
-      final $2 = _matchRange(35, 91);
-      if (ok) {
-        $0 = $2;
-        break;
-      }
-      final $3 = _matchRange(93, 1114111);
-      if (ok) {
-        $0 = $3;
-        break;
-      }
-      break;
+    final $1 = _matchRange(32, 33);
+    if (ok) {
+      $0 = $1;
+      return $0;
+    }
+    final $2 = _matchRange(35, 91);
+    if (ok) {
+      $0 = $2;
+      return $0;
+    }
+    final $3 = _matchRange(93, 1114111);
+    if (ok) {
+      $0 = $3;
+      return $0;
     }
     return $0;
   }
@@ -605,51 +593,40 @@ class ExampleParser {
 
   dynamic _parseValue() {
     dynamic $0;
-    final $1 = _ch;
-    while (true) {
-      final $2 = _parseArray();
-      if (ok) {
-        $0 = $2;
-        break;
-      }
-      _ch = $1;
-      final $3 = _parse_false();
-      if (ok) {
-        $0 = $3;
-        break;
-      }
-      _ch = $1;
-      final $4 = _parse_null();
-      if (ok) {
-        $0 = $4;
-        break;
-      }
-      _ch = $1;
-      final $5 = _parse_true();
-      if (ok) {
-        $0 = $5;
-        break;
-      }
-      _ch = $1;
-      final $6 = _parseObject();
-      if (ok) {
-        $0 = $6;
-        break;
-      }
-      _ch = $1;
-      final $7 = _parse_number();
-      if (ok) {
-        $0 = $7;
-        break;
-      }
-      _ch = $1;
-      final $8 = _parse_string();
-      if (ok) {
-        $0 = $8;
-        break;
-      }
-      _ch = $1;
-      break;
+    final $1 = _parseArray();
+    if (ok) {
+      $0 = $1;
+      return $0;
+    }
+    final $2 = _parse_false();
+    if (ok) {
+      $0 = $2;
+      return $0;
+    }
+    final $3 = _parse_null();
+    if (ok) {
+      $0 = $3;
+      return $0;
+    }
+    final $4 = _parse_true();
+    if (ok) {
+      $0 = $4;
+      return $0;
+    }
+    final $5 = _parseObject();
+    if (ok) {
+      $0 = $5;
+      return $0;
+    }
+    final $6 = _parse_number();
+    if (ok) {
+      $0 = $6;
+      return $0;
+    }
+    final $7 = _parse_string();
+    if (ok) {
+      $0 = $7;
+      return $0;
     }
     return $0;
   }
@@ -862,7 +839,6 @@ class ExampleParser {
     final $5 = _pos;
     _matchChar(45, 45);
     ok = true;
-    final $6 = _ch;
     while (true) {
       _matchChar(48, 48);
       if (ok) {
@@ -881,50 +857,49 @@ class ExampleParser {
       if (ok) {
         break;
       }
-      _ch = $6;
       break;
     }
     if (ok) {
-      final $7 = _ch;
-      final $8 = _pos;
+      final $6 = _ch;
+      final $7 = _pos;
       _matchChar(46, 46);
       if (ok) {
-        var $9 = 0;
+        var $8 = 0;
         while (true) {
           _matchRange(48, 57);
           if (!ok) {
             break;
           }
-          $9++;
+          $8++;
         }
-        ok = $9 != 0;
+        ok = $8 != 0;
       }
       if (!ok) {
-        _ch = $7;
-        _pos = $8;
+        _ch = $6;
+        _pos = $7;
       }
       ok = true;
-      final $10 = _ch;
-      final $11 = _pos;
-      const $12 = [69, 69, 101, 101];
-      _matchRanges($12);
+      final $9 = _ch;
+      final $10 = _pos;
+      const $11 = [69, 69, 101, 101];
+      _matchRanges($11);
       if (ok) {
-        const $13 = [43, 43, 45, 45];
-        _matchRanges($13);
+        const $12 = [43, 43, 45, 45];
+        _matchRanges($12);
         ok = true;
-        var $14 = 0;
+        var $13 = 0;
         while (true) {
           _matchRange(48, 57);
           if (!ok) {
             break;
           }
-          $14++;
+          $13++;
         }
-        ok = $14 != 0;
+        ok = $13 != 0;
       }
       if (!ok) {
-        _ch = $10;
-        _pos = $11;
+        _ch = $9;
+        _pos = $10;
       }
       ok = true;
     }

@@ -326,6 +326,7 @@ abstract class ExpressionsGeneratorBase extends ExpressionVisitor<void> {
         final sequence = node as SequenceExpression;
         final expressions = sequence.expressions;
         var count = 0;
+        var skipOtional = false;
         for (final expression in expressions) {
           switch (expression.kind) {
             case ExpressionKind.andPredicate:
@@ -334,13 +335,16 @@ abstract class ExpressionsGeneratorBase extends ExpressionVisitor<void> {
             default:
           }
 
-          if (count++ > 0) {
+          if (expression.isOptional && skipOtional) {
+            continue;
+          }
+
+          if (count > 0) {
             return true;
           }
 
-          if (willExpressionChangeCharOnFailure(expression, processed)) {
-            return true;
-          }
+          skipOtional = true;
+          count++;
         }
 
         return false;

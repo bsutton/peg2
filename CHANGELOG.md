@@ -1,3 +1,7 @@
+## 0.2.6
+
+- Improvements to code generation algorithms
+
 ## 0.2.5
 
 - Improvements to code generation algorithms. The generated code of the general parser is now even smaller
