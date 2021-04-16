@@ -66,11 +66,7 @@ class ActionCodeGenerator {
   void _genearteActionCode(List<String> errors) {
     final sink = StringBuffer();
     _assignSemanticVariables(sink, errors);
-    if (!Utils.isDynamicType(resultType)) {
-      sink.write('late ');
-    }
-
-    sink.write(resultType);
+    sink.write(Utils.getNullableType(resultType));
     sink.write(' \$\$;');
     sink.write(actionSource);
     if (variable != null) {

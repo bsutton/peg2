@@ -313,35 +313,35 @@ class ExampleParser {
     }
     _matchChar(98, 98);
     if (ok) {
-      late int $$;
+      int? $$;
       $$ = 0x8;
       $0 = $$;
       return $0;
     }
     _matchChar(102, 102);
     if (ok) {
-      late int $$;
+      int? $$;
       $$ = 0xC;
       $0 = $$;
       return $0;
     }
     _matchChar(110, 110);
     if (ok) {
-      late int $$;
+      int? $$;
       $$ = 0xA;
       $0 = $$;
       return $0;
     }
     _matchChar(114, 114);
     if (ok) {
-      late int $$;
+      int? $$;
       $$ = 0xD;
       $0 = $$;
       return $0;
     }
     _matchChar(116, 116);
     if (ok) {
-      late int $$;
+      int? $$;
       $$ = 0x9;
       $0 = $$;
       return $0;
@@ -365,7 +365,7 @@ class ExampleParser {
     final $1 = _matchRange(97, 102);
     if (ok) {
       final v = $1!;
-      late int $$;
+      int? $$;
       $$ = v - 97;
       $0 = $$;
       return $0;
@@ -373,7 +373,7 @@ class ExampleParser {
     final $2 = _matchRange(65, 70);
     if (ok) {
       final v = $2!;
-      late int $$;
+      int? $$;
       $$ = v - 65;
       $0 = $$;
       return $0;
@@ -381,7 +381,7 @@ class ExampleParser {
     final $3 = _matchRange(48, 57);
     if (ok) {
       final v = $3!;
-      late int $$;
+      int? $$;
       $$ = v - 48;
       $0 = $$;
       return $0;
@@ -406,7 +406,7 @@ class ExampleParser {
             final b = $5!;
             final c = $6!;
             final d = $7!;
-            late int $$;
+            int? $$;
             $$ = a * 0xfff + b * 0xff + c * 0xf + d;
             $0 = $$;
           }
@@ -467,7 +467,7 @@ class ExampleParser {
       _parse_$RightSquareBracket();
       if (ok) {
         final v = $4;
-        late List $$;
+        List? $$;
         $$ = v ?? [];
         $0 = $$;
       }
@@ -512,7 +512,7 @@ class ExampleParser {
         if (ok) {
           final k = $4!;
           final v = $5;
-          late MapEntry<String, dynamic> $$;
+          MapEntry<String, dynamic>? $$;
           $$ = MapEntry(k, v);
           $0 = $$;
         }
@@ -558,7 +558,7 @@ class ExampleParser {
       }
       final m = $2!;
       final n = $3!;
-      late List<MapEntry<String, dynamic>> $$;
+      List<MapEntry<String, dynamic>>? $$;
       $$ = [m, ...n];
       $0 = $$;
     }
@@ -579,7 +579,7 @@ class ExampleParser {
       _parse_$RightBrace();
       if (ok) {
         final m = $4;
-        late Map<String, dynamic> $$;
+        Map<String, dynamic>? $$;
         $$ = <String, dynamic>{}..addEntries(m ?? []);
         $0 = $$;
       }
@@ -664,7 +664,7 @@ class ExampleParser {
       }
       final v = $2;
       final n = $3!;
-      late List $$;
+      List? $$;
       $$ = [v, ...n];
       $0 = $$;
     }
@@ -767,14 +767,10 @@ class ExampleParser {
     final $0 = _ch;
     final $1 = _pos;
     final $2 = _failPos;
-    final $3 = _failStart;
-    final $4 = _failures0;
     _matchAny();
     _ch = $0;
     _pos = $1;
     _failPos = $2;
-    _failStart = $3;
-    _failures0 = $4;
     ok = !ok;
     if (!ok) {
       if (_fail('\'end of file\'')) {
@@ -913,7 +909,7 @@ class ExampleParser {
     if (ok) {
       _parse$$spacing();
       final n = $2!;
-      late num $$;
+      num? $$;
       $$ = num.parse(n);
       $0 = $$;
     }
@@ -948,7 +944,7 @@ class ExampleParser {
       if (ok) {
         _parse$$spacing();
         final c = $4!;
-        late String $$;
+        String? $$;
         $$ = String.fromCharCodes(c);
         $0 = $$;
       }

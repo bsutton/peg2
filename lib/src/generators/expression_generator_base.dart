@@ -590,14 +590,17 @@ abstract class ExpressionsGeneratorBase extends ExpressionVisitor<void> {
 
   void _visitPrefix(PrefixExpression node) {
     final variable = addNodeVar(code, node);
+    final rule = node.rule;
     final child = node.expression;
     final storage = <String, String>{};
     addStoreVar(code, Members.ch, storage);
     addStoreVar(code, Members.pos, storage);
     addStoreVar(code, Members.failPos, storage);
-    addStoreVar(code, Members.failStart, storage);
-    for (final variable in failures.variables) {
-      addStoreVar(code, variable, storage);
+    if (rule.kind == ProductionRuleKind.nonterminal) {
+      addStoreVar(code, Members.failStart, storage);
+      for (final variable in failures.variables) {
+        addStoreVar(code, variable, storage);
+      }
     }
 
     acceptNode(child, code);
