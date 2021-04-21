@@ -1,7 +1,7 @@
 name: peg2
 description: PEG+ (Parsing expression grammar) parser source code generator, command line tool.
 homepage: https://github.com/mezoni/peg2
-version: 0.2.7
+version: 0.2.8
 environment:
   sdk: '>=2.12.0 <3.0.0'
 dependencies:

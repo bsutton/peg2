@@ -18,7 +18,9 @@ class GrammarInitializer0 {
       grammar.start = startingRules.first;
     }
 
-    grammar.start!.expression.resultUsed = true;
+    if (grammar.start != null) {
+      grammar.start!.expression.resultUsed = true;
+    }
 
     final expresionMapInitializer = ExpresionMapInitializer();
     expresionMapInitializer.initialize(grammar);
