@@ -40,6 +40,7 @@ Remember to periodically update this software to get the latest version.
 
 Test results based on testing data from project https://github.com/miloyip/nativejson-benchmark  
 Compared to the parser built into Dart VM.  
+A modified grammar of the PEG2 JSON parser is used, with an algorithm for parsing numbers from the Dart VM parser.  
 
 ```
 Parse 50 times: E:\prj\test_json\bin\data\canada.json
