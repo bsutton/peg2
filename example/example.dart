@@ -40,8 +40,6 @@ class ExampleParser {
 
   int _ch = 0;
 
-  int _failPos = -1;
-
   int _failStart = -1;
 
   int _failures0 = 0;
@@ -126,48 +124,49 @@ class ExampleParser {
       _failures0 = 0;
     }
 
-    if (_failPos == _length) {
-      _unterminated = name;
-    }
-
     return true;
   }
 
   @pragma('vm:prefer-inline')
   int _getChar(int pos) {
     if (pos < _source.length) {
-      var ch = _source.codeUnitAt(pos);
-      if (ch >= 0xD800 && ch <= 0xDBFF) {
-        if (pos + 1 < _source.length) {
-          final ch2 = _source.codeUnitAt(pos + 1);
-          if (ch2 >= 0xDC00 && ch2 <= 0xDFFF) {
-            ch = ((ch - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
-          } else {
-            throw FormatException('Unpaired high surrogate', _source, pos);
-          }
-        } else {
-          throw FormatException('The source has been exhausted', _source, pos);
-        }
-      } else {
-        if (ch >= 0xDC00 && ch <= 0xDFFF) {
-          throw FormatException(
-              'UTF-16 surrogate values are illegal in UTF-32', _source, pos);
-        }
+      _ch = _source.codeUnitAt(pos);
+      if (_ch >= 0xD800) {
+        return _getChar32(pos);
       }
 
-      return ch;
+      return _ch;
     }
 
     return _eof;
   }
 
   @pragma('vm:prefer-inline')
+  int _getChar32(int pos) {
+    if (_ch >= 0xD800 && _ch <= 0xDBFF) {
+      if (pos + 1 < _source.length) {
+        final ch2 = _source.codeUnitAt(pos + 1);
+        if (ch2 >= 0xDC00 && ch2 <= 0xDFFF) {
+          _ch = ((_ch - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
+        } else {
+          throw FormatException('Unpaired high surrogate', _source, pos);
+        }
+      } else {
+        throw FormatException('The source has been exhausted', _source, pos);
+      }
+    } else {
+      if (_ch >= 0xDC00 && _ch <= 0xDFFF) {
+        throw FormatException(
+            'UTF-16 surrogate values are illegal in UTF-32', _source, pos);
+      }
+    }
+
+    return _ch;
+  }
+
+  @pragma('vm:prefer-inline')
   int? _matchAny() {
     if (_ch == _eof) {
-      if (_failPos < _pos) {
-        _failPos = _pos;
-      }
-
       ok = false;
       return null;
     }
@@ -180,23 +179,6 @@ class ExampleParser {
   }
 
   @pragma('vm:prefer-inline')
-  T? _matchChar<T>(int ch, T? result) {
-    if (ch != _ch) {
-      if (_failPos < _pos) {
-        _failPos = _pos;
-      }
-
-      ok = false;
-      return null;
-    }
-
-    _pos += _ch <= 0xffff ? 1 : 2;
-    _ch = _getChar(_pos);
-    ok = true;
-    return result;
-  }
-
-  @pragma('vm:prefer-inline')
   int? _matchRange(int start, int end) {
     if (_ch >= start && _ch <= end) {
       final ch = _ch;
@@ -204,10 +186,6 @@ class ExampleParser {
       _ch = _getChar(_pos);
       ok = true;
       return ch;
-    }
-
-    if (_failPos < _pos) {
-      _failPos = _pos;
     }
 
     ok = false;
@@ -232,39 +210,24 @@ class ExampleParser {
     }
 
     ok = false;
-    if (_failPos < _pos) {
-      _failPos = _pos;
-    }
-
     return null;
   }
 
   @pragma('vm:prefer-inline')
-  String? _matchString(String text) {
-    var i = 0;
-    if (_ch == text.codeUnitAt(0)) {
-      i++;
-      if (_pos + text.length <= _source.length) {
-        for (; i < text.length; i++) {
-          if (text.codeUnitAt(i) != _source.codeUnitAt(_pos + i)) {
-            break;
-          }
-        }
+  T _nextChar<T>(T value) {
+    ok = true;
+    _pos += _ch <= 0xffff ? 1 : 2;
+    if (_pos < _source.length) {
+      _ch = _source.codeUnitAt(_pos);
+      if (_ch >= 0xD800) {
+        _ch = _getChar32(_pos);
       }
+
+      return value;
     }
 
-    ok = i == text.length;
-    if (ok) {
-      _pos = _pos + text.length;
-      _ch = _getChar(_pos);
-      return text;
-    } else {
-      final pos = _pos + i;
-      if (_failPos < pos) {
-        _failPos = pos;
-      }
-      return null;
-    }
+    _ch = _eof;
+    return value;
   }
 
   @pragma('vm:prefer-inline')
@@ -272,7 +235,10 @@ class ExampleParser {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
-    _matchChar(92, 92);
+    ok = false;
+    if (_ch == 92) {
+      _nextChar(_ch);
+    }
     if (ok) {
       $0 = _parse$$escaped();
       if (ok) {
@@ -298,22 +264,34 @@ class ExampleParser {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
-    $0 = _matchChar(34, 34);
+    ok = false;
+    if (_ch == 34) {
+      $0 = _nextChar(_ch);
+    }
 
     if (ok) {
       return $0;
     }
-    $0 = _matchChar(92, 92);
+    ok = false;
+    if (_ch == 92) {
+      $0 = _nextChar(_ch);
+    }
 
     if (ok) {
       return $0;
     }
-    $0 = _matchChar(47, 47);
+    ok = false;
+    if (_ch == 47) {
+      $0 = _nextChar(_ch);
+    }
 
     if (ok) {
       return $0;
     }
-    _matchChar(98, 98);
+    ok = false;
+    if (_ch == 98) {
+      _nextChar(_ch);
+    }
     if (ok) {
       int? $$;
       $$ = 0x8;
@@ -322,7 +300,10 @@ class ExampleParser {
     if (ok) {
       return $0;
     }
-    _matchChar(102, 102);
+    ok = false;
+    if (_ch == 102) {
+      _nextChar(_ch);
+    }
     if (ok) {
       int? $$;
       $$ = 0xC;
@@ -331,7 +312,10 @@ class ExampleParser {
     if (ok) {
       return $0;
     }
-    _matchChar(110, 110);
+    ok = false;
+    if (_ch == 110) {
+      _nextChar(_ch);
+    }
     if (ok) {
       int? $$;
       $$ = 0xA;
@@ -340,7 +324,10 @@ class ExampleParser {
     if (ok) {
       return $0;
     }
-    _matchChar(114, 114);
+    ok = false;
+    if (_ch == 114) {
+      _nextChar(_ch);
+    }
     if (ok) {
       int? $$;
       $$ = 0xD;
@@ -349,7 +336,10 @@ class ExampleParser {
     if (ok) {
       return $0;
     }
-    _matchChar(116, 116);
+    ok = false;
+    if (_ch == 116) {
+      _nextChar(_ch);
+    }
     if (ok) {
       int? $$;
       $$ = 0x9;
@@ -358,7 +348,10 @@ class ExampleParser {
     if (ok) {
       return $0;
     }
-    _matchChar(117, 117);
+    ok = false;
+    if (_ch == 117) {
+      _nextChar(_ch);
+    }
     if (ok) {
       $0 = _parse$$hexdig4();
       if (ok) {
@@ -376,7 +369,11 @@ class ExampleParser {
 
   int? _parse$$hexdig() {
     int? $0;
-    final $1 = _matchRange(97, 102);
+    int? $1;
+    ok = false;
+    if (_ch >= 97 && _ch <= 102) {
+      $1 = _nextChar(_ch);
+    }
     if (ok) {
       final v = $1!;
       int? $$;
@@ -386,7 +383,11 @@ class ExampleParser {
     if (ok) {
       return $0;
     }
-    final $2 = _matchRange(65, 70);
+    int? $2;
+    ok = false;
+    if (_ch >= 65 && _ch <= 70) {
+      $2 = _nextChar(_ch);
+    }
     if (ok) {
       final v = $2!;
       int? $$;
@@ -396,7 +397,11 @@ class ExampleParser {
     if (ok) {
       return $0;
     }
-    final $3 = _matchRange(48, 57);
+    int? $3;
+    ok = false;
+    if (_ch >= 48 && _ch <= 57) {
+      $3 = _nextChar(_ch);
+    }
     if (ok) {
       final v = $3!;
       int? $$;
@@ -442,8 +447,10 @@ class ExampleParser {
 
   List<int>? _parse$$spacing() {
     do {
-      const $0 = [9, 10, 13, 13, 32, 32];
-      _matchRanges($0);
+      ok = false;
+      if (_ch >= 9 && _ch <= 10 || _ch == 13 || _ch == 32) {
+        _nextChar(_ch);
+      }
     } while (ok);
     ok = true;
 
@@ -453,17 +460,26 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   int? _parse$$unescaped() {
     int? $0;
-    $0 = _matchRange(32, 33);
+    ok = false;
+    if (_ch >= 32 && _ch <= 33) {
+      $0 = _nextChar(_ch);
+    }
 
     if (ok) {
       return $0;
     }
-    $0 = _matchRange(35, 91);
+    ok = false;
+    if (_ch >= 35 && _ch <= 91) {
+      $0 = _nextChar(_ch);
+    }
 
     if (ok) {
       return $0;
     }
-    $0 = _matchRange(93, 1114111);
+    ok = false;
+    if (_ch >= 93 && _ch <= 1114111) {
+      $0 = _nextChar(_ch);
+    }
 
     if (ok) {
       return $0;
@@ -691,94 +707,112 @@ class ExampleParser {
 
   @pragma('vm:prefer-inline')
   String? _parse_$Colon() {
-    _failPos = _pos;
-    _matchChar(58, ':');
+    ok = false;
+    if (_ch == 58) {
+      _nextChar(':');
+    }
     if (ok) {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\':\'')) {}
-      _failures0 |= 0x1000;
+      if (_fail('\':\'')) {
+        _failures0 |= 0x1000;
+      }
     }
     return null;
   }
 
   String? _parse_$Comma() {
-    _failPos = _pos;
-    _matchChar(44, ',');
+    ok = false;
+    if (_ch == 44) {
+      _nextChar(',');
+    }
     if (ok) {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\',\'')) {}
-      _failures0 |= 0x800;
+      if (_fail('\',\'')) {
+        _failures0 |= 0x800;
+      }
     }
     return null;
   }
 
   @pragma('vm:prefer-inline')
   String? _parse_$LeftBrace() {
-    _failPos = _pos;
-    _matchChar(123, '{');
+    ok = false;
+    if (_ch == 123) {
+      _nextChar('{');
+    }
     if (ok) {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\'{\'')) {}
-      _failures0 |= 0x80;
+      if (_fail('\'{\'')) {
+        _failures0 |= 0x80;
+      }
     }
     return null;
   }
 
   @pragma('vm:prefer-inline')
   String? _parse_$LeftSquareBracket() {
-    _failPos = _pos;
-    _matchChar(91, '[');
+    ok = false;
+    if (_ch == 91) {
+      _nextChar('[');
+    }
     if (ok) {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\'[\'')) {}
-      _failures0 |= 0x200;
+      if (_fail('\'[\'')) {
+        _failures0 |= 0x200;
+      }
     }
     return null;
   }
 
   @pragma('vm:prefer-inline')
   String? _parse_$RightBrace() {
-    _failPos = _pos;
-    _matchChar(125, '}');
+    ok = false;
+    if (_ch == 125) {
+      _nextChar('}');
+    }
     if (ok) {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\'}\'')) {}
-      _failures0 |= 0x100;
+      if (_fail('\'}\'')) {
+        _failures0 |= 0x100;
+      }
     }
     return null;
   }
 
   @pragma('vm:prefer-inline')
   String? _parse_$RightSquareBracket() {
-    _failPos = _pos;
-    _matchChar(93, ']');
+    ok = false;
+    if (_ch == 93) {
+      _nextChar(']');
+    }
     if (ok) {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\']\'')) {}
-      _failures0 |= 0x400;
+      if (_fail('\']\'')) {
+        _failures0 |= 0x400;
+      }
     }
     return null;
   }
 
   @pragma('vm:prefer-inline')
   dynamic _parse_end_of_file() {
-    _failPos = _pos;
     ok = _ch == 1114112;
     if (!ok) {
-      if (_fail('\'end of file\'')) {}
-      _failures0 |= 0x1;
+      if (_fail('\'end of file\'')) {
+        _failures0 |= 0x1;
+      }
     }
     return null;
   }
@@ -786,8 +820,10 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   dynamic _parse_false() {
     dynamic $0;
-    _failPos = _pos;
-    _matchString('false');
+    ok = _source.startsWith('false', _pos);
+    if (ok) {
+      _ch = _getChar(_pos += 5);
+    }
     if (ok) {
       _parse$$spacing();
       dynamic $$;
@@ -795,8 +831,9 @@ class ExampleParser {
       $0 = $$;
     }
     if (!ok) {
-      if (_fail('\'false\'')) {}
-      _failures0 |= 0x2;
+      if (_fail('\'false\'')) {
+        _failures0 |= 0x2;
+      }
     }
     return $0;
   }
@@ -811,8 +848,10 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   dynamic _parse_null() {
     dynamic $0;
-    _failPos = _pos;
-    _matchString('null');
+    ok = _source.startsWith('null', _pos);
+    if (ok) {
+      _ch = _getChar(_pos += 4);
+    }
     if (ok) {
       _parse$$spacing();
       dynamic $$;
@@ -820,8 +859,9 @@ class ExampleParser {
       $0 = $$;
     }
     if (!ok) {
-      if (_fail('\'null\'')) {}
-      _failures0 |= 0x8;
+      if (_fail('\'null\'')) {
+        _failures0 |= 0x8;
+      }
     }
     return $0;
   }
@@ -829,21 +869,32 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   num? _parse_number() {
     num? $0;
-    _failPos = _pos;
     String? $1;
     final $2 = _pos;
     final $3 = _ch;
-    _matchChar(45, 45);
+    ok = false;
+    if (_ch == 45) {
+      _nextChar(_ch);
+    }
     ok = true;
     while (true) {
-      _matchChar(48, 48);
+      ok = false;
+      if (_ch == 48) {
+        _nextChar(_ch);
+      }
       if (ok) {
         break;
       }
-      _matchRange(49, 57);
+      ok = false;
+      if (_ch >= 49 && _ch <= 57) {
+        _nextChar(_ch);
+      }
       if (ok) {
         do {
-          _matchRange(48, 57);
+          ok = false;
+          if (_ch >= 48 && _ch <= 57) {
+            _nextChar(_ch);
+          }
         } while (ok);
         ok = true;
       }
@@ -855,11 +906,17 @@ class ExampleParser {
     if (ok) {
       final $4 = _ch;
       final $5 = _pos;
-      _matchChar(46, 46);
+      ok = false;
+      if (_ch == 46) {
+        _nextChar(_ch);
+      }
       if (ok) {
         var $6 = 0;
         do {
-          _matchRange(48, 57);
+          ok = false;
+          if (_ch >= 48 && _ch <= 57) {
+            _nextChar(_ch);
+          }
           $6++;
         } while (ok);
         ok = $6 != 1;
@@ -871,18 +928,25 @@ class ExampleParser {
       ok = true;
       final $7 = _ch;
       final $8 = _pos;
-      const $9 = [69, 69, 101, 101];
-      _matchRanges($9);
+      ok = false;
+      if (_ch == 69 || _ch == 101) {
+        _nextChar(_ch);
+      }
       if (ok) {
-        const $10 = [43, 43, 45, 45];
-        _matchRanges($10);
+        ok = false;
+        if (_ch == 43 || _ch == 45) {
+          _nextChar(_ch);
+        }
         ok = true;
-        var $11 = 0;
+        var $9 = 0;
         do {
-          _matchRange(48, 57);
-          $11++;
+          ok = false;
+          if (_ch >= 48 && _ch <= 57) {
+            _nextChar(_ch);
+          }
+          $9++;
         } while (ok);
-        ok = $11 != 1;
+        ok = $9 != 1;
       }
       if (!ok) {
         _ch = $7;
@@ -904,18 +968,21 @@ class ExampleParser {
       $0 = $$;
     }
     if (!ok) {
-      if (_fail('\'number\'')) {}
-      _failures0 |= 0x40;
+      if (_fail('\'number\'')) {
+        _failures0 |= 0x40;
+      }
     }
     return $0;
   }
 
   String? _parse_string() {
     String? $0;
-    _failPos = _pos;
     final $1 = _ch;
     final $2 = _pos;
-    _matchChar(34, '"');
+    ok = false;
+    if (_ch == 34) {
+      _nextChar('"');
+    }
     if (ok) {
       List<int>? $3;
       final $4 = <int>[];
@@ -929,7 +996,10 @@ class ExampleParser {
       if (ok = true) {
         $3 = $4;
       }
-      _matchChar(34, '"');
+      ok = false;
+      if (_ch == 34) {
+        _nextChar('"');
+      }
       if (ok) {
         _parse$$spacing();
         final c = $3!;
@@ -941,8 +1011,9 @@ class ExampleParser {
     if (!ok) {
       _ch = $1;
       _pos = $2;
-      if (_fail('\'string\'')) {}
-      _failures0 |= 0x20;
+      if (_fail('\'string\'')) {
+        _failures0 |= 0x20;
+      }
     }
     return $0;
   }
@@ -950,8 +1021,10 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   dynamic _parse_true() {
     dynamic $0;
-    _failPos = _pos;
-    _matchString('true');
+    ok = _source.startsWith('true', _pos);
+    if (ok) {
+      _ch = _getChar(_pos += 4);
+    }
     if (ok) {
       _parse$$spacing();
       dynamic $$;
@@ -959,15 +1032,15 @@ class ExampleParser {
       $0 = $$;
     }
     if (!ok) {
-      if (_fail('\'true\'')) {}
-      _failures0 |= 0x10;
+      if (_fail('\'true\'')) {
+        _failures0 |= 0x10;
+      }
     }
     return $0;
   }
 
   void _reset() {
     error = null;
-    _failPos = 0;
     _failStart = 0;
     _failures0 = 0;
     _length = _source.length;

@@ -1,5 +1,6 @@
 import 'package:peg2/src/generators/if_else_generator.dart';
 import 'package:peg2/src/generators/production_rule_name_generator.dart';
+import 'package:peg2/src/generators/recognizer_generator.dart';
 import 'package:peg2/src/helpers/null_check_helper.dart';
 
 import '../../expressions.dart';
@@ -18,10 +19,10 @@ abstract class ExpressionsGeneratorBase
 
   final ClassMembers members;
 
-  final bool optimize;
+  final ParserGeneratorOptions options;
 
   ExpressionsGeneratorBase(
-      {required this.failures, required this.members, required this.optimize});
+      {required this.failures, required this.members, required this.options});
 
   ExpressionGenerator acceptChild(Expression node, ExpressionGenerator parent) {
     final generator = node.accept(this);
@@ -212,35 +213,17 @@ abstract class ExpressionsGeneratorBase
     final g = ExpressionGenerator(node);
     g.generate = (block) {
       g.allocateVariable();
-      final ranges = <int>[];
-      for (final group in node.ranges.groups) {
-        ranges.add(group.start);
-        ranges.add(group.end);
-      }
-
-      if (ranges.length == 2) {
-        if (ranges[0] == ranges[1]) {
-          final char = ranges[0];
-          final args = [literal(char), literal(char)];
-          final call = callExpression(Members.matchChar, args);
-          if (g.isVariableDeclared) {
-            block.assign(g.variable!, call);
-          } else {
-            block.callAndTryAssignFinal(g.variable, call);
-          }
-        } else {
-          final start = ranges[0];
-          final end = ranges[1];
-          final args = [literal(start), literal(end)];
-          final call = callExpression(Members.matchRange, args);
-          if (g.isVariableDeclared) {
-            block.assign(g.variable!, call);
-          } else {
-            block.callAndTryAssignFinal(g.variable, call);
-          }
-        }
-      } else {
+      final recognizerGenerator = RecognizerGenerator(
+          list: node.startCharacters, maxCount: 10, variable: Members.ch);
+      final control = recognizerGenerator.generate();
+      if (control == null) {
         final range = g.allocate();
+        final ranges = <int>[];
+        for (final group in node.ranges.groups) {
+          ranges.add(group.start);
+          ranges.add(group.end);
+        }
+
         block.assignConst(range, literalList(ranges));
         final args = [ref(range)];
         final call = callExpression(Members.matchRanges, args);
@@ -249,6 +232,18 @@ abstract class ExpressionsGeneratorBase
         } else {
           block.callAndTryAssignFinal(g.variable, call);
         }
+      } else {
+        g.declareVariable(block);
+        block.assign(Members.ok, false$);
+        block.if$(control, (block) {
+          final args = [ref(Members.ch)];
+          final call = callExpression(Members.nextChar, args);
+          if (g.variable == null) {
+            block.addStatement(call);
+          } else {
+            block.assign(g.variable!, call);
+          }
+        });
       }
     };
 
@@ -266,22 +261,41 @@ abstract class ExpressionsGeneratorBase
         block.tryAssign(g.variable, () => ref(''));
         block.assign(Members.ok, true$);
       } else if (text.length == 1) {
-        final char = text.codeUnitAt(0);
-        final args = [literal(char), literalString(text)];
-        final call = callExpression(Members.matchChar, args);
-        if (g.isVariableDeclared) {
-          block.assign(g.variable!, call);
-        } else {
-          block.callAndTryAssignFinal(g.variable, call);
+        final recognizerGenerator = RecognizerGenerator(
+            list: node.startCharacters, maxCount: 10, variable: Members.ch);
+        final control = recognizerGenerator.generate();
+        if (control == null) {
+          throw StateError('Internal error');
         }
+
+        g.declareVariable(block);
+        block.assign(Members.ok, false$);
+        block.if$(control, (block) {
+          final args = [literalString(text)];
+          final call = callExpression(Members.nextChar, args);
+          if (g.variable == null) {
+            block.addStatement(call);
+          } else {
+            block.assign(g.variable!, call);
+          }
+        });
       } else {
-        final args = [literalString(text)];
-        final call = callExpression(Members.matchString, args);
-        if (g.isVariableDeclared) {
-          block.assign(g.variable!, call);
-        } else {
-          block.callAndTryAssignFinal(g.variable, call);
-        }
+        g.declareVariable(block);
+        final args = [literalString(text), ref(Members.pos)];
+        final call =
+            methodCallExpression(ref(Members.source), 'startsWith', args);
+        block.assign(Members.ok, call);
+        block.if$(ref(Members.ok), (block) {
+          if (g.variable != null) {
+            block.assign(g.variable!, literalString(text));
+          }
+
+          final pos =
+              binaryExpression(ref(Members.pos), '+=', literal(text.length));
+          final args = [pos];
+          final call = callExpression(Members.getChar, args);
+          block.assign(Members.ch, call);
+        });
       }
     };
 
@@ -544,7 +558,6 @@ abstract class ExpressionsGeneratorBase
       } else {
         g.store(block, Members.ch);
         g.store(block, Members.pos);
-        g.store(block, Members.failPos);
         if (rule.kind == ProductionRuleKind.nonterminal) {
           g.store(block, Members.failStart);
           for (final variable in failures.variables) {

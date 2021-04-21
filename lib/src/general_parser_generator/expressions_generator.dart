@@ -4,8 +4,8 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
   ExpressionsGenerator(
       {required BitFlagGenerator failures,
       required ClassMembers members,
-      required bool optimize})
-      : super(failures: failures, members: members, optimize: optimize);
+      required ParserGeneratorOptions options})
+      : super(failures: failures, members: members, options: options);
 
   @override
   ExpressionGenerator visitOrderedChoice(OrderedChoiceExpression node) {
@@ -21,19 +21,13 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
             !node.isOptional) {
           final args = [literalString(rule.name)];
           final control = callExpression(Members.fail, args);
-          block.if$(control, (code) {
+          block.if$(control, (block) {
             final terminalId = rule.terminalId;
             final setFlag = failures.generateSet(true, [terminalId]);
             block.addSourceCode(setFlag.join('\n'));
           });
         }
-      }
-
-      if (rule.kind == ProductionRuleKind.terminal &&
-          level == 0 &&
-          !node.isOptional) {
-        block.assign(Members.failPos, ref(Members.pos));
-      }
+      }      
 
       if (expressions.length > 1) {
         _generateOrderedChoiceMultiple(node, block, g, failure);

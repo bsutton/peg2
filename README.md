@@ -5,7 +5,7 @@ peg2
 
 PEG+ (Parsing expression grammar) parser source code generator, command line tool.
 
-Version 0.2.8
+Version 0.2.9
 
 This is a slightly modified (extended) version of PEG with support for nonterminal, terminal and subterminal symbols and with the support of the expression "Capture".
 
@@ -35,6 +35,29 @@ pub global run peg2 json.peg
 ```
 
 Remember to periodically update this software to get the latest version.
+
+### Performance
+
+Test results based on testing data from project https://github.com/miloyip/nativejson-benchmark  
+Compared to the parser built into Dart VM.  
+
+```
+Parse 50 times: E:\prj\test_json\bin\data\canada.json
+Dart JSON: k: 1.33, 47.25 MB/s, 2271.61 ms (100.00%),
+PEG2 JSON: k: 1.00, 62.73 MB/s, 1711.14 ms (75.33%),
+
+Parse 50 times: E:\prj\test_json\bin\data\citm_catalog.json
+Dart JSON: k: 1.00, 99.82 MB/s, 825.00 ms (54.90%),
+PEG2 JSON: k: 1.82, 54.80 MB/s, 1502.71 ms (100.00%),
+
+Parse 50 times: E:\prj\test_json\bin\data\twitter.json
+Dart JSON: k: 1.00, 62.47 MB/s, 433.49 ms (62.96%),
+PEG2 JSON: k: 1.59, 39.33 MB/s, 688.53 ms (100.00%),
+
+OS: Microsoft Windows 7 Ultimate 6.1.7601
+Kernel: Windows_NT 6.1.7601
+Processor (4 core) Intel(R) Core(TM) i5-3450 CPU @ 3.10GHz
+```
 
 ### Grammar
 

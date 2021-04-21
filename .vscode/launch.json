@@ -26,8 +26,7 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "example/test_json.peg",
-                "--optimize"
+                "example/test_json.peg",                
             ]
         },
         {

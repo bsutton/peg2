@@ -28,7 +28,7 @@ class ParserClassGenerator extends ParserClassGeneratorBase {
       final block = CodeBlock();
       final allocator = VariableAllocator('\$');
       final generator = ExpressionsGenerator(
-          failures: failures!, members: members, optimize: options.optimize);
+          failures: failures!, members: members, options: options);
       final g = expression.accept(generator);
       g.allocator = allocator;
       g.generate(block);

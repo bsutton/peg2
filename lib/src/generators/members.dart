@@ -5,25 +5,23 @@ class Members {
 
   static const error = 'error';
 
-  static const fail = '_fail';
-
-  static const failPos = '_failPos';
+  static const fail = '_fail';  
 
   static const failStart = '_failStart';
 
   static const failures = '_failures';
 
+  static const getChar = '_getChar';
+
   static const length = '_length';
 
-  static const matchAny = '_matchAny';
-
-  static const matchChar = '_matchChar';
+  static const matchAny = '_matchAny';  
 
   static const matchRange = '_matchRange';
 
-  static const matchRanges = '_matchRanges';
+  static const matchRanges = '_matchRanges';  
 
-  static const matchString = '_matchString';
+  static const nextChar = '_nextChar';
 
   static const ok = 'ok';
 

@@ -1,13 +1,19 @@
 import 'package:code_builder/code_builder.dart';
 import 'package:code_builder/code_builder.dart' as _cb;
 
-Reference ref(String symbol, [String? url]) => refer(symbol, url);
-
 final false$ = literalFalse;
 
 final null$ = literalNull;
 
 final true$ = literalTrue;
+
+Expression binaryExpression(Expression left, String operation, Expression rigth) {
+  final code = <Code>[];
+  code.add(left.code);
+  code.add(Code(operation));
+  code.add(rigth.code);  
+  return codeToExpression(Block.of(code));
+}
 
 Expression callExpression(String name,
     [List<Expression> positionalArguments = const [],
@@ -16,8 +22,8 @@ Expression callExpression(String name,
   return ref(name).call(positionalArguments, namedArguments, typeArguments);
 }
 
-Expression literalList(Iterable values, [Reference? type]) {
-  return _cb.literalList(values, type);
+Expression codeToExpression(Code code) {
+  return CodeExpression(code);
 }
 
 Expression literal(Object literal) {
@@ -28,13 +34,8 @@ Expression literal(Object literal) {
   return _cb.literal(literal);
 }
 
-Expression methodCallExpression(Expression object, String property,
-    [List<Expression> positionalArguments = const [],
-    Map<String, Expression> namedArguments = const {},
-    List<Reference> typeArguments = const []]) {
-  return object
-      .property(property)
-      .call(positionalArguments, namedArguments, typeArguments);
+Expression literalList(Iterable values, [Reference? type]) {
+  return _cb.literalList(values, type);
 }
 
 Expression literalString(String value) {
@@ -51,6 +52,15 @@ Expression literalString(String value) {
   return CodeExpression(Code(value));
 }
 
+Expression methodCallExpression(Expression object, String property,
+    [List<Expression> positionalArguments = const [],
+    Map<String, Expression> namedArguments = const {},
+    List<Reference> typeArguments = const []]) {
+  return object
+      .property(property)
+      .call(positionalArguments, namedArguments, typeArguments);
+}
+
 Expression postfixExpression(Expression expression, String suffix) {
   final code = <Code>[];
   code.add(expression.code);
@@ -58,6 +68,8 @@ Expression postfixExpression(Expression expression, String suffix) {
   return codeToExpression(Block.of(code));
 }
 
-Expression codeToExpression(Code code) {
-  return CodeExpression(code);
+Reference ref(String symbol, [String? url]) => refer(symbol, url);
+
+Code stringToCode(String code) {
+  return Code(code);
 }

@@ -12,11 +12,11 @@ import 'package:code_builder/code_builder.dart'
 import 'package:peg2/src/generators/production_rule_name_generator.dart';
 
 import '../../grammar.dart';
+import '../helpers/expression_helper.dart';
+import '../helpers/type_helper.dart';
 import 'bit_flag_generator.dart';
 import 'class_members.dart';
-import '../helpers/expression_helper.dart';
 import 'members.dart';
-import '../helpers/type_helper.dart';
 
 abstract class ParserClassGeneratorBase {
   static const _methodParse = '''
@@ -88,48 +88,48 @@ abstract class ParserClassGeneratorBase {
       _failStart = _pos;
       _unterminated = null;
       {{CLEAR_FAILURES}}
-    }
-
-    if (_failPos == _length) {
-      _unterminated = name;
-    }
+    }   
 
     return true;
 ''';
 
   static const _methodGetChar = '''
     if (pos < _source.length) {
-      var ch = _source.codeUnitAt(pos);
-      if (ch >= 0xD800 && ch <= 0xDBFF) {
-        if (pos + 1 < _source.length) {
-          final ch2 = _source.codeUnitAt(pos + 1);
-          if (ch2 >= 0xDC00 && ch2 <= 0xDFFF) {
-            ch = ((ch - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
-          } else {
-            throw FormatException('Unpaired high surrogate', _source, pos);
-          }
-        } else {
-          throw FormatException('The source has been exhausted', _source, pos);
-        }
-      } else {
-        if (ch >= 0xDC00 && ch <= 0xDFFF) {
-          throw FormatException(
-              'UTF-16 surrogate values are illegal in UTF-32', _source, pos);
-        }
+      _ch = _source.codeUnitAt(pos);
+      if (_ch >= 0xD800) {
+        return _getChar32(pos);
       }
 
-      return ch;
+      return _ch;
     }
 
     return _eof;
 ''';
 
-  static const _methodMatchAny = '''
-    if (_ch == _eof) {
-      if (_failPos < _pos) {
-        _failPos = _pos;
+  static const _methodGetChar32 = '''
+    if (_ch >= 0xD800 && _ch <= 0xDBFF) {
+      if (pos + 1 < _source.length) {
+        final ch2 = _source.codeUnitAt(pos + 1);
+        if (ch2 >= 0xDC00 && ch2 <= 0xDFFF) {
+          _ch = ((_ch - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
+        } else {
+          throw FormatException('Unpaired high surrogate', _source, pos);
+        }
+      } else {
+        throw FormatException('The source has been exhausted', _source, pos);
       }
+    } else {
+      if (_ch >= 0xDC00 && _ch <= 0xDFFF) {
+        throw FormatException(
+            'UTF-16 surrogate values are illegal in UTF-32', _source, pos);
+      }
+    }
 
+    return _ch;
+''';
+
+  static const _methodMatchAny = '''
+    if (_ch == _eof) {      
       ok = false;
       return null;
     }
@@ -141,22 +141,6 @@ abstract class ParserClassGeneratorBase {
     return ch;
 ''';
 
-  static const _methodMatchChar = '''
-    if (ch != _ch) {
-      if (_failPos < _pos) {
-        _failPos = _pos;
-      }
-
-      ok = false;
-      return null;
-    }
-
-    _pos += _ch <= 0xffff ? 1 : 2;
-    _ch = _getChar(_pos);
-    ok = true;
-    return result;
-''';
-
   static const _methodMatchRange = '''
     if (_ch >= start && _ch <= end) {
       final ch = _ch;
@@ -164,10 +148,6 @@ abstract class ParserClassGeneratorBase {
       _ch = _getChar(_pos);
       ok = true;
       return ch;
-    }
-
-    if (_failPos < _pos) {
-      _failPos = _pos;
     }
 
     ok = false;
@@ -190,44 +170,28 @@ abstract class ParserClassGeneratorBase {
       }
     }
 
-    ok = false;
-    if (_failPos < _pos) {
-      _failPos = _pos;
-    }
-
+    ok = false;    
     return null;
 ''';
 
-  static const _methodMatchString = r'''  
-    var i = 0;
-    if (_ch == text.codeUnitAt(0)) {
-      i++;
-      if (_pos + text.length <= _source.length) {
-        for (; i < text.length; i++) {
-          if (text.codeUnitAt(i) != _source.codeUnitAt(_pos + i)) {
-            break;
-          }
-        }
+  static const _methodNextChar = '''
+    ok = true;
+    _pos += _ch <= 0xffff ? 1 : 2;
+    if (_pos < _source.length) {
+      _ch = _source.codeUnitAt(_pos);
+      if (_ch >= 0xD800) {
+        _ch = _getChar32(_pos);
       }
+
+      return value;
     }
 
-    ok = i == text.length;
-    if (ok) {
-      _pos = _pos + text.length;
-      _ch = _getChar(_pos);
-      return text;
-    } else {
-      final pos = _pos + i;
-      if (_failPos < pos) {
-        _failPos = pos;
-      }
-      return null;
-    }
+    _ch = _eof;
+    return value;
 ''';
 
   static const _methodReset = '''
-    error = null;
-    _failPos = 0;
+    error = null;    
     _failStart = 0;
     {{CLEAR_FAILURES}}
     _length = _source.length;
@@ -347,17 +311,6 @@ abstract class ParserClassGeneratorBase {
               b.name = name;
               b.type = ref('int');
               b.assignment = literal(0).code;
-            }));
-
-    _addField(
-        builder,
-        FieldModifier.var$,
-        Members.failPos,
-        (b, modifier, name) => Field((b) {
-              b.modifier = modifier;
-              b.name = name;
-              b.type = ref('int');
-              b.assignment = literal(-1).code;
             }));
 
     _addField(
@@ -505,6 +458,14 @@ abstract class ParserClassGeneratorBase {
     _addMethod(builder, name, returns, body,
         inline: true, parameters: parameters);
 
+    returns = ref('int');
+    name = '_getChar32';
+    parameters = <String, Reference>{};
+    parameters['pos'] = ref('int');
+    body = Code(_methodGetChar32);
+    _addMethod(builder, name, returns, body,
+        inline: true, parameters: parameters);
+
     returns = ref('int?');
     name = Members.matchAny;
     body = Code(_methodMatchAny);
@@ -515,17 +476,6 @@ abstract class ParserClassGeneratorBase {
       body,
       inline: true,
     );
-
-    returns = ref('T?');
-    name = Members.matchChar;
-    body = Code(_methodMatchChar);
-    parameters = {};
-    parameters['ch'] = ref('int');
-    parameters['result'] = ref('T?');
-    types = [];
-    types.add(ref('T'));
-    _addMethod(builder, name, returns, body,
-        inline: true, parameters: parameters, types: types);
 
     returns = ref('int?');
     name = Members.matchRange;
@@ -544,13 +494,15 @@ abstract class ParserClassGeneratorBase {
     _addMethod(builder, name, returns, body,
         inline: true, parameters: parameters);
 
-    returns = ref('String?');
-    name = Members.matchString;
-    body = Code(_methodMatchString);
+    returns = ref('T');
+    name = Members.nextChar;
+    body = Code(_methodNextChar);
     parameters = {};
-    parameters['text'] = ref('String');
+    parameters['value'] = ref('T');
+    types = [];
+    types.add(ref('T'));
     _addMethod(builder, name, returns, body,
-        inline: true, parameters: parameters);
+        inline: true, parameters: parameters, types: types);
 
     returns = ref('void');
     name = '_reset';

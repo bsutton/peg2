@@ -1,3 +1,8 @@
+## 0.2.9
+
+- Fixed bug in error tracking system 
+- Improvements to code generation algorithms
+
 ## 0.2.8
 
 - Fixed a bug when initializing a start rule in case of an error in the grammar when unused rules are found

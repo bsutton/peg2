@@ -15,7 +15,7 @@ class ProductionRule {
 
   final ProductionRuleKind kind;
 
-  int? id;
+  int id = 0;
 
   final Set<SymbolExpression> memoizationRequests = {};
 

@@ -83,8 +83,6 @@ class Peg2Parser {
 
   int _ch = 0;
 
-  int _failPos = -1;
-
   int _failStart = -1;
 
   int _failures0 = 0;
@@ -169,48 +167,49 @@ class Peg2Parser {
       _failures0 = 0;
     }
 
-    if (_failPos == _length) {
-      _unterminated = name;
-    }
-
     return true;
   }
 
   @pragma('vm:prefer-inline')
   int _getChar(int pos) {
     if (pos < _source.length) {
-      var ch = _source.codeUnitAt(pos);
-      if (ch >= 0xD800 && ch <= 0xDBFF) {
-        if (pos + 1 < _source.length) {
-          final ch2 = _source.codeUnitAt(pos + 1);
-          if (ch2 >= 0xDC00 && ch2 <= 0xDFFF) {
-            ch = ((ch - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
-          } else {
-            throw FormatException('Unpaired high surrogate', _source, pos);
-          }
-        } else {
-          throw FormatException('The source has been exhausted', _source, pos);
-        }
-      } else {
-        if (ch >= 0xDC00 && ch <= 0xDFFF) {
-          throw FormatException(
-              'UTF-16 surrogate values are illegal in UTF-32', _source, pos);
-        }
+      _ch = _source.codeUnitAt(pos);
+      if (_ch >= 0xD800) {
+        return _getChar32(pos);
       }
 
-      return ch;
+      return _ch;
     }
 
     return _eof;
   }
 
   @pragma('vm:prefer-inline')
+  int _getChar32(int pos) {
+    if (_ch >= 0xD800 && _ch <= 0xDBFF) {
+      if (pos + 1 < _source.length) {
+        final ch2 = _source.codeUnitAt(pos + 1);
+        if (ch2 >= 0xDC00 && ch2 <= 0xDFFF) {
+          _ch = ((_ch - 0xD800) << 10) + (ch2 - 0xDC00) + 0x10000;
+        } else {
+          throw FormatException('Unpaired high surrogate', _source, pos);
+        }
+      } else {
+        throw FormatException('The source has been exhausted', _source, pos);
+      }
+    } else {
+      if (_ch >= 0xDC00 && _ch <= 0xDFFF) {
+        throw FormatException(
+            'UTF-16 surrogate values are illegal in UTF-32', _source, pos);
+      }
+    }
+
+    return _ch;
+  }
+
+  @pragma('vm:prefer-inline')
   int? _matchAny() {
     if (_ch == _eof) {
-      if (_failPos < _pos) {
-        _failPos = _pos;
-      }
-
       ok = false;
       return null;
     }
@@ -223,23 +222,6 @@ class Peg2Parser {
   }
 
   @pragma('vm:prefer-inline')
-  T? _matchChar<T>(int ch, T? result) {
-    if (ch != _ch) {
-      if (_failPos < _pos) {
-        _failPos = _pos;
-      }
-
-      ok = false;
-      return null;
-    }
-
-    _pos += _ch <= 0xffff ? 1 : 2;
-    _ch = _getChar(_pos);
-    ok = true;
-    return result;
-  }
-
-  @pragma('vm:prefer-inline')
   int? _matchRange(int start, int end) {
     if (_ch >= start && _ch <= end) {
       final ch = _ch;
@@ -247,10 +229,6 @@ class Peg2Parser {
       _ch = _getChar(_pos);
       ok = true;
       return ch;
-    }
-
-    if (_failPos < _pos) {
-      _failPos = _pos;
     }
 
     ok = false;
@@ -275,51 +253,42 @@ class Peg2Parser {
     }
 
     ok = false;
-    if (_failPos < _pos) {
-      _failPos = _pos;
-    }
-
     return null;
   }
 
   @pragma('vm:prefer-inline')
-  String? _matchString(String text) {
-    var i = 0;
-    if (_ch == text.codeUnitAt(0)) {
-      i++;
-      if (_pos + text.length <= _source.length) {
-        for (; i < text.length; i++) {
-          if (text.codeUnitAt(i) != _source.codeUnitAt(_pos + i)) {
-            break;
-          }
-        }
+  T _nextChar<T>(T value) {
+    ok = true;
+    _pos += _ch <= 0xffff ? 1 : 2;
+    if (_pos < _source.length) {
+      _ch = _source.codeUnitAt(_pos);
+      if (_ch >= 0xD800) {
+        _ch = _getChar32(_pos);
       }
+
+      return value;
     }
 
-    ok = i == text.length;
-    if (ok) {
-      _pos = _pos + text.length;
-      _ch = _getChar(_pos);
-      return text;
-    } else {
-      final pos = _pos + i;
-      if (_failPos < pos) {
-        _failPos = pos;
-      }
-      return null;
-    }
+    _ch = _eof;
+    return value;
   }
 
   dynamic _parse$$ACTION_BODY() {
     final $0 = _ch;
     final $1 = _pos;
-    _matchChar(123, '{');
+    ok = false;
+    if (_ch == 123) {
+      _nextChar('{');
+    }
     if (ok) {
       do {
         _parse$$ACTION_BODY();
       } while (ok);
       ok = true;
-      _matchChar(125, '}');
+      ok = false;
+      if (_ch == 125) {
+        _nextChar('}');
+      }
     }
     if (ok) {
       return null;
@@ -338,16 +307,17 @@ class Peg2Parser {
 
   @pragma('vm:prefer-inline')
   String? _parse$$COMMENT() {
-    _matchChar(35, '#');
+    ok = false;
+    if (_ch == 35) {
+      _nextChar('#');
+    }
     if (ok) {
       do {
         final $0 = _ch;
         final $1 = _pos;
-        final $2 = _failPos;
         _parse$$EOL();
         _ch = $0;
         _pos = $1;
-        _failPos = $2;
         ok = !ok;
         if (ok) {
           _matchAny();
@@ -362,12 +332,17 @@ class Peg2Parser {
   }
 
   dynamic _parse$$EOL() {
-    _matchString('\r\n');
+    ok = _source.startsWith('\r\n', _pos);
+    if (ok) {
+      _ch = _getChar(_pos += 2);
+    }
     if (ok) {
       return null;
     }
-    const $0 = [10, 10, 13, 13];
-    _matchRanges($0);
+    ok = false;
+    if (_ch == 10 || _ch == 13) {
+      _nextChar(_ch);
+    }
     if (ok) {
       return null;
     }
@@ -388,16 +363,26 @@ class Peg2Parser {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
-    _matchChar(92, 92);
+    ok = false;
+    if (_ch == 92) {
+      _nextChar(_ch);
+    }
     if (ok) {
-      _matchChar(117, 'u');
+      ok = false;
+      if (_ch == 117) {
+        _nextChar('u');
+      }
       if (ok) {
         String? $3;
         final $4 = _pos;
         var $5 = 0;
         do {
-          const $6 = [48, 57, 65, 70, 97, 102];
-          _matchRanges($6);
+          ok = false;
+          if (_ch >= 48 && _ch <= 57 ||
+              _ch >= 65 && _ch <= 70 ||
+              _ch >= 97 && _ch <= 102) {
+            _nextChar(_ch);
+          }
           $5++;
         } while (ok);
         ok = $5 != 1;
@@ -444,8 +429,10 @@ class Peg2Parser {
     if (ok) {
       return null;
     }
-    const $0 = [48, 57, 95, 95];
-    _matchRanges($0);
+    ok = false;
+    if (_ch >= 48 && _ch <= 57 || _ch == 95) {
+      _nextChar(_ch);
+    }
     if (ok) {
       return null;
     }
@@ -453,8 +440,10 @@ class Peg2Parser {
   }
 
   int? _parse$$IDENT_START() {
-    const $0 = [65, 90, 97, 122];
-    _matchRanges($0);
+    ok = false;
+    if (_ch >= 65 && _ch <= 90 || _ch >= 97 && _ch <= 122) {
+      _nextChar(_ch);
+    }
 
     return null;
   }
@@ -464,10 +453,16 @@ class Peg2Parser {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
-    _matchChar(92, '\\');
+    ok = false;
+    if (_ch == 92) {
+      _nextChar('\\');
+    }
     if (ok) {
-      const $4 = [34, 34, 92, 92, 110, 110, 114, 114, 116, 116];
-      final $3 = _matchRanges($4);
+      int? $3;
+      ok = false;
+      if (_ch == 34 || _ch == 92 || _ch == 110 || _ch == 114 || _ch == 116) {
+        $3 = _nextChar(_ch);
+      }
       if (ok) {
         final c = $3!;
         int? $$;
@@ -487,13 +482,11 @@ class Peg2Parser {
     }
     ok = !_source.startsWith('\\', _pos);
     if (ok) {
-      final $5 = _ch;
-      final $6 = _pos;
-      final $7 = _failPos;
+      final $4 = _ch;
+      final $5 = _pos;
       _parse$$EOL();
-      _ch = $5;
-      _pos = $6;
-      _failPos = $7;
+      _ch = $4;
+      _pos = $5;
       ok = !ok;
       if (ok) {
         $0 = _matchAny();
@@ -516,7 +509,10 @@ class Peg2Parser {
     final $2 = _pos;
     final $3 = _parse$$RANGE_CHAR();
     if (ok) {
-      _matchChar(45, '-');
+      ok = false;
+      if (_ch == 45) {
+        _nextChar('-');
+      }
       if (ok) {
         final $4 = _parse$$RANGE_CHAR();
         if (ok) {
@@ -550,10 +546,16 @@ class Peg2Parser {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
-    _matchChar(92, '\\');
+    ok = false;
+    if (_ch == 92) {
+      _nextChar('\\');
+    }
     if (ok) {
-      const $4 = [92, 93, 110, 110, 114, 114, 116, 116];
-      final $3 = _matchRanges($4);
+      int? $3;
+      ok = false;
+      if (_ch >= 92 && _ch <= 93 || _ch == 110 || _ch == 114 || _ch == 116) {
+        $3 = _nextChar(_ch);
+      }
       if (ok) {
         final c = $3!;
         int? $$;
@@ -571,18 +573,17 @@ class Peg2Parser {
     if (ok) {
       return $0;
     }
-    final $5 = _failPos;
-    _matchRange(92, 93);
-    _failPos = $5;
+    ok = false;
+    if (_ch >= 92 && _ch <= 93) {
+      _nextChar(_ch);
+    }
     ok = !ok;
     if (ok) {
-      final $6 = _ch;
-      final $7 = _pos;
-      final $8 = _failPos;
+      final $4 = _ch;
+      final $5 = _pos;
       _parse$$EOL();
-      _ch = $6;
-      _pos = $7;
-      _failPos = $8;
+      _ch = $4;
+      _pos = $5;
       ok = !ok;
       if (ok) {
         $0 = _matchAny();
@@ -600,8 +601,10 @@ class Peg2Parser {
 
   @pragma('vm:prefer-inline')
   dynamic _parse$$SPACE() {
-    const $0 = [9, 9, 32, 32];
-    _matchRanges($0);
+    ok = false;
+    if (_ch == 9 || _ch == 32) {
+      _nextChar(_ch);
+    }
     if (ok) {
       return null;
     }
@@ -635,17 +638,25 @@ class Peg2Parser {
   int? _parse$$TERMINAL_CHAR() {
     final $0 = _ch;
     final $1 = _pos;
-    _matchString('//');
+    ok = _source.startsWith('//', _pos);
     if (ok) {
-      _matchChar(39, 39);
+      _ch = _getChar(_pos += 2);
+    }
+    if (ok) {
+      ok = false;
+      if (_ch == 39) {
+        _nextChar(_ch);
+      }
     }
     if (ok) {
       return null;
     }
     _ch = $0;
     _pos = $1;
-    const $2 = [32, 38, 40, 126];
-    _matchRanges($2);
+    ok = false;
+    if (_ch >= 32 && _ch <= 38 || _ch >= 40 && _ch <= 126) {
+      _nextChar(_ch);
+    }
     if (ok) {
       return null;
     }
@@ -1390,198 +1401,242 @@ class Peg2Parser {
 
   String? _parse_$Ampersand() {
     String? $0;
-    _failPos = _pos;
-    $0 = _matchChar(38, '&');
+    ok = false;
+    if (_ch == 38) {
+      $0 = _nextChar('&');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'&\'')) {}
-      _failures0 |= 0x100;
+      if (_fail('\'&\'')) {
+        _failures0 |= 0x100;
+      }
     }
     return $0;
   }
 
   String? _parse_$Asterisk() {
     String? $0;
-    _failPos = _pos;
-    $0 = _matchChar(42, '*');
+    ok = false;
+    if (_ch == 42) {
+      $0 = _nextChar('*');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'*\'')) {}
-      _failures0 |= 0x1000000;
+      if (_fail('\'*\'')) {
+        _failures0 |= 0x1000000;
+      }
     }
     return $0;
   }
 
   @pragma('vm:prefer-inline')
   String? _parse_$Comma() {
-    _failPos = _pos;
-    _matchChar(44, ',');
+    ok = false;
+    if (_ch == 44) {
+      _nextChar(',');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\',\'')) {}
-      _failures0 |= 0x200000;
+      if (_fail('\',\'')) {
+        _failures0 |= 0x200000;
+      }
     }
     return null;
   }
 
   String? _parse_$EqualSign() {
-    _failPos = _pos;
-    _matchChar(61, '=');
+    ok = false;
+    if (_ch == 61) {
+      _nextChar('=');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'=\'')) {}
-      _failures0 |= 0x8000;
+      if (_fail('\'=\'')) {
+        _failures0 |= 0x8000;
+      }
     }
     return null;
   }
 
   String? _parse_$ExclamationMark() {
     String? $0;
-    _failPos = _pos;
-    $0 = _matchChar(33, '!');
+    ok = false;
+    if (_ch == 33) {
+      $0 = _nextChar('!');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'!\'')) {}
-      _failures0 |= 0x40000;
+      if (_fail('\'!\'')) {
+        _failures0 |= 0x40000;
+      }
     }
     return $0;
   }
 
   String? _parse_$GreaterThanSign() {
-    _failPos = _pos;
-    _matchChar(62, '>');
+    ok = false;
+    if (_ch == 62) {
+      _nextChar('>');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'>\'')) {}
-      _failures0 |= 0x4000000;
+      if (_fail('\'>\'')) {
+        _failures0 |= 0x4000000;
+      }
     }
     return null;
   }
 
   String? _parse_$LeftParenthesis() {
-    _failPos = _pos;
-    _matchChar(40, '(');
+    ok = false;
+    if (_ch == 40) {
+      _nextChar('(');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'(\'')) {}
-      _failures0 |= 0x80000;
+      if (_fail('\'(\'')) {
+        _failures0 |= 0x80000;
+      }
     }
     return null;
   }
 
   String? _parse_$LessThanSign() {
-    _failPos = _pos;
-    _matchChar(60, '<');
+    ok = false;
+    if (_ch == 60) {
+      _nextChar('<');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'<\'')) {}
-      _failures0 |= 0x2000000;
+      if (_fail('\'<\'')) {
+        _failures0 |= 0x2000000;
+      }
     }
     return null;
   }
 
   String? _parse_$Period() {
-    _failPos = _pos;
-    _matchChar(46, '.');
+    ok = false;
+    if (_ch == 46) {
+      _nextChar('.');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'.\'')) {}
-      _failures0 |= 0x800;
+      if (_fail('\'.\'')) {
+        _failures0 |= 0x800;
+      }
     }
     return null;
   }
 
   String? _parse_$PlusSign() {
     String? $0;
-    _failPos = _pos;
-    $0 = _matchChar(43, '+');
+    ok = false;
+    if (_ch == 43) {
+      $0 = _nextChar('+');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'+\'')) {}
-      _failures0 |= 0x100000;
+      if (_fail('\'+\'')) {
+        _failures0 |= 0x100000;
+      }
     }
     return $0;
   }
 
   String? _parse_$QuestionMark() {
     String? $0;
-    _failPos = _pos;
-    $0 = _matchChar(63, '?');
+    ok = false;
+    if (_ch == 63) {
+      $0 = _nextChar('?');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'?\'')) {}
-      _failures0 |= 0x400000;
+      if (_fail('\'?\'')) {
+        _failures0 |= 0x400000;
+      }
     }
     return $0;
   }
 
   String? _parse_$RightParenthesis() {
-    _failPos = _pos;
-    _matchChar(41, ')');
+    ok = false;
+    if (_ch == 41) {
+      _nextChar(')');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\')\'')) {}
-      _failures0 |= 0x400;
+      if (_fail('\')\'')) {
+        _failures0 |= 0x400;
+      }
     }
     return null;
   }
 
   String? _parse_$Semicolon() {
-    _failPos = _pos;
-    _matchChar(59, ';');
+    ok = false;
+    if (_ch == 59) {
+      _nextChar(';');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\';\'')) {}
-      _failures0 |= 0x40;
+      if (_fail('\';\'')) {
+        _failures0 |= 0x40;
+      }
     }
     return null;
   }
 
   String? _parse_$Slash() {
-    _failPos = _pos;
-    _matchChar(47, '/');
+    ok = false;
+    if (_ch == 47) {
+      _nextChar('/');
+    }
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'/\'')) {}
-      _failures0 |= 0x800000;
+      if (_fail('\'/\'')) {
+        _failures0 |= 0x800000;
+      }
     }
     return null;
   }
 
   String? _parse_action() {
     String? $0;
-    _failPos = _pos;
     final $1 = _ch;
     final $2 = _pos;
-    _matchChar(123, '{');
+    ok = false;
+    if (_ch == 123) {
+      _nextChar('{');
+    }
     if (ok) {
       final $3 = _pos;
       do {
@@ -1592,7 +1647,10 @@ class Peg2Parser {
       if (ok) {
         $0 = _source.substring($3, _pos);
       }
-      _matchChar(125, '}');
+      ok = false;
+      if (_ch == 125) {
+        _nextChar('}');
+      }
       if (ok) {
         _parse$$SPACING();
         final b = $0!;
@@ -1602,8 +1660,9 @@ class Peg2Parser {
     if (!ok) {
       _ch = $1;
       _pos = $2;
-      if (_fail('\'action\'')) {}
-      _failures0 |= 0x80;
+      if (_fail('\'action\'')) {
+        _failures0 |= 0x80;
+      }
     }
     return $0;
   }
@@ -1611,10 +1670,12 @@ class Peg2Parser {
   @pragma('vm:prefer-inline')
   Expression? _parse_character_class() {
     Expression? $0;
-    _failPos = _pos;
     final $1 = _ch;
     final $2 = _pos;
-    _matchChar(91, '[');
+    ok = false;
+    if (_ch == 91) {
+      _nextChar('[');
+    }
     if (ok) {
       List<List<int>>? $3;
       final $4 = <List<int>>[];
@@ -1638,7 +1699,10 @@ class Peg2Parser {
         ok = true;
       }
       if (ok) {
-        _matchChar(93, ']');
+        ok = false;
+        if (_ch == 93) {
+          _nextChar(']');
+        }
         if (ok) {
           _parse$$SPACING();
           final r = $3!;
@@ -1651,19 +1715,20 @@ class Peg2Parser {
     if (!ok) {
       _ch = $1;
       _pos = $2;
-      if (_fail('\'character class\'')) {}
-      _failures0 |= 0x200;
+      if (_fail('\'character class\'')) {
+        _failures0 |= 0x200;
+      }
     }
     return $0;
   }
 
   @pragma('vm:prefer-inline')
   dynamic _parse_end_of_file() {
-    _failPos = _pos;
     ok = _ch == 1114112;
     if (!ok) {
-      if (_fail('\'end of file\'')) {}
-      _failures0 |= 0x1000;
+      if (_fail('\'end of file\'')) {
+        _failures0 |= 0x1000;
+      }
     }
     return null;
   }
@@ -1671,10 +1736,12 @@ class Peg2Parser {
   @pragma('vm:prefer-inline')
   String? _parse_globals() {
     String? $0;
-    _failPos = _pos;
     final $1 = _ch;
     final $2 = _pos;
-    _matchString('%{');
+    ok = _source.startsWith('%{', _pos);
+    if (ok) {
+      _ch = _getChar(_pos += 2);
+    }
     if (ok) {
       final $3 = _pos;
       do {
@@ -1685,7 +1752,10 @@ class Peg2Parser {
       if (ok) {
         $0 = _source.substring($3, _pos);
       }
-      _matchString('}%');
+      ok = _source.startsWith('}%', _pos);
+      if (ok) {
+        _ch = _getChar(_pos += 2);
+      }
       if (ok) {
         _parse$$SPACING();
         final b = $0!;
@@ -1695,8 +1765,9 @@ class Peg2Parser {
     if (!ok) {
       _ch = $1;
       _pos = $2;
-      if (_fail('\'globals\'')) {}
-      _failures0 |= 0x2000;
+      if (_fail('\'globals\'')) {
+        _failures0 |= 0x2000;
+      }
     }
     return $0;
   }
@@ -1711,10 +1782,12 @@ class Peg2Parser {
   @pragma('vm:prefer-inline')
   String? _parse_library_prefix() {
     String? $0;
-    _failPos = _pos;
     final $1 = _pos;
     final $2 = _ch;
-    _matchChar(95, 95);
+    ok = false;
+    if (_ch == 95) {
+      _nextChar(_ch);
+    }
     ok = true;
     _parse$$IDENTIFIER();
     if (!ok) {
@@ -1725,8 +1798,9 @@ class Peg2Parser {
     }
 
     if (!ok) {
-      if (_fail('\'library prefix\'')) {}
-      _failures0 |= 0x20;
+      if (_fail('\'library prefix\'')) {
+        _failures0 |= 0x20;
+      }
     }
     return $0;
   }
@@ -1734,10 +1808,12 @@ class Peg2Parser {
   @pragma('vm:prefer-inline')
   Expression? _parse_literal() {
     Expression? $0;
-    _failPos = _pos;
     final $1 = _ch;
     final $2 = _pos;
-    _matchChar(34, 34);
+    ok = false;
+    if (_ch == 34) {
+      _nextChar(_ch);
+    }
     if (ok) {
       List<int>? $3;
       final $4 = <int>[];
@@ -1759,7 +1835,10 @@ class Peg2Parser {
       if (ok = true) {
         $3 = $4;
       }
-      _matchChar(34, 34);
+      ok = false;
+      if (_ch == 34) {
+        _nextChar(_ch);
+      }
       if (ok) {
         _parse$$SPACING();
         final c = $3!;
@@ -1771,8 +1850,9 @@ class Peg2Parser {
     if (!ok) {
       _ch = $1;
       _pos = $2;
-      if (_fail('\'literal\'')) {}
-      _failures0 |= 0x10000;
+      if (_fail('\'literal\'')) {
+        _failures0 |= 0x10000;
+      }
     }
     return $0;
   }
@@ -1780,10 +1860,12 @@ class Peg2Parser {
   @pragma('vm:prefer-inline')
   String? _parse_members() {
     String? $0;
-    _failPos = _pos;
     final $1 = _ch;
     final $2 = _pos;
-    _matchChar(123, '{');
+    ok = false;
+    if (_ch == 123) {
+      _nextChar('{');
+    }
     if (ok) {
       final $3 = _pos;
       do {
@@ -1794,7 +1876,10 @@ class Peg2Parser {
       if (ok) {
         $0 = _source.substring($3, _pos);
       }
-      _matchChar(125, '}');
+      ok = false;
+      if (_ch == 125) {
+        _nextChar('}');
+      }
       if (ok) {
         _parse$$SPACING();
         final b = $0!;
@@ -1804,50 +1889,56 @@ class Peg2Parser {
     if (!ok) {
       _ch = $1;
       _pos = $2;
-      if (_fail('\'members\'')) {}
-      _failures0 |= 0x20000;
+      if (_fail('\'members\'')) {
+        _failures0 |= 0x20000;
+      }
     }
     return $0;
   }
 
   String? _parse_non_terminal_name() {
     String? $0;
-    _failPos = _pos;
     $0 = _parse$$IDENTIFIER();
     if (ok) {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'non terminal name\'')) {}
-      _failures0 |= 0x1;
+      if (_fail('\'non terminal name\'')) {
+        _failures0 |= 0x1;
+      }
     }
     return $0;
   }
 
   String? _parse_semantic_value() {
     String? $0;
-    _failPos = _pos;
     final $1 = _ch;
     final $2 = _pos;
     $0 = _parse$$IDENTIFIER();
     if (ok) {
-      _matchChar(58, ':');
+      ok = false;
+      if (_ch == 58) {
+        _nextChar(':');
+      }
     }
     if (!ok) {
       _ch = $1;
       _pos = $2;
-      if (_fail('\'semantic value\'')) {}
-      _failures0 |= 0x8;
+      if (_fail('\'semantic value\'')) {
+        _failures0 |= 0x8;
+      }
     }
     return $0;
   }
 
   String? _parse_sub_terminal_name() {
     String? $0;
-    _failPos = _pos;
     final $1 = _pos;
     final $2 = _ch;
-    _matchChar(64, 64);
+    ok = false;
+    if (_ch == 64) {
+      _nextChar(_ch);
+    }
     if (ok) {
       _parse$$IDENTIFIER();
     }
@@ -1861,18 +1952,21 @@ class Peg2Parser {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'sub terminal name\'')) {}
-      _failures0 |= 0x4;
+      if (_fail('\'sub terminal name\'')) {
+        _failures0 |= 0x4;
+      }
     }
     return $0;
   }
 
   String? _parse_terminal_name() {
     String? $0;
-    _failPos = _pos;
     final $1 = _pos;
     final $2 = _ch;
-    _matchChar(39, 39);
+    ok = false;
+    if (_ch == 39) {
+      _nextChar(_ch);
+    }
     if (ok) {
       var $3 = 0;
       do {
@@ -1885,7 +1979,10 @@ class Peg2Parser {
       } while (ok);
       ok = $3 != 1;
       if (ok) {
-        _matchChar(39, 39);
+        ok = false;
+        if (_ch == 39) {
+          _nextChar(_ch);
+        }
       }
     }
     if (!ok) {
@@ -1898,19 +1995,22 @@ class Peg2Parser {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'terminal name\'')) {}
-      _failures0 |= 0x2;
+      if (_fail('\'terminal name\'')) {
+        _failures0 |= 0x2;
+      }
     }
     return $0;
   }
 
   String? _parse_type_name() {
     String? $0;
-    _failPos = _pos;
     final $1 = _pos;
     _parse$$IDENTIFIER();
     if (ok) {
-      _matchChar(63, 63);
+      ok = false;
+      if (_ch == 63) {
+        _nextChar(_ch);
+      }
       ok = true;
     }
 
@@ -1921,15 +2021,15 @@ class Peg2Parser {
       _parse$$SPACING();
     }
     if (!ok) {
-      if (_fail('\'type name\'')) {}
-      _failures0 |= 0x10;
+      if (_fail('\'type name\'')) {
+        _failures0 |= 0x10;
+      }
     }
     return $0;
   }
 
   void _reset() {
     error = null;
-    _failPos = 0;
     _failStart = 0;
     _failures0 = 0;
     _length = _source.length;
