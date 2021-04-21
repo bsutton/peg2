@@ -1,5 +1,3 @@
-part of '../../utils.dart';
-
 class VariableAllocator {
   final String prefix;
 
@@ -7,7 +5,7 @@ class VariableAllocator {
 
   int _index = 0;
 
-  String alloc() {
+  String allocate() {
     final result = '$prefix${_index++}';
     return result;
   }

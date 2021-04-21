@@ -1,4 +1,3 @@
-// @dart = 2.10
 part of '../../general_parser_generator.dart';
 
 class ParserGenerator extends ParserGeneratorBase {

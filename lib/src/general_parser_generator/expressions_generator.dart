@@ -1,123 +1,107 @@
-// @dart = 2.10
 part of '../../general_parser_generator.dart';
 
 class ExpressionsGenerator extends ExpressionsGeneratorBase {
-  String choiceVariable;
-
   ExpressionsGenerator(
-      {@required VariableAllocator allocator,
-      @required List<Code> code,
-      @required BitFlagGenerator failures,
-      @required ClassMembers members,
-      @required bool optimize})
-      : super(
-            allocator: allocator,
-            code: code,
-            failures: failures,
-            members: members,
-            optimize: optimize);
+      {required BitFlagGenerator failures,
+      required ClassMembers members,
+      required bool optimize})
+      : super(failures: failures, members: members, optimize: optimize);
 
   @override
-  void visitOrderedChoice(OrderedChoiceExpression node) {
-    final variable = allocNodeVar(node);
-    choiceVariable = variable;
-    final rule = node.rule;
-    final level = node.level;
-    final expressions = node.expressions;
-    void failure(List<Code> code) {
+  ExpressionGenerator visitOrderedChoice(OrderedChoiceExpression node) {
+    final g = ExpressionGenerator(node);
+    g.generate = (block) {
+      g.declareVariable(block);
+      final rule = node.rule!;
+      final level = node.level;
+      final expressions = node.expressions;
+      void failure(CodeBlock block) {
+        if (rule.kind == ProductionRuleKind.terminal &&
+            level == 0 &&
+            !node.isOptional) {
+          final args = [literalString(rule.name)];
+          final control = callExpression(Members.fail, args);
+          block.if$(control, (code) {
+            final terminalId = rule.terminalId;
+            final setFlag = failures.generateSet(true, [terminalId]);
+            block.addSourceCode(setFlag.join('\n'));
+          });
+        }
+      }
+
       if (rule.kind == ProductionRuleKind.terminal &&
           level == 0 &&
           !node.isOptional) {
-        final arguments = <_cb.Expression>[];
-        arguments.add(literalString(rule.name));
-        final condition = call$(Members.fail, arguments);
-        code <<
-            if$(condition, (code) {
-              final terminalId = rule.terminalId;
-              final setFlag = failures.generateSet(true, [terminalId]);
-              code << Code(setFlag.join('\n'));
-            });
+        block.assign(Members.failPos, ref(Members.pos));
       }
-    }
 
-    if (rule.kind == ProductionRuleKind.terminal &&
-        level == 0 &&
-        !node.isOptional) {
-      code << assign(Members.failPos, refer(Members.pos));
-    }
+      if (expressions.length > 1) {
+        _generateOrderedChoiceMultiple(node, block, g, failure);
+      } else {
+        _generateOrderedChoiceSingle(node, block, g, failure);
+      }
+    };
 
-    if (variable != null) {
-      final returnType = Utils.getNullableType(node.resultType);
-      code << declareVariable(refer(returnType), variable);
-    }
-
-    if (expressions.length > 1) {
-      _generateOrderedChoice(node, variable, failure);
-    } else {
-      _generateOrderedChoiceSingle(node, variable, failure);
-    }
-
-    childVariable = variable;
+    return g;
   }
 
   @override
-  void visitSequence(SequenceExpression node) {
-    final variable = choiceVariable;
-    final startCharacters = node.startCharacters;
-    final localVariables = <String>[];
-    final semanticVariables = <String>[];
-    final types = <String>[];
-    final code$ = code;
-    void generate() {
-      generateSequence(node, variable, 0,
-          localVariables: localVariables,
-          semanticVariables: semanticVariables,
-          types: types);
-    }
-
-    final rule = node.rule;
-    var canPredict = false;
-    if (optimize) {
-      if (rule.isTerminal || rule.isSubterminal && optimize) {
-        final groups = startCharacters.groups;
-        if (groups.length == 1) {
-          canPredict = true;
-        }
-      }
-    }
-
-    if (canPredict) {
-      final groups = startCharacters.groups;
-      final group = groups.first;
-      final start = group.start;
-      final end = group.end;
-      _cb.Expression condition;
-      if (start == end) {
-        condition = refer(Members.ch).equalTo(literal(start));
-      } else {
-        condition = refer(Members.ch)
-            .greaterOrEqualTo(literal(start))
-            .and(refer(Members.ch).lessOrEqualTo(literal(end)));
-      }
-
-      code << assign(Members.ok, literalFalse);
-      code <<
-          if$(condition, (code) {
-            runBlock(code, generate);
-          });
-    } else {
-      runBlock(code, generate);
-    }
-
-    code = code$;
-    childVariable = variable;
+  ExpressionGenerator visitSequence(SequenceExpression node) {
+    return generateSequence(node, 0);
   }
 
-  void _generateOrderedChoice(OrderedChoiceExpression node, String variable,
-      void Function(List<Code>) failure) {
+  void _generateOrderedChoiceMultiple(
+      OrderedChoiceExpression node,
+      CodeBlock block,
+      ExpressionGenerator g,
+      void Function(CodeBlock block) failure) {
     final expressions = node.expressions;
+    final isTopLevel = node.level == 0;
     final charChanges = <bool>[];
     final posChanges = <bool>[];
+    void addReturn(CodeBlock block) {
+      if (g.variable == null) {
+        block.addStatement(null$.returned);
+      } else {
+        block.addStatement(ref(g.variable!).returned);
+      }
+    }
+
+    void addBreakOrReturn(CodeBlock block) {
+      if (isTopLevel) {
+        addReturn(block);
+      } else {
+        block.break$();
+      }
+    }
+
+    void success(CodeBlock block) {
+      addBreakOrReturn(block);
+    }
+
+    void body(CodeBlock block) {
+      for (var i = 0; i < expressions.length; i++) {
+        final child = expressions[i];
+        final g1 = acceptChild(child, g);
+        g1.variable = g.variable;
+        g1.isVariableDeclared = g.isVariableDeclared;
+        g1.addVariables(g);
+        g1.generate(block);
+        generatePostCode(g1, block, success, null);
+        if (charChanges[i]) {
+          g.restore(block, Members.ch);
+        }
+
+        if (posChanges[i]) {
+          g.restore(block, Members.pos);
+        }
+      }
+
+      if (!isTopLevel) {
+        block.break$();
+      }
+    }
+
     for (final child in expressions) {
       final willChangeChar = willExpressionChangeCharOnFailure(child, {});
       final willChangePos = willSequenceChangePosOnFailure(child);
@@ -125,95 +109,59 @@ class ExpressionsGenerator extends ExpressionsGeneratorBase {
       posChanges.add(willChangePos);
     }
 
-    final storage = <String, String>{};
     if (charChanges.where((e) => e).isNotEmpty) {
-      addStoreVar(code, Members.ch, storage);
+      g.store(block, Members.ch);
     }
 
     if (posChanges.where((e) => e).isNotEmpty) {
-      addStoreVar(code, Members.pos, storage);
+      g.store(block, Members.pos);
     }
 
-    final level = node.level;
-    final canReturn = level == 0;
-    void block(List<Code> code) {
-      for (var i = 0; i < expressions.length; i++) {
-        final child = expressions[i];
-        acceptNode(child, code);
-        void success(List<Code> code) {
-          if (canReturn) {
-            if (variable == null) {
-              code << literalNull.returned.statement;
-            } else {
-              code << refer(variable).returned.statement;
-            }
-          } else {
-            code << break$;
-          }
-        }
-
-        generateEpilogue(child, code, success, null);
-        if (charChanges[i]) {
-          addRestoreVar(code, Members.ch, storage);
-        }
-
-        if (posChanges[i]) {
-          addRestoreVar(code, Members.pos, storage);
-        }
-      }
-
-      if (!canReturn) {
-        code << break$;
-      }
-    }
-
-    if (canReturn) {
-      block(code);
+    if (isTopLevel) {
+      body(block);
     } else {
-      code << while$(literalTrue, block);
+      block.while$(true$, body);
     }
 
-    failure(code);
-    if (node.level == 0) {
-      if (variable == null) {
-        code << literalNull.returned.statement;
-      } else {
-        code << refer(variable).returned.statement;
-      }
+    failure(block);
+    if (isTopLevel) {
+      addReturn(block);
     }
   }
 
-  void _generateOrderedChoiceSingle(OrderedChoiceExpression node,
-      String variable, void Function(List<Code>) failure) {
+  void _generateOrderedChoiceSingle(
+      OrderedChoiceExpression node,
+      CodeBlock block,
+      ExpressionGenerator g,
+      void Function(CodeBlock block) failure) {
+    void fail(CodeBlock block) {
+      g.restoreAll(block);
+      failure(block);
+      g.fail = block;
+    }
+
     final child = node.expressions[0];
     final needSavePos = willSequenceChangePosOnFailure(child);
     final needSaveChar = willExpressionChangeCharOnFailure(child, {});
-    if (variable != null) {
-      childVariable = allocator.alloc();
-    }
-
-    final storage = <String, String>{};
     if (needSaveChar) {
-      addStoreVar(code, Members.ch, storage);
+      g.store(block, Members.ch);
     }
 
     if (needSavePos) {
-      addStoreVar(code, Members.pos, storage);
+      g.store(block, Members.pos);
     }
 
-    acceptNode(child, code);
-    void fail(List<Code> code) {
-      addRestoreVars(code, storage);
-      failure(code);
-      failBlocks[node] = code;
-    }
-
-    generateEpilogue(child, code, null, fail);
+    final g1 = acceptChild(child, g);
+    g1.variable = g.variable;
+    g1.isVariableDeclared = g.isVariableDeclared;
+    g1.addVariables(g);
+    g1.generate(block);
+    generatePostCode(g1, block, null, fail);
     if (node.level == 0) {
-      if (variable == null) {
-        code << literalNull.returned.statement;
+      if (g.variable == null) {
+        block.addStatement(null$.returned);
       } else {
-        code << refer(variable).returned.statement;
+        block.addStatement(ref(g.variable!).returned);
       }
     }
   }

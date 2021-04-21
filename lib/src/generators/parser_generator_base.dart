@@ -1,5 +1,7 @@
-// @dart = 2.10
-part of '../../generators.dart';
+import 'package:code_builder/code_builder.dart';
+import 'package:dart_style/dart_style.dart';
+
+import '../../grammar.dart';
 
 abstract class ParserGeneratorBase {
   final Grammar grammar;

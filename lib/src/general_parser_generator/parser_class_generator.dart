@@ -1,4 +1,3 @@
-// @dart = 2.10
 part of '../../general_parser_generator.dart';
 
 class ParserClassGenerator extends ParserClassGeneratorBase {
@@ -12,28 +11,28 @@ class ParserClassGenerator extends ParserClassGeneratorBase {
   }
 
   void _addRule(ProductionRule rule) {
-    final name = IdentifierHelper.getRuleIdentifier(rule);
+    final nameGenerator = ProductionRuleNameGenerator();
+    final name = nameGenerator.generate(rule);
     final method = Method((b) {
       if (rule.directCallers.length < 2) {
-        b.annotations
-            .add(refer('pragma').call([literalString('vm:prefer-inline')]));
+        final args = [literalString('vm:prefer-inline')];
+        final annotation = ref('pragma').call(args);
+        b.annotations.add(annotation);
       }
 
       b.name = name;
       final expression = rule.expression;
       final returnType = rule.returnType ?? expression.resultType;
-      final returns = Utils.getNullableType(returnType);
-      b.returns = refer(returns);
+      final returns = nullableType(returnType);
+      b.returns = ref(returns);
+      final block = CodeBlock();
       final allocator = VariableAllocator('\$');
-      final code = <Code>[];
       final generator = ExpressionsGenerator(
-          allocator: allocator,
-          code: code,
-          failures: failures,
-          members: members,
-          optimize: options.optimize);
-      expression.accept(generator);
-      b.body = Block.of(code);
+          failures: failures!, members: members, optimize: options.optimize);
+      final g = expression.accept(generator);
+      g.allocator = allocator;
+      g.generate(block);
+      b.body = block.code;
     });
 
     members.addMethod(name, method);

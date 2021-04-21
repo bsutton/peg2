@@ -1,5 +1,4 @@
-// @dart = 2.10
-part of '../../generators.dart';
+import 'dart:math';
 
 class BitFlagGenerator {
   static const int size = 32;
@@ -38,7 +37,7 @@ class BitFlagGenerator {
     final code = <String>[];
     final mask = pow(2, size).round() - 1;
     final init = set ? 0 : mask;
-    final values = List<int>.filled(variables.length, null);
+    final values = List<int?>.filled(variables.length, null);
     for (var i = 0; i < bits.length; i++) {
       final bit = bits[i];
       RangeError.checkValueInInterval(bit, 0, length - 1, 'bit');
@@ -52,9 +51,11 @@ class BitFlagGenerator {
 
       value = 1 << position;
       if (set) {
-        values[index] |= value;
+        final v = values[index]!;
+        values[index] = v | value;
       } else {
-        values[index] &= (~value) & mask;
+        final v = values[index]!;
+        values[index] = v & ((~value) & mask);
       }
     }
 

@@ -23,7 +23,7 @@ class ProductionRule {
 
   String? returnType;
 
-  int? terminalId;
+  int terminalId = 0;
 
   ProductionRule(this.name, this.kind, this.expression, this.returnType);
 

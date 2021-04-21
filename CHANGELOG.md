@@ -1,3 +1,8 @@
+## 0.2.7
+
+- Improvements to code generation algorithms
+- Migrating to non-nullable code
+
 ## 0.2.6
 
 - Improvements to code generation algorithms

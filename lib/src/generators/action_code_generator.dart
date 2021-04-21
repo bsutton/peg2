@@ -1,29 +1,31 @@
-// @dart = 2.10
-part of '../../generators.dart';
+import '..//helpers/null_check_helper.dart';
+import '../helpers/expression_helper.dart';
+import '../helpers/type_helper.dart';
+import 'code_block.dart';
 
 class ActionCodeGenerator {
-  final String actionSource;
+  final String? actionSource;
 
-  final List<Code> code;
+  CodeBlock block;
 
-  final List<String> localVariables;
+  final List<String?> localVariables;
 
-  final List<String> semanticVariables;
+  final List<String?> semanticVariables;
 
   String resultType;
 
   final List<String> types;
 
-  String variable;
+  String? variable;
 
   ActionCodeGenerator(
-      {@required this.actionSource,
-      @required this.code,
-      @required this.localVariables,
-      @required this.semanticVariables,
-      @required this.resultType,
-      @required this.types,
-      @required this.variable});
+      {required this.actionSource,
+      required this.block,
+      required this.localVariables,
+      required this.semanticVariables,
+      required this.resultType,
+      required this.types,
+      required this.variable});
 
   void generate(List<String> errors) {
     if (actionSource != null) {
@@ -33,7 +35,7 @@ class ActionCodeGenerator {
     }
   }
 
-  void _assignSemanticVariables(StringSink sink, List<String> errors) {
+  void _assignSemanticVariables(List<String> errors) {
     for (var i = 0; i < semanticVariables.length; i++) {
       final semanticVariable = semanticVariables[i];
       if (semanticVariable == null) {
@@ -48,33 +50,19 @@ class ActionCodeGenerator {
       }
 
       final type = types[i];
-      if (type == null) {
-        errors.add(
-            'The value type is not specified for the semantic variable \'$semanticVariable\'');
-        return;
-      }
-
-      final value = Utils.getNullCheckedValue(localVariable, type);
-      sink.write('final ');
-      sink.write(semanticVariable);
-      sink.write(' = ');
-      sink.write(value);
-      sink.write(';');
+      final value = nullCheck(ref(localVariable), type);
+      block.assignFinal(semanticVariable, value);
     }
   }
 
   void _genearteActionCode(List<String> errors) {
-    final sink = StringBuffer();
-    _assignSemanticVariables(sink, errors);
-    sink.write(Utils.getNullableType(resultType));
-    sink.write(' \$\$;');
-    sink.write(actionSource);
+    _assignSemanticVariables(errors);
+    final type = nullableType(resultType);
+    block.declare('\$\$', ref(type));
+    block.addSourceCode(actionSource!);
     if (variable != null) {
-      sink.write(variable);
-      sink.write(' = \$\$;');
+      block.assign(variable!, ref('\$\$'));
     }
-
-    code << Code(sink.toString());
   }
 
   void _generateResultCode(List<String> errors) {
@@ -88,8 +76,7 @@ class ActionCodeGenerator {
       return;
     }
 
-    final sink = StringBuffer();
-    _assignSemanticVariables(sink, errors);
+    _assignSemanticVariables(errors);
     final values = <String>[];
     for (var i = 0; i < semanticVariables.length; i++) {
       final semanticVariable = semanticVariables[i];
@@ -99,17 +86,15 @@ class ActionCodeGenerator {
     }
 
     if (values.isEmpty) {
-      final value = localVariables.first;
-      values.add(value);
+      //final value = localVariables.first;
+      //values.add(value);
     }
 
-    final value =
-        values.length == 1 ? values.first : '[' + values.join(', ') + ']';
-
-    sink.write(variable);
-    sink.write(' = ');
-    sink.write(value);
-    sink.write(';');
-    code << Code(sink.toString());
+    if (values.length == 1) {
+      block.assign(variable!, ref(values.first));
+    } else if (values.length > 1) {
+      final list = literalList(values.map(ref));
+      block.assign(variable!, list);
+    }
   }
 }

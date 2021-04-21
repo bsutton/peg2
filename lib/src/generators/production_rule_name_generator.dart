@@ -1,5 +1,4 @@
-// @dart = 2.10
-part of '../../generators.dart';
+import '../../grammar.dart';
 
 class ProductionRuleNameGenerator {
   String generate(ProductionRule rule) {
@@ -8,7 +7,7 @@ class ProductionRuleNameGenerator {
       case ProductionRuleKind.nonterminal:
         break;
       case ProductionRuleKind.terminal:
-        name = _generateTerminalName(name, rule.id);
+        name = _generateTerminalName(name, rule.id!);
         break;
       case ProductionRuleKind.subterminal:
         name = '\$\$' + name.substring(1);

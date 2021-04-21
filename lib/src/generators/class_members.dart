@@ -1,5 +1,4 @@
-// @dart = 2.10
-part of '../../generators.dart';
+import 'package:code_builder/code_builder.dart';
 
 class ClassMembers {
   final Map<String, Field> constants = {};

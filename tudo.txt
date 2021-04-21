@@ -1,7 +1,9 @@
 NEW:
 optimize code for ordered choice with single optional expression
 reimplement TOKEN 'semantic value'
-
+can change pos, ch resolvers
+remove cb extensions
+add optimize mode
 
 OLD:
 check duplicare semantic variables

@@ -1,6 +1,3 @@
-// @dart = 2.10
-part of '../../generators.dart';
-
 class Members {
   static const ch = '_ch';
 

@@ -274,18 +274,20 @@ class ExampleParser {
     final $2 = _pos;
     _matchChar(92, 92);
     if (ok) {
-      final $3 = _parse$$escaped();
+      $0 = _parse$$escaped();
       if (ok) {
-        final r = $3!;
+        final r = $0!;
         $0 = r;
-        return $0;
       }
+    }
+    if (ok) {
+      return $0;
     }
     _ch = $1;
     _pos = $2;
-    final $4 = _parse$$unescaped();
+    $0 = _parse$$unescaped();
+
     if (ok) {
-      $0 = $4;
       return $0;
     }
     return $0;
@@ -296,19 +298,19 @@ class ExampleParser {
     int? $0;
     final $1 = _ch;
     final $2 = _pos;
-    final $3 = _matchChar(34, 34);
+    $0 = _matchChar(34, 34);
+
     if (ok) {
-      $0 = $3;
       return $0;
     }
-    final $4 = _matchChar(92, 92);
+    $0 = _matchChar(92, 92);
+
     if (ok) {
-      $0 = $4;
       return $0;
     }
-    final $5 = _matchChar(47, 47);
+    $0 = _matchChar(47, 47);
+
     if (ok) {
-      $0 = $5;
       return $0;
     }
     _matchChar(98, 98);
@@ -316,6 +318,8 @@ class ExampleParser {
       int? $$;
       $$ = 0x8;
       $0 = $$;
+    }
+    if (ok) {
       return $0;
     }
     _matchChar(102, 102);
@@ -323,6 +327,8 @@ class ExampleParser {
       int? $$;
       $$ = 0xC;
       $0 = $$;
+    }
+    if (ok) {
       return $0;
     }
     _matchChar(110, 110);
@@ -330,6 +336,8 @@ class ExampleParser {
       int? $$;
       $$ = 0xA;
       $0 = $$;
+    }
+    if (ok) {
       return $0;
     }
     _matchChar(114, 114);
@@ -337,6 +345,8 @@ class ExampleParser {
       int? $$;
       $$ = 0xD;
       $0 = $$;
+    }
+    if (ok) {
       return $0;
     }
     _matchChar(116, 116);
@@ -344,16 +354,20 @@ class ExampleParser {
       int? $$;
       $$ = 0x9;
       $0 = $$;
+    }
+    if (ok) {
       return $0;
     }
     _matchChar(117, 117);
     if (ok) {
-      final $6 = _parse$$hexdig4();
+      $0 = _parse$$hexdig4();
       if (ok) {
-        final r = $6!;
+        final r = $0!;
         $0 = r;
-        return $0;
       }
+    }
+    if (ok) {
+      return $0;
     }
     _ch = $1;
     _pos = $2;
@@ -368,6 +382,8 @@ class ExampleParser {
       int? $$;
       $$ = v - 97;
       $0 = $$;
+    }
+    if (ok) {
       return $0;
     }
     final $2 = _matchRange(65, 70);
@@ -376,6 +392,8 @@ class ExampleParser {
       int? $$;
       $$ = v - 65;
       $0 = $$;
+    }
+    if (ok) {
       return $0;
     }
     final $3 = _matchRange(48, 57);
@@ -384,6 +402,8 @@ class ExampleParser {
       int? $$;
       $$ = v - 48;
       $0 = $$;
+    }
+    if (ok) {
       return $0;
     }
     return $0;
@@ -392,20 +412,20 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   int? _parse$$hexdig4() {
     int? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    final $4 = _parse$$hexdig();
+    final $1 = _ch;
+    final $2 = _pos;
+    final $3 = _parse$$hexdig();
     if (ok) {
-      final $5 = _parse$$hexdig();
+      final $4 = _parse$$hexdig();
       if (ok) {
-        final $6 = _parse$$hexdig();
+        final $5 = _parse$$hexdig();
         if (ok) {
-          final $7 = _parse$$hexdig();
+          final $6 = _parse$$hexdig();
           if (ok) {
-            final a = $4!;
-            final b = $5!;
-            final c = $6!;
-            final d = $7!;
+            final a = $3!;
+            final b = $4!;
+            final c = $5!;
+            final d = $6!;
             int? $$;
             $$ = a * 0xfff + b * 0xff + c * 0xf + d;
             $0 = $$;
@@ -414,20 +434,17 @@ class ExampleParser {
       }
     }
     if (!ok) {
-      _ch = $2;
-      _pos = $3;
+      _ch = $1;
+      _pos = $2;
     }
     return $0;
   }
 
   List<int>? _parse$$spacing() {
-    while (true) {
+    do {
       const $0 = [9, 10, 13, 13, 32, 32];
       _matchRanges($0);
-      if (!ok) {
-        break;
-      }
-    }
+    } while (ok);
     ok = true;
 
     return null;
@@ -436,19 +453,19 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   int? _parse$$unescaped() {
     int? $0;
-    final $1 = _matchRange(32, 33);
+    $0 = _matchRange(32, 33);
+
     if (ok) {
-      $0 = $1;
       return $0;
     }
-    final $2 = _matchRange(35, 91);
+    $0 = _matchRange(35, 91);
+
     if (ok) {
-      $0 = $2;
       return $0;
     }
-    final $3 = _matchRange(93, 1114111);
+    $0 = _matchRange(93, 1114111);
+
     if (ok) {
-      $0 = $3;
       return $0;
     }
     return $0;
@@ -457,24 +474,23 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   List? _parseArray() {
     List? $0;
-    final $2 = _ch;
-    final $3 = _pos;
+    final $1 = _ch;
+    final $2 = _pos;
     _parse_$LeftSquareBracket();
     if (ok) {
-      final $5 = _parseValues();
-      final $4 = $5;
+      final $3 = _parseValues();
       ok = true;
       _parse_$RightSquareBracket();
       if (ok) {
-        final v = $4;
+        final v = $3;
         List? $$;
         $$ = v ?? [];
         $0 = $$;
       }
     }
     if (!ok) {
-      _ch = $2;
-      _pos = $3;
+      _ch = $1;
+      _pos = $2;
     }
     return $0;
   }
@@ -482,36 +498,36 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   dynamic _parseJson() {
     dynamic $0;
-    final $2 = _ch;
-    final $3 = _pos;
+    final $1 = _ch;
+    final $2 = _pos;
     _parse_leading_spaces();
-    final $4 = _parseValue();
+    $0 = _parseValue();
     if (ok) {
       _parse_end_of_file();
       if (ok) {
-        final v = $4;
+        final v = $0;
         $0 = v;
       }
     }
     if (!ok) {
-      _ch = $2;
-      _pos = $3;
+      _ch = $1;
+      _pos = $2;
     }
     return $0;
   }
 
   MapEntry<String, dynamic>? _parseMember() {
     MapEntry<String, dynamic>? $0;
-    final $2 = _ch;
-    final $3 = _pos;
-    final $4 = _parse_string();
+    final $1 = _ch;
+    final $2 = _pos;
+    final $3 = _parse_string();
     if (ok) {
       _parse_$Colon();
       if (ok) {
-        final $5 = _parseValue();
+        final $4 = _parseValue();
         if (ok) {
-          final k = $4!;
-          final v = $5;
+          final k = $3!;
+          final v = $4;
           MapEntry<String, dynamic>? $$;
           $$ = MapEntry(k, v);
           $0 = $$;
@@ -519,8 +535,8 @@ class ExampleParser {
       }
     }
     if (!ok) {
-      _ch = $2;
-      _pos = $3;
+      _ch = $1;
+      _pos = $2;
     }
     return $0;
   }
@@ -528,36 +544,34 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   List<MapEntry<String, dynamic>>? _parseMembers() {
     List<MapEntry<String, dynamic>>? $0;
-    final $2 = _parseMember();
+    final $1 = _parseMember();
     if (ok) {
-      List<MapEntry<String, dynamic>>? $3;
-      final $4 = <MapEntry<String, dynamic>>[];
+      List<MapEntry<String, dynamic>>? $2;
+      final $3 = <MapEntry<String, dynamic>>[];
       while (true) {
-        MapEntry<String, dynamic>? $5;
-        final $7 = _ch;
-        final $8 = _pos;
+        MapEntry<String, dynamic>? $4;
+        final $5 = _ch;
+        final $6 = _pos;
         _parse_$Comma();
         if (ok) {
-          final $9 = _parseMember();
+          $4 = _parseMember();
           if (ok) {
-            final m = $9!;
-            $5 = m;
+            final m = $4!;
+            $4 = m;
           }
         }
         if (!ok) {
-          _ch = $7;
-          _pos = $8;
-        }
-        if (!ok) {
+          _ch = $5;
+          _pos = $6;
           break;
         }
-        $4.add($5!);
+        $3.add($4!);
       }
       if (ok = true) {
-        $3 = $4;
+        $2 = $3;
       }
-      final m = $2!;
-      final n = $3!;
+      final m = $1!;
+      final n = $2!;
       List<MapEntry<String, dynamic>>? $$;
       $$ = [m, ...n];
       $0 = $$;
@@ -569,63 +583,68 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   Map<String, dynamic>? _parseObject() {
     Map<String, dynamic>? $0;
-    final $2 = _ch;
-    final $3 = _pos;
+    final $1 = _ch;
+    final $2 = _pos;
     _parse_$LeftBrace();
     if (ok) {
-      final $5 = _parseMembers();
-      final $4 = $5;
+      final $3 = _parseMembers();
       ok = true;
       _parse_$RightBrace();
       if (ok) {
-        final m = $4;
+        final m = $3;
         Map<String, dynamic>? $$;
         $$ = <String, dynamic>{}..addEntries(m ?? []);
         $0 = $$;
       }
     }
     if (!ok) {
-      _ch = $2;
-      _pos = $3;
+      _ch = $1;
+      _pos = $2;
     }
     return $0;
   }
 
   dynamic _parseValue() {
     dynamic $0;
-    final $1 = _parseArray();
+    $0 = _parseArray();
     if (ok) {
-      $0 = $1;
+      final Array = $0!;
+      $0 = Array;
+    }
+    if (ok) {
       return $0;
     }
-    final $2 = _parse_false();
+    $0 = _parse_false();
+
     if (ok) {
-      $0 = $2;
       return $0;
     }
-    final $3 = _parse_null();
+    $0 = _parse_null();
+
     if (ok) {
-      $0 = $3;
       return $0;
     }
-    final $4 = _parse_true();
+    $0 = _parse_true();
+
     if (ok) {
-      $0 = $4;
       return $0;
     }
-    final $5 = _parseObject();
+    $0 = _parseObject();
     if (ok) {
-      $0 = $5;
+      final Object = $0!;
+      $0 = Object;
+    }
+    if (ok) {
       return $0;
     }
-    final $6 = _parse_number();
+    $0 = _parse_number();
+
     if (ok) {
-      $0 = $6;
       return $0;
     }
-    final $7 = _parse_string();
+    $0 = _parse_string();
+
     if (ok) {
-      $0 = $7;
       return $0;
     }
     return $0;
@@ -634,36 +653,34 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   List? _parseValues() {
     List? $0;
-    final $2 = _parseValue();
+    final $1 = _parseValue();
     if (ok) {
-      List? $3;
-      final $4 = <dynamic>[];
+      List? $2;
+      final $3 = <dynamic>[];
       while (true) {
-        dynamic $5;
-        final $7 = _ch;
-        final $8 = _pos;
+        dynamic $4;
+        final $5 = _ch;
+        final $6 = _pos;
         _parse_$Comma();
         if (ok) {
-          final $9 = _parseValue();
+          $4 = _parseValue();
           if (ok) {
-            final v = $9;
-            $5 = v;
+            final v = $4;
+            $4 = v;
           }
         }
         if (!ok) {
-          _ch = $7;
-          _pos = $8;
-        }
-        if (!ok) {
+          _ch = $5;
+          _pos = $6;
           break;
         }
-        $4.add($5);
+        $3.add($4);
       }
       if (ok = true) {
-        $3 = $4;
+        $2 = $3;
       }
-      final v = $2;
-      final n = $3!;
+      final v = $1;
+      final n = $2!;
       List? $$;
       $$ = [v, ...n];
       $0 = $$;
@@ -680,9 +697,8 @@ class ExampleParser {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\':\'')) {
-        _failures0 |= 0x1000;
-      }
+      if (_fail('\':\'')) {}
+      _failures0 |= 0x1000;
     }
     return null;
   }
@@ -694,9 +710,8 @@ class ExampleParser {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\',\'')) {
-        _failures0 |= 0x800;
-      }
+      if (_fail('\',\'')) {}
+      _failures0 |= 0x800;
     }
     return null;
   }
@@ -709,9 +724,8 @@ class ExampleParser {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\'{\'')) {
-        _failures0 |= 0x80;
-      }
+      if (_fail('\'{\'')) {}
+      _failures0 |= 0x80;
     }
     return null;
   }
@@ -724,9 +738,8 @@ class ExampleParser {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\'[\'')) {
-        _failures0 |= 0x200;
-      }
+      if (_fail('\'[\'')) {}
+      _failures0 |= 0x200;
     }
     return null;
   }
@@ -739,9 +752,8 @@ class ExampleParser {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\'}\'')) {
-        _failures0 |= 0x100;
-      }
+      if (_fail('\'}\'')) {}
+      _failures0 |= 0x100;
     }
     return null;
   }
@@ -754,9 +766,8 @@ class ExampleParser {
       _parse$$spacing();
     }
     if (!ok) {
-      if (_fail('\']\'')) {
-        _failures0 |= 0x400;
-      }
+      if (_fail('\']\'')) {}
+      _failures0 |= 0x400;
     }
     return null;
   }
@@ -764,26 +775,18 @@ class ExampleParser {
   @pragma('vm:prefer-inline')
   dynamic _parse_end_of_file() {
     _failPos = _pos;
-    final $0 = _ch;
-    final $1 = _pos;
-    final $2 = _failPos;
-    _matchAny();
-    _ch = $0;
-    _pos = $1;
-    _failPos = $2;
-    ok = !ok;
+    ok = _ch == 1114112;
     if (!ok) {
-      if (_fail('\'end of file\'')) {
-        _failures0 |= 0x1;
-      }
+      if (_fail('\'end of file\'')) {}
+      _failures0 |= 0x1;
     }
     return null;
   }
 
   @pragma('vm:prefer-inline')
   dynamic _parse_false() {
-    _failPos = _pos;
     dynamic $0;
+    _failPos = _pos;
     _matchString('false');
     if (ok) {
       _parse$$spacing();
@@ -792,9 +795,8 @@ class ExampleParser {
       $0 = $$;
     }
     if (!ok) {
-      if (_fail('\'false\'')) {
-        _failures0 |= 0x2;
-      }
+      if (_fail('\'false\'')) {}
+      _failures0 |= 0x2;
     }
     return $0;
   }
@@ -808,8 +810,8 @@ class ExampleParser {
 
   @pragma('vm:prefer-inline')
   dynamic _parse_null() {
-    _failPos = _pos;
     dynamic $0;
+    _failPos = _pos;
     _matchString('null');
     if (ok) {
       _parse$$spacing();
@@ -818,21 +820,19 @@ class ExampleParser {
       $0 = $$;
     }
     if (!ok) {
-      if (_fail('\'null\'')) {
-        _failures0 |= 0x8;
-      }
+      if (_fail('\'null\'')) {}
+      _failures0 |= 0x8;
     }
     return $0;
   }
 
   @pragma('vm:prefer-inline')
   num? _parse_number() {
-    _failPos = _pos;
     num? $0;
-    String? $2;
-    final $3 = _pos;
-    final $4 = _ch;
-    final $5 = _pos;
+    _failPos = _pos;
+    String? $1;
+    final $2 = _pos;
+    final $3 = _ch;
     _matchChar(45, 45);
     ok = true;
     while (true) {
@@ -842,12 +842,9 @@ class ExampleParser {
       }
       _matchRange(49, 57);
       if (ok) {
-        while (true) {
+        do {
           _matchRange(48, 57);
-          if (!ok) {
-            break;
-          }
-        }
+        } while (ok);
         ok = true;
       }
       if (ok) {
@@ -856,113 +853,104 @@ class ExampleParser {
       break;
     }
     if (ok) {
-      final $6 = _ch;
-      final $7 = _pos;
+      final $4 = _ch;
+      final $5 = _pos;
       _matchChar(46, 46);
       if (ok) {
-        var $8 = 0;
-        while (true) {
+        var $6 = 0;
+        do {
           _matchRange(48, 57);
-          if (!ok) {
-            break;
-          }
-          $8++;
-        }
-        ok = $8 != 0;
+          $6++;
+        } while (ok);
+        ok = $6 != 1;
       }
       if (!ok) {
-        _ch = $6;
-        _pos = $7;
+        _ch = $4;
+        _pos = $5;
       }
       ok = true;
-      final $9 = _ch;
-      final $10 = _pos;
-      const $11 = [69, 69, 101, 101];
-      _matchRanges($11);
+      final $7 = _ch;
+      final $8 = _pos;
+      const $9 = [69, 69, 101, 101];
+      _matchRanges($9);
       if (ok) {
-        const $12 = [43, 43, 45, 45];
-        _matchRanges($12);
+        const $10 = [43, 43, 45, 45];
+        _matchRanges($10);
         ok = true;
-        var $13 = 0;
-        while (true) {
+        var $11 = 0;
+        do {
           _matchRange(48, 57);
-          if (!ok) {
-            break;
-          }
-          $13++;
-        }
-        ok = $13 != 0;
+          $11++;
+        } while (ok);
+        ok = $11 != 1;
       }
       if (!ok) {
-        _ch = $9;
-        _pos = $10;
+        _ch = $7;
+        _pos = $8;
       }
       ok = true;
     }
     if (!ok) {
-      _ch = $4;
-      _pos = $5;
+      _ch = $3;
     }
     if (ok) {
-      $2 = _source.substring($3, _pos);
+      $1 = _source.substring($2, _pos);
     }
     if (ok) {
       _parse$$spacing();
-      final n = $2!;
+      final n = $1!;
       num? $$;
       $$ = num.parse(n);
       $0 = $$;
     }
     if (!ok) {
-      if (_fail('\'number\'')) {
-        _failures0 |= 0x40;
-      }
+      if (_fail('\'number\'')) {}
+      _failures0 |= 0x40;
     }
     return $0;
   }
 
   String? _parse_string() {
-    _failPos = _pos;
     String? $0;
-    final $2 = _ch;
-    final $3 = _pos;
+    _failPos = _pos;
+    final $1 = _ch;
+    final $2 = _pos;
     _matchChar(34, '"');
     if (ok) {
-      List<int>? $4;
-      final $5 = <int>[];
+      List<int>? $3;
+      final $4 = <int>[];
       while (true) {
-        final $6 = _parse$$char();
+        final $5 = _parse$$char();
         if (!ok) {
           break;
         }
-        $5.add($6!);
+        $4.add($5!);
       }
       if (ok = true) {
-        $4 = $5;
+        $3 = $4;
       }
       _matchChar(34, '"');
       if (ok) {
         _parse$$spacing();
-        final c = $4!;
+        final c = $3!;
         String? $$;
         $$ = String.fromCharCodes(c);
         $0 = $$;
       }
     }
     if (!ok) {
-      _ch = $2;
-      _pos = $3;
-      if (_fail('\'string\'')) {
-        _failures0 |= 0x20;
-      }
+      _ch = $1;
+      _pos = $2;
+      if (_fail('\'string\'')) {}
+      _failures0 |= 0x20;
     }
     return $0;
   }
 
   @pragma('vm:prefer-inline')
   dynamic _parse_true() {
-    _failPos = _pos;
     dynamic $0;
+    _failPos = _pos;
     _matchString('true');
     if (ok) {
       _parse$$spacing();
@@ -971,9 +959,8 @@ class ExampleParser {
       $0 = $$;
     }
     if (!ok) {
-      if (_fail('\'true\'')) {
-        _failures0 |= 0x10;
-      }
+      if (_fail('\'true\'')) {}
+      _failures0 |= 0x10;
     }
     return $0;
   }

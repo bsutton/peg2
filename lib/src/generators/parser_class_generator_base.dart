@@ -1,5 +1,22 @@
-// @dart = 2.10
-part of '../../generators.dart';
+import 'package:code_builder/code_builder.dart'
+    show
+        Block,
+        Class,
+        ClassBuilder,
+        Code,
+        Field,
+        FieldModifier,
+        Method,
+        Parameter,
+        Reference;
+import 'package:peg2/src/generators/production_rule_name_generator.dart';
+
+import '../../grammar.dart';
+import 'bit_flag_generator.dart';
+import 'class_members.dart';
+import '../helpers/expression_helper.dart';
+import 'members.dart';
+import '../helpers/type_helper.dart';
 
 abstract class ParserClassGeneratorBase {
   static const _methodParse = '''
@@ -220,7 +237,7 @@ abstract class ParserClassGeneratorBase {
     ok = false;
 ''';
 
-  BitFlagGenerator failures;
+  BitFlagGenerator? failures;
 
   final Grammar grammar;
 
@@ -269,7 +286,7 @@ abstract class ParserClassGeneratorBase {
               b.modifier = modifier;
               b.static = true;
               b.name = name;
-              b.type = refer('int');
+              b.type = ref('int');
               b.assignment = literal(0x10ffff + 1).code;
             }));
 
@@ -281,7 +298,7 @@ abstract class ParserClassGeneratorBase {
               b.static = true;
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('List<String>');
+              b.type = ref('List<String>');
               final terminals = getTerminals();
               terminals.sort((x, y) => x.terminalId.compareTo(y.terminalId));
               final names = terminals.map((e) => e.name);
@@ -296,7 +313,7 @@ abstract class ParserClassGeneratorBase {
         (b, modifier, name) => Field((b) {
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('FormatException?');
+              b.type = ref('FormatException?');
             }));
 
     _addField(
@@ -306,7 +323,7 @@ abstract class ParserClassGeneratorBase {
         (b, modifier, name) => Field((b) {
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('int');
+              b.type = ref('int');
               b.assignment = literal(-1).code;
             }));
 
@@ -317,8 +334,8 @@ abstract class ParserClassGeneratorBase {
         (b, modifier, name) => Field((b) {
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('bool');
-              b.assignment = literalFalse.code;
+              b.type = ref('bool');
+              b.assignment = false$.code;
             }));
 
     _addField(
@@ -328,7 +345,7 @@ abstract class ParserClassGeneratorBase {
         (b, modifier, name) => Field((b) {
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('int');
+              b.type = ref('int');
               b.assignment = literal(0).code;
             }));
 
@@ -339,7 +356,7 @@ abstract class ParserClassGeneratorBase {
         (b, modifier, name) => Field((b) {
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('int');
+              b.type = ref('int');
               b.assignment = literal(-1).code;
             }));
 
@@ -350,7 +367,7 @@ abstract class ParserClassGeneratorBase {
         (b, modifier, name) => Field((b) {
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('int');
+              b.type = ref('int');
               b.assignment = literal(0).code;
             }));
 
@@ -361,7 +378,7 @@ abstract class ParserClassGeneratorBase {
         (b, modifier, name) => Field((b) {
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('int');
+              b.type = ref('int');
               b.assignment = literal(0).code;
             }));
 
@@ -372,7 +389,7 @@ abstract class ParserClassGeneratorBase {
         (b, modifier, name) => Field((b) {
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('String');
+              b.type = ref('String');
               b.assignment = literalString('').code;
             }));
 
@@ -383,10 +400,10 @@ abstract class ParserClassGeneratorBase {
         (b, modifier, name) => Field((b) {
               b.modifier = modifier;
               b.name = name;
-              b.type = refer('String?');
+              b.type = ref('String?');
             }));
 
-    for (var name in failures.variables) {
+    for (var name in failures!.variables) {
       _addField(
           builder,
           FieldModifier.var$,
@@ -394,7 +411,7 @@ abstract class ParserClassGeneratorBase {
           (b, modifier, name) => Field((b) {
                 b.modifier = modifier;
                 b.name = name;
-                b.type = refer('int');
+                b.type = ref('int');
                 b.assignment = literal(0).code;
               }));
     }
@@ -416,7 +433,7 @@ abstract class ParserClassGeneratorBase {
     final method = Method((b) {
       if (inline) {
         b.annotations
-            .add(refer('pragma').call([literalString('vm:prefer-inline')]));
+            .add(ref('pragma').call([literalString('vm:prefer-inline')]));
       }
 
       b.name = name;
@@ -438,29 +455,29 @@ abstract class ParserClassGeneratorBase {
   }
 
   void _addMethodParse(ClassBuilder builder) {
-    final start = grammar.start;
+    final start = grammar.start!;
     final expression = start.expression;
     final returnType = start.returnType ?? expression.resultType;
-    final returns = Utils.getNullableType(returnType);
+    final nameGenerator = ProductionRuleNameGenerator();
+    final returns = nullableType(returnType);
     final parameters = <String, Reference>{};
-    parameters['source'] = refer('String');
+    parameters['source'] = ref('String');
     final code = <Code>[];
-    code <<
-        Code(_methodParse.replaceAll(
-            '{{PARSE}}', IdentifierHelper.getRuleIdentifier(start)));
-    _addMethod(builder, 'parse', refer(returns), Block.of(code),
+    code.add(Code(
+        _methodParse.replaceAll('{{PARSE}}', nameGenerator.generate(start))));
+    _addMethod(builder, 'parse', ref(returns), Block.of(code),
         parameters: parameters);
   }
 
   void _addMethods(ClassBuilder builder) {
-    final clearFailures = failures.generateClear().join('\n');
+    final clearFailures = failures!.generateClear().join('\n');
     String template;
-    var returns = refer('void');
+    var returns = ref('void');
     var name = '_buildError';
     var body = Code(_methodBuildError);
     template = _methodBuildError;
     final addFlags = <String>[];
-    for (final variable in failures.variables) {
+    for (final variable in failures!.variables) {
       addFlags.add('flags.add($variable);');
     }
 
@@ -470,25 +487,25 @@ abstract class ParserClassGeneratorBase {
     var types = <Reference>[];
     _addMethod(builder, name, returns, body);
 
-    returns = refer('bool');
+    returns = ref('bool');
     name = Members.fail;
     template = _methodFail;
     template = template.replaceAll('{{CLEAR_FAILURES}}', clearFailures);
     body = Code(template);
     parameters = <String, Reference>{};
-    parameters['name'] = refer('String');
+    parameters['name'] = ref('String');
     _addMethod(builder, name, returns, body,
         inline: true, parameters: parameters);
 
-    returns = refer('int');
+    returns = ref('int');
     name = '_getChar';
     parameters = <String, Reference>{};
-    parameters['pos'] = refer('int');
+    parameters['pos'] = ref('int');
     body = Code(_methodGetChar);
     _addMethod(builder, name, returns, body,
         inline: true, parameters: parameters);
 
-    returns = refer('int?');
+    returns = ref('int?');
     name = Members.matchAny;
     body = Code(_methodMatchAny);
     _addMethod(
@@ -499,43 +516,43 @@ abstract class ParserClassGeneratorBase {
       inline: true,
     );
 
-    returns = refer('T?');
+    returns = ref('T?');
     name = Members.matchChar;
     body = Code(_methodMatchChar);
     parameters = {};
-    parameters['ch'] = refer('int');
-    parameters['result'] = refer('T?');
+    parameters['ch'] = ref('int');
+    parameters['result'] = ref('T?');
     types = [];
-    types.add(refer('T'));
+    types.add(ref('T'));
     _addMethod(builder, name, returns, body,
         inline: true, parameters: parameters, types: types);
 
-    returns = refer('int?');
+    returns = ref('int?');
     name = Members.matchRange;
     body = Code(_methodMatchRange);
     parameters = {};
-    parameters['start'] = refer('int');
-    parameters['end'] = refer('int');
+    parameters['start'] = ref('int');
+    parameters['end'] = ref('int');
     _addMethod(builder, name, returns, body,
         inline: true, parameters: parameters);
 
-    returns = refer('int?');
+    returns = ref('int?');
     name = Members.matchRanges;
     body = Code(_methodMatchRanges);
     parameters = {};
-    parameters['ranges'] = refer('List<int>');
+    parameters['ranges'] = ref('List<int>');
     _addMethod(builder, name, returns, body,
         inline: true, parameters: parameters);
 
-    returns = refer('String?');
+    returns = ref('String?');
     name = Members.matchString;
     body = Code(_methodMatchString);
     parameters = {};
-    parameters['text'] = refer('String');
+    parameters['text'] = ref('String');
     _addMethod(builder, name, returns, body,
         inline: true, parameters: parameters);
 
-    returns = refer('void');
+    returns = ref('void');
     name = '_reset';
     template = _methodReset;
     template = template.replaceAll('{{CLEAR_FAILURES}}', clearFailures);
@@ -562,7 +579,7 @@ abstract class ParserClassGeneratorBase {
       final list = names.toList();
       list.sort();
       for (final name in list) {
-        final field = fields[name];
+        final field = fields[name]!;
         builder.fields.add(field);
       }
     }
@@ -583,14 +600,14 @@ abstract class ParserClassGeneratorBase {
     final public = methods.keys.where((e) => !e.startsWith('_')).toList();
     public.sort();
     for (final name in public) {
-      final method = methods[name];
+      final method = methods[name]!;
       builder.methods.add(method);
     }
 
     final private = methods.keys.where((e) => e.startsWith('_')).toList();
     private.sort();
     for (final name in private) {
-      final method = methods[name];
+      final method = methods[name]!;
       builder.methods.add(method);
     }
   }
