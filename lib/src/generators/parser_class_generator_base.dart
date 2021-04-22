@@ -141,19 +141,6 @@ abstract class ParserClassGeneratorBase {
     return ch;
 ''';
 
-  static const _methodMatchRange = '''
-    if (_ch >= start && _ch <= end) {
-      final ch = _ch;
-      _pos += _ch <= 0xffff ? 1 : 2;
-      _ch = _getChar(_pos);
-      ok = true;
-      return ch;
-    }
-
-    ok = false;
-    return null;
-''';
-
   static const _methodMatchRanges = '''
     // Use binary search
     for (var i = 0; i < ranges.length; i += 2) {
@@ -476,15 +463,6 @@ abstract class ParserClassGeneratorBase {
       body,
       inline: true,
     );
-
-    returns = ref('int?');
-    name = Members.matchRange;
-    body = Code(_methodMatchRange);
-    parameters = {};
-    parameters['start'] = ref('int');
-    parameters['end'] = ref('int');
-    _addMethod(builder, name, returns, body,
-        inline: true, parameters: parameters);
 
     returns = ref('int?');
     name = Members.matchRanges;

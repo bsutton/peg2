@@ -1,3 +1,7 @@
+## 0.2.10
+
+- An unused method has been removed from the generated code.
+
 ## 0.2.9
 
 - Fixed bug in error tracking system 

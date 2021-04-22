@@ -179,20 +179,6 @@ class ExampleParser {
   }
 
   @pragma('vm:prefer-inline')
-  int? _matchRange(int start, int end) {
-    if (_ch >= start && _ch <= end) {
-      final ch = _ch;
-      _pos += _ch <= 0xffff ? 1 : 2;
-      _ch = _getChar(_pos);
-      ok = true;
-      return ch;
-    }
-
-    ok = false;
-    return null;
-  }
-
-  @pragma('vm:prefer-inline')
   int? _matchRanges(List<int> ranges) {
     // Use binary search
     for (var i = 0; i < ranges.length; i += 2) {
