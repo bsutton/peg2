@@ -7,11 +7,12 @@ final null$ = literalNull;
 
 final true$ = literalTrue;
 
-Expression binaryExpression(Expression left, String operation, Expression rigth) {
+Expression binaryExpression(
+    Expression left, String operation, Expression rigth) {
   final code = <Code>[];
   code.add(left.code);
   code.add(Code(operation));
-  code.add(rigth.code);  
+  code.add(rigth.code);
   return codeToExpression(Block.of(code));
 }
 

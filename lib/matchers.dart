@@ -1,0 +1,23 @@
+import 'expressions.dart';
+
+part 'src/matchers/and_predicate_matcher.dart';
+part 'src/matchers/any_character_matcher.dart';
+part 'src/matchers/capture_matcher.dart';
+part 'src/matchers/character_class_matcher.dart';
+part 'src/matchers/expressions_to_matchers_converter.dart';
+part 'src/matchers/literal_matcher.dart';
+part 'src/matchers/matcher.dart';
+part 'src/matchers/multilple_elements_matcher.dart';
+part 'src/matchers/nonterminal_matcher.dart';
+part 'src/matchers/not_predicate_matcher.dart';
+part 'src/matchers/one_or_more_matcher.dart';
+part 'src/matchers/optional_matcher.dart';
+part 'src/matchers/ordered_choice_matcher.dart';
+part 'src/matchers/predicate_matcher.dart';
+part 'src/matchers/sequence_matcher.dart';
+part 'src/matchers/single_element_matcher.dart';
+part 'src/matchers/subterminal_matcher.dart';
+part 'src/matchers/symbol_matcher.dart';
+part 'src/matchers/terminal_matcher.dart';
+part 'src/matchers/visitors.dart';
+part 'src/matchers/zero_or_more_matcher.dart';

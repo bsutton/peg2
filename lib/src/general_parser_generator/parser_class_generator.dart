@@ -11,6 +11,13 @@ class ParserClassGenerator extends ParserClassGeneratorBase {
   }
 
   void _addRule(ProductionRule rule) {
+    final matcherGenerator = MatcherGeneratorBase(failures: failures!);
+    MatcherGenerator accept(Matcher node, MatcherGenerator parent) {
+      final generator = node.accept(matcherGenerator);
+      generator.allocator = parent.allocator;
+      return generator;
+    }
+
     final nameGenerator = ProductionRuleNameGenerator();
     final name = nameGenerator.generate(rule);
     final method = Method((b) {
@@ -27,11 +34,14 @@ class ParserClassGenerator extends ParserClassGeneratorBase {
       b.returns = ref(returns);
       final block = CodeBlock();
       final allocator = VariableAllocator('\$');
-      final generator = ExpressionsGenerator(
-          failures: failures!, members: members, options: options);
-      final g = expression.accept(generator);
-      g.allocator = allocator;
-      g.generate(block);
+      final converter = ExpressionsToMatchersConverter();
+      final matcher = expression.accept(converter);
+      final generator = matcher.accept(matcherGenerator);
+      //final generator = ExpressionsGenerator(
+      //    failures: failures!, members: members, options: options);
+      //final g = expression.accept(generator);
+      generator.allocator = allocator;
+      generator.generate(block, accept);
       b.body = block.code;
     });
 

@@ -1,6 +1,7 @@
 ## 0.2.10
 
-- An unused method has been removed from the generated code.
+- An unused methods has been removed from the generated code
+- Implemented a new code generator
 
 ## 0.2.9
 

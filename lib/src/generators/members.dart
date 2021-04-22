@@ -5,7 +5,7 @@ class Members {
 
   static const error = 'error';
 
-  static const fail = '_fail';  
+  static const fail = '_fail';
 
   static const failStart = '_failStart';
 
@@ -15,11 +15,11 @@ class Members {
 
   static const length = '_length';
 
-  static const matchAny = '_matchAny';  
+  static const matchAny = '_matchAny';
 
   static const matchRange = '_matchRange';
 
-  static const matchRanges = '_matchRanges';  
+  static const matchRanges = '_matchRanges';
 
   static const nextChar = '_nextChar';
 
