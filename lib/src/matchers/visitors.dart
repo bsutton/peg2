@@ -21,6 +21,34 @@ abstract class MatcherVisitor<T> {
 
   T visitOrderedChoice(OrderedChoiceMatcher node);
 
+  T visitPostfixAndPredicate(PostfixAndPredicateMatcher node);
+
+  T visitPostfixAnyCharacter(PostfixAnyCharacterMatcher node);
+
+  T visitPostfixCapture(PostfixCaptureMatcher node);
+
+  T visitPostfixCharacterClass(PostfixCharacterClassMatcher node);
+
+  T visitPostfixLiteral(PostfixLiteralMatcher node);
+
+  T visitPostfixNonterminal(PostfixNonterminalMatcher node);
+
+  T visitPostfixNotPredicate(PostfixNotPredicateMatcher node);
+
+  T visitPostfixOneOrMore(PostfixOneOrMoreMatcher node);
+
+  T visitPostfixOptional(PostfixOptionalMatcher node);
+
+  T visitPostfixOrderedChoice(PostfixOrderedChoiceMatcher node);
+
+  T visitPostfixSequence(PostfixSequenceMatcher node);
+
+  T visitPostfixSubterminal(PostfixSubterminalMatcher node);
+
+  T visitPostfixTerminal(PostfixTerminalMatcher node);
+
+  T visitPostfixZeroOrMore(PostfixZeroOrMoreMatcher node);
+
   T visitSequence(SequenceMatcher node);
 
   T visitSubterminal(SubterminalMatcher node);

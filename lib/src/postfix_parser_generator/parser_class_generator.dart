@@ -1,4 +1,4 @@
-part of '../../general_parser_generator.dart';
+part of '../../postfix_parser_generator.dart';
 
 class ParserClassGenerator extends ParserClassGeneratorBase {
   ParserClassGenerator(
@@ -20,13 +20,9 @@ class ParserClassGenerator extends ParserClassGeneratorBase {
 
     final nameGenerator = ProductionRuleNameGenerator();
     final name = nameGenerator.generate(rule);
+    var returnType = rule.returnType ?? rule.expression.resultType;
+    returnType = nullableType(returnType);
     final method = Method((b) {
-      if (rule.directCallers.length < 2) {
-        final args = [literalString('vm:prefer-inline')];
-        final annotation = ref('pragma').call(args);
-        b.annotations.add(annotation);
-      }
-
       b.name = name;
       final expression = rule.expression;
       final returnType = rule.returnType ?? expression.resultType;
@@ -46,7 +42,8 @@ class ParserClassGenerator extends ParserClassGeneratorBase {
   }
 
   void _addRules() {
-    for (final rule in grammar.rules) {
+    final rules = grammar.rules;
+    for (final rule in rules) {
       _addRule(rule);
     }
   }

@@ -1,4 +1,4 @@
-part of '../../matchers.dart';
+part of '../../general_parser_generator.dart';
 
 class ExpressionsToMatchersConverter extends ExpressionVisitor<Matcher> {
   @override
